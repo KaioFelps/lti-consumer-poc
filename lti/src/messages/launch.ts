@@ -32,9 +32,10 @@ export class LTIResourceLinkLaunchRequest<
   CustomContextType = never,
 > implements IntoLtiClaim
 {
+  private readonly version = AvailableLtiVersion["1p3"];
+  private readonly messageType = MessageTypeClaim.resourceLink;
+
   public constructor(
-    private readonly messageType = MessageTypeClaim.resourceLink,
-    private readonly version = AvailableLtiVersion["1p3"],
     /**
      * This ID is set by the platform when the tool is deployed.
      */
