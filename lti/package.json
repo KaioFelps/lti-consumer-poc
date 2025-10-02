@@ -1,0 +1,13 @@
+{
+  "name": "lti",
+  "version": "1.0.0",
+  "description": "Tool for implementing a LTI-compliant platform.",
+  "license": "MIT",
+  "author": "kaiofelps",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {}
+}
