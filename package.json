@@ -2,9 +2,9 @@
   "name": "lti-consumer-poc",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "kaiofelps",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
