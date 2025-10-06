@@ -8,6 +8,7 @@
  * [custom parameter substitution]: https://www.imsglobal.org/spec/lti/v1p3/#customproperty
  */
 
+import { ClassProperties } from "common/src/types/class-properties";
 import {
   AnyLtiRole,
   ContextClaim,
@@ -16,7 +17,6 @@ import {
   UserIdentityClaim,
   VendorExtraClaims,
 } from "$/claims";
-
 import {
   AvailableLtiVersion,
   IntoLtiClaim,
@@ -35,7 +35,7 @@ export class LTIResourceLinkLaunchRequest<
   private readonly version = AvailableLtiVersion["1p3"];
   private readonly messageType = MessageTypeClaim.resourceLink;
 
-  public constructor(
+  private constructor(
     /**
      * This ID is set by the platform when the tool is deployed.
      */
@@ -113,6 +113,26 @@ export class LTIResourceLinkLaunchRequest<
      */
     public vendor?: VendorExtraClaims,
   ) {}
+
+  public static create<CustomRoles = never, CustomContextType = never>(
+    args: ClassProperties<
+      LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>
+    >,
+  ): LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType> {
+    return new LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>(
+      args.deploymentId,
+      args.targetLink,
+      args.resourceLink,
+      args.roles,
+      args.userIdentity,
+      args.context,
+      args.platformInstance,
+      args.mentorScope,
+      args.launchPresentation,
+      args.customClaims,
+      args.vendor,
+    );
+  }
 
   intoLtiClaim(): object {
     return {
