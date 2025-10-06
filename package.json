@@ -64,6 +64,7 @@
     "testEnvironment": "node"
   },
   "workspaces": [
-    "lti"
+    "lti",
+    "common"
   ]
 }
