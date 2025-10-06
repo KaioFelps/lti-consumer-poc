@@ -27,6 +27,16 @@ services:
     links:
       - moodle_db
 
+  platform_db:
+    container_name: lti_experiment_consumer_pg_db
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - ${DB_PORT}:5432
+
   moodle_db:
     container_name: lti_experiment_moodle_mariadb
     image: bitnami/mariadb:latest
@@ -44,13 +54,14 @@ services:
     ports:
       - ${MOODLE_DB_PORT}:3306
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
 networks:
   moodle-network:
+
 
 volumes:
   moodle_data:
