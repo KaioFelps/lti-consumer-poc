@@ -1,6 +1,6 @@
 services:
   moodle:
-    container_name: lti_experiment_moodle
+    container_name: lti_consumer_poc_moodle
     image: bitnami/moodle:latest
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
@@ -29,7 +29,7 @@ services:
 
   platform_db:
     container_name: lti_experiment_consumer_pg_db
-    image: postgres:latest
+    image: postgres:18
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
@@ -38,7 +38,7 @@ services:
       - ${DB_PORT}:5432
 
   moodle_db:
-    container_name: lti_experiment_moodle_mariadb
+    container_name: lti_consumer_poc_moodle_mariadb
     image: bitnami/mariadb:latest
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
