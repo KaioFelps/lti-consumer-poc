@@ -1,8 +1,11 @@
+import { Nullable } from "common/src/types/nullable";
 import type { Optional } from "common/src/types/optional";
+import { option } from "fp-ts";
+import { Option } from "fp-ts/lib/Option";
 import { EntityBase } from "@/core/entity-base";
-import { User, type UserProps } from "../user/user.entity";
+import { User, type UserProps, UserUncheckedProps } from "../user/user.entity";
 import type { PersonGender } from "./enums/gender";
-import type { CPF } from "./value-objects/cpf";
+import { CPF } from "./value-objects/cpf";
 
 export type PersonProps = {
   user: User;
@@ -13,17 +16,36 @@ export type PersonProps = {
   surname: string;
 };
 
+export type PersonUncheckedProps = UserUncheckedProps & {
+  cpf: string;
+  birthDate: Date;
+  gender: PersonGender | null | undefined;
+  firstName: string;
+  surname: string;
+};
+
+/**
+ * Used to parse an raw response from Drizzle
+ */
+export type PersonNullableProps = UserUncheckedProps &
+  Nullable<
+    PersonUncheckedProps,
+    "cpf" | "birthDate" | "gender" | "firstName" | "surname"
+  >;
+
 export class Person extends EntityBase<PersonProps> {
   public static create(
-    props_: Omit<PersonProps, "user"> & Optional<UserProps, "id">,
+    props_: Omit<PersonProps, "user"> &
+      Omit<Optional<UserProps, "systemRole">, "id">,
   ) {
-    const { id, passwordHash, username, profilePictureUrl, ...props } = props_;
+    const { passwordHash, username, profilePictureUrl, systemRole, ...props } =
+      props_;
 
     const user = User.create({
-      id: id ?? Person.generateId(),
       passwordHash,
       username,
       profilePictureUrl,
+      systemRole,
     });
 
     return Person.createFromUser(user, props);
@@ -34,5 +56,49 @@ export class Person extends EntityBase<PersonProps> {
     props: Omit<PersonProps, "user">,
   ): Person {
     return new Person({ user, ...props });
+  }
+
+  public static createUnchecked(props: PersonUncheckedProps): Person {
+    const personProps = {
+      birthDate: props.birthDate,
+      cpf: CPF.createUnchecked(props.cpf),
+      firstName: props.firstName,
+      surname: props.surname,
+      user: User.createUnchecked({
+        id: props.id,
+        passwordHash: props.passwordHash,
+        profilePictureUrl: props.profilePictureUrl,
+        systemRole: props.systemRole,
+        username: props.username,
+      }),
+      gender: props.gender ?? undefined,
+    } satisfies PersonProps;
+
+    return new Person(personProps);
+  }
+
+  public static tryCreateUnchecked(
+    partialProps: Optional<
+      PersonUncheckedProps,
+      "birthDate" | "cpf" | "firstName" | "surname"
+    >,
+  ): Option<Person> {
+    if (
+      typeof partialProps.birthDate === "undefined" ||
+      typeof partialProps.cpf === "undefined" ||
+      typeof partialProps.firstName === "undefined" ||
+      typeof partialProps.surname === "undefined"
+    )
+      return option.none;
+
+    return option.some(
+      Person.createUnchecked({
+        ...partialProps,
+        birthDate: partialProps.birthDate,
+        cpf: partialProps.cpf,
+        firstName: partialProps.firstName,
+        surname: partialProps.surname,
+      }),
+    );
   }
 }
