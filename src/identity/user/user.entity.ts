@@ -23,7 +23,7 @@ export class User extends EntityBase<UserProps> {
   public static create(
     props: Omit<Optional<UserProps, "systemRole">, "id">,
   ): User {
-    // Fill the props object this way instead of simpling spreading ...props
+    // Filling the props object this way instead of simpling spreading ...props
     // avoid filling the entity `props` protected field with unexpected
     // properties.
     // Unexpected properties won't be persisted.
