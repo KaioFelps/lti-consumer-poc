@@ -1,5 +1,7 @@
-import { either } from "fp-ts";
+import { either, option } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
+import { pipe } from "fp-ts/lib/function";
+import { Option } from "fp-ts/lib/Option";
 import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
 
 export class CPF {
@@ -23,23 +25,34 @@ export class CPF {
   public static parseFromString(
     cpfString: string,
   ): Either<InvalidArgumentError, CPF> {
-    // TODO: *really* validate a CPF, what goes beyond checking if its numeric and has 11 chars
-    const cpfAlphanumericChars = cpfString.replaceAll(".", "").replace("-", "");
+    return pipe(
+      CPF.validateCPFString(cpfString),
+      option.fold(
+        () => either.right(new CPF(cpfString)),
+        (error) => either.left(error),
+      ),
+    );
+  }
 
-    if (Number.isNaN(Number(cpfAlphanumericChars))) {
+  // TODO: *really* validate a CPF, what goes beyond checking if its numeric and has 11 chars
+  public static validateCPFString(
+    cpfString: string,
+  ): Option<InvalidArgumentError> {
+    const trimmedCPF = cpfString.replaceAll(".", "").replace("-", "").trim();
+
+    if (Number.isNaN(Number(trimmedCPF))) {
       const error = new InvalidArgumentError(
         "identity:person:cpf:non-numeric-chars",
       );
 
-      return either.left(error);
+      return option.some(error);
     }
 
-    if (cpfAlphanumericChars.length !== 11) {
+    if (trimmedCPF.length !== 11) {
       const error = new InvalidArgumentError("identity:person:cpf:invalid-cpf");
-
-      return either.left(error);
+      return option.some(error);
     }
 
-    return either.right(new CPF(cpfAlphanumericChars));
+    return option.none;
   }
 }
