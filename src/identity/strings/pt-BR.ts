@@ -13,3 +13,5 @@ export const identityMessageStringsPTBR: MessageStringTranslationMap = {
 
   "identity:person:cpf:invalid-cpf": "O CPF fornecido é inválido.",
 };
+
+Object.freeze(identityMessageStringsPTBR);
