@@ -8,6 +8,13 @@
       "when": 1759933397274,
       "tag": "0000_add-users-table",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1759943621739,
+      "tag": "0001_add-email-field-to-users-table\n",
+      "breakpoints": true
     }
   ]
 }

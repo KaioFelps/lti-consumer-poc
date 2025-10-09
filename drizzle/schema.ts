@@ -47,6 +47,7 @@ export const usersTable = pgTable(
     gender: personGenderEnum(),
     firstName: varchar("first_name", { length: 255 }),
     surname: varchar({ length: 255 }),
+    email: varchar({ length: 255 }).unique(),
   },
   (_table) => [
     check("users_id_not_null", sql`NOT NULL id`),
