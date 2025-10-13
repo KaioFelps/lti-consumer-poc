@@ -17,7 +17,9 @@ export class RegisterPersonDTO extends RegisterUserDTO implements DTO {
       .refine((cpf) => option.isNone(CPF.validateCPFString(cpf)), {
         error: "auth:register-person:cpf-invalid-cpf",
       }),
-    birthDate: z.date({ error: "auth:register-person:date-invalid-type" }),
+    birthDate: z.coerce.date({
+      error: "auth:register-person:date-invalid-type",
+    }),
     firstName: z.string({
       error: "auth:register-person:first-name-invalid-type",
     }),
