@@ -3,11 +3,11 @@ import { ClassProperties } from "common/src/types/class-properties";
 import { either, option } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import z from "zod";
-import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
 import { DTO } from "@/core/interfaces/dto";
 import { ValidationErrors } from "@/core/validation/validation-errors";
 import { PersonGender } from "@/identity/person/enums/gender";
 import { CPF } from "@/identity/person/value-objects/cpf";
+import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
 import { RegisterUserDTO } from "./register-user.dto";
 
 export class RegisterPersonDTO extends RegisterUserDTO implements DTO {
@@ -69,16 +69,8 @@ export class RegisterPersonDTO extends RegisterUserDTO implements DTO {
     if (either.isLeft(userValidation))
       validationErrors.merge(userValidation.left);
 
-    if (errors) {
-      for (const error of errors.issues) {
-        const validationError = new InvalidArgumentError(
-          error.message,
-          error.path.join("."),
-        );
-
-        validationErrors.appendError(validationError);
-      }
-    }
+    if (errors)
+      validationErrors.merge(mapZodErrorsToCoreValidationErrors(errors));
 
     return either.left(validationErrors);
   }

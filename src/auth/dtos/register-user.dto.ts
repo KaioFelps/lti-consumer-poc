@@ -3,10 +3,10 @@ import { ClassProperties } from "common/src/types/class-properties";
 import { either } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import z from "zod";
-import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
 import { DTO } from "@/core/interfaces/dto";
 import { ValidationErrors } from "@/core/validation/validation-errors";
 import { SystemRole } from "@/identity/user/enums/system-role";
+import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
 
 export class RegisterUserDTO implements DTO {
   protected static readonly registerUserSchema = z.object({
@@ -40,17 +40,6 @@ export class RegisterUserDTO implements DTO {
 
     if (success) return either.right(undefined);
 
-    const errorsSet = new ValidationErrors();
-
-    for (const error of validationErrors.issues) {
-      const argumentError = new InvalidArgumentError(
-        error.message,
-        error.path.join("."),
-      );
-
-      errorsSet.appendError(argumentError);
-    }
-
-    return either.left(errorsSet);
+    return either.left(mapZodErrorsToCoreValidationErrors(validationErrors));
   }
 }
