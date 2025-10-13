@@ -1,3 +1,5 @@
+import { PersonGender } from "@/identity/person/enums/gender";
+import { SystemRole } from "@/identity/user/enums/system-role";
 import { MessageStringTranslationMap } from "@/message-string/internal";
 
 export const authMessageStringsPTBR: MessageStringTranslationMap = {
@@ -9,6 +11,29 @@ export const authMessageStringsPTBR: MessageStringTranslationMap = {
 
   "auth:register-user:password-too-short":
     "A senha deve ter, no mínimo, 8 caracteres.",
+
+  "auth:user-register:system-role-invalid-type":
+    "O cargo do usuário deve assumir um dos valores " +
+    `${SystemRole.Admin} ou ${SystemRole.User}.`,
+
+  "auth:register-person:date-invalid-type":
+    "A data precisa estar num formato válido.",
+
+  "auth:register-person:email-invalid-type":
+    "O e-mail fornecido precisa ser um endereço de e-mail válido.",
+
+  "auth:register-person:gender-invalid-type":
+    "Se informado, o gênero deve ser ser representado por um dos valores válidos: " +
+    `${PersonGender.Female}, ${PersonGender.Male} ou ${PersonGender.NonBinary}`,
+
+  "auth:register-person:cpf-invalid-type": "Informar seu CPF é obrigatório.",
+  "auth:register-person:cpf-invalid-cpf": "O CPF fornecido é inválido",
+
+  "auth:register-person:first-name-invalid-type":
+    "O primeiro nome é um campo obrigatório.",
+
+  "auth:register-person:surname-invalid-type":
+    "O sobrenome é um campo obrigatório.",
 };
 
 Object.freeze(authMessageStringsPTBR);
