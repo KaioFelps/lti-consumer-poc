@@ -19,12 +19,6 @@ export class RegisterUserDTO implements DTO {
         error: "auth:user-register:system-role-invalid-type",
       })
       .optional(),
-    teste: z.object({
-      foo: z.string(),
-      bar: z.object({
-        teste3: z.string(),
-      }),
-    }),
   });
 
   @Expose()
