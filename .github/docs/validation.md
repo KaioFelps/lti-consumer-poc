@@ -35,6 +35,7 @@ import z from "zod";
 import { DTO } from "@/core/dto";
 import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
 import { ValidationErrors } from "@/core/validation/validation-errors";
+import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
 
 export class BazDTO implements DTO {
   protected static fooSchema = z.object({
@@ -50,24 +51,15 @@ export class BazDTO implements DTO {
 
   validate(): Either<ValidationErrors, void> {
     const { success, error: errors } = BazDTO.fooSchema.safeParse(this);
-
     if (success) return either.right(undefined);
-
-    const validationErrors = new ValidationErrors();
-
-    for (const error of errors.issues) {
-      const invalidArgumentError = new InvalidArgumentError(
-        error.message,
-        error.path.join("."),
-      );
-
-      validationErrors.appendError(invalidArgumentError);
-    }
-
-    return either.left(validationErrors);
+    return either.left(mapZodErrorsToCoreValidationErrors(validationErrors));
   }
 }
 ```
+
+`mapZodErrorsToCoreValidationErrors` is a simple function which iterates over each zod validation error
+and inserts the error as an `InvalidArgumentError` inside a `ValidationErrors` instance, using
+the error message set at the schema as an `errorMessageIdentifier`.
 
 Note that you **must decorate each property** with `@Expose()`. The validation pipe removes
 any unknown property from body, and class-transform ignores non-exposed properties during this
@@ -76,3 +68,14 @@ verification.
 The validation pipe *sets the strategy to "exposeAll"*, however, there is a
 [4-year-old](https://github.com/typestack/class-transformer/issues/740) bug that won't expose
 every property anyway, forcing us to manually expose each one exhaustively.
+
+## Message Strings
+Be sure your `InvalidArgumentError`'s `errorMessageIdentifier` value **is always a valid
+message string identifier**. After every request, the `DTOValidationExceptionFilter` will be
+called and, if the response is an instance of `DTOValidationException`, it will translate
+every message string by its identifier.
+
+As specified at [Message Strings] guide, unrecognized identifiers will trigger an
+`IrrecoverableError`.
+
+[Message Strings]: ./message-string.md#unrecognized-identifiers-and-string-maps

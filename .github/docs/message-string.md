@@ -3,8 +3,8 @@ This is a module that implements a naïve translator/string formatter.
 Modules should define translations of strings and use the created identifier
 as messages.
 
-Errors and other services should never request a message directly, but rather a
-identifier for a message string that will be parsed used `translate` further on.
+Errors and other services **should never request a message directly, but rather a
+identifier for a message string that will be parsed used `translate` further on**.
 
 ## Defining Message Strings
 
@@ -34,4 +34,16 @@ export const enUS: MessageStringTranslationMap = {
     // other strings...
     ...myModuleMessageStrings,
 };
+```
+
+## Unrecognized Identifiers and String Maps
+
+When `TranslatorService` cannot find a message strings map for a given language,
+it returns the identifier untouched.
+
+If there is a message strings map but the given identifier is not present,
+`translate` function will throw a `IrrecoverableError` accusing which identifier
+is missing in which language message strings map, e.g.:
+```
+IrrecoverableError: The identifier <IDENTIFIER> have not been set to <MESSAGE_STRINGS_LANGUAGE> translations.
 ```
