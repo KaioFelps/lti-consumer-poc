@@ -15,6 +15,13 @@
       "when": 1759943621739,
       "tag": "0001_add-email-field-to-users-table\n",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1760383662317,
+      "tag": "0002_fix-non-binary-person-gender-enum-value",
+      "breakpoints": true
     }
   ]
 }
