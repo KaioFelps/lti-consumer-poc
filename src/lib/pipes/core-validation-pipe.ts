@@ -1,11 +1,8 @@
-import {
-  ArgumentMetadata,
-  BadRequestException,
-  PipeTransform,
-} from "@nestjs/common";
+import { ArgumentMetadata, PipeTransform } from "@nestjs/common";
 import { plainToInstance } from "class-transformer";
 import { either } from "fp-ts";
 import type { DTO } from "@/core/interfaces/dto";
+import { DTOValidationException } from "@/lib/exceptions/dto-validation/exception";
 
 /**
  * Validates the body parameter (decorated with `@Body()`).
@@ -45,7 +42,7 @@ export class CoreValidationPipe implements PipeTransform {
     );
 
     const isValid = valueAsInstanceOfADto.validate();
-    if (either.isLeft(isValid)) throw new BadRequestException(isValid.left);
+    if (either.isLeft(isValid)) throw new DTOValidationException(isValid.left);
     return valueAsInstanceOfADto;
   }
 }
