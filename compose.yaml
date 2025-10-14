@@ -1,7 +1,7 @@
 services:
   moodle:
     container_name: lti_consumer_poc_moodle
-    image: bitnami/moodle:latest
+    image: bitnamilegacy/moodle:5.0.1-debian-12-r6
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
       - MOODLE_DATABASE_USER=${MOODLE_DB_USER}
