@@ -18,8 +18,9 @@ export class VendorExtraClaims implements IntoLtiClaim {
   }
 
   intoLtiClaim(): object {
-    return Object.entries(this.claims).map(([key, value]) => ({
-      [`${this.vendorPredicade}/${key}`]: value,
-    }));
+    return Object.entries(this.claims).reduce((acc, [key, value]) => {
+      acc[`${this.vendorPredicade}/${key}`] = value;
+      return acc;
+    }, {});
   }
 }
