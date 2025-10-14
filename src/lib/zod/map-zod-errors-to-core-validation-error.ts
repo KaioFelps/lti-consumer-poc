@@ -6,10 +6,10 @@ export function mapZodErrorsToCoreValidationErrors(errors: ZodError) {
   const validationErrors = new ValidationErrors();
 
   for (const error of errors.issues) {
-    const validationError = new InvalidArgumentError(
-      error.message,
-      error.path.join("."),
-    );
+    const validationError = new InvalidArgumentError({
+      errorMessageIdentifier: error.message,
+      argumentName: error.path.join("."),
+    });
 
     validationErrors.appendError(validationError);
   }

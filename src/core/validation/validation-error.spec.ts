@@ -5,10 +5,10 @@ describe("ValidationErrors", () => {
   it("should correctly append validation errors", () => {
     const validationErrors = new ValidationErrors();
 
-    const error = new InvalidArgumentError(
-      "test:some:message:identifier",
-      "nonNestedArgument",
-    );
+    const error = new InvalidArgumentError({
+      errorMessageIdentifier: "test:some:message:identifier",
+      argumentName: "nonNestedArgument",
+    });
     validationErrors.appendError(error);
 
     expect(validationErrors.getErrors()).toMatchObject({
@@ -26,7 +26,10 @@ describe("ValidationErrors", () => {
     const validationErrors = new ValidationErrors();
     for (const id of ["test:identifier", "test:another-identifier"]) {
       validationErrors.appendError(
-        new InvalidArgumentError(id, "nonNestedArgument"),
+        new InvalidArgumentError({
+          errorMessageIdentifier: id,
+          argumentName: "nonNestedArgument",
+        }),
       );
     }
 
@@ -50,13 +53,15 @@ describe("ValidationErrors", () => {
   it("should handle validation of nested arguments from some schema", () => {
     const validationErrors = new ValidationErrors();
 
-    for (const [id, arg] of [
+    for (const [errorMessageIdentifier, argumentName] of [
       ["test:identifier-1", "some.nested.arg"],
       ["test:identifier-2", "some.nested.arg"],
       ["test:identifier-1", "some.arg"],
       ["test:identifier-1", "some.nested.evenDeeper.arg"],
     ])
-      validationErrors.appendError(new InvalidArgumentError(id, arg));
+      validationErrors.appendError(
+        new InvalidArgumentError({ errorMessageIdentifier, argumentName }),
+      );
 
     expect(validationErrors.getErrors()).toMatchObject({
       some: {

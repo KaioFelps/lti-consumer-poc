@@ -41,15 +41,17 @@ export class CPF {
     const trimmedCPF = cpfString.replaceAll(".", "").replace("-", "").trim();
 
     if (Number.isNaN(Number(trimmedCPF))) {
-      const error = new InvalidArgumentError(
-        "identity:person:cpf:non-numeric-chars",
-      );
+      const error = new InvalidArgumentError({
+        errorMessageIdentifier: "identity:person:cpf:non-numeric-chars",
+      });
 
       return option.some(error);
     }
 
     if (trimmedCPF.length !== 11) {
-      const error = new InvalidArgumentError("identity:person:cpf:invalid-cpf");
+      const error = new InvalidArgumentError({
+        errorMessageIdentifier: "identity:person:cpf:invalid-cpf",
+      });
       return option.some(error);
     }
 
