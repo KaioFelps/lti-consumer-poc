@@ -2,6 +2,7 @@
  * This is an object to ensure type-safety of the LTI context claim.
  */
 
+import { ClassProperties } from "common/src/types/class-properties";
 import { ContextType } from "..";
 import { IntoLtiClaim } from "../serialization";
 
@@ -34,7 +35,7 @@ export class ContextClaim<CustomContextType = never> implements IntoLtiClaim {
   ) {}
 
   public static fromClaims<CustomContextType>(
-    claims: ContextClaim<CustomContextType>,
+    claims: ClassProperties<ContextClaim<CustomContextType>>,
   ): ContextClaim<CustomContextType> {
     return new ContextClaim(claims.id, claims.type, claims.label, claims.title);
   }
