@@ -22,6 +22,7 @@ import {
   IntoLtiClaim,
   LTIClaimKey,
   MessageTypeClaim,
+  resolveClaimKey,
 } from "$/claims/serialization";
 
 /**
@@ -84,6 +85,7 @@ export class LTIResourceLinkLaunchRequest<
      * This field is an object that describes the context within which the launch is occurring.
      */
     public context?: ContextClaim<CustomContextType>,
+
     /**
      * Data about **the instance** of the platform that started the launch. Note that
      * a single platform may have multiple (virtual) intances. See [multitenancy].
@@ -137,17 +139,19 @@ export class LTIResourceLinkLaunchRequest<
   intoLtiClaim(): object {
     return {
       ...this.userIdentity?.intoLtiClaim(),
-      [LTIClaimKey.version]: this.version.toString(),
-      [LTIClaimKey.messageType]: this.messageType.toString(),
-      [LTIClaimKey.deploymentId]: this.deploymentId,
-      [LTIClaimKey.targetLinkUri]: this.targetLink,
-      [LTIClaimKey.resourceLink]: this.resourceLink,
-      [LTIClaimKey.roles]: this.roles,
-      [LTIClaimKey.context]: this.context?.intoLtiClaim(),
-      [LTIClaimKey.platformInstanceData]: this.platformInstance?.intoLtiClaim(),
-      [LTIClaimKey.mentoredUsers]: this.mentorScope,
-      [LTIClaimKey.launchPresentation]: this.launchPresentation?.intoLtiClaim(),
-      [LTIClaimKey.customs]: this.customClaims,
+      [resolveClaimKey(LTIClaimKey.messageType)]: this.messageType.toString(),
+      [resolveClaimKey(LTIClaimKey.version)]: this.version.toString(),
+      [resolveClaimKey(LTIClaimKey.deploymentId)]: this.deploymentId,
+      [resolveClaimKey(LTIClaimKey.targetLinkUri)]: this.targetLink,
+      [resolveClaimKey(LTIClaimKey.resourceLink)]: this.resourceLink,
+      [resolveClaimKey(LTIClaimKey.roles)]: this.roles,
+      [resolveClaimKey(LTIClaimKey.context)]: this.context?.intoLtiClaim(),
+      [resolveClaimKey(LTIClaimKey.platformInstanceData)]:
+        this.platformInstance?.intoLtiClaim(),
+      [resolveClaimKey(LTIClaimKey.mentoredUsers)]: this.mentorScope,
+      [resolveClaimKey(LTIClaimKey.launchPresentation)]:
+        this.launchPresentation?.intoLtiClaim(),
+      [resolveClaimKey(LTIClaimKey.customs)]: this.customClaims,
       ...this.vendor?.intoLtiClaim(),
     };
   }
