@@ -8,8 +8,13 @@ import { ErrorBase } from "./error-base";
  * variant.
  */
 export class IrrecoverableError extends Error implements ErrorBase {
-  public constructor(public message: string) {
-    super(message);
+  public constructor(public error: string | Error) {
+    if (error instanceof Error) {
+      super(error.message, error);
+      return;
+    }
+
+    super(error);
   }
 
   public readonly errorMessageIdentifier: string = "core:programming-error";
