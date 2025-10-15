@@ -34,6 +34,12 @@ export const authMessageStringsPTBR: MessageStringTranslationMap = {
 
   "auth:register-person:surname-invalid-type":
     "O sobrenome é um campo obrigatório.",
+
+  "auth:authenticate-user:username-invalid-type":
+    "O campo 'username' é obrigatório e precisa ser um texto válido.",
+
+  "auth:authenticate-user:password-invalid-type":
+    "A senha precisa ser um texto e é obrigatória.",
 };
 
 Object.freeze(authMessageStringsPTBR);
