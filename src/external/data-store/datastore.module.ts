@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
-import { AppConfigModule } from "@/config/config.module";
 import { EnvironmentVars } from "@/config/environment-vars";
 import { DrizzleClient } from "./drizzle/client";
+import { RepositoriesModule } from "./drizzle/repositories/repositories.module";
 
 @Module({
   providers: [
@@ -12,6 +12,6 @@ import { DrizzleClient } from "./drizzle/client";
     },
   ],
   exports: [DrizzleClient],
-  imports: [AppConfigModule],
+  imports: [RepositoriesModule],
 })
 export class DataStoreModule {}
