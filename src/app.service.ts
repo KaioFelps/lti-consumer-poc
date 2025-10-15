@@ -1,14 +1,14 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { usersTable } from "drizzle/schema";
 import { sql } from "drizzle-orm";
-import { DrizzleClient } from "./data-store/drizzle/client";
+import { DrizzleClient } from "./external/data-store/drizzle/client";
 import { Person, PersonUncheckedProps } from "./identity/person/person.entity";
 import { User } from "./identity/user/user.entity";
 import { trimNullProperties } from "./utils/trim-null-properties";
 
 @Injectable()
 export class AppService {
-  @Inject() private drizzle: DrizzleClient;
+  public constructor(private drizzle: DrizzleClient) {}
 
   async getUsers(): Promise<User[]> {
     const rawUser = await this.drizzle
