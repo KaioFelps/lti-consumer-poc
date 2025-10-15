@@ -45,4 +45,8 @@ export class User extends EntityBase<UserProps> {
       profilePictureUrl: props.profilePictureUrl ?? undefined,
     });
   }
+
+  public getPasswordHash(): string {
+    return this.props.passwordHash;
+  }
 }
