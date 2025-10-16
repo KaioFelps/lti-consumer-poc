@@ -1,7 +1,7 @@
 import { Body, Controller, Inject, Post } from "@nestjs/common";
 import { either } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
-import { ExceptionFactory } from "@/lib/exceptions/exception-factory";
+import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { LoginDTO } from "./dtos/login.dto";
 import { RegisterPersonDTO } from "./dtos/register-person.dto";
 import { AuthenticateUserService } from "./services/authenticate-user.service";
@@ -17,7 +17,7 @@ export class AuthController {
       await this.authenticateUserServer.execute(dto),
       either.match(
         (error) => {
-          throw ExceptionFactory.fromError(error);
+          throw ExceptionsFactory.fromError(error);
         },
         (user) => user,
       ),
