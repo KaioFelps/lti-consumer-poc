@@ -17,6 +17,8 @@ export class IrrecoverableError extends Error implements ErrorBase {
     super(error);
   }
 
-  public readonly errorMessageIdentifier: string = "core:programming-error";
+  public readonly errorMessageIdentifier: string =
+    "core:errors:internal-error-message";
+
   public readonly errorType: string = IrrecoverableError.name;
 }
