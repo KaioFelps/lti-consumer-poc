@@ -4,7 +4,7 @@ export const identityMessageStringsPTBR: MessageStringTranslationMap = {
   "identity:person:cpf:non-numeric-chars": (args, identifier) => {
     if (!args.argumentName)
       console.warn(
-        `The message string "${identifier}" expected ` +
+        `The message string '${identifier}' expected ` +
           `an \`args.argumentName\` property.`,
       );
 
@@ -17,14 +17,15 @@ export const identityMessageStringsPTBR: MessageStringTranslationMap = {
     { username }: { username: string | undefined },
     identifier,
   ) => {
-    if (!username) {
+    if (typeof username === "undefined") {
       console.warn(
-        `The message string "${identifier}" expected ` +
+        `The message string '${identifier}' expected ` +
           `an \`args.username\` property.`,
       );
+      return identifier;
     }
 
-    return `Não foi encontrado nenhum usuário com o username "${username}".`;
+    return `Não foi encontrado nenhum usuário com o username '${username}'.`;
   },
 };
 
