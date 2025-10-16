@@ -39,7 +39,7 @@ export class DTOValidationExceptionFilter implements ExceptionFilter {
       exception.validationErrors.getErrors(),
     );
 
-    response.status(status).json({ errors });
+    response.status(status).json({ errors, status });
   }
 
   private async serializeValidationError(
