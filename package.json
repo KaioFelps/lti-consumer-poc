@@ -76,7 +76,15 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "@/(.*)": [
+        "<rootDir>/src/$1"
+      ],
+      "$/(.*)": [
+        "<rootDir>/lti/src/$1"
+      ]
+    }
   },
   "workspaces": [
     "lti",
