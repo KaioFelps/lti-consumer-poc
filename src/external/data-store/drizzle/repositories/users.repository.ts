@@ -30,7 +30,12 @@ export class DrizzleUsersRepository extends UsersRepository {
             .where(sql`username = ${username}`)
             .limit(1)
             .execute(),
-        (error: Error) => new IrrecoverableError(error),
+        (error: Error) =>
+          new IrrecoverableError(
+            "An error occurred in DrizzleUsersRepository when " +
+              "finding a user by its username.",
+            error,
+          ),
       ),
       taskEither.map((userAsArray) => {
         if (userAsArray.length === 0) return option.none;

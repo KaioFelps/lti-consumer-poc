@@ -8,13 +8,13 @@ import { ErrorBase } from "./error-base";
  * variant.
  */
 export class IrrecoverableError extends Error implements ErrorBase {
-  public constructor(public error: string | Error) {
-    if (error instanceof Error) {
-      super(error.message, error);
-      return;
-    }
-
-    super(error);
+  public constructor(
+    public message: string,
+    cause?: Error,
+  ) {
+    super(message, {
+      cause,
+    });
   }
 
   public readonly errorMessageIdentifier: string =
