@@ -1,6 +1,6 @@
 import { Inject, Injectable, Scope } from "@nestjs/common";
+import { BaseException } from "@/lib/exceptions/base/exception";
 import { TranslatorService } from "@/message-string/translator.service";
-import { BaseException } from "../../exceptions/base/exception";
 import { ExceptionPresenter } from "../exception-presenter";
 
 type PresentedSimpleException = {
