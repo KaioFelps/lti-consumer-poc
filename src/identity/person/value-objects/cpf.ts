@@ -5,10 +5,33 @@ import { Option } from "fp-ts/lib/Option";
 import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
 
 export class CPF {
-  private constructor(private value: string) {}
+  private digits: Uint8Array;
 
+  private constructor(value: string) {
+    value = value.replaceAll(".", "").replaceAll("-", "");
+    this.digits = Uint8Array.from(value);
+  }
+
+  /**
+   * @returns CPF digits only.
+   */
+  public toRawString() {
+    return this.digits.join("").toString();
+  }
+
+  /**
+   * @returns CPF digits in "XXX.XXX.XXX-XX" format.
+   */
   public toString() {
-    return this.value;
+    return (
+      this.digits.slice(0, 3).join("") +
+      "." +
+      this.digits.slice(3, 6).join("") +
+      "." +
+      this.digits.slice(6, 9).join("") +
+      "-" +
+      this.digits.slice(9, 11).join("")
+    );
   }
 
   public static createUnchecked(value: string): CPF {
