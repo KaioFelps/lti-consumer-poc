@@ -12,6 +12,9 @@ export const authMessageStringsPTBR: MessageStringTranslationMap = {
   "auth:register-user:password-too-short":
     "A senha deve ter, no mínimo, 8 caracteres.",
 
+  "auth:register-user:password-too-long":
+    "A senha não deve exceder 70 caracteres.",
+
   "auth:user-register:system-role-invalid-type":
     "O cargo do usuário deve assumir um dos valores " +
     `${SystemRole.Admin} ou ${SystemRole.User}.`,
