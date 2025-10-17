@@ -6,8 +6,8 @@ import {
   Injectable,
   Scope,
 } from "@nestjs/common";
+import { SimpleExceptionPresenter } from "@/external/presenters/exceptions/simple-exception.presenter";
 import { HttpResponse } from "@/lib";
-import { SimpleExceptionPresenter } from "../../presenters/exceptions/simple-exception.presenter";
 import { BaseException } from "./exception";
 
 @Injectable({ scope: Scope.REQUEST })

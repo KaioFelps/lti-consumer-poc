@@ -1,6 +1,6 @@
 import { Global, Module } from "@nestjs/common";
 import { APP_FILTER } from "@nestjs/core";
-import { SimpleExceptionPresenter } from "../presenters/exceptions/simple-exception.presenter";
+import { SimpleExceptionPresenter } from "@/external/presenters/exceptions/simple-exception.presenter";
 import { BaseExceptionFilter } from "./base/exception-filter";
 import { DTOValidationExceptionFilter } from "./dto-validation/exception-filter";
 
