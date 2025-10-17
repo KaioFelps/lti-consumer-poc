@@ -4,6 +4,7 @@ import { AppService } from "./app.service";
 import { AuthModule } from "./auth/auth.module";
 import { AppConfigModule } from "./config/config.module";
 import { ExternalModule } from "./external/external.module";
+import { IdentityModule } from "./identity/identity.module";
 import { GlobalExceptionFiltersModule } from "./lib/exceptions/global-exception-filters.module";
 import { MessageStringModule } from "./message-string/message-string.module";
 
@@ -14,6 +15,7 @@ import { MessageStringModule } from "./message-string/message-string.module";
     GlobalExceptionFiltersModule,
     ExternalModule,
     AuthModule,
+    IdentityModule,
   ],
   controllers: [AppController],
   providers: [AppService],
