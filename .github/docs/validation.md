@@ -51,8 +51,15 @@ export class BazDTO implements DTO {
 
   validate(): Either<ValidationErrors, void> {
     const { success, error: errors } = BazDTO.fooSchema.safeParse(this);
-    if (success) return either.right(undefined);
-    return either.left(mapZodErrorsToCoreValidationErrors(validationErrors));
+
+    if (!success) {
+      return either.left(mapZodErrorsToCoreValidationErrors(validationErrors));
+    }
+
+    // Assigning the parsed data back to the DTO instance ensures
+    // values are coerced (e.g., a string being parsed to a `Date` instance).
+    Object.assign(this, data);
+    return either.right(undefined);
   }
 }
 ```

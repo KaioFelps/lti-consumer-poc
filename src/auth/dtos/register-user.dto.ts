@@ -13,7 +13,8 @@ export class RegisterUserDTO implements DTO {
     username: z.string({ error: "auth:register-user:username-invalid-type" }),
     password: z
       .string({ error: "auth:register-user:password-invalid-type" })
-      .min(8, { error: "auth:register-user:password-too-short" }),
+      .min(8, { error: "auth:register-user:password-too-short" })
+      .max(70, { error: "auth:register-user:password-too-long" }),
     systemRole: z
       .enum([SystemRole.Admin, SystemRole.User], {
         error: "auth:user-register:system-role-invalid-type",
@@ -35,11 +36,17 @@ export class RegisterUserDTO implements DTO {
   }
 
   validate(): Either<ValidationErrors, undefined> {
-    const { success, error: validationErrors } =
-      RegisterUserDTO.registerUserSchema.safeParse(this);
+    const {
+      success,
+      data,
+      error: validationErrors,
+    } = RegisterUserDTO.registerUserSchema.safeParse(this);
 
-    if (success) return either.right(undefined);
+    if (!success) {
+      return either.left(mapZodErrorsToCoreValidationErrors(validationErrors));
+    }
 
-    return either.left(mapZodErrorsToCoreValidationErrors(validationErrors));
+    Object.assign(this, data);
+    return either.right(undefined);
   }
 }

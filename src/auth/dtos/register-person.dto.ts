@@ -58,11 +58,16 @@ export class RegisterPersonDTO extends RegisterUserDTO implements DTO {
   public validate(): Either<ValidationErrors, undefined> {
     const userValidation = super.validate();
 
-    const { success, error: errors } =
-      RegisterPersonDTO.registerPersonSchema.safeParse(this);
+    const {
+      success,
+      error: errors,
+      data,
+    } = RegisterPersonDTO.registerPersonSchema.safeParse(this);
 
-    if (success && either.isRight(userValidation))
+    if (success && either.isRight(userValidation)) {
+      Object.assign(this, data);
       return either.right(undefined);
+    }
 
     const validationErrors = new ValidationErrors();
 
