@@ -1,6 +1,10 @@
 import { Body, Controller, Inject, Post } from "@nestjs/common";
 import { either } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
+import { PersonPresenter } from "@/external/presenters/entities/person.presenter";
+import { PersonGender } from "@/identity/person/enums/gender";
+import { RegisterNewPersonService } from "@/identity/person/services/register-new-person.service";
+import { CPF } from "@/identity/person/value-objects/cpf";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { LoginDTO } from "./dtos/login.dto";
 import { RegisterPersonDTO } from "./dtos/register-person.dto";
@@ -10,6 +14,9 @@ import { AuthenticateUserService } from "./services/authenticate-user.service";
 export class AuthController {
   @Inject()
   private authenticateUserServer: AuthenticateUserService;
+
+  @Inject()
+  private registerNewPersonService: RegisterNewPersonService;
 
   @Post("login")
   public async login(@Body() dto: LoginDTO) {
@@ -28,6 +35,22 @@ export class AuthController {
 
   @Post("register")
   public async registerPerson(@Body() dto: RegisterPersonDTO) {
-    console.log(dto);
+    const newPersonResult = await this.registerNewPersonService.execute({
+      birthDate: dto.birthDate,
+      cpf: CPF.createUnchecked(dto.cpf),
+      email: dto.email,
+      firstName: dto.firstName,
+      password: dto.password,
+      surname: dto.surname,
+      username: dto.username,
+      gender: dto.gender && PersonGender[dto.gender],
+    });
+
+    if (either.isLeft(newPersonResult)) {
+      throw ExceptionsFactory.fromError(newPersonResult.left);
+    }
+
+    const person = newPersonResult.right;
+    return PersonPresenter.present(person);
   }
 }
