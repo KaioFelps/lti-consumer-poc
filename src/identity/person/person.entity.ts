@@ -108,4 +108,37 @@ export class Person extends EntityBase<PersonProps> {
       }),
     );
   }
+
+  // getters
+  public getUser(): User {
+    return this.props.user;
+  }
+
+  public getCpf(): CPF {
+    return this.props.cpf;
+  }
+
+  public getBirthDate(): Date {
+    return this.props.birthDate;
+  }
+
+  public getGender(): PersonGender | undefined {
+    return this.props.gender;
+  }
+
+  public getFirstName(): string {
+    return this.props.firstName;
+  }
+
+  public getSurname(): string {
+    return this.props.surname;
+  }
+
+  public getEmail(): string {
+    return this.props.email;
+  }
+
+  public __getProps(): PersonProps {
+    return this.props;
+  }
 }

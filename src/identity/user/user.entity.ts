@@ -1,10 +1,10 @@
 import { Optional } from "common/src/types/optional";
-import { UUIDTypes } from "uuid";
 import { EntityBase } from "@/core/entity-base";
+import { UUID } from "@/core/uuid";
 import { SystemRole } from "./enums/system-role";
 
 export type UserProps = {
-  id: UUIDTypes;
+  id: UUID;
   username: string;
   passwordHash: string;
   profilePictureUrl?: string;
@@ -12,7 +12,7 @@ export type UserProps = {
 };
 
 export type UserUncheckedProps = {
-  id: UUIDTypes;
+  id: UUID;
   username: string;
   passwordHash: string;
   profilePictureUrl?: string | null;
@@ -46,7 +46,23 @@ export class User extends EntityBase<UserProps> {
     });
   }
 
+  public getId() {
+    return this.props.id;
+  }
+
   public getPasswordHash(): string {
     return this.props.passwordHash;
+  }
+
+  public getUsername(): string {
+    return this.props.username;
+  }
+
+  public getProfilePictureUrl(): string | null {
+    return this.props.profilePictureUrl ?? null;
+  }
+
+  public getSystemRole(): SystemRole {
+    return this.props.systemRole;
   }
 }
