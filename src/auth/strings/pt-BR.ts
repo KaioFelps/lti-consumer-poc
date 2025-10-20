@@ -43,6 +43,8 @@ export const authMessageStringsPTBR: MessageStringTranslationMap = {
 
   "auth:authenticate-user:password-invalid-type":
     "A senha precisa ser um texto e é obrigatória.",
+
+  "auth:authenticate-user:invalid-credentials": "Credenciais inválidas.",
 };
 
 Object.freeze(authMessageStringsPTBR);
