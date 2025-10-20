@@ -13,10 +13,7 @@ type AuthenticateUserParams = {
   password: string;
 };
 
-type PossibleErrors =
-  | IrrecoverableError
-  | ResourceNotFoundError
-  | UnauthorizedError;
+type PossibleErrors = IrrecoverableError | UnauthorizedError;
 
 @Injectable()
 export class AuthenticateUserService {
@@ -29,10 +26,19 @@ export class AuthenticateUserService {
     username,
     password,
   }: AuthenticateUserParams): Promise<Either<PossibleErrors, User>> {
+    const errorMessageIdentifier = "auth:authenticate-user:invalid-credentials";
     const userFromDatastore =
       await this.usersRepository.findUserByUsername(username);
 
-    if (either.isLeft(userFromDatastore)) return userFromDatastore;
+    if (either.isLeft(userFromDatastore)) {
+      const error = userFromDatastore.left;
+      if (error instanceof ResourceNotFoundError) {
+        return either.left(new UnauthorizedError({ errorMessageIdentifier }));
+      }
+
+      return either.left(error);
+    }
+
     const user = userFromDatastore.right;
 
     const passwordsMatch = await this.passwordComparator.compare(
@@ -43,7 +49,7 @@ export class AuthenticateUserService {
     if (!passwordsMatch)
       return either.left(
         new UnauthorizedError({
-          errorMessageIdentifier: "auth:authenticate-user:invalid-credentials",
+          errorMessageIdentifier,
         }),
       );
 
