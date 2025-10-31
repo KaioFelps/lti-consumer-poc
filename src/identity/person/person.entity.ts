@@ -134,6 +134,10 @@ export class Person extends EntityBase<PersonProps> {
     return this.props.surname;
   }
 
+  public getName(): string {
+    return `${this.getFirstName()} ${this.getSurname()}`;
+  }
+
   public getEmail(): string {
     return this.props.email;
   }
