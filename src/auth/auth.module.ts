@@ -5,6 +5,7 @@ import { AuthenticateUserService } from "./services/authenticate-user.service";
 
 @Module({
   providers: [AuthenticateUserService],
+  exports: [AuthenticateUserService],
   controllers: [AuthController],
   imports: [IdentityModule],
 })

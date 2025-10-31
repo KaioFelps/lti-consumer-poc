@@ -7,6 +7,7 @@ import { ExternalModule } from "./external/external.module";
 import { IdentityModule } from "./identity/identity.module";
 import { GlobalExceptionFiltersModule } from "./lib/exceptions/global-exception-filters.module";
 import { MessageStringModule } from "./message-string/message-string.module";
+import { OIDCModule } from "./oidc/oidc.module";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MessageStringModule } from "./message-string/message-string.module";
     ExternalModule,
     AuthModule,
     IdentityModule,
+    OIDCModule,
   ],
   controllers: [AppController],
   providers: [AppService],
