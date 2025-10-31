@@ -12,18 +12,22 @@ export class EnvironmentVars {
       readonly host: string;
       readonly name: string;
     },
+    public readonly appUrl: string,
   ) {}
 
   public static async create(
     nestConfigService: ConfigService<EnvironmentVariablesSchema, true>,
   ): Promise<EnvironmentVars> {
-    return new EnvironmentVars({
-      //   connectionUrl: nestConfigService.get("DB_CONNECTION_URL"),
-      host: nestConfigService.get("DB_HOST"),
-      password: nestConfigService.get("DB_PASSWORD"),
-      port: nestConfigService.get("DB_PORT"),
-      user: nestConfigService.get("DB_USER"),
-      name: nestConfigService.get("DB_NAME"),
-    });
+    return new EnvironmentVars(
+      {
+        //   connectionUrl: nestConfigService.get("DB_CONNECTION_URL"),
+        host: nestConfigService.get("DB_HOST"),
+        password: nestConfigService.get("DB_PASSWORD"),
+        port: nestConfigService.get("DB_PORT"),
+        user: nestConfigService.get("DB_USER"),
+        name: nestConfigService.get("DB_NAME"),
+      },
+      nestConfigService.get("APP_URL"),
+    );
   }
 }
