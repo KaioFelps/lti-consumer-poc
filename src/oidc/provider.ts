@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import Provider, { type Configuration } from "oidc-provider";
 import { EnvironmentVars } from "@/config/environment-vars";
+import { AvailableACRs, AvailableScopes } from "./consts";
 import { OIDCAccountsRepository } from "./repositories/accounts.repository";
 import { OIDCClientsRepository } from "./repositories/clients.repository";
 
@@ -21,6 +22,8 @@ export class OIDCProvider extends Provider {
       interactions: {
         url: (_, interaction) => `/oidc/interaction/${interaction.uid}`,
       },
+      acrValues: [AvailableACRs.loa1, AvailableACRs.loa0],
+      scopes: [...AvailableScopes],
     } satisfies Configuration;
 
     console.log(environments.appUrl);
