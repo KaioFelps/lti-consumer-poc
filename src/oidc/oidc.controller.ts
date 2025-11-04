@@ -1,4 +1,5 @@
 import {
+  All,
   Body,
   Controller,
   Get,
@@ -17,6 +18,8 @@ import { AuthenticateUserService } from "@/auth/services/authenticate-user.servi
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { UnauthorizedError } from "@/core/errors/unauthorized.error";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
+import { AvailableACRs } from "./consts";
+import { resolveAcrValues } from "./helpers";
 import { OIDCProvider } from "./provider";
 
 @Controller("oidc")
@@ -39,6 +42,7 @@ export class OIDCController {
     @Req() request: Request,
     @Res() response: Response,
   ) {
+    console.log("chamou");
     const interaction = await this.provider.interactionDetails(
       request,
       response,
@@ -103,8 +107,18 @@ export class OIDCController {
 
     const user = authentication.right;
 
+    const acr = resolveAcrValues(details);
+    // AMR values are specified in a IANA registry.
+    // See: https://datatracker.ietf.org/doc/html/rfc8176
+    const acrObject: Partial<InteractionResults["login"]> = acr
+      ? { amr: ["pwd"], acr: AvailableACRs.loa1 }
+      : {};
+
     const result: InteractionResults = {
-      login: { accountId: user.getId().toString() },
+      login: {
+        accountId: user.getId().toString(),
+        ...acrObject,
+      },
     };
 
     await this.provider.interactionFinished(request, response, result, {
@@ -127,5 +141,11 @@ export class OIDCController {
     }
 
     // const grantId = details.grantId;
+  }
+
+  @All("/*path")
+  public mountedOIDC(@Req() req: Request, @Res() res: Response) {
+    req.url = req.originalUrl.replace("/oidc", "");
+    return this.provider.callback()(req, res);
   }
 }
