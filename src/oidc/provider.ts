@@ -14,6 +14,15 @@ export class OIDCProvider extends Provider {
   ) {
     const clients = await clientsRepository.getClients();
 
+    // test client
+    clients.push({
+      client_secret: "test-client-1-secret",
+      client_id: "test-client-1",
+      client_name: "Test Client",
+      application_type: "web",
+      redirect_uris: ["http://localhost:4000/callback"],
+    });
+
     const config = {
       clients,
       findAccount: async (_ctx, id, _token) => {
@@ -24,9 +33,15 @@ export class OIDCProvider extends Provider {
       },
       acrValues: [AvailableACRs.loa1, AvailableACRs.loa0],
       scopes: [...AvailableScopes],
+      features: {
+        claimsParameter: { enabled: true },
+        devInteractions: { enabled: false },
+        clientCredentials: { enabled: true },
+      },
+      // routes: {}
     } satisfies Configuration;
 
-    console.log(environments.appUrl);
-    return new OIDCProvider(environments.appUrl, config);
+    const issuerUrl = `${environments.appUrl}/oidc`;
+    return new OIDCProvider(issuerUrl, config);
   }
 }
