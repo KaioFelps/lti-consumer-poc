@@ -15,3 +15,9 @@ Além disso, outros experimentos estão sendo realizados e testados neste reposi
 [Strings de mensagens]: ./.github/docs/message-string.md
 [Validações & tratamento de erros]: ./.github/docs/validation.md
 [Erros]: ./.github/docs/errors.md
+
+## Relying Party (Client)
+Para testar em desenvolvimento o funcionamento do Authorization Server, uma segunda aplicação está
+sendo utilizada como um cliente. Esta aplicação está disponível no repositório [oidc-rp-client-experiment].
+
+[oidc-rp-client-experiment]: https://github.com/KaioFelps/oidc-rp-client-experiment
