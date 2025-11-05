@@ -1,6 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import Provider, { type Configuration } from "oidc-provider";
 import { EnvironmentVars } from "@/config/environment-vars";
+import { OIDCRedisAdapterFactory } from "@/external/data-store/redis/oidc/adapter-factory";
+import { OIDCRedisAdapterBridge } from "@/external/data-store/redis/oidc/adpater-bridge";
 import { AvailableACRs, AvailableScopes } from "./consts";
 import { OIDCAccountsRepository } from "./repositories/accounts.repository";
 import { OIDCClientsRepository } from "./repositories/clients.repository";
@@ -11,6 +13,7 @@ export class OIDCProvider extends Provider {
     environments: EnvironmentVars,
     clientsRepository: OIDCClientsRepository,
     oidcAccountsRepository: OIDCAccountsRepository,
+    oidcAdapterFactory: OIDCRedisAdapterFactory,
   ) {
     const clients = await clientsRepository.getClients();
 
@@ -23,7 +26,11 @@ export class OIDCProvider extends Provider {
       redirect_uris: ["http://localhost:4000/callback"],
     });
 
+    const adapter = OIDCRedisAdapterBridge;
+    adapter.setInternalAdapter(oidcAdapterFactory);
+
     const config = {
+      adapter,
       clients,
       findAccount: async (_ctx, id, _token) => {
         return await oidcAccountsRepository.findAccountById(id);
