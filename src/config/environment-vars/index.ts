@@ -13,6 +13,12 @@ export class EnvironmentVars {
       readonly name: string;
     },
     public readonly appUrl: string,
+    public readonly redis: {
+      user: string;
+      password: string;
+      port: number;
+      host: string;
+    },
   ) {}
 
   public static async create(
@@ -28,6 +34,12 @@ export class EnvironmentVars {
         name: nestConfigService.get("DB_NAME"),
       },
       nestConfigService.get("APP_URL"),
+      {
+        user: nestConfigService.get("REDIS_USER"),
+        password: nestConfigService.get("REDIS_PASSWORD"),
+        host: nestConfigService.get("REDIS_HOST"),
+        port: nestConfigService.get("REDIS_PORT"),
+      },
     );
   }
 }

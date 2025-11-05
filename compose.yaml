@@ -26,6 +26,8 @@ services:
         condition: service_healthy
     links:
       - moodle_db
+    profiles:
+      - full
 
   platform_db:
     container_name: lti_experiment_consumer_pg_db
@@ -36,6 +38,9 @@ services:
       - POSTGRES_DB=${DB_NAME}
     ports:
       - ${DB_PORT}:5432
+    profiles:
+      - full
+      - local
 
   moodle_db:
     container_name: lti_consumer_poc_moodle_mariadb
@@ -58,6 +63,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    profiles:
+      - full
+
+  platform_redis:
+    image: redis/redis-stack-server:latest
+    container_name: lti_experiment_consumer_redis
+    environment:
+      REDIS_ARGS: |
+        --requirepass ${REDIS_PASSWORD}
+        --user ${REDIS_USER}
+        on >${REDIS_PASSWORD} allkeys allcommands +@all
+    ports:
+      - ${REDIS_PORT}:6379
+    profiles:
+      - full
+      - local
 
 networks:
   moodle-network:
