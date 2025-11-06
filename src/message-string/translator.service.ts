@@ -8,11 +8,16 @@ import { translate } from "./internal/translate";
 export class TranslatorService {
   public constructor(@Inject(REQUEST) private readonly request: HttpRequest) {}
 
+  public getLocale(): string {
+    const locale = this.request.cookies.lti_consumer_poc_language ?? "pt-BR";
+    return locale;
+  }
+
   public async translate(
     identifier: string,
     args?: MessageStringFormatterArg,
   ): Promise<string> {
-    const language = this.request.cookies.lti_consumer_poc_language ?? "pt-BR";
+    const language = this.getLocale();
     const strings = await this.getStringsFromLanguageTag(language);
 
     if (!strings) return identifier;
