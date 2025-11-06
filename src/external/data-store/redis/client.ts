@@ -1,25 +1,22 @@
 import { Inject, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
-import Redis from "ioredis";
+import { createClient, RedisClientType } from "redis";
 import { EnvironmentVars } from "@/config/environment-vars";
 
-export class RedisClient
-  extends Redis
-  implements OnModuleInit, OnModuleDestroy
-{
-  public constructor(@Inject() env: EnvironmentVars) {
-    const { user: _, ...redisConfig } = env.redis;
+export class Redis implements OnModuleInit, OnModuleDestroy {
+  public readonly client: RedisClientType;
 
-    super({
-      ...redisConfig,
-      lazyConnect: true,
-    });
+  public constructor(@Inject() env: EnvironmentVars) {
+    const url = `redis://${env.redis.user}:${env.redis.password}@${env.redis.host}:${env.redis.port}`;
+    const client = createClient({ url });
+
+    this.client = client as RedisClientType;
   }
 
   async onModuleInit() {
-    await this.connect();
+    await this.client.connect();
   }
 
   onModuleDestroy() {
-    this.disconnect();
+    this.client.destroy();
   }
 }
