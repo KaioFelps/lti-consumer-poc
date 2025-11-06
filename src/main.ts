@@ -6,9 +6,11 @@ import { config } from "dotenv";
 import { expand } from "dotenv-expand";
 import { AppModule } from "./app.module";
 import { CoreValidationPipe } from "./lib/pipes/core-validation-pipe";
+import { loadMessageStrings } from "./message-string/loader";
 
 async function bootstrap() {
   expand(config());
+  await loadMessageStrings();
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
