@@ -4,7 +4,7 @@ Errors are an important part of any application. When a system returns different
 errors on distinct situations, it makes harder for the front-end to keep up with
 them.
 
-For this, there is a standardize way of creating and using errors within this
+For this, there is a standardized way of creating and using errors within this
 proof-of-concept application.
 
 ### TL;DR
