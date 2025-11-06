@@ -13,6 +13,7 @@ export class EnvironmentVars {
       readonly name: string;
     },
     public readonly appUrl: string,
+    public readonly appSecret: string,
     public readonly redis: {
       user: string;
       password: string;
@@ -34,6 +35,7 @@ export class EnvironmentVars {
         name: nestConfigService.get("DB_NAME"),
       },
       nestConfigService.get("APP_URL"),
+      nestConfigService.get("APP_SECRET"),
       {
         user: nestConfigService.get("REDIS_USER"),
         password: nestConfigService.get("REDIS_PASSWORD"),
