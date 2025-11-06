@@ -20,10 +20,19 @@ export class RegisterPersonDTO extends RegisterUserDTO implements DTO {
     birthDate: z.coerce.date({
       error: "auth:register-person:date-invalid-type",
     }),
-    firstName: z.string({
-      error: "auth:register-person:first-name-invalid-type",
-    }),
-    surname: z.string({ error: "auth:register-person:surname-invalid-type" }),
+    firstName: z
+      .string({
+        error: "auth:register-person:first-name-invalid-type",
+      })
+      .min(1, {
+        error: "auth:register-person:first-name-invalid-type",
+      }),
+
+    surname: z
+      .string({ error: "auth:register-person:surname-invalid-type" })
+      .min(1, {
+        error: "auth:register-person:first-name-invalid-type",
+      }),
     email: z.email({ error: "auth:register-person:email-invalid-type" }),
     gender: z
       .enum([PersonGender.Female, PersonGender.Male, PersonGender.NonBinary], {
