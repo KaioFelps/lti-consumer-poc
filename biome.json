@@ -30,6 +30,9 @@
       "complexity": {
         "noStaticOnlyClass": "off",
         "useLiteralKeys": "off"
+      },
+      "suspicious": {
+        "noConfusingVoidType": "off"
       }
     }
   },
