@@ -11,7 +11,7 @@ proof-of-concept application.
 Use errors inside your application, returning them as `Either` instances.
 Convert them to exceptions in controllers and throw them.
 
-Let "Your" be your error's name, e.g. "ResourceNotFoundError". To create a
+Let "Your" be your error's name, e.g. "ResourceNotFound". To create a
 new error, you:
 
 1. **must** create the error class so that `YourError extends ErrorBase` and place
@@ -20,9 +20,12 @@ new error, you:
   place it in `/src/lib/exceptions/your/exception.ts`;
 3. **must** make your exception obtainable from [`ExceptionsFactory`];
 4. **may** create an exception filter such that `YourExceptionFilter implements ExceptionFilter`
-  and place it in `/src/lib/exceptions/your/exception-filter.ts`; and
-5. **must** register `YourExceptionFilter` in [`GlobalExceptionFiltersModule.providers`]
-  (if created) using an object like `{ provide: APP_FILTER, useClass: YourExceptionFilter }`.
+  and place it in `/src/lib/exceptions/your/exception-filter.ts`,
+  and, if created, you **must**:
+    - create a module `YourExceptionModule` in `src/lib/exceptions/your/your-exception.module.ts`;
+    - register `YourExceptionFilter` in `YourExceptionModule.imports` using an object like
+      `{ provide: APP_FILTER, useClass: YourExceptionFilter }`;
+    - import `YourExceptionModule` in [`GlobalExceptionFiltersModule.imports`].
 
 ## Creating New Errors
 
@@ -120,8 +123,111 @@ the your filter's scope to `REQUEST` (`@Injectable({ scope: Scope.REQUEST })`).
 Your filter needs to be decorated with `@Catch(<YOUR_EXCEPTION_CLASS>)`, so that
 Nest.js knows what error this filter is supposed to handle.
 
-Also, exception filters must be registered inside
-[`GlobalExceptionFiltersModule.providers`] list with an object like
+## Modules
+
+If you ended up creating a exception filter, it may compose a module. Therefore,
+do create a `your-exception.module.ts` file containing a Nest
+`YourExceptionModule` valid module. You must register `YourException` in
+`YourExceptionModule.providers` within an object like
 `{ provide: APP_FILTER, useClass: <YOUR_ERROR_EXCEPTION> }`.
 
-[`GlobalExceptionFiltersModule.providers`]: /src/lib/exceptions/global-exception-filters.module.ts
+Import `YourExceptionModule` in [`GlobalExceptionFiltersModule.imports`] so that
+it's discovered by NestJS.
+
+## Exception Filter's Responder Strategies
+
+Endpoints may be either a RESTful handler or a classic MVC one. Depending on
+its kind, exceptions must be handled in different manners.
+
+Usually, a API endpoint would return errors as a JSON, while MVC routes would
+redirect to the previous route flashing this error.
+
+Therefore, in order to handle both cases, when your error is too complex to fit
+in the [`BaseException`] and its filter, you also need to create a factory that
+will create the correct error response (as said above).
+
+```ts
+// /src/lib/exceptions/your/responder.factory.ts
+import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpArgumentsHost } from "@nestjs/common/interfaces";
+import { YourExceptionPresenter } from "@/external/presenters/exceptions/your-exception.presenter";
+import { HttpRequest, HttpResponse } from "@/lib";
+import { TranslatorService } from "@/message-string/translator.service";
+import { ExceptionFilterResponderFactory } from "../../exception-responders/factory";
+import { ExceptionFilterResponder } from "../../exception-responders/responder";
+import { YourException } from "./exception";
+
+type Output = ...; // usually void for redirects and some sort of object for JSON responses
+
+@Injectable()
+export class YourExceptionFilterResponderFactory extends ExceptionFilterResponderFactory<YourException, Output> {
+  public constructor(
+    private readonly presenter: YourExceptionPresenter,
+    private readonly translator: TranslatorService,
+  ) {
+    super();
+  }
+
+  public create(request: HttpRequest): ExceptionFilterResponder<YourException, Output> {
+    if (this.isMVC(request)) return new MVCStrategy(this.translator);
+    return new APIStrategy(this.presenter);
+  }
+}
+
+class MVCStrategy extends ExceptionFilterResponder {
+  public constructor(private readonly t: TranslatorService) {
+    super();
+  }
+
+  public async respond(
+    _status: number,
+    ctx: HttpArgumentsHost,
+    exception: YourException,
+  ): Promise<void> {
+    const request = ctx.getRequest<HttpRequest>();
+    const response = ctx.getResponse<HttpResponse>();
+    const session = request["session"] as Record<string, unknown>;
+    const target = request.headers.referer ?? "/";
+
+    const errorMessage = await this.t.translate(
+      exception.error.errorMessageIdentifier,
+      exception.error.messageParams,
+    );
+
+    session.error = errorMessage;
+
+    // set the body to flash so that the EJS template can persist
+    // the input values.
+    if (session.flash) session.flash["values"] = request.body;
+    else {
+      session.flash = {
+        values: request.body,
+      };
+    }
+
+    return response.redirect(HttpStatus.FOUND, target);
+  }
+}
+
+export class APIStrategy extends ExceptionFilterResponder {
+  public constructor(private readonly presenter: YourExceptionPresenter) {
+    super();
+  }
+
+  public async respond(
+    status: number,
+    ctx: HttpArgumentsHost,
+    exception: YourException,
+  ): Promise<object> {
+    return ctx
+      .getResponse<HttpResponse>()
+      .status(status)
+      .json(await this.presenter.present(exception));
+  }
+}
+```
+
+Don't forget to register this as a provider in `YourExceptionModule`.
+
+[`GlobalExceptionFiltersModule.providers`]: /src/lib/globals/exception-filters.module.ts
+[`GlobalExceptionFiltersModule.imports`]: /src/lib/globals/exception-filters.module.ts

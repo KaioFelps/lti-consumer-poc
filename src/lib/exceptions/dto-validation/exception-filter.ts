@@ -10,15 +10,18 @@ import {
   ValidationErrorsMap,
 } from "@/core/validation/validation-errors";
 import { TranslatorService } from "@/message-string/translator.service";
-import { HttpResponse } from "../..";
+import { HttpRequest } from "../..";
 import { DTOValidationException } from "./exception";
+import { DtoValidationExceptionFilterResponderFactory } from "./responder.factory";
 
-type SerializedValidationError = { message: string; argumentName: string };
+export type SerializedValidationError = {
+  message: string;
+  argumentName: string;
+};
 
-type SerializedValidationErrorsMap = Record<
+export type SerializedValidationErrorsMap = Record<
   string,
-  | Array<SerializedValidationError>
-  | { [key: string]: SerializedValidationErrorsMap }
+  SerializedValidationError[] | { [key: string]: SerializedValidationErrorsMap }
 >;
 
 /**
@@ -28,18 +31,21 @@ type SerializedValidationErrorsMap = Record<
 @Injectable({ scope: Scope.REQUEST })
 @Catch(DTOValidationException)
 export class DTOValidationExceptionFilter implements ExceptionFilter {
-  public constructor(private readonly translator: TranslatorService) {}
+  public constructor(
+    private readonly translator: TranslatorService,
+    private readonly responderFactory: DtoValidationExceptionFilterResponderFactory,
+  ) {}
 
   async catch(exception: DTOValidationException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<HttpResponse>();
+    const request = ctx.getRequest<HttpRequest>();
     const status = exception.getStatus();
 
     const errors = await this.serializeValidationError(
       exception.validationErrors.getErrors(),
     );
 
-    response.status(status).json({ errors, status });
+    return this.responderFactory.create(request).respond(status, ctx, errors);
   }
 
   private async serializeValidationError(
