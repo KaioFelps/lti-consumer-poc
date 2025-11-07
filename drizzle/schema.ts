@@ -26,7 +26,7 @@ export const usersTable = pgTable(
   {
     // user fields
     id: uuid().primaryKey().notNull(),
-    username: varchar({ length: 255 }).notNull(),
+    username: varchar({ length: 255 }).notNull().unique(),
     passwordHash: varchar("password_hash", { length: 120 }).notNull(),
     profilePictureUrl: varchar("profile_picture_url", { length: 255 }),
     systemRole: systemRoleEnum("system_role")

@@ -22,6 +22,13 @@
       "when": 1760383662317,
       "tag": "0002_fix-non-binary-person-gender-enum-value",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1762491454023,
+      "tag": "0003_make_username_unique",
+      "breakpoints": true
     }
   ]
 }
