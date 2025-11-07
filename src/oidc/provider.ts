@@ -45,6 +45,11 @@ export class OIDCProvider extends Provider {
         devInteractions: { enabled: false },
         clientCredentials: { enabled: true },
       },
+      cookies: {
+        names: {
+          session: "lti_consumer_poc_oidc_session",
+        },
+      },
       // routes: {}
     } satisfies Configuration;
 

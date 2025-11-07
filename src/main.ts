@@ -25,6 +25,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.use(
     session({
+      name: "lti_consumer_poc_session",
       secret: env.appSecret,
       resave: false,
       saveUninitialized: false,
