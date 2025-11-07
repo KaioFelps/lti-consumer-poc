@@ -18,6 +18,7 @@ import { AuthenticateUserService } from "@/auth/services/authenticate-user.servi
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { UnauthorizedError } from "@/core/errors/unauthorized.error";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
+import { TranslatorService } from "@/message-string/translator.service";
 import { AvailableACRs } from "./consts";
 import { resolveAcrValues } from "./helpers";
 import { OIDCProvider } from "./provider";
@@ -29,6 +30,9 @@ export class OIDCController {
 
   @Inject()
   private authenticateUserService: AuthenticateUserService;
+
+  @Inject()
+  private t: TranslatorService;
 
   /**
    * See [User flows].
@@ -42,29 +46,40 @@ export class OIDCController {
     @Req() request: Request,
     @Res() response: Response,
   ) {
-    console.log("chamou");
     const interaction = await this.provider.interactionDetails(
       request,
       response,
     );
 
-    console.log(interaction, "\n\n", JSON.stringify(interaction));
-
     const _client = await this.provider.Client.find(
       interaction.params.client_id as string,
     );
 
-    // TODO:
-    // As we'll be dealing with a SPA, perhaps we should encode the data we will
-    // need in the SPA and perform a secondary redirect to a SPA route which
-    // renders the expected view using the URL-encoded data to redirect back, as
-    // required by the interaction endpoint specification from `node-oidc-provider`.
     switch (interaction.prompt.name) {
       case "login":
-        break;
+        return response.render("login", {
+          endpoint: `/oidc/interaction/${interaction.uid}/login`,
+          registerEndpoint: "/auth/register",
+          title: await this.t.translate("oidc:login:title"),
+          locale: this.t.getLocale(),
+          labels: {
+            username: await this.t.translate(
+              "auth:forms:login:labels:username",
+            ),
+            password: await this.t.translate(
+              "auth:forms:login:labels:password",
+            ),
+          },
+          buttons: {
+            login: await this.t.translate("auth:forms:login:buttons:login"),
+            noAccount: await this.t.translate(
+              "auth:forms:login:buttons:no-account",
+            ),
+          },
+        });
 
       case "consent":
-        break;
+        return response.render("confirm", {});
 
       default:
         throw new IrrecoverableError(
