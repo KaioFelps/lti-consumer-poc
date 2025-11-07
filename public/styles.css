@@ -1,0 +1,30 @@
+label {
+    display: block;
+    margin-bottom: 12px;
+}
+
+label > span {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.error-span {
+    color: red;
+}
+
+.success-alert {
+    padding: 8px 16px;
+    background: color-mix(in oklab, green 25%, transparent);
+    color: green;
+    margin-bottom: 12px;
+}
+
+.error-alert {
+    padding: 8px 16px;
+    background: color-mix(in oklab, red 25%, transparent);
+    color: red;
+    margin-bottom: 12px;
+}
+
+.success-alert a { font-weight: bold; color: green; }
+.error-alert a { font-weight: bold; color: red; }

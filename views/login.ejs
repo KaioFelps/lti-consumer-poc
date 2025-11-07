@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="<%= locale %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <title><%= title %></title>
+</head>
+<body>
+    <h1><%= title %></h1>
+    <% if (flash?.success) { %>
+        <div class="success-alert">
+            <span><%= flash.success.message %></span><br>
+            <a href="<%= loginEndpoint %>"><%= flash.success.loginButtonMessage %></a>
+        </div>
+    <% } %>
+    <% if (error) { %>
+        <div class="error-alert">
+            <span><%= error %></span><br>
+        </div>
+    <% } %>
+    <form action="<%= endpoint %>" method="post">
+        <label>
+            <span><%= labels.username %></span>
+            <% (validationErrors?.username ?? []).forEach(error => { %>
+                <span class="error-span"><%= error.message %></span>
+            <% }) %>
+            <input type="text" name="username" id="username-input" value="<%= flash?.values?.username %>">
+        </label>
+        <label>
+            <span><%= labels.password %></span>
+            <% (validationErrors?.username ?? []).forEach(error => { %>
+                <span class="error-span"><%= error.message %></span>
+            <% }) %>
+            <input type="password" name="password" id="password-input" value="<%= flash?.values?.password %>">
+        </label>
+        
+        <button><%= buttons.login %></button>
+        <br>
+        <a href="<%= registerEndpoint %>"><%= buttons.noAccount %></a>
+    </form>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="<%= locale %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <title><%= title %></title>
+</head>
+<body>
+    <h1><%= title %></h1>
+
+    <% if (flash?.success) { %>
+        <div class="success-alert">
+            <span><%= flash.success.message %></span><br>
+            <a href="<%= loginEndpoint %>"><%= flash.success.loginButtonMessage %></a>
+        </div>
+    <% } %>
+
+    <form action="<%= endpoint %>" method="POST">
+        <label>
+            <span><%= labels.username %></span>
+            <% (validationErrors?.username ?? []).forEach(error => { %>
+                <span class="error-span"><%= error.message %></span>
+            <% }) %>
+            <input type="text" name="username" value="<%= flash?.values?.username %>">
+        </label>
+        <label>
+            <span><%= labels.firstName %></span>
+            <% (validationErrors?.firstName ?? []).forEach(error => { %>
+                <span class="error-span"><%= error.message %></span>
+            <% }) %>
+            <input type="text" name="firstName" value="<%= flash?.values?.firstName %>">
+        </label>
+        <label>
+            <span><%= labels.surname %></span>
+            <% (validationErrors?.surname ?? []).forEach(error => { %>
+                <span class="error-span"><%= error.message %></span>
+            <% }) %>
+            <input type="text" name="surname" value="<%= flash?.values?.surname %>">
+        </label>
+        <label>
+            <span><%= labels.cpf %></span>
+            <% (validationErrors?.cpf ?? []).forEach(error => { %>
+                <span class="error-span"><%= error.message %></span>
+            <% }) %>
+            <input type="text" name="cpf" value="<%= flash?.values?.cpf %>">
+        </label>
+        <label>
+            <span><%= labels.birthDate %></span>
+            <% (validationErrors?.birthDate ?? []).forEach(error => { %>
+                <span class="error-span"><%= error.message %></span>
+            <% }) %>
+            <input type="date" name="birthDate" value="<%= flash?.values?.birthDate %>">
+        </label>
+        <label>
+            <span><%= labels.email %></span>
+            <% (validationErrors?.email ?? []).forEach(error => { %>
+                <span class="error-span"><%= error.message %></span>
+            <% }) %>
+            <input type="email" name="email" value="<%= flash?.values?.email %>">
+        </label>
+        <label>
+            <span><%= labels.gender %></span>
+            <% (validationErrors?.gender ?? []).forEach(error => { %>
+                <span class="error-span"><%= error.message %></span>
+            <% }) %>
+            <input type="text" name="gender" value="<%= flash?.values?.gender %>">
+        </label>
+        <label>
+            <span><%= labels.password %></span>
+            <% (validationErrors?.password ?? []).forEach(error => { %>
+                <span class="error-span"><%= error.message %></span>
+            <% }) %>
+            <input type="text" name="password" value="<%= flash?.values?.password %>">
+        </label>
+
+        <button><%= buttons.create %></button>
+        <br>
+        <a href="<%= loginEndpoint %>"><%= buttons.alreadyHasAccount %></a>
+    </form>
+</body>
+</html>
