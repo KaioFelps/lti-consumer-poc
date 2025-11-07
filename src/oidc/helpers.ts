@@ -11,27 +11,28 @@ import type { Interaction } from "oidc-provider";
 export function resolveAcrValues(
   interaction: Interaction,
 ): { essential: boolean; values: string[] } | undefined {
-  // TODO: find out where are claims being located at and then
-  // try to find acr.essential && acr.values
-  // TODO: acr.values must override params.acr_values if present
-  console.debug("interaction.prompt.details", interaction.prompt.details);
-  console.debug("interaction.params.claims", interaction.params.claims);
-  console.debug("interaction.params.acr_values", interaction.params.acr_values);
-  console.debug("interaction.params.id_token", interaction.params.id_token);
-
-  const claimsObject = interaction.prompt.details.claims as object | undefined;
-  if (claimsObject && "acr" in claimsObject) {
-    const acrObject = claimsObject.acr as {
-      essential?: boolean;
+  /**
+   * interaction.prompt.details { acr: { value: 'loa1', essential: true, values: [ '["loa1"]' ] } }  type: object
+   * interaction.params.claims {"id_token":{"acr":{"value":"loa1","essential":true}}}  type: string
+   * interaction.params.acr_values ["loa1"]  type: string
+   * interaction.params.id_token undefined  type: undefined
+   */
+  type Details = {
+    acr?: {
       value?: string;
       values?: string[];
+      essential?: boolean;
     };
+  };
 
-    const acrValues = new Set([...(acrObject.values ?? [])]);
-    if (acrObject.value) acrValues.add(acrObject.value);
+  const details = interaction.prompt.details as Details;
+
+  if (details.acr) {
+    const acrValues = new Set([...(details.acr.values ?? [])]);
+    if (details.acr.value) acrValues.add(details.acr.value);
 
     return {
-      essential: acrObject.essential ?? false,
+      essential: details.acr.essential ?? false,
       values: Array.from(acrValues),
     };
   }
