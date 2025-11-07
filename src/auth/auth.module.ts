@@ -1,5 +1,6 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { IdentityModule } from "@/identity/identity.module";
+import { FlashSessionMiddleware } from "@/lib/middlewares/flash-session.middleware";
 import { AuthController } from "./auth.controller";
 import { AuthenticateUserService } from "./services/authenticate-user.service";
 
@@ -9,4 +10,8 @@ import { AuthenticateUserService } from "./services/authenticate-user.service";
   controllers: [AuthController],
   imports: [IdentityModule],
 })
-export class AuthModule {}
+export class AuthModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(FlashSessionMiddleware).forRoutes(AuthController);
+  }
+}
