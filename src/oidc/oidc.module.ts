@@ -27,6 +27,6 @@ import { OIDCClientsRepository } from "./repositories/clients.repository";
 })
 export class OIDCModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(FlashSessionMiddleware).forRoutes(OIDCController);
+    consumer.apply(FlashSessionMiddleware).forRoutes("/oidc/interaction/*path");
   }
 }

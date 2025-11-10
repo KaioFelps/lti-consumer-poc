@@ -17,6 +17,7 @@ import { LoginDTO } from "@/auth/dtos/login.dto";
 import { AuthenticateUserService } from "@/auth/services/authenticate-user.service";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { UnauthorizedError } from "@/core/errors/unauthorized.error";
+import { MVC } from "@/lib/decorators/mvc-route";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { TranslatorService } from "@/message-string/translator.service";
 import { AvailableACRs } from "./consts";
@@ -40,6 +41,7 @@ export class OIDCController {
    * [User flows]: https://github.com/panva/node-oidc-provider/blob/main/docs/README.md#user-flows
    */
   // This `uid` param will be used by `oidc.Provider` to obtain the interaction instance.
+  @MVC()
   @Get("interaction/:uid")
   @Header("cache-control", "no-store")
   public async interactions(
@@ -88,6 +90,7 @@ export class OIDCController {
     }
   }
 
+  @MVC()
   @Post("interaction/:uid/login")
   @Header("cache-control", "no-store")
   public async loginIteractionFinished(
@@ -102,6 +105,8 @@ export class OIDCController {
         "A non-login prompt request has reached login final endpoint.",
       );
     }
+
+    console.debug("login");
 
     const authentication = pipe(
       await this.authenticateUserService.execute(login),
@@ -141,6 +146,7 @@ export class OIDCController {
     });
   }
 
+  @MVC()
   @Post("interaction/:uid/consent")
   @Header("cache-control", "no-store")
   public async consentIteractionFinished(
