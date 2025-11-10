@@ -8,12 +8,18 @@ import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-
 
 export class LoginDTO implements DTO {
   protected static loginSchema = z.object({
-    username: z.string({
-      error: "auth:authenticate-user:username-invalid-type",
-    }),
-    password: z.string({
-      error: "auth:authenticate-user:password-invalid-type",
-    }),
+    username: z
+      .string({
+        error: "auth:authenticate-user:username-invalid-type",
+      })
+      .min(1, {
+        error: "auth:authenticate-user:username-invalid-type",
+      }),
+    password: z
+      .string({
+        error: "auth:authenticate-user:password-invalid-type",
+      })
+      .min(1, { error: "auth:authenticate-user:password-invalid-type" }),
   });
 
   @Expose()
