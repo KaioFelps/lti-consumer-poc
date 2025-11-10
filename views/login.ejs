@@ -29,7 +29,7 @@
         </label>
         <label>
             <span><%= labels.password %></span>
-            <% (validationErrors?.username ?? []).forEach(error => { %>
+            <% (validationErrors?.password ?? []).forEach(error => { %>
                 <span class="error-span"><%= error.message %></span>
             <% }) %>
             <input type="password" name="password" id="password-input" value="<%= flash?.values?.password %>">
