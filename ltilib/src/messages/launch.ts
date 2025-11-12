@@ -16,14 +16,14 @@ import {
   PlatformInstanceClaim,
   UserIdentityClaim,
   VendorExtraClaims,
-} from "$/claims";
+} from "ltilib/src/claims";
 import {
   AvailableLtiVersion,
   IntoLtiClaim,
   LTIClaimKey,
   MessageTypeClaim,
   resolveClaimKey,
-} from "$/claims/serialization";
+} from "ltilib/src/claims/serialization";
 
 /**
  * See: https://www.imsglobal.org/spec/lti/v1p3/#resource-link-launch-request-message

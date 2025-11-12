@@ -1,5 +1,5 @@
 {
-  "name": "local-lti",
+  "name": "ltilib",
   "version": "1.0.0",
   "description": "Tool for implementing a LTI-compliant platform.",
   "license": "MIT",
