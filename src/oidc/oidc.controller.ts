@@ -11,18 +11,23 @@ import {
 } from "@nestjs/common";
 import { Request, Response } from "express";
 import { either } from "fp-ts";
+import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
-import { type InteractionResults } from "oidc-provider";
+import { Client, Interaction, type InteractionResults } from "oidc-provider";
 import { LoginDTO } from "@/auth/dtos/login.dto";
 import { AuthenticateUserService } from "@/auth/services/authenticate-user.service";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { UnauthorizedError } from "@/core/errors/unauthorized.error";
+import { HttpRequest, HttpResponse } from "@/lib";
 import { MVC } from "@/lib/decorators/mvc-route";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { TranslatorService } from "@/message-string/translator.service";
 import { AvailableACRs } from "./consts";
-import { resolveAcrValues } from "./helpers";
+import { reasonsAreValidPromptReasons, resolveAcrValues } from "./helpers";
 import { OIDCProvider } from "./provider";
+import { OIDCAccountsRepository } from "./repositories/accounts.repository";
+import { ConsentViewManagerFactory } from "./view-manager/consent";
+import { LoginViewManager } from "./view-manager/login";
 
 @Controller("oidc")
 export class OIDCController {
@@ -31,6 +36,9 @@ export class OIDCController {
 
   @Inject()
   private authenticateUserService: AuthenticateUserService;
+
+  @Inject()
+  private accountRepository: OIDCAccountsRepository;
 
   @Inject()
   private t: TranslatorService;
@@ -52,36 +60,76 @@ export class OIDCController {
       request,
       response,
     );
+    const localeHint = interaction.params.ui_locales as string | undefined;
 
-    const _client = await this.provider.Client.find(
-      interaction.params.client_id as string,
-    );
+    const clientResult = await this.getClient(interaction);
+    if (either.isLeft(clientResult)) {
+      return await this.provider.interactionFinished(
+        request,
+        response,
+        clientResult.left,
+        { mergeWithLastSubmission: false },
+      );
+    }
+    const client = clientResult.right;
 
     switch (interaction.prompt.name) {
-      case "login":
-        return response.render("login", {
-          endpoint: `/oidc/interaction/${interaction.uid}/login`,
-          registerEndpoint: "/auth/register",
-          title: await this.t.translate("oidc:login:title"),
-          locale: this.t.getLocale(),
-          labels: {
-            username: await this.t.translate(
-              "auth:forms:login:labels:username",
-            ),
-            password: await this.t.translate(
-              "auth:forms:login:labels:password",
-            ),
-          },
-          buttons: {
-            login: await this.t.translate("auth:forms:login:buttons:login"),
-            noAccount: await this.t.translate(
-              "auth:forms:login:buttons:no-account",
-            ),
-          },
+      case "login": {
+        const viewManager = new LoginViewManager({
+          interaction,
+          translatorService: this.t,
+          localeHint,
         });
 
-      case "consent":
-        return response.render("confirm", {});
+        return response.render(
+          viewManager.getView(),
+          await viewManager.getRenderData(),
+        );
+      }
+
+      case "consent": {
+        const accountId = interaction.session!.accountId;
+        const account = await this.accountRepository.findAccountById(accountId);
+
+        if (!account) {
+          console.error(
+            `Couldn't find account with id ${accountId}, even though it have been authenticated` +
+              `previously. This may indicate data inconsistency.`,
+          );
+
+          return await this.provider.interactionFinished(
+            request,
+            response,
+            { error: "invalid_request" },
+            { mergeWithLastSubmission: false },
+          );
+        }
+
+        const reasons = interaction.prompt.reasons;
+        if (!reasonsAreValidPromptReasons(reasons)) {
+          throw new IrrecoverableError(
+            "Unexpected prompt reason triggered consent interaction.",
+          );
+        }
+
+        // Solves one reason per time. This is allowed since oidc-provider recursively
+        // redirects user back to this interaction fallback until there is no reasons left
+        // to stop user from performing whatever it's trynna do.
+        const reason = reasons[0];
+        const viewManager = ConsentViewManagerFactory.create({
+          reason,
+          client,
+          account,
+          translatorService: this.t,
+          localeHint,
+          interaction,
+        });
+
+        return response.render(
+          viewManager.getView(),
+          await viewManager.getRenderData(),
+        );
+      }
 
       default:
         throw new IrrecoverableError(
@@ -219,9 +267,40 @@ export class OIDCController {
     });
   }
 
-  @All("/*path")
+  @All("*path")
   public mountedOIDC(@Req() req: Request, @Res() res: Response) {
     req.url = req.originalUrl.replace("/oidc", "");
     return this.provider.callback()(req, res);
+  }
+
+  private async getClient(
+    interaction: Interaction,
+  ): Promise<Either<InteractionResults, Client>> {
+    // TODO: find out whether oidc-provider does ensure client_id exists
+    // before even calling this endpoint and, if this is the case,
+    // remove this validation.
+    const clientId = interaction.params.client_id as string | undefined;
+    if (!clientId) {
+      return either.left({
+        error: "invalid_request",
+        error_description: await this.t.translateWithHint(
+          "oidc:error-descriptions:no-client-id-parameter",
+          interaction.params.ui_locales as string | undefined,
+        ),
+      });
+    }
+
+    const client = await this.provider.Client.find(clientId);
+    if (!client) {
+      return either.left({
+        error: "unauthorized_client",
+        error_description: await this.t.translateWithHint(
+          "oidc:error-descriptions:unregistered-or-unauthorized-client",
+          interaction.params.ui_locales as string | undefined,
+        ),
+      });
+    }
+
+    return either.right(client);
   }
 }
