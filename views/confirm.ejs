@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .buttons-container {
+            display: flex;
+            gap: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1><%= title %></h1>
+
+    <% if (error) { %>
+        <div class="error-alert">
+            <span><%= error %></span><br>
+        </div>
+    <% } %>
+
+    <p><%= content.p1 %></p>
+    <p><%= content.p2 %></p>
+
+    <% if (content.missingScopes.length) { %>
+        <ul>
+            <% content.missingScopes.forEach(scope => { %>
+                <li><%= scope %></li>
+            <% }) %>
+        </ul>
+    <% } %>
+
+    <div class="buttons-container">
+        <form action="<%= endpoints.abort %>" method="post">
+            <button><%= buttons.cancel %></button>
+        </form>
+        <form action="<%= endpoints.consent %>" method="post">
+            <button><%= buttons.authorize %></button>
+        </form>
+    </div>
+</body>
+</html>
