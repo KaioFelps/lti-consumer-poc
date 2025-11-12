@@ -35,11 +35,24 @@ export class OIDCProvider extends Provider {
       findAccount: async (_ctx, id, _token) => {
         return await oidcAccountsRepository.findAccountById(id);
       },
+      // this option specify claims returned according to scopes given
+      claims: {
+        email: ["email"],
+        profile: [
+          "birthdate",
+          "family_name",
+          "gender",
+          "given_name",
+          "locale",
+          "name",
+          "nickname",
+        ],
+      },
       interactions: {
         url: (_, interaction) => `/oidc/interaction/${interaction.uid}`,
       },
       acrValues: [AvailableACRs.loa1, AvailableACRs.loa0],
-      scopes: [...AvailableScopes],
+      scopes: AvailableScopes as string[],
       features: {
         claimsParameter: { enabled: true },
         devInteractions: { enabled: false },
@@ -50,10 +63,30 @@ export class OIDCProvider extends Provider {
           session: "lti_consumer_poc_oidc_session",
         },
       },
+      // values are expected to be seconds
+      ttl: {
+        Session: 60 * 60 * 24, // 1 day
+        Interaction: 60 * 5, // 5 minutes,
+      },
+      renderError: async (ctx, out, error) => {
+        console.debug(ctx.body);
+        console.debug(error);
+        ctx.body = out;
+      },
       // routes: {}
     } satisfies Configuration;
 
     const issuerUrl = `${environments.appUrl}/oidc`;
-    return new OIDCProvider(issuerUrl, config);
+    const provider = new OIDCProvider(issuerUrl, config);
+
+    provider.on("server_error", (ctx, error) => {
+      console.debug("server error", ctx.url, error);
+    });
+
+    provider.on("userinfo.error", (ctx, error) => {
+      console.debug("userinfo error", error, ctx.url);
+    });
+
+    return provider;
   }
 }
