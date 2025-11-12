@@ -13,11 +13,28 @@ export class TranslatorService {
     return locale;
   }
 
+  public async translateWithHint(
+    identifier: string,
+    language_hint?: string,
+    args?: MessageStringFormatterArg,
+  ): Promise<string> {
+    const language = language_hint ?? this.getLocale();
+    return await this.translateToLanguage(identifier, language, args);
+  }
+
   public async translate(
     identifier: string,
     args?: MessageStringFormatterArg,
   ): Promise<string> {
     const language = this.getLocale();
+    return await this.translateToLanguage(identifier, language, args);
+  }
+
+  private async translateToLanguage(
+    identifier: string,
+    language: string,
+    args?: MessageStringFormatterArg,
+  ): Promise<string> {
     const strings = await this.getStringsFromLanguageTag(language);
 
     if (!strings) return identifier;
