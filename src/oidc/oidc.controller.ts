@@ -106,8 +106,6 @@ export class OIDCController {
       );
     }
 
-    console.debug("login");
-
     const authentication = pipe(
       await this.authenticateUserService.execute(login),
       either.mapLeft((error) => {
@@ -154,6 +152,8 @@ export class OIDCController {
     @Res() response: Response,
   ) {
     const details = await this.provider.interactionDetails(request, response);
+    const accountId = details.session?.accountId;
+    const clientId = details.params.client_id as string;
 
     if (details.prompt.name !== "consent") {
       throw new IrrecoverableError(
@@ -161,7 +161,62 @@ export class OIDCController {
       );
     }
 
-    // const grantId = details.grantId;
+    const grant = details.grantId
+      ? await this.provider.Grant.find(details.grantId)
+      : new this.provider.Grant({ accountId, clientId });
+
+    if (!grant) {
+      return await this.provider.interactionFinished(
+        request,
+        response,
+        {
+          error: "invalid_request_object",
+          error_description: "request sent a non-existing grant ID",
+        },
+        { mergeWithLastSubmission: false },
+      );
+    }
+
+    const promptDetails = details.prompt.details;
+
+    const scopes = promptDetails.missingOIDCScope as string[] | undefined;
+    if (scopes) grant.addOIDCScope(scopes.join(" "));
+
+    const claims = promptDetails.missingOIDCClaims as string[] | undefined;
+    if (claims) grant.addOIDCClaims(claims);
+
+    const resourceScopes = promptDetails.missingResourceScopes as
+      | Record<string, string[]>
+      | undefined;
+
+    if (resourceScopes) {
+      for (const [indicator, scopes] of Object.entries(resourceScopes)) {
+        grant.addResourceScope(indicator, scopes.join(" "));
+      }
+    }
+
+    const grantId = await grant.save();
+    const consent: InteractionResults["consent"] = {};
+    // only pass grantId to consent if not modifying an existing grant
+    if (!details.grantId) consent.grantId = grantId;
+
+    await this.provider.interactionFinished(request, response, { consent });
+  }
+
+  @MVC()
+  @Post("interaction/:uid/abort")
+  public async abortInteraction(
+    @Req() req: HttpRequest,
+    @Res() res: HttpResponse,
+  ) {
+    const result = {
+      error: "access_denied",
+      error_description: "end-user aborted interaction",
+    };
+
+    await this.provider.interactionFinished(req, res, result, {
+      mergeWithLastSubmission: false,
+    });
   }
 
   @All("/*path")
