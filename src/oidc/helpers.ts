@@ -40,3 +40,22 @@ export function resolveAcrValues(
   const acr = interaction.params.acr_values as string | undefined;
   if (acr) return { essential: false, values: acr.split(" ") };
 }
+
+// see: https://github.com/panva/node-oidc-provider/blob/main/docs/README.md#interactionspolicy
+const possibleConsentPromptReasons = [
+  "native_client_prompt",
+  "op_scopes_missing",
+  "op_claims_missing",
+  "rs_scopes_missing",
+  "rar_prompt",
+] as const;
+
+export type ConsentPromptReason = (typeof possibleConsentPromptReasons)[number];
+
+export function reasonsAreValidPromptReasons(
+  reasons: string[],
+): reasons is ConsentPromptReason[] {
+  return reasons.every((reason) =>
+    possibleConsentPromptReasons.includes(reason as ConsentPromptReason),
+  );
+}
