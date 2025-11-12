@@ -2,7 +2,7 @@
 Esse repositório contém uma pequena aplicação LTI-Compatible capaz de registrar learning tools.
 
 ## Objetivo
-A prova de conceito consiste em registrar o Moodle como uma Learning Tool e obter informações sobre
+A prova de conceito (PoC ou PdC) consiste em registrar o Moodle como uma Learning Tool e obter informações sobre
 atividades realizadas em determinados cursos.
 
 Além disso, outros experimentos estão sendo realizados e testados neste repositório:
@@ -21,3 +21,14 @@ Para testar em desenvolvimento o funcionamento do Authorization Server, uma segu
 sendo utilizada como um cliente. Esta aplicação está disponível no repositório [oidc-rp-client-experiment].
 
 [oidc-rp-client-experiment]: https://github.com/KaioFelps/oidc-rp-client-experiment
+
+## OIDC
+A implementação atual de um provider OIDC permite se autenticar e
+autorizar/rejeitar permissões para clientes registrados. Para testar, levante ambos os servidores (este e, em seguida,
+o cliente — nesta exata ordem) e acesse a rota `localhost:4000/info` para tentar obter os dados da sua conta neste
+resource server.
+
+Se não houver sessão, pela implementação, você deverá se autenticar. Quando autenticado, você deverá conceder (ou não)
+as permissões (*grants*) requeridas pelo cliente.
+
+Para deslogar-se, acesse a rota `localhost:3000/oidc/session/end`.
