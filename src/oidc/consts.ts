@@ -9,11 +9,15 @@ export const AvailableACRs = Object.freeze({
   loa1: "1",
 });
 
-export const AvailableScopes = Object.freeze([
-  "openid",
+export enum AvailableScope {
+  openId = "openid",
+  email = "email",
+  profile = "profile",
   /**
    * Allow refresh tokens to be issued along with access tokens.
    * See: https://openid.net/specs/openid-connect-core-1_0.html#OfflineAccess
    */
-  "offline_access",
-]);
+  offlineAccess = "offline_access",
+}
+
+export const AvailableScopes = Object.freeze(Object.values(AvailableScope));
