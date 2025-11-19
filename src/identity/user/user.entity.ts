@@ -1,6 +1,6 @@
 import { Optional } from "common/src/types/optional";
+import { UUID } from "common/src/types/uuid";
 import { EntityBase } from "@/core/entity-base";
-import { UUID } from "@/core/uuid";
 import { SystemRole } from "./enums/system-role";
 
 export type UserProps = {

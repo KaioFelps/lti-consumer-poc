@@ -1,4 +1,4 @@
-import { generateUUID, type UUID } from "./uuid";
+import { generateUUID, type UUID } from "../../common/src/types/uuid";
 
 export abstract class EntityBase<Props> {
   protected constructor(protected props: Props) {}
