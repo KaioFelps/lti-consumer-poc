@@ -21,7 +21,7 @@ import {
   AvailableLtiVersion,
   IntoLtiClaim,
   LTIClaimKey,
-  MessageTypeClaim,
+  MessageType,
   resolveClaimKey,
 } from "ltilib/src/claims/serialization";
 
@@ -34,7 +34,7 @@ export class LTIResourceLinkLaunchRequest<
 > implements IntoLtiClaim
 {
   private readonly version = AvailableLtiVersion["1p3"];
-  private readonly messageType = MessageTypeClaim.resourceLink;
+  private readonly messageType = MessageType.resourceLink;
 
   private constructor(
     /**
