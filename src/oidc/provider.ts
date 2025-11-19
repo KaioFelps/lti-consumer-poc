@@ -3,6 +3,9 @@ import Provider, { type Configuration } from "oidc-provider";
 import { EnvironmentVars } from "@/config/environment-vars";
 import { OIDCRedisAdapterFactory } from "@/external/data-store/redis/oidc/adapter-factory";
 import { OIDCRedisAdapterBridge } from "@/external/data-store/redis/oidc/adpater-bridge";
+import { MessageType } from "$/claims/serialization";
+import { MessagePlacement } from "$/registration/enums/message-placement";
+import { PlatformConfigurationMetadata } from "$/registration/platform-configuration-metadata";
 import { AvailableACRs, AvailableScopes } from "./consts";
 import { OIDCAccountsRepository } from "./repositories/accounts.repository";
 import { OIDCClientsRepository } from "./repositories/clients.repository";
@@ -73,10 +76,22 @@ export class OIDCProvider extends Provider {
         console.debug(error);
         ctx.body = out;
       },
+      discovery: new PlatformConfigurationMetadata({
+        version: process.env.npm_package_version ?? "development",
+        messagesSupported: [
+          { type: MessageType.resourceLink },
+          {
+            type: MessageType.deepLinking,
+            placements: [MessagePlacement.ContentArea],
+          },
+        ],
+        productFamilyCode: environments.app.productCode,
+      }).intoConfiguration(),
+
       // routes: {}
     } satisfies Configuration;
 
-    const issuerUrl = `${environments.appUrl}/oidc`;
+    const issuerUrl = `${environments.app.url}/oidc`;
     const provider = new OIDCProvider(issuerUrl, config);
 
     provider.on("server_error", (ctx, error) => {
