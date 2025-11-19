@@ -9,7 +9,7 @@
  * ```ts
  * class Foo {
  *  private constructor(
- *      private myProperty: string;
+ *      public myProperty: string;
  *  ) {}
  *
  *  public myPublicMethod() {
