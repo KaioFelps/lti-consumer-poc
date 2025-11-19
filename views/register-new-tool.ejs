@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="<%= locale %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <title><%= title %></title>
+</head>
+<body>
+    <h1><%= title %></h1>
+    <% if (flash?.success) { %>
+        <div class="success-alert">
+            <span><%= flash.success.message %></span><br>
+            <a href="<%= loginEndpoint %>"><%= flash.success.loginButtonMessage %></a>
+        </div>
+    <% } %>
+    <% if (error) { %>
+        <div class="error-alert">
+            <span><%= error %></span><br>
+        </div>
+    <% } %>
+    <a href="<%= registerUri %>"><%= labels.registerPlatform %></a>
+</body>
+</html>

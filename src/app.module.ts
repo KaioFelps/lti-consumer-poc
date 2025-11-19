@@ -7,6 +7,7 @@ import { ExternalModule } from "./external/external.module";
 import { IdentityModule } from "./identity/identity.module";
 import { GlobalExceptionFiltersModule } from "./lib/globals/exception-filters.module";
 import { GlobalInterceptorsModule } from "./lib/globals/interceptors.module";
+import { LtiModule } from "./lti/lti.module";
 import { MessageStringModule } from "./message-string/message-string.module";
 import { OIDCModule } from "./oidc/oidc.module";
 
@@ -20,6 +21,7 @@ import { OIDCModule } from "./oidc/oidc.module";
     AuthModule,
     IdentityModule,
     OIDCModule,
+    LtiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
