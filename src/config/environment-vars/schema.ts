@@ -8,6 +8,12 @@ export const environmentVariablesSchema = z.object({
   DB_HOST: z.string(),
   APP_URL: z.url(),
   APP_SECRET: z.string(),
+  APP_NAME: z.string(),
+  APP_PRODUCT_NAME: z.string(),
+  NODE_ENV: z
+    .enum(["production", "development"])
+    .optional()
+    .default("production"),
   REDIS_PASSWORD: z.string(),
   REDIS_USER: z.string(),
   REDIS_PORT: z.coerce.number(),

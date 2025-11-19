@@ -5,6 +5,7 @@ import { EnvironmentVariablesSchema } from "./schema";
 @Injectable()
 export class EnvironmentVars {
   private constructor(
+    public readonly nodeEnv: EnvironmentVariablesSchema["NODE_ENV"],
     public readonly database: {
       readonly user: string;
       readonly password: string;
@@ -12,13 +13,17 @@ export class EnvironmentVars {
       readonly host: string;
       readonly name: string;
     },
-    public readonly appUrl: string,
-    public readonly appSecret: string,
+    public readonly app: {
+      readonly url: string;
+      readonly secret: string;
+      readonly name: string;
+      readonly productCode: string;
+    },
     public readonly redis: {
-      user: string;
-      password: string;
-      port: number;
-      host: string;
+      readonly user: string;
+      readonly password: string;
+      readonly port: number;
+      readonly host: string;
     },
   ) {}
 
@@ -26,6 +31,7 @@ export class EnvironmentVars {
     nestConfigService: ConfigService<EnvironmentVariablesSchema, true>,
   ): Promise<EnvironmentVars> {
     return new EnvironmentVars(
+      nestConfigService.get("NODE_ENV"),
       {
         //   connectionUrl: nestConfigService.get("DB_CONNECTION_URL"),
         host: nestConfigService.get("DB_HOST"),
@@ -34,8 +40,12 @@ export class EnvironmentVars {
         user: nestConfigService.get("DB_USER"),
         name: nestConfigService.get("DB_NAME"),
       },
-      nestConfigService.get("APP_URL"),
-      nestConfigService.get("APP_SECRET"),
+      {
+        url: nestConfigService.get("APP_URL"),
+        secret: nestConfigService.get("APP_SECRET"),
+        name: nestConfigService.get("APP_NAME"),
+        productCode: nestConfigService.get("APP_PRODUCT_NAME"),
+      },
       {
         user: nestConfigService.get("REDIS_USER"),
         password: nestConfigService.get("REDIS_PASSWORD"),
