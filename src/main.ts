@@ -26,7 +26,7 @@ async function bootstrap() {
   app.use(
     session({
       name: "lti_consumer_poc_session",
-      secret: env.appSecret,
+      secret: env.app.secret,
       resave: false,
       saveUninitialized: false,
       store: new RedisStore({ client: redis.client }),
