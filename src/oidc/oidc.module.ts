@@ -10,6 +10,7 @@ import { OIDCAccountsRepository } from "./repositories/accounts.repository";
 import { OIDCClientsRepository } from "./repositories/clients.repository";
 
 @Module({
+  imports: [AuthModule, RedisODICModule],
   controllers: [OIDCController],
   providers: [
     {
@@ -23,7 +24,7 @@ import { OIDCClientsRepository } from "./repositories/clients.repository";
       ],
     },
   ],
-  imports: [AuthModule, RedisODICModule],
+  exports: [OIDCProvider],
 })
 export class OIDCModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
