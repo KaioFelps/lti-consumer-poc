@@ -21,6 +21,7 @@ services:
     volumes:
       - moodle_data:/bitnami/moodle
       - moodledata_data:/bitnami/moodledata
+      - ./certs/rootCA.pem:/usr/local/share/ca-certificates/mkcert-root.crt:ro
     depends_on:
       moodle_db:
         condition: service_healthy
