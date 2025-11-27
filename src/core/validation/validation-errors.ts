@@ -1,3 +1,5 @@
+import { option } from "fp-ts";
+import { Option } from "fp-ts/lib/Option";
 import { InvalidArgumentError } from "../errors/invalid-argument.error";
 
 export type ValidationError = InvalidArgumentError;
@@ -16,6 +18,32 @@ export class ValidationErrors {
 
   public getErrors() {
     return this.errors;
+  }
+
+  public pickFirstError() {
+    const errorTuples = Object.entries(this.errors);
+    if (errorTuples.length === 0) return option.none;
+    const [field, error] = errorTuples[0];
+    return this.pickFirstErrorRecursively(field, error);
+  }
+
+  private pickFirstErrorRecursively(
+    field: string,
+    error: ValidationErrorsMap[string],
+  ): Option<[string, InvalidArgumentError]> {
+    if (Array.isArray(error)) {
+      return error.length === 0 ? option.none : option.some([field, error[0]]);
+    }
+
+    const errorTuples = Object.entries(error);
+    if (errorTuples.length === 0) return option.none;
+
+    const [firstErrorField, firstError] = errorTuples[0];
+
+    return this.pickFirstErrorRecursively(
+      [field, firstErrorField].join("."),
+      firstError as ValidationErrorsMap[string],
+    );
   }
 
   public appendError(error: ValidationError) {
