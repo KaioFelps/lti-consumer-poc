@@ -16,8 +16,6 @@ import { ToolSupportedMessage } from "./tool-supported-message";
 type ToolRecordArgs = ClassProperties<ToolRecord>;
 
 export class ToolRecord implements IntoLtiClaim {
-  public static readonly ltiToolConfigurationKey = LTI_TOOL_CONFIGURATION_KEY;
-
   public readonly applicationType: "web" = "web";
   public readonly tokenEndpointAuthMethod: "private_key_jwt" =
     "private_key_jwt";
