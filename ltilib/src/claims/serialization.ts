@@ -20,7 +20,7 @@ const LTI_CLAIM_PREFIX = `${LTI_PREFIX}/spec/lti/claim`;
  * The type of the LTI Message.
  */
 export enum MessageType {
-  resourceLink = "LTIResourceLinkRequest",
+  resourceLink = "LtiResourceLinkRequest",
   deepLinking = "LtiDeepLinkingRequest",
 }
 
