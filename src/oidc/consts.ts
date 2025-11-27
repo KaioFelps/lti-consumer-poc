@@ -1,3 +1,6 @@
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
+import { NamesAndRolesProvisioningServiceScopes } from "$/names-and-roles-provisioning/scopes";
+
 export const AvailableACRs = Object.freeze({
   /**
    * Level of Assurance 0: a non-authenticated user.
@@ -20,4 +23,11 @@ export enum AvailableScope {
   offlineAccess = "offline_access",
 }
 
-export const AvailableScopes = Object.freeze(Object.values(AvailableScope));
+export const AvailableScopes = Object.freeze([
+  ...Object.values(AvailableScope),
+  AssignmentAndGradeServiceScopes.Lineitem,
+  AssignmentAndGradeServiceScopes.LineitemReadonly,
+  AssignmentAndGradeServiceScopes.ResultReadonly,
+  AssignmentAndGradeServiceScopes.Score,
+  NamesAndRolesProvisioningServiceScopes.MembershipReadonly,
+]);
