@@ -1,10 +1,10 @@
-import { SupportedMessage } from "./supported-message";
+import { ToolConfigurationSupportedMessage } from "./supported-message";
 
 export type GrantType = "implicit" | "client_credentials";
 export type ResponseType = "id_token";
 export type Contact = `${string}@${string}.${string}`;
 
-export const LTI_CONFIGURATION_KEY =
+export const LTI_TOOL_CONFIGURATION_KEY =
   "https://purl.imsglobal.org/spec/lti-tool-configuration";
 
 /**
@@ -15,7 +15,7 @@ export const LTI_CONFIGURATION_KEY =
  * - https://www.imsglobal.org/spec/lti-dr/v1p0#tool-configuration
  * - https://openid.net/specs/openid-connect-registration-1_0-errata2.html
  */
-export type LtiDynamicToolConfiguration = {
+export type DraftLtiDynamicToolConfiguration = {
   client_id?: string;
   application_type: "web";
   grant_types: [
@@ -25,6 +25,7 @@ export type LtiDynamicToolConfiguration = {
   ];
   response_types: ["id_token", ...ResponseType[]];
   redirect_uris: string[];
+  initiate_login_uri: string;
   client_name: string;
   jwks_uri: string;
   logo_uri?: string;
@@ -37,7 +38,7 @@ export type LtiDynamicToolConfiguration = {
   /**
    * See: https://www.imsglobal.org/spec/lti-dr/v1p0#lti-configuration-0
    */
-  [LTI_CONFIGURATION_KEY]: {
+  [LTI_TOOL_CONFIGURATION_KEY]: {
     domain: string;
     secondary_domains?: string[];
     deployment_id?: string;
@@ -46,8 +47,20 @@ export type LtiDynamicToolConfiguration = {
     /**
      * See: https://www.imsglobal.org/spec/lti-dr/v1p0#lti-message
      */
-    messages: SupportedMessage[];
+    messages: ToolConfigurationSupportedMessage[];
     claims: string[];
     custom_parameters?: Record<string, string>;
   };
 };
+
+/**
+ * Represents a stored configuration from some registered LTI tool. Platforms
+ * must return this type after registering a LTI tool and everytime a tool requests
+ * its configuration within the platform.
+ */
+export type LtiDynamicToolConfiguration = DraftLtiDynamicToolConfiguration & {
+  client_id: string;
+};
+
+// TODO: add a zod schema to validate these data and also ensure they are not too big to fit int the
+// database schema (e.g., name cannot exceed 255 characters).

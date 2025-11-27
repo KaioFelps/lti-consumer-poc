@@ -1,1 +1,3 @@
-export class InvalidToolConfigurationError extends Error {}
+export class InvalidToolConfigurationError {
+  public constructor(public errors: Record<string, string>) {}
+}
