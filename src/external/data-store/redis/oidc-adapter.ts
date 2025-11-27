@@ -3,14 +3,14 @@
  */
 
 import { AdapterPayload } from "oidc-provider";
-import { Redis } from "../client";
 import {
   grantable,
   grantKeyFor,
   resolveOIDCKey,
   uidKeyFor,
   userCodeKeyFor,
-} from "./helpers";
+} from "@/oidc/adapter/helpers";
+import { Redis } from "./client";
 
 export class OIDCRedisAdapter {
   public constructor(

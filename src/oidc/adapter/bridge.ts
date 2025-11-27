@@ -1,20 +1,17 @@
 import { Adapter, AdapterPayload } from "oidc-provider";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { OIDCRedisAdapter } from "./adapter";
-import { OIDCRedisAdapterFactory } from "./adapter-factory";
+import { ModelName, OIDCAdapterFactory } from "./factory";
 
-export class OIDCRedisAdapterBridge implements Adapter {
-  private static internalAdapterFactory: OIDCRedisAdapterFactory;
-  private internalAdapter!: OIDCRedisAdapter;
+export class OIDCAdapterBridge implements Adapter {
+  private static internalAdapterFactory: OIDCAdapterFactory;
+  private internalAdapter!: Adapter;
 
-  public static setInternalAdapter(
-    internalAdapterFactory: OIDCRedisAdapterFactory,
-  ) {
-    OIDCRedisAdapterBridge.internalAdapterFactory = internalAdapterFactory;
+  public static setInternalAdapter(internalAdapterFactory: OIDCAdapterFactory) {
+    OIDCAdapterBridge.internalAdapterFactory = internalAdapterFactory;
   }
 
-  public constructor(name: string) {
-    if (!OIDCRedisAdapterBridge.internalAdapterFactory) {
+  public constructor(modelName: ModelName) {
+    if (!OIDCAdapterBridge.internalAdapterFactory) {
       throw new IrrecoverableError(
         "Tried to instantiate a OIDCRedisAdapterBridge without " +
           " setting its internal adapter factory beforehands.",
@@ -22,7 +19,7 @@ export class OIDCRedisAdapterBridge implements Adapter {
     }
 
     this.internalAdapter =
-      OIDCRedisAdapterBridge.internalAdapterFactory.getAdapter(name);
+      OIDCAdapterBridge.internalAdapterFactory.getAdapter(modelName);
   }
 
   public async upsert(
@@ -34,17 +31,17 @@ export class OIDCRedisAdapterBridge implements Adapter {
   }
 
   public async find(id: string): Promise<AdapterPayload | undefined> {
-    return await this.internalAdapter.find(id);
+    return (await this.internalAdapter.find(id)) ?? undefined;
   }
 
   public async findByUserCode(
     userCode: string,
   ): Promise<AdapterPayload | undefined> {
-    return await this.internalAdapter.findByUserCode(userCode);
+    return (await this.internalAdapter.findByUserCode(userCode)) ?? undefined;
   }
 
   public async findByUid(uid: string): Promise<AdapterPayload | undefined> {
-    return await this.internalAdapter.findByUid(uid);
+    return (await this.internalAdapter.findByUid(uid)) ?? undefined;
   }
 
   public async consume(id: string): Promise<undefined> {
