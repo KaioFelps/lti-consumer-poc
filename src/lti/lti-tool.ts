@@ -2,7 +2,7 @@ import { either } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { nanoid } from "nanoid";
 import { ClientMetadata } from "oidc-provider";
-import { ZodError } from "zod";
+import type { ZodError } from "zod";
 import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
 import { ValidationErrors } from "@/core/validation/validation-errors";
 import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
