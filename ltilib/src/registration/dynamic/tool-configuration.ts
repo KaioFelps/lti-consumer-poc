@@ -61,6 +61,3 @@ export type DraftLtiDynamicToolConfiguration = {
 export type LtiDynamicToolConfiguration = DraftLtiDynamicToolConfiguration & {
   client_id: string;
 };
-
-// TODO: add a zod schema to validate these data and also ensure they are not too big to fit int the
-// database schema (e.g., name cannot exceed 255 characters).
