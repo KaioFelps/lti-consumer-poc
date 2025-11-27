@@ -1,16 +1,16 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { AuthModule } from "@/auth/auth.module";
 import { EnvironmentVars } from "@/config/environment-vars";
-import { OIDCRedisAdapterFactory } from "@/external/data-store/redis/oidc/adapter-factory";
-import { RedisODICModule } from "@/external/data-store/redis/oidc/redis-oidc.module";
 import { FlashSessionMiddleware } from "@/lib/middlewares/flash-session.middleware";
+import { OIDCAdapterFactory } from "@/oidc/adapter/factory";
+import { OIDCAdapterModule } from "./adapter/adapter.module";
 import { OIDCController } from "./oidc.controller";
 import { OIDCProvider } from "./provider";
 import { OIDCAccountsRepository } from "./repositories/accounts.repository";
 import { OIDCClientsRepository } from "./repositories/clients.repository";
 
 @Module({
-  imports: [AuthModule, RedisODICModule],
+  imports: [AuthModule, OIDCAdapterModule],
   controllers: [OIDCController],
   providers: [
     {
@@ -20,7 +20,7 @@ import { OIDCClientsRepository } from "./repositories/clients.repository";
         EnvironmentVars,
         OIDCClientsRepository,
         OIDCAccountsRepository,
-        OIDCRedisAdapterFactory,
+        OIDCAdapterFactory,
       ],
     },
   ],
