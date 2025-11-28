@@ -1,5 +1,4 @@
 import { ClassProperties } from "common/src/types/class-properties";
-import { UUID } from "common/src/types/uuid";
 import { either } from "fp-ts";
 import { IntoLtiClaim } from "$/claims/serialization";
 import {
@@ -20,42 +19,44 @@ export class ToolRecord implements IntoLtiClaim {
   public readonly tokenEndpointAuthMethod: "private_key_jwt" =
     "private_key_jwt";
 
-  protected constructor(
+  /**
+   * It is not stated by Open ID to be a UUID. oidc-provider uses nanoids, for instance.
+   */
+  public readonly id: string;
+  public name: string;
+  public responseTypes: ResponseType[];
+  public grantTypes: GrantType[];
+  public uris: {
+    initiate: string;
+    jwks: string;
+    redirect: string[];
+    homePage?: string;
+    logo?: string;
+    tos?: string;
+    policy?: string;
+  };
+  public scope: string;
+  public contacts?: Contact[];
+  public ltiConfiguration: {
+    domain: string;
+    description?: string;
+    deploymentsIds: string[];
+    targetLinkUri: string;
+    customParameters?: Record<string, string>;
     /**
-     * It is not stated by Open ID to be a UUID. oidc-provider uses nanoids, for instance.
+     * The way the database schema is does not allow a same message type
+     * being specified more than once. Every placements in which that
+     * message should be available at MUST be declared on one single
+     * `SupportedMessage` object, inside `placements` array.
      */
-    public readonly id: UUID,
-    public name: string,
-    public responseTypes: ResponseType[],
-    public grantTypes: GrantType[],
-    public uris: {
-      initiate: string;
-      jwks: string;
-      redirect: string[];
-      homePage?: string;
-      logo?: string;
-      tos?: string;
-      policy?: string;
-    },
-    public scope: string,
-    public contacts: Contact[],
-    public ltiConfiguration: {
-      domain: string;
-      description?: string;
-      deploymentsIds: string[];
-      targetLinkUri: string;
-      customParameters?: Record<string, string>;
-      /**
-       * The way the database schema is does not allow a same message type
-       * being specified more than once. Every placements in which that
-       * message should be available at MUST be declared on one single
-       * `SupportedMessage` object, inside `placements` array.
-       */
-      messages: ToolSupportedMessage[];
-      claims: string[];
-    },
-    public clientSecret?: string,
-  ) {}
+    messages: ToolSupportedMessage[];
+    claims: string[];
+  };
+  public clientSecret?: string;
+
+  protected constructor(args: ToolRecordArgs) {
+    Object.assign(this, args);
+  }
 
   public static create(data: ToolRecordArgs) {
     if (!data.uris.jwks && !data.clientSecret) {
@@ -67,19 +68,29 @@ export class ToolRecord implements IntoLtiClaim {
       );
     }
 
-    return either.right(
-      new ToolRecord(
-        data.id,
-        data.name,
-        data.responseTypes,
-        data.grantTypes,
-        data.uris,
-        data.scope,
-        data.contacts,
-        data.ltiConfiguration,
-        data.clientSecret,
-      ),
-    );
+    if (data.applicationType !== "web") {
+      return either.left(
+        new InvalidToolConfigurationError({
+          application_type:
+            'LTI Tools must have `application_type` set to "web".',
+        }),
+      );
+    }
+
+    if (data.tokenEndpointAuthMethod !== "private_key_jwt") {
+      return either.left(
+        new InvalidToolConfigurationError({
+          token_endpoint_auth_method:
+            'LTI Tool must have `token_endpoint_auth_method` set to "private_key_jwt"',
+        }),
+      );
+    }
+
+    return either.right(new ToolRecord(data));
+  }
+
+  public static createUnchecked(data: ToolRecordArgs) {
+    return new ToolRecord(data);
   }
 
   /**
@@ -102,7 +113,7 @@ export class ToolRecord implements IntoLtiClaim {
         .responseTypes as DraftLtiDynamicToolConfiguration["response_types"],
       scope: this.scope,
       token_endpoint_auth_method: this.tokenEndpointAuthMethod,
-      contacts: this.contacts.length === 0 ? undefined : this.contacts,
+      contacts: this.contacts?.length === 0 ? undefined : this.contacts,
       logo_uri: this.uris.logo,
       policy_uri: this.uris.policy,
       tos_uri: this.uris.tos,
