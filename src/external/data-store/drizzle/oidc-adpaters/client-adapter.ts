@@ -1,10 +1,18 @@
-import { option, taskEither } from "fp-ts";
+/**
+ * Some of these methods does not need to be implemented, since they are not to be called
+ * when managing OIDC Clients and LTI Tools.
+ */
+
+import { either, option, taskEither } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { Adapter, AdapterPayload, errors } from "oidc-provider";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ValidationErrors } from "@/core/validation/validation-errors";
 import { OIDCServerErrorException } from "@/lib/exceptions/oidc/exception";
-import { mapTaskEitherEitherAndFlatten } from "@/lib/fp-ts";
+import {
+  eitherPromiseToTaskEither,
+  mapTaskEitherEitherAndFlatten,
+} from "@/lib/fp-ts";
 import { LtiToolIdPrefix } from "@/lti";
 import { LtiTool } from "@/lti/lti-tool";
 import { LTIToolsRepository } from "@/lti/lti-tools.repository";
@@ -14,7 +22,6 @@ import { OIDCClient } from "@/oidc/client";
 import { OIDCClientsRepository } from "@/oidc/repositories/clients.repository";
 import { LTI_TOOL_CONFIGURATION_KEY } from "$/registration/dynamic/tool-configuration";
 
-// TODO: implement every method from this adapter
 export class DrizzleOIDCClientAdapter implements Adapter {
   public constructor(
     name: ModelName,
@@ -75,51 +82,68 @@ export class DrizzleOIDCClientAdapter implements Adapter {
   }
 
   public async find(id: string): Promise<AdapterPayload | undefined> {
-    // const [client, tool] = Promise;
-    // const key = resolveOIDCKey(id);
-    // const data = await this.redis.client.json.get(key);
-    // if (data) return JSON.parse(data as string);
-    throw new Error("find not implemented");
+    if (id.startsWith(LtiToolIdPrefix)) {
+      return await pipe(
+        eitherPromiseToTaskEither(() => this.toolsRepository.findToolById(id)),
+        taskEither.match(
+          (err) => {
+            if (err instanceof IrrecoverableError) return either.left(err);
+            return either.right(option.none);
+          },
+          (tool) => either.right(option.some(tool)),
+        ),
+        taskEither.map((tool) =>
+          pipe(
+            tool,
+            option.match(
+              () => undefined,
+              (tool) => tool.intoOIDCClient(),
+            ),
+          ),
+        ),
+        taskEither.match(
+          (err) => {
+            console.error(err);
+            throw new OIDCServerErrorException();
+          },
+          (tool) => tool,
+        ),
+      )();
+    }
   }
 
   public async findByUserCode(
-    userCode: string,
+    _userCode: string,
   ): Promise<AdapterPayload | undefined> {
-    // const id = await this.redis.client.get(userCodeKeyFor(userCode));
-    // if (id) return await this.find(id);
-    throw new Error("findByUserCode not implemented");
+    throw new Error(
+      `findByUserCode not implemented for ${DrizzleOIDCClientAdapter.name}`,
+    );
   }
 
-  public async findByUid(uid: string): Promise<AdapterPayload | undefined> {
-    // const id = await this.redis.client.get(uidKeyFor(uid));
-    // if (id) return await this.find(id);
-    throw new Error("findByUid not implemented");
+  public async findByUid(_uid: string): Promise<AdapterPayload | undefined> {
+    throw new Error(
+      `findByUid not implemented for ${DrizzleOIDCClientAdapter.name}`,
+    );
   }
 
-  public async consume(id: string): Promise<undefined> {
-    // await this.redis.client.json.set(
-    //   resolveOIDCKey(id),
-    //   "consumed",
-    //   Math.floor(Date.now() / 1000),
-    // );
-    throw new Error("consume not implemented");
+  public async consume(_id: string): Promise<undefined> {
+    throw new Error(
+      `consume not implemented for ${DrizzleOIDCClientAdapter.name}`,
+    );
   }
 
   public async destroy(id: string): Promise<undefined> {
-    // const key = resolveOIDCKey(id);
-    // await this.redis.client.del(key);
-    throw new Error("destroy not implemented");
+    const deleteResult = await this.toolsRepository.deleteToolById(id);
+    if (either.isLeft(deleteResult)) {
+      console.error(deleteResult.left);
+      throw new OIDCServerErrorException();
+    }
   }
 
-  public async revokeByGrantId(grantId: string): Promise<undefined> {
-    //   const multi = this.redis.client.multi();
-
-    //   const tokens = await this.redis.client.lRange(grantKeyFor(grantId), 0, -1);
-    //   tokens.forEach((token) => multi.del(token));
-
-    //   multi.del(grantKeyFor(grantId));
-    //   await multi.exec();
-    throw new Error("revokeByGrantId not implemented");
+  public async revokeByGrantId(_grantId: string): Promise<undefined> {
+    throw new Error(
+      `revokeByGrantId not implemented for ${DrizzleOIDCClientAdapter.name}`,
+    );
   }
 }
 

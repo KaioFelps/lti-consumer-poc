@@ -352,4 +352,25 @@ export class DrizzleLtiToolsRepository extends LTIToolsRepository {
       taskEither.map((_row) => tool),
     )();
   }
+
+  public async deleteToolById(
+    id: string,
+  ): Promise<Either<IrrecoverableError, void>> {
+    return await pipe(
+      taskEither.tryCatch(
+        () =>
+          this.drizzle
+            .getClient()
+            .delete(oauthClient)
+            .where(eq(oauthClient.id, id)),
+        (err: Error) => {
+          return new IrrecoverableError(
+            `An error occurred in ${DrizzleLtiToolsRepository.name} when deleting the LTI Tool with ID ${id}.`,
+            err,
+          );
+        },
+      ),
+      taskEither.map((_result) => {}),
+    )();
+  }
 }

@@ -15,4 +15,8 @@ export abstract class LTIToolsRepository {
   public abstract upsertTool(
     tool: LtiTool,
   ): Promise<Either<IrrecoverableError, LtiTool>>;
+
+  public abstract deleteToolById(
+    id: string,
+  ): Promise<Either<IrrecoverableError, void>>;
 }
