@@ -18,7 +18,10 @@ export class LtiController {
   @Get("register")
   @Render("register-new-tool")
   public async register() {
-    const toolRegisterUri = "http://localhost/enrol/lti/register.php?token=";
+    // TODO: render a form to take the register URL and move this initiate message snippet
+    // to a POST route to make it *really* dynamic
+    const toolRegisterUri =
+      "https://127.0.0.1/enrol/lti/register.php?token=2d5793aad442548b34167c65adffe52e54feceb9315fb83163971d34cd15";
 
     const issuer =
       this.vars.nodeEnv === "development"
