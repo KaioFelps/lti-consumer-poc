@@ -8,9 +8,9 @@ export abstract class LTIToolsRepository {
     Either<IrrecoverableError, LtiTool[]>
   >;
 
-  public abstract findToolById: Promise<
-    Either<IrrecoverableError | ResourceNotFoundError, LtiTool>
-  >;
+  public abstract findToolById(
+    id: string,
+  ): Promise<Either<IrrecoverableError | ResourceNotFoundError, LtiTool>>;
 
   public abstract upsertTool(
     tool: LtiTool,
