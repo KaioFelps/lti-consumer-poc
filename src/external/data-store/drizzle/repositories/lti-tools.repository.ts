@@ -328,13 +328,15 @@ export class DrizzleLtiToolsRepository extends LTIToolsRepository {
         );
 
         if (messagesWithRole.length) {
-          await tx.insert(ltiToolSupportedMessageRoles).values(
-            messagesWithRole.map((message) => ({
+          const mappedRoles = messagesWithRole.flatMap((message) =>
+            message.roles!.map((role) => ({
               clientId: record.id,
               messageType: message.type,
-              role: message.roles!.join(" "),
+              role,
             })),
           );
+
+          await tx.insert(ltiToolSupportedMessageRoles).values(mappedRoles);
         }
       }
     });
