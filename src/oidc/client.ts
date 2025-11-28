@@ -1,17 +1,18 @@
 import { ClassProperties } from "common/src/types/class-properties";
-import { generateUUID, type UUID } from "common/src/types/uuid";
+import { generateUUID } from "common/src/types/uuid";
 import { either } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import type { AllClientMetadata, ClientMetadata } from "oidc-provider";
 import type { ZodError } from "zod";
 import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
 import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
+import { ODICClientIdPrefix } from ".";
 import { clientConfigurationSchema } from "./schemas";
 
 type OIDCClientArgs = ClassProperties<OIDCClient>;
 
 export class OIDCClient {
-  public readonly id: UUID;
+  public readonly id: string;
   public readonly applicationType: ClientMetadata["application_type"];
   public name: string;
   public uris: {
@@ -39,7 +40,7 @@ export class OIDCClient {
     }
 
     return new OIDCClient({
-      id: generateUUID(),
+      id: `${ODICClientIdPrefix}${generateUUID()}`,
       ...data,
     });
   }
