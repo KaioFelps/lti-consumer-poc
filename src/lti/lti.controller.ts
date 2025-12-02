@@ -8,18 +8,18 @@ import {
   Res,
   Session,
 } from "@nestjs/common";
+import Provider from "oidc-provider";
 import { EnvironmentVars } from "@/config/environment-vars";
 import { HttpResponse, RequestSession } from "@/lib";
 import { MVC } from "@/lib/decorators/mvc-route";
 import { TranslatorService } from "@/message-string/translator.service";
-import { OIDCProvider } from "@/oidc/provider";
 import { LtiRegistrationInitiationRequest } from "$/messages/initiate-register";
 import { RegisterToolDTO } from "./dtos/register-tool.dto";
 
 @Controller("lti")
 export class LtiController {
   @Inject()
-  private provider: OIDCProvider;
+  private provider: Provider;
 
   @Inject()
   private t: TranslatorService;

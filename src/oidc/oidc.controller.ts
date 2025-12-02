@@ -13,7 +13,11 @@ import { Request, Response } from "express";
 import { either } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
-import { Client, Interaction, type InteractionResults } from "oidc-provider";
+import Provider, {
+  Client,
+  Interaction,
+  type InteractionResults,
+} from "oidc-provider";
 import { LoginDTO } from "@/auth/dtos/login.dto";
 import { AuthenticateUserService } from "@/auth/services/authenticate-user.service";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
@@ -24,7 +28,6 @@ import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { TranslatorService } from "@/message-string/translator.service";
 import { AvailableACRs } from "./consts";
 import { reasonsAreValidPromptReasons, resolveAcrValues } from "./helpers";
-import { OIDCProvider } from "./provider";
 import { OIDCAccountsRepository } from "./repositories/accounts.repository";
 import { ConsentViewManagerFactory } from "./view-manager/consent";
 import { LoginViewManager } from "./view-manager/login";
@@ -32,7 +35,7 @@ import { LoginViewManager } from "./view-manager/login";
 @Controller("oidc")
 export class OIDCController {
   @Inject()
-  private provider: OIDCProvider;
+  private provider: Provider;
 
   @Inject()
   private authenticateUserService: AuthenticateUserService;

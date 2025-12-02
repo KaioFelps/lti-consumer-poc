@@ -1,11 +1,12 @@
-import { moodleToolData } from "moodleToolData";
-import { Injectable } from "@nestjs/common";
 import { generateUUID } from "common/src/types/uuid";
-import { either } from "fp-ts";
+import { taskEither } from "fp-ts";
+import { pipe } from "fp-ts/lib/function";
 import Provider, { type Configuration, errors } from "oidc-provider";
 import { EnvironmentVars } from "@/config/environment-vars";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
+import { eitherPromiseToTaskEither } from "@/lib/fp-ts";
 import { ltiToolConfigurationSchema } from "@/lti/lti-tool-config-schemas";
+import { LTIToolsRepository } from "@/lti/lti-tools.repository";
 import { OIDCAdapterBridge } from "@/oidc/adapter/bridge";
 import { OIDCAdapterFactory } from "@/oidc/adapter/factory";
 import { MessageType } from "$/claims/serialization";
@@ -16,21 +17,20 @@ import { AvailableACRs, AvailableScopes } from "./consts";
 import { OIDCAccountsRepository } from "./repositories/accounts.repository";
 import { OIDCClientsRepository } from "./repositories/clients.repository";
 
-@Injectable()
-export class OIDCProvider extends Provider {
-  public static async create(
-    environments: EnvironmentVars,
-    clientsRepository: OIDCClientsRepository,
-    oidcAccountsRepository: OIDCAccountsRepository,
-    oidcAdapterFactory: OIDCAdapterFactory,
-  ) {
-    const clientsResult = await clientsRepository.getClients();
-    if (either.isLeft(clientsResult)) {
-      throw ExceptionsFactory.fromError(clientsResult.left);
-    }
-    const clients = clientsResult.right.map((client) => client.asMetadata());
+export class OIDCProviderFactory {
+  public constructor(
+    private environments: EnvironmentVars,
+    private clientsRepository: OIDCClientsRepository,
+    private ltiToolsRepository: LTIToolsRepository,
+    private oidcAccountsRepository: OIDCAccountsRepository,
+    private oidcAdapterFactory: OIDCAdapterFactory,
+  ) {}
 
-    // #region: test clients
+  public async create(): Promise<Provider> {
+    const adapter = OIDCAdapterBridge;
+    adapter.setInternalAdapter(this.oidcAdapterFactory);
+
+    const clients = await this.getClientsAndLtiTools();
     clients.push({
       client_secret: "test-client-1-secret",
       client_id: "test-client-1",
@@ -39,38 +39,30 @@ export class OIDCProvider extends Provider {
       redirect_uris: ["http://localhost:4000/callback"],
       scope: "openid email profile",
     });
-    clients.push({
-      jwks_uri: moodleToolData.jwksUrl,
-      client_id: moodleToolData.clientId,
-      initiate_login_uri: moodleToolData.initiateLoginUrl,
-      client_name: moodleToolData.clientName,
-      application_type: "web",
-      redirect_uris: [moodleToolData.toolUrl],
-    });
-    // #endregion
-
-    const adapter = OIDCAdapterBridge;
-    adapter.setInternalAdapter(oidcAdapterFactory);
 
     const config = {
       extraClientMetadata: {
         properties: [LTI_TOOL_CONFIGURATION_KEY],
-        validator(_ctx, _key, value, _metadata) {
-          const { success, error } =
-            ltiToolConfigurationSchema.safeParse(value);
+        validator(_ctx, key, value, _metadata) {
+          if (key === LTI_TOOL_CONFIGURATION_KEY) {
+            if (!value) return;
 
-          if (!success) {
-            const firstError = error.issues[0];
-            throw new errors.InvalidClientMetadata(
-              `${firstError.path.join(".")}: ${firstError.message}`,
-            );
+            const { success, error } =
+              ltiToolConfigurationSchema.safeParse(value);
+
+            if (!success) {
+              const firstError = error.issues[0];
+              throw new errors.InvalidClientMetadata(
+                `${firstError.path.join(".")}: ${firstError.message}`,
+              );
+            }
           }
         },
       },
       adapter,
       clients,
       findAccount: async (_ctx, id, _token) => {
-        return await oidcAccountsRepository.findAccountById(id);
+        return await this.oidcAccountsRepository.findAccountById(id);
       },
       // this option specify claims returned according to given scopes
       claims: {
@@ -127,14 +119,14 @@ export class OIDCProvider extends Provider {
             placements: [MessagePlacement.ContentArea],
           },
         ],
-        productFamilyCode: environments.app.productCode,
+        productFamilyCode: this.environments.app.productCode,
       }).intoConfiguration(),
     } satisfies Configuration;
 
-    const issuerUrl = `${environments.app.url}/oidc`;
-    const provider = new OIDCProvider(issuerUrl, config);
+    const issuerUrl = `${this.environments.app.url}/oidc`;
+    const provider = new Provider(issuerUrl, config);
 
-    if (environments.nodeEnv === "development") {
+    if (this.environments.nodeEnv === "development") {
       provider.on("server_error", (ctx, error) => {
         console.debug("server error", ctx.url, error);
       });
@@ -149,5 +141,28 @@ export class OIDCProvider extends Provider {
     }
 
     return provider;
+  }
+
+  private async getClientsAndLtiTools() {
+    return await pipe(
+      eitherPromiseToTaskEither(() => this.ltiToolsRepository.findManyTools()),
+      taskEither.map((tools) => tools.map((tool) => tool.asClientMetadata())),
+      taskEither.map((tools) => {
+        return pipe(
+          eitherPromiseToTaskEither(() => this.clientsRepository.getClients()),
+          taskEither.map((clients) =>
+            clients.map((client) => client.asClientMetadata()),
+          ),
+          taskEither.map((clients) => [...tools, ...clients]),
+        );
+      }),
+      taskEither.flattenW,
+      taskEither.match(
+        (error) => {
+          throw ExceptionsFactory.fromError(error);
+        },
+        (clientMetaData) => clientMetaData,
+      ),
+    )();
   }
 }

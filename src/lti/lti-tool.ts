@@ -86,7 +86,7 @@ export class LtiTool {
     );
   }
 
-  public intoOIDCClient(): ClientMetadata {
+  public asClientMetadata(): ClientMetadata {
     const ltiClaims = this.record.intoLtiClaim();
     const { [LTI_TOOL_CONFIGURATION_KEY]: _, ...claims } = ltiClaims;
     return claims;

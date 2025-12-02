@@ -97,7 +97,7 @@ export class DrizzleOIDCClientAdapter implements Adapter {
             tool,
             option.match(
               () => undefined,
-              (tool) => tool.intoOIDCClient(),
+              (tool) => tool.asClientMetadata(),
             ),
           ),
         ),

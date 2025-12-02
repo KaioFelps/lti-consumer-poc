@@ -74,7 +74,7 @@ export class OIDCClient {
     return new OIDCClient(data);
   }
 
-  asMetadata(): ClientMetadata {
+  asClientMetadata(): ClientMetadata {
     return {
       client_id: this.id.toString(),
       application_type: this.applicationType,

@@ -1,11 +1,13 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import Provider from "oidc-provider";
 import { AuthModule } from "@/auth/auth.module";
 import { EnvironmentVars } from "@/config/environment-vars";
 import { FlashSessionMiddleware } from "@/lib/middlewares/flash-session.middleware";
+import { LTIToolsRepository } from "@/lti/lti-tools.repository";
 import { OIDCAdapterFactory } from "@/oidc/adapter/factory";
 import { OIDCAdapterModule } from "./adapter/adapter.module";
 import { OIDCController } from "./oidc.controller";
-import { OIDCProvider } from "./provider";
+import { OIDCProviderFactory } from "./provider.factory";
 import { OIDCAccountsRepository } from "./repositories/accounts.repository";
 import { OIDCClientsRepository } from "./repositories/clients.repository";
 
@@ -14,17 +16,31 @@ import { OIDCClientsRepository } from "./repositories/clients.repository";
   controllers: [OIDCController],
   providers: [
     {
-      provide: OIDCProvider,
-      useFactory: OIDCProvider.create,
+      provide: Provider,
+      useFactory: (
+        envVars: EnvironmentVars,
+        clientsRepository: OIDCClientsRepository,
+        ltiToolsRepository: LTIToolsRepository,
+        oidcAccountsRepository: OIDCAccountsRepository,
+        oidcAdapterFactory: OIDCAdapterFactory,
+      ) =>
+        new OIDCProviderFactory(
+          envVars,
+          clientsRepository,
+          ltiToolsRepository,
+          oidcAccountsRepository,
+          oidcAdapterFactory,
+        ).create(),
       inject: [
         EnvironmentVars,
         OIDCClientsRepository,
+        LTIToolsRepository,
         OIDCAccountsRepository,
         OIDCAdapterFactory,
       ],
     },
   ],
-  exports: [OIDCProvider],
+  exports: [Provider],
 })
 export class OIDCModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
