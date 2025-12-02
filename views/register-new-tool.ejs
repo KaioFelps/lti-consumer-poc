@@ -11,7 +11,6 @@
     <% if (flash?.success) { %>
         <div class="success-alert">
             <span><%= flash.success.message %></span><br>
-            <a href="<%= loginEndpoint %>"><%= flash.success.loginButtonMessage %></a>
         </div>
     <% } %>
     <% if (error) { %>
@@ -19,6 +18,74 @@
             <span><%= error %></span><br>
         </div>
     <% } %>
-    <a href="<%= registerUri %>"><%= labels.registerPlatform %></a>
+    <form action="<%= endpoint %>" method="post">
+        <label>
+            <span><%= labels.registrationEndpoint %></span>
+            <% (validationErrors?.registrationEndpoint ?? []).forEach(error => { %>
+                <span class="error-span"><%- error.message %></span>
+            <% }) %>
+            <input type="text" name="registrationEndpoint" id="register-endpoint-input" value="<%= flash?.values?.registrationEndpoint %>">
+        </label>
+
+        <% if (shallShowDockerInternalHostOption) { %>
+            <div>
+                <% (validationErrors?.useDockerInternalHost ?? []).forEach(error => { %>
+                    <span class="error-span"><%- error.message %></span>
+                <% }) %>
+                <label class="checkbox-item">
+                    <input
+                        type="checkbox"
+                        name="useDockerInternalHost"
+                        <% if (flash?.values?.useDockerInternalHost) { %>
+                            checked
+                        <% } %>
+                    >
+                    <span><%= labels.useDockerInternalHost %></span>
+                </label>
+                <p style="font-size: 0.75rem;"><%- descriptions.useDockerInternalHost %></p>
+            </div>
+        <% } %>
+        
+        <button><%= buttons.submit %></button>
+    </form>
+
+    <% if (initiateRegister.endpoint) { %>
+        <hr>
+        <div id="registration-container" class="alert alert-info">
+            <p><%- initiateRegister.readyToGoParagraph %></p>
+            <button id="btn-start-registration" class="btn btn-primary">
+               <%= initiateRegister.finishRegistrationButton %>
+            </button>
+        </div>
+
+        <div id="success-message" style="display: none;" class="success-alert">
+            <%- initiateRegister.successMessage %>
+        </div>
+
+        <script>
+            const registerUrl = new URL("<%- initiateRegister.endpoint %>");
+            const btn = document.getElementById('btn-start-registration');
+
+            btn.addEventListener('click', () => {
+                const popup = window.open(
+                    registerUrl, 
+                    '<%= initiateRegister.popupTitle %>', 
+                    'width=800,height=600,resizable,scrollbars'
+                );
+
+                window.addEventListener("message", (event) => {
+                    if (event.origin !== registerUrl.origin) return;
+
+                    const mustClose = event.data && event.data.subject === "org.imsglobal.lti.close";
+
+                    if (mustClose) {
+                        popup.close();
+                        document.getElementById('registration-container').style.display = 'none';
+                        document.getElementById('success-message').style.display = 'block';
+                    }
+                }, false);
+            });
+        </script>
+    <% } %>
 </body>
 </html>

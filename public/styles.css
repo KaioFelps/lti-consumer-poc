@@ -8,6 +8,17 @@ label > span {
     margin-bottom: 8px;
 }
 
+label.checkbox-item {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 4px;
+}
+
+label.checkbox-item > span {
+    margin-bottom: unset;
+}
+
 .error-span {
     color: red;
 }
