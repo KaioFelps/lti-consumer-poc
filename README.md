@@ -48,54 +48,6 @@ os passos abaixo são necessário para conseguir replicar o experimento (que é 
 
 [`mkcert`]: https://github.com/FiloSottile/mkcert
 
----
-
-> [!WARNING]
-> Novamente, a biblioteca `oidc-provider` é *deveras inflexível*. Seu Authorization Server se recusa a lidar com
-> aplicações locais em vários subserviços. Em outras palavras, tentar registrar o Moodle pelo URL "localhost"
-> acarreta o erro "redirect_uris for web clients using implicit flow must not be using localhost".
-> Portanto, **acesse e utilize o endereço do moodle pelo IP local (`127.0.0.1`), especialmente durante o registro**.
-
-Para utilizar o Moodle como uma ferramenta LTI, foram realizadas as seguintes configurações:
-- http://localhost/admin/category.php?category=enrolltifolder
-    - Email visibility: `Visible to course participants`
-    - City/town: *\<empty\>*
-    - Select a country: `Brazil`
-    - Timezone: `America/Sao_Paulo`
-    - Preferred language: `English (en)`
-    - Institution: *\<empty\>*
-- http://localhost/admin/settings.php?section=enrolsettingslti_registrations > Register a platform
-    - Platform name: Lti Consumer PoC
-    - Tool details
-
-        Modifique as informações no arquivo [`./moodleToolData.ts`] de acordo com as informações que o Moodle forneceu.
-    
-    - Platform details > Edit platform details
-
-        Preencha os campos da seguinte forma:
-        - Platform ID (issuer): `http://localhost:3000/oidc`
-        - Client ID: *\<coloque o campo `clientId` do objeto em [`./moodleToolData.ts`] \>*
-        - Authentication request URL: `http://localhost:3000/oidc/auth`
-        - Public keyset URL: `http://localhost:3000/oidc/jwks`
-        - Access token URL: `http://localhost:3000/oidc/token`
-    
-    - Platform details > Deployments
-
-        Adicione um deployment com as informações contidas no primeiro objeto da lista `deployments` em [`./moodleToolData.ts`].
-        Se necessário, adicione mais deployments no array.
-
-- http://localhost/admin/settings.php?section=logos
-    - Compact logo: envie alguma imagem qualquer.
-
-        O registro dinâmico do OpenID Connect especifica que o campo `logo_uri` é opcional, mas quando presente,
-        deve ser um URL válido. A atual implementação do Moodle envia uma string vazia *sempre*, o que fere
-        a implementação e é impedido de prosseguir devido as checagens realizadas pela biblioteca `oidc-provider`.
-        Colocar uma logo faz com que o Moodle envie uma URL válida e o registro possa ocorrer. Esse problema deveria
-        ser reportado no Issue Tracker do Moodle — se é que já não foi —, no entanto não foi possível acessar o site
-        no presente momento.
-
-[`./moodleToolData.ts`]: ./moodleToolData.ts
-
 ## Desbloqueando URLs Inseguros (Somente em Desenvolvimento)
 - http://localhost/admin/settings.php?section=httpsecurity
     - desligue a opção "Secure cookies only"
@@ -105,6 +57,46 @@ Para utilizar o Moodle como uma ferramenta LTI, foram realizadas as seguintes co
         em que o Moodle fará requisições com cURL para `host.docker.internal`, que será resolvido para um IP na
         faixa `192.168.0.0/16`. Por isso, esta também precisa ser desbloqueada.
     - adicione a porta `3000` no campo "cURL allowed ports list"
+
+---
+
+> [!WARNING]
+> Novamente, a biblioteca `oidc-provider` é *deveras inflexível*. Seu Authorization Server se recusa a lidar com
+> aplicações locais em vários subserviços. Em outras palavras, tentar registrar o Moodle pelo URL "localhost"
+> acarreta o erro "redirect_uris for web clients using implicit flow must not be using localhost".
+> Portanto, **acesse e utilize o endereço do moodle pelo IP local (`127.0.0.1`), especialmente durante o registro**.
+
+Para utilizar o Moodle como uma ferramenta LTI, foram realizadas as seguintes configurações:
+- https://127.0.0.1/admin/category.php?category=enrolltifolder
+    - Email visibility: `Visible to course participants`
+    - City/town: *\<empty\>*
+    - Select a country: `Brazil`
+    - Timezone: `America/Sao_Paulo`
+    - Preferred language: `English (en)`
+    - Institution: *\<empty\>*
+- https://127.0.0.1/admin/settings.php?section=logos
+    - Compact logo: envie alguma imagem qualquer.
+
+        O registro dinâmico do OpenID Connect especifica que o campo `logo_uri` é opcional, mas quando presente,
+        deve ser um URL válido. A atual implementação do Moodle envia uma string vazia *sempre*, o que fere
+        a implementação e é impedido de prosseguir devido as checagens realizadas pela biblioteca `oidc-provider`.
+        Colocar uma logo faz com que o Moodle envie uma URL válida e o registro possa ocorrer. Esse problema deveria
+        ser reportado no Issue Tracker do Moodle — se é que já não foi —, no entanto não foi possível acessar o site
+        no presente momento.
+
+Feito isso, utilize o registro dinâmico para registrar o Moodle como uma ferramenta LTI nesta plataforma:
+1. Acesse https://127.0.0.1/admin/settings.php?section=enrolsettingslti_registrations > Register a platform
+    - Platform name: Lti Consumer PoC
+2. Copie o endereço do campo Registration URL.
+3. Acesse http://localhost:3000/lti/register.
+4. Cole o endereço de registro do Moodle no campo URL do endpoint de registro da ferramenta.
+5. Marque a opção Utilizar host interna do Docker.
+    
+    Essa opção é necessária para instâncias do Moodle que estejam rodando em containers do Docker. Ela
+    substitui o `issuer` dos tokens JWT intercambiados durante o processo de registro de modo que o container
+    do Moodle consiga acessar a plataforma no localhost.
+6. Clique em Registrar ferramenta LTI.
+7. Clique em Finalizar registro.
 
 ## Configurações LTI 
 As seguintes partes do código são implementações das especificações do LTI:
