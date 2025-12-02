@@ -16,7 +16,7 @@ export class FlashSessionMiddleware implements NestMiddleware {
 
     delete session.error;
     delete session.validationErrors;
-    delete session.flash;
+    session.flash = {};
 
     return next();
   }
