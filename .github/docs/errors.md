@@ -187,7 +187,6 @@ class MVCStrategy extends ExceptionFilterResponder {
     const request = ctx.getRequest<HttpRequest>();
     const response = ctx.getResponse<HttpResponse>();
     const session = request["session"] as Record<string, unknown>;
-    const target = request.headers.referer ?? "/";
 
     const errorMessage = await this.t.translate(
       exception.error.errorMessageIdentifier,
@@ -205,7 +204,7 @@ class MVCStrategy extends ExceptionFilterResponder {
       };
     }
 
-    return response.redirect(HttpStatus.FOUND, target);
+    return response.redirectBack();
   }
 }
 

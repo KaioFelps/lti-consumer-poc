@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { HttpArgumentsHost } from "@nestjs/common/interfaces";
 import { ExceptionPresenter } from "@/external/presenters/exception-presenter";
 import { SimpleExceptionPresenter } from "@/external/presenters/exceptions/simple-exception.presenter";
@@ -42,7 +42,6 @@ class MVCStrategy extends ExceptionFilterResponder<unknown, void> {
     const request = ctx.getRequest<HttpRequest>();
     const response = ctx.getResponse<HttpResponse>();
     const session = request["session"] as Record<string, unknown>;
-    const target = request.headers.referer ?? "/";
 
     const errorMessage = await this.t.translate(
       exception.error.errorMessageIdentifier,
@@ -57,7 +56,7 @@ class MVCStrategy extends ExceptionFilterResponder<unknown, void> {
       };
     }
 
-    return response.redirect(HttpStatus.FOUND, target);
+    return response.redirectBack();
   }
 }
 

@@ -12,6 +12,8 @@ import { Redis } from "./external/data-store/redis/client";
 import { CoreValidationPipe } from "./lib/pipes/core-validation-pipe";
 import { loadMessageStrings } from "./message-string/loader";
 
+import "@/lib";
+
 async function bootstrap() {
   expand(config());
   await loadMessageStrings();

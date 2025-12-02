@@ -7,7 +7,6 @@ import {
   Inject,
   Post,
   Render,
-  Req,
   Res,
   Session,
 } from "@nestjs/common";
@@ -16,7 +15,7 @@ import { pipe } from "fp-ts/lib/function";
 import { PersonGender } from "@/identity/person/enums/gender";
 import { RegisterNewPersonService } from "@/identity/person/services/register-new-person.service";
 import { CPF } from "@/identity/person/value-objects/cpf";
-import { HttpRequest, HttpResponse } from "@/lib";
+import { HttpResponse } from "@/lib";
 import { MVC } from "@/lib/decorators/mvc-route";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { TranslatorService } from "@/message-string/translator.service";
@@ -105,7 +104,6 @@ export class AuthController {
 
   @Post("register")
   public async registerPerson(
-    @Req() request: HttpRequest,
     @Res() response: HttpResponse,
     @Body() dto: RegisterPersonDTO,
     @Session() session: Record<string, unknown>,
@@ -138,6 +136,6 @@ export class AuthController {
       ),
     };
 
-    return response.redirect(request.headers.referer ?? "/");
+    return response.redirectBack();
   }
 }

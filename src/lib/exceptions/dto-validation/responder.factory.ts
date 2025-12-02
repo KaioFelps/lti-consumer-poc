@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { HttpArgumentsHost } from "@nestjs/common/interfaces";
 import { HttpRequest, HttpResponse } from "@/lib";
 import { ExceptionFilterResponderFactory } from "../../exception-responders/factory";
@@ -41,7 +41,6 @@ export class MvcResponder extends ExceptionFilterResponder<Body, Output> {
     const request = ctx.getRequest<HttpRequest>();
     const response = ctx.getResponse<HttpResponse>();
     const session = request["session"] as Record<string, unknown>;
-    const target = request.headers.referer ?? "/";
 
     session.validationErrors = errors;
     if (session.flash) session.flash["values"] = request.body;
@@ -51,6 +50,6 @@ export class MvcResponder extends ExceptionFilterResponder<Body, Output> {
       };
     }
 
-    return response.redirect(HttpStatus.FOUND, target);
+    return response.redirectBack();
   }
 }
