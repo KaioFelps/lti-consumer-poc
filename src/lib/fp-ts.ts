@@ -15,7 +15,6 @@ export function eitherPromiseToTaskEither<E, V>(
 ): TaskEither<E, V> {
   return pipe(
     taskEither.fromTask(promise),
-    (a) => a,
     taskEither.map(taskEither.fromEither),
     taskEither.flatten,
   );
@@ -37,6 +36,18 @@ export function mapTaskEitherEitherAndFlatten<E1, V, E2, V2>(
       taskEither.map((value) =>
         eitherPromiseToTaskEither(() => promise(value)),
       ),
+      taskEither.flattenW,
+    );
+}
+
+export function mapTaskEitherIntoEitherAndFlatten<E1, V1, E2, V2>(
+  func: (value: V1) => Either<E2, V2>,
+) {
+  return (te: TaskEither<E1, V1>) =>
+    pipe(
+      te,
+      taskEither.map(func),
+      taskEither.map(taskEither.fromEither),
       taskEither.flattenW,
     );
 }
