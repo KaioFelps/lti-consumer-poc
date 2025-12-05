@@ -63,7 +63,7 @@ export class ToolRecord implements IntoLtiClaim {
       return either.left(
         new InvalidToolConfigurationError({
           client_secret:
-            "Tool must have at least `client_secret` if `jwks_uri` is not present.",
+            "Tool must have at least `client_secret` if `jwks_uri` is not present",
         }),
       );
     }
@@ -72,7 +72,7 @@ export class ToolRecord implements IntoLtiClaim {
       return either.left(
         new InvalidToolConfigurationError({
           application_type:
-            'LTI Tools must have `application_type` set to "web".',
+            'LTI Tools must have `application_type` set to "web"',
         }),
       );
     }
