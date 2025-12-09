@@ -5,6 +5,7 @@ import Provider, { type Configuration, errors } from "oidc-provider";
 import { EnvironmentVars } from "@/config/environment-vars";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { eitherPromiseToTaskEither } from "@/lib/fp-ts";
+import { LtiToolIdPrefix } from "@/lti";
 import { ltiToolConfigurationSchema } from "@/lti/lti-tool-config-schemas";
 import { LTIToolsRepository } from "@/lti/lti-tools.repository";
 import { OIDCAdapterBridge } from "@/oidc/adapter/bridge";
@@ -13,6 +14,7 @@ import { MessageType } from "$/claims/serialization";
 import { LTI_TOOL_CONFIGURATION_KEY } from "$/registration/dynamic/tool-configuration";
 import { MessagePlacement } from "$/registration/enums/message-placement";
 import { PlatformConfigurationMetadata } from "$/registration/platform-configuration-metadata";
+import { ODICClientIdPrefix } from ".";
 import { AvailableACRs, AvailableScopes } from "./consts";
 import { OIDCAccountsRepository } from "./repositories/accounts.repository";
 import { OIDCClientsRepository } from "./repositories/clients.repository";
@@ -88,8 +90,21 @@ export class OIDCProviderFactory {
         clientCredentials: { enabled: true },
         registration: {
           enabled: true,
-          idFactory: () => {
-            return generateUUID();
+          idFactory: (ctx) => {
+            const isLtiTool =
+              LTI_TOOL_CONFIGURATION_KEY in (ctx.oidc.body ?? {});
+
+            /**
+             * We ensure every tool or client be prefixed according to what it its.
+             * This allows further calls to perform explicit routines specific to
+             * fetching and mounting LTI tools or more simple routines only to fetch
+             * Open ID client (which contain only a subset of LTI Tool properties).
+             */
+            const prefix = isLtiTool ? LtiToolIdPrefix : ODICClientIdPrefix;
+
+            let id = generateUUID();
+            id = `${prefix}${id}`;
+            return id;
           },
           initialAccessToken: false,
           issueRegistrationAccessToken: false,

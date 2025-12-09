@@ -16,11 +16,9 @@ import {
 import { LtiToolIdPrefix } from "@/lti";
 import { LtiTool } from "@/lti/lti-tool";
 import { LTIToolsRepository } from "@/lti/lti-tools.repository";
-import { ODICClientIdPrefix } from "@/oidc";
 import { ModelName } from "@/oidc/adapter/factory";
 import { OIDCClient } from "@/oidc/client";
 import { OIDCClientsRepository } from "@/oidc/repositories/clients.repository";
-import { LTI_TOOL_CONFIGURATION_KEY } from "$/registration/dynamic/tool-configuration";
 
 export class DrizzleOIDCClientAdapter implements Adapter {
   public constructor(
@@ -40,24 +38,9 @@ export class DrizzleOIDCClientAdapter implements Adapter {
     payload: AdapterPayload,
     _expiresIn: number,
   ): Promise<undefined> {
-    const isLtiTool = LTI_TOOL_CONFIGURATION_KEY in payload;
+    const isLtiTool = id.startsWith(LtiToolIdPrefix);
+    payload.client_id = id;
 
-    /**
-     * We ensure every tool or client be prefixed according to what it its.
-     * If the ID does not have the prefix, we'll assume it's a new register and the ID
-     * has just been generated.
-     *
-     * A way better solution would be to do this inside
-     * `idFactory` method from provide configuration, however the context available
-     * in that callback does not have access to body (and thus to the client metadata),
-     * stopping us from deciding which prefix to use.
-     */
-    if (!id.startsWith(LtiToolIdPrefix) && !id.startsWith(ODICClientIdPrefix)) {
-      const prefix = isLtiTool ? LtiToolIdPrefix : ODICClientIdPrefix;
-      id = `${prefix}${id}`;
-    }
-
-    if (id) payload.client_id = id;
     if (isLtiTool) {
       await pipe(
         LtiTool.tryCreateFromClientMetadata(payload),
