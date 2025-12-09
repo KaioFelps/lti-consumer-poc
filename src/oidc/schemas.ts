@@ -2,7 +2,7 @@ import { ClientMetadata } from "oidc-provider";
 import z from "zod";
 
 export const clientConfigurationSchema = z.object({
-  client_id: z.uuid().optional(),
+  client_id: z.string().optional(),
   application_type: z.enum([
     "web",
     "native",
