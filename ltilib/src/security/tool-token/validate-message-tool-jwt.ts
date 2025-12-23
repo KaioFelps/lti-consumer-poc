@@ -4,11 +4,8 @@ import { pipe } from "fp-ts/lib/function";
 import * as jose from "jose";
 import { errors as jerr } from "jose";
 import { mapTaskEitherIntoEitherAndFlatten as mapAndFlatten } from "@/lib/fp-ts";
+import { Platform } from "$/core/platform";
 import { JoseJwtClaimValidationFailureReason } from "$/lib/jose";
-
-type PlatformData = {
-  issuerUrl: string;
-};
 
 type ToolData = {
   clientId: string;
@@ -95,7 +92,7 @@ const ltiMinimalAllowedClaimsSet = Object.freeze([
  */
 export async function validateMessageToolJwt<T extends jose.JWTPayload>(
   token: string,
-  platform: PlatformData,
+  platform: Platform,
   tool: ToolData,
   options: ValidateMessageToolJwtOptions<T> = {},
 ): Promise<Either<ToolJwtValidationError, T>> {
@@ -104,7 +101,7 @@ export async function validateMessageToolJwt<T extends jose.JWTPayload>(
 
   const maxTokenAge = options.tokenTTL ?? 600;
   const expectedIssuer = tool.clientId;
-  const expectedAudience = platform.issuerUrl;
+  const expectedAudience = platform.issuer;
 
   if (options.vendorPrefix && !options.vendorPrefix.startsWith("http://")) {
     const error = new jerr.JWTInvalid(
@@ -137,9 +134,7 @@ export async function validateMessageToolJwt<T extends jose.JWTPayload>(
     te.map(([payload, allowedClaims]) =>
       discardUnknownClaims<T>(payload, allowedClaims),
     ),
-    mapAndFlatten((claims) =>
-      validateAudienceAndAzp(claims, platform.issuerUrl),
-    ),
+    mapAndFlatten((claims) => validateAudienceAndAzp(claims, platform.issuer)),
     mapAndFlatten((claims) => validateNonce(claims, options.nonceIsFresh)),
     mapAndFlatten(validateMessageSpecificClaims),
     mapAndFlatten((claims) =>

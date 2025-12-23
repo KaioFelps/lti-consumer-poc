@@ -12,6 +12,7 @@ import { either } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import * as jose from "jose";
 import { createMockKeySet } from "ltilib/tests/utils/create-jwks";
+import { Platform } from "$/core/platform";
 import { JoseJwtClaimValidationFailureReason } from "$/lib/jose";
 import { validateMessageToolJwt } from "./validate-message-tool-jwt";
 
@@ -21,9 +22,10 @@ describe("validateMessageToolJwt", async () => {
   const platformIssuer = "https://lms.uofexample.edu";
   const toolId = "s6BhdRkqt3";
 
-  const platformData = {
-    issuerUrl: platformIssuer,
-  } satisfies Parameters<typeof validateMessageToolJwt>["1"];
+  const platform = new Platform({
+    issuer: platformIssuer,
+    jsonWebKey: jwk,
+  });
 
   const toolData = {
     clientId: toolId,
@@ -54,7 +56,7 @@ describe("validateMessageToolJwt", async () => {
 
     const jwtValidationResult = await validateMessageToolJwt(
       jwt,
-      platformData,
+      platform,
       toolData,
     );
 
@@ -80,7 +82,7 @@ describe("validateMessageToolJwt", async () => {
 
       const jwtValidationResult = await validateMessageToolJwt(
         jwt,
-        platformData,
+        platform,
         toolData,
       );
 
@@ -110,7 +112,7 @@ describe("validateMessageToolJwt", async () => {
 
     const jwtValidationResult = await validateMessageToolJwt(
       compliantTokenWithUnknownSignature,
-      platformData,
+      platform,
       toolData,
     );
 
@@ -136,7 +138,7 @@ describe("validateMessageToolJwt", async () => {
 
     const jwtValidationResult = await validateMessageToolJwt(
       tokenWithWrongIssuer,
-      platformData,
+      platform,
       toolData,
     );
 
@@ -168,7 +170,7 @@ describe("validateMessageToolJwt", async () => {
 
     const jwtValidationResult = await validateMessageToolJwt(
       tokenWithWrongAudience,
-      platformData,
+      platform,
       toolData,
     );
 
@@ -200,7 +202,7 @@ describe("validateMessageToolJwt", async () => {
 
     const jwtValidationResult = await validateMessageToolJwt(
       tokenWithWrongAudience,
-      platformData,
+      platform,
       toolData,
     );
 
@@ -233,7 +235,7 @@ describe("validateMessageToolJwt", async () => {
 
     let jwtValidationResult = await validateMessageToolJwt(
       jwt,
-      platformData,
+      platform,
       toolData,
     );
 
@@ -254,11 +256,7 @@ describe("validateMessageToolJwt", async () => {
       .setProtectedHeader(protectedHeader)
       .sign(privateKey);
 
-    jwtValidationResult = await validateMessageToolJwt(
-      jwt,
-      platformData,
-      toolData,
-    );
+    jwtValidationResult = await validateMessageToolJwt(jwt, platform, toolData);
 
     expect(
       either.isRight(jwtValidationResult),
@@ -279,7 +277,7 @@ describe("validateMessageToolJwt", async () => {
 
     const jwtValidationResult = await validateMessageToolJwt(
       expiredToken,
-      platformData,
+      platform,
       toolData,
     );
 
@@ -314,7 +312,7 @@ describe("validateMessageToolJwt", async () => {
 
     let jwtValidationResult = await validateMessageToolJwt(
       tokenWithInvalidNonce,
-      platformData,
+      platform,
       toolData,
       {
         nonceIsFresh: checkNonceIsValid,
@@ -340,7 +338,7 @@ describe("validateMessageToolJwt", async () => {
 
     jwtValidationResult = await validateMessageToolJwt(
       tokenWithValidNonce,
-      platformData,
+      platform,
       toolData,
       {
         nonceIsFresh: checkNonceIsValid,
@@ -366,7 +364,7 @@ describe("validateMessageToolJwt", async () => {
 
     const jwtValidationResult = await validateMessageToolJwt(
       jwt,
-      platformData,
+      platform,
       toolData,
     );
 
@@ -407,7 +405,7 @@ describe("validateMessageToolJwt", async () => {
 
     let jwtValidationResult = await validateMessageToolJwt(
       invalidJwt,
-      platformData,
+      platform,
       toolData,
       {
         messageSpecificClaims: [customClaim],
@@ -431,7 +429,7 @@ describe("validateMessageToolJwt", async () => {
 
     jwtValidationResult = await validateMessageToolJwt(
       jwt,
-      platformData,
+      platform,
       toolData,
       {
         messageSpecificClaims: [customClaim],
@@ -500,7 +498,7 @@ describe("validateMessageToolJwt", async () => {
 
       const validationResult = await validateMessageToolJwt<Payload>(
         jwt,
-        platformData,
+        platform,
         toolData,
         {
           vendorPrefix,
@@ -533,7 +531,7 @@ describe("validateMessageToolJwt", async () => {
 
       const validationResult = await validateMessageToolJwt<Payload>(
         jwt,
-        platformData,
+        platform,
         toolData,
         {
           vendorPrefix,
@@ -570,7 +568,7 @@ describe("validateMessageToolJwt", async () => {
 
       const validationResult = await validateMessageToolJwt<Payload>(
         jwt,
-        platformData,
+        platform,
         toolData,
         {
           vendorPrefix,
@@ -596,7 +594,7 @@ describe("validateMessageToolJwt", async () => {
 
     const validationResult = await validateMessageToolJwt(
       jwt,
-      platformData,
+      platform,
       toolData,
     );
 
