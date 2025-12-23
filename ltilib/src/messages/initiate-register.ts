@@ -1,9 +1,10 @@
 import { ClassProperties } from "common/src/types/class-properties";
+import { LtiInitiationMessage } from "$/security/lti-message";
 
 type LtiRegistrationInitiationRequestArgs =
   ClassProperties<LtiRegistrationInitiationRequest>;
 
-export class LtiRegistrationInitiationRequest {
+export class LtiRegistrationInitiationRequest implements LtiInitiationMessage {
   /**
    * The full URI to ehe platform's openid configuration.
    */
@@ -16,8 +17,7 @@ export class LtiRegistrationInitiationRequest {
   /**
    * The tool initiation register URI. This is likely provided by
    * the tool in a manner unspecified by the LTI Advantage specifications,
-   * but that usually involves some UI in the tool that shares this
-   * URI.
+   * but that usually involves some UI in the tool that shares this URI.
    */
   public toolInitiateRegisterUri: URL;
 
