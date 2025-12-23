@@ -1,1 +1,0 @@
-export { LTIResourceLinkLaunchRequest } from "./launch";

@@ -4,7 +4,7 @@ import {
   InstitutionRole,
   MembershipRole,
   SystemRole,
-} from "$/claims";
+} from "$/claims/enums/roles";
 import { MessageType } from "$/claims/serialization";
 import {
   GrantType,

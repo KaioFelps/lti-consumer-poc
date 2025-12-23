@@ -15,7 +15,7 @@ import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
 import { LtiTool } from "@/lti/lti-tool";
 import { LTIToolsRepository } from "@/lti/lti-tools.repository";
-import { AnyLtiRole } from "$/claims";
+import { AnyLtiRole } from "$/claims/enums/roles";
 import { MessageType } from "$/claims/serialization";
 import { Contact, GrantType } from "$/registration/dynamic/tool-configuration";
 import { MessagePlacement } from "$/registration/enums/message-placement";
