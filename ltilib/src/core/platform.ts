@@ -14,7 +14,10 @@ export class Platform {
    * The platform's private key used to sign JWSs.
    */
   public readonly jsonWebKey: JWK;
-
+  /**
+   * A resolver to the launch initiation endpoint in the platform.
+   */
+  public readonly initiateLaunchEndpoint: (resourceLinkId: string) => string;
   /**
    * Represents an instance of the platform.
    *
