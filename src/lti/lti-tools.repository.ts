@@ -1,9 +1,10 @@
 import { Either } from "fp-ts/lib/Either";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
+import { LtiToolsRepository as BaseLtiToolsRepository } from "$/core/repositories/tools.repository";
 import { LtiTool } from "./lti-tool";
 
-export abstract class LTIToolsRepository {
+export abstract class LtiToolsRepository extends BaseLtiToolsRepository<IrrecoverableError> {
   public abstract findManyTools(): Promise<
     Either<IrrecoverableError, LtiTool[]>
   >;

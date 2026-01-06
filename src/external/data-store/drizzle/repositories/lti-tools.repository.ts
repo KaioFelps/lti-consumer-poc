@@ -3,28 +3,30 @@ import {
   ltiToolSupportedMessageRoles,
   ltiToolSupportedMessages,
   ltiTools,
-  oauthClient,
+  oauthClients,
   oauthContacts,
   oauthRedirectUris,
 } from "drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { option, taskEither } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
 import { LtiTool } from "@/lti/lti-tool";
-import { LTIToolsRepository } from "@/lti/lti-tools.repository";
+import { LtiToolsRepository } from "@/lti/lti-tools.repository";
 import { AnyLtiRole } from "$/claims/enums/roles";
 import { MessageType } from "$/claims/serialization";
+import { LtiResourceLink } from "$/core/resource-link";
 import { Contact, GrantType } from "$/registration/dynamic/tool-configuration";
 import { MessagePlacement } from "$/registration/enums/message-placement";
 import { ToolRecord } from "$/registration/tool-record";
 import { ToolSupportedMessage } from "$/registration/tool-supported-message";
 import { DrizzleClient } from "../client";
+import ltiToolsMapper from "../mappers/lti-tools.mapper";
 
 @Injectable()
-export class DrizzleLtiToolsRepository extends LTIToolsRepository {
+export class DrizzleLtiToolsRepository extends LtiToolsRepository {
   @Inject()
   private readonly drizzle: DrizzleClient;
 
@@ -32,22 +34,9 @@ export class DrizzleLtiToolsRepository extends LTIToolsRepository {
     return await pipe(
       taskEither.tryCatch(
         () =>
-          this.drizzle.getClient().query.ltiTools.findMany({
-            with: {
-              deployments: true,
-              oauthClient: {
-                with: {
-                  contacts: true,
-                  redirectUris: true,
-                },
-              },
-              supportedMessages: {
-                with: {
-                  roles: true,
-                },
-              },
-            },
-          }),
+          this.drizzle
+            .getClient()
+            .query.ltiTools.findMany(ltiToolsMapper.requiredQueryConfig),
         (error: Error) => {
           return new IrrecoverableError(
             `An error occurred in ${DrizzleLtiToolsRepository.name} on ` +
@@ -129,21 +118,8 @@ export class DrizzleLtiToolsRepository extends LTIToolsRepository {
       taskEither.tryCatch(
         () =>
           this.drizzle.getClient().query.ltiTools.findFirst({
+            ...ltiToolsMapper.requiredQueryConfig,
             where: eq(ltiTools.id, id),
-            with: {
-              deployments: true,
-              oauthClient: {
-                with: {
-                  contacts: true,
-                  redirectUris: true,
-                },
-              },
-              supportedMessages: {
-                with: {
-                  roles: true,
-                },
-              },
-            },
           }),
         (err: Error) => {
           return new IrrecoverableError(
@@ -155,67 +131,7 @@ export class DrizzleLtiToolsRepository extends LTIToolsRepository {
       taskEither.map((row) => {
         return pipe(
           option.fromNullable(row),
-          option.map((row) =>
-            ToolRecord.createUnchecked({
-              applicationType: row.oauthClient.applicationType as "web",
-              contacts: row.oauthClient.contacts.map(
-                (contact) => contact.email as Contact,
-              ),
-              grantTypes: row.grantTypes.split(" ") as GrantType[],
-              id: row.id,
-              ltiConfiguration: {
-                claims: row.claims.split(" "),
-                deploymentsIds: row.deployments.map(
-                  (deployment) => deployment.id,
-                ),
-                domain: row.domain,
-                messages: row.supportedMessages.map(
-                  (message) =>
-                    ({
-                      type: message.type as MessageType,
-                      customParameters: message.customParameters as Record<
-                        string,
-                        string
-                      >,
-                      iconUri: message.iconUri ?? undefined,
-                      label: message.label ?? undefined,
-                      placements:
-                        message.placements
-                          ?.split(" ")
-                          .map((placement) => placement as MessagePlacement) ??
-                        undefined,
-                      roles:
-                        message.roles?.length === 0
-                          ? undefined
-                          : message.roles.map(
-                              (role) => role.role as AnyLtiRole,
-                            ),
-                      targetLinkUri: message.targetLinkUri ?? undefined,
-                    }) satisfies ToolSupportedMessage,
-                ),
-                targetLinkUri: row.targetLinkUri,
-                customParameters: row.customParameters as Record<
-                  string,
-                  string
-                >,
-                description: row.description ?? undefined,
-              },
-              name: row.oauthClient.name,
-              responseTypes: row.responseTypes.split(" ") as "id_token"[],
-              scope: row.oauthClient.scopes,
-              tokenEndpointAuthMethod: "private_key_jwt",
-              uris: {
-                initiate: row.initiateUri,
-                jwks: row.oauthClient.jwksUri,
-                redirect: row.oauthClient.redirectUris.map(({ uri }) => uri),
-                homePage: row.homePageUri ?? undefined,
-                logo: row.logoUri ?? undefined,
-                policy: row.policyUri ?? undefined,
-                tos: row.tosUri ?? undefined,
-              },
-              clientSecret: row.oauthClient.clientSecret ?? undefined,
-            }),
-          ),
+          option.map(ltiToolsMapper.fromRow),
           option.map((record) => new LtiTool(record)),
         );
       }),
@@ -235,108 +151,70 @@ export class DrizzleLtiToolsRepository extends LTIToolsRepository {
   public async upsertTool(
     tool: LtiTool,
   ): Promise<Either<IrrecoverableError, LtiTool>> {
-    const record = tool.record;
-    const ltiToolMappedData = {
-      claims: record.ltiConfiguration.claims.join(" "),
-      customParameters: record.ltiConfiguration.customParameters,
-      domain: record.ltiConfiguration.domain,
-      grantTypes: record.grantTypes.join(" "),
-      id: record.id,
-      initiateUri: record.uris.initiate,
-      responseTypes: record.responseTypes.join(" "),
-      targetLinkUri: record.ltiConfiguration.targetLinkUri,
-      description: record.ltiConfiguration.description,
-      homePageUri: record.uris.homePage,
-      logoUri: record.uris.logo,
-      policyUri: record.uris.policy,
-      tosUri: record.uris.tos,
-    };
-
-    const oauthClientMappedData = {
-      id: record.id,
-      applicationType: record.applicationType,
-      jwksUri: record.uris.jwks,
-      name: record.name,
-      scopes: record.scope,
-      clientSecret: record.clientSecret,
-    };
+    const {
+      oauthClient: { contacts, redirectUris, ...oauthClient },
+      deployments: _,
+      supportedMessages,
+      ...record
+    } = ltiToolsMapper.intoRow(tool.record);
 
     const transaction = this.drizzle.getClient().transaction(async (tx) => {
-      await tx
-        .insert(oauthClient)
-        .values(oauthClientMappedData)
-        .onConflictDoUpdate({
-          target: oauthClient.id,
-          set: oauthClientMappedData,
-        });
+      await tx.insert(oauthClients).values(oauthClient).onConflictDoUpdate({
+        target: oauthClients.id,
+        set: oauthClient,
+      });
 
-      // an option for small sets is to simply delete everything and insert just the fresh data
+      /**
+       * an option for small sets is to simply delete everything and insert just the fresh data
+       */
+
       await tx
         .delete(oauthRedirectUris)
         .where(eq(oauthRedirectUris.clientId, record.id));
 
-      if (record.uris.redirect.length) {
-        await tx
-          .insert(oauthRedirectUris)
-          .values(
-            record.uris.redirect.map((uri) => ({ uri, clientId: record.id })),
-          );
+      if (redirectUris.length) {
+        await tx.insert(oauthRedirectUris).values(redirectUris);
       }
 
       await tx
         .delete(oauthContacts)
         .where(eq(oauthContacts.clientId, record.id));
 
-      if (record.contacts?.length) {
-        await tx
-          .insert(oauthContacts)
-          .values(
-            record.contacts.map((email) => ({ clientId: record.id, email })),
-          );
-      }
+      if (contacts.length) await tx.insert(oauthContacts).values(contacts);
 
       await tx
         .insert(ltiTools)
-        .values(ltiToolMappedData)
+        .values(record)
         .onConflictDoUpdate({
           target: ltiTools.id,
-          set: {
-            ...ltiToolMappedData,
-            id: undefined,
-          },
+          set: { ...record, id: undefined },
         });
 
       await tx
         .delete(ltiToolSupportedMessages)
         .where(eq(ltiToolSupportedMessages.clientId, record.id));
 
-      if (record.ltiConfiguration.messages.length) {
-        await tx.insert(ltiToolSupportedMessages).values(
-          record.ltiConfiguration.messages.map((message) => ({
-            clientId: record.id,
-            type: message.type,
-            customParameters: message.customParameters,
-            iconUri: message.iconUri,
-            label: message.label,
-            placements: message.placements?.join(" "),
-            targetLinkUri: message.targetLinkUri,
-          })),
+      if (supportedMessages.length) {
+        type Message = (typeof supportedMessages)[number];
+
+        const [_roles, messages] = supportedMessages.reduce(
+          (acc, supportedMessage) => {
+            const { roles, ...message } = supportedMessage;
+
+            acc[0].push(roles);
+            acc[1].push(message);
+
+            return acc;
+          },
+          [[] as Message["roles"][], [] as Omit<Message, "roles">[]] as const,
         );
 
-        const messagesWithRole = record.ltiConfiguration.messages.filter(
-          (message) => message.roles?.length,
-        );
+        const roles = _roles.flat();
 
-        if (messagesWithRole.length) {
-          const mappedRoles = messagesWithRole.flatMap((message) =>
-            message.roles!.map((role) => ({
-              clientId: record.id,
-              messageType: message.type,
-              role,
-            })),
-          );
+        await tx.insert(ltiToolSupportedMessages).values(messages);
 
-          await tx.insert(ltiToolSupportedMessageRoles).values(mappedRoles);
+        if (roles.length) {
+          await tx.insert(ltiToolSupportedMessageRoles).values(roles);
         }
       }
     });
@@ -363,8 +241,8 @@ export class DrizzleLtiToolsRepository extends LTIToolsRepository {
         () =>
           this.drizzle
             .getClient()
-            .delete(oauthClient)
-            .where(eq(oauthClient.id, id)),
+            .delete(oauthClients)
+            .where(eq(oauthClients.id, id)),
         (err: Error) => {
           return new IrrecoverableError(
             `An error occurred in ${DrizzleLtiToolsRepository.name} when deleting the LTI Tool with ID ${id}.`,
@@ -373,6 +251,27 @@ export class DrizzleLtiToolsRepository extends LTIToolsRepository {
         },
       ),
       taskEither.map((_result) => {}),
+    )();
+  }
+
+  public async findToolsOwningResourceLinks(
+    resourceLinksIds: LtiResourceLink["id"][],
+  ): Promise<Either<IrrecoverableError, ToolRecord[]>> {
+    return await pipe(
+      taskEither.tryCatch(
+        () =>
+          this.drizzle.getClient().query.ltiTools.findMany({
+            ...ltiToolsMapper.requiredQueryConfig,
+            where: inArray(ltiTools.id, resourceLinksIds),
+          }),
+        (error: Error) => {
+          return new IrrecoverableError(
+            `An error occurred in ${DrizzleLtiToolsRepository.name} when finding tools by resource links IDs.`,
+            error,
+          );
+        },
+      ),
+      taskEither.map((rows) => rows.map(ltiToolsMapper.fromRow)),
     )();
   }
 }

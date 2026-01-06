@@ -52,7 +52,7 @@ export const oauthApplicationTypeEnum = pgEnum("oauth_application_type", [
   "native",
 ]);
 
-export const oauthClient = pgTable("oauth_client", {
+export const oauthClients = pgTable("oauth_client", {
   id: varchar({ length: 64 }).primaryKey(),
   name: varchar({ length: 255 }).notNull(),
   clientSecret: varchar("client_secret"),
@@ -64,7 +64,7 @@ export const oauthClient = pgTable("oauth_client", {
 export const ltiTools = pgTable("lti_tools", {
   id: varchar({ length: 64 })
     .primaryKey()
-    .references(() => oauthClient.id, { onDelete: "cascade" }),
+    .references(() => oauthClients.id, { onDelete: "cascade" }),
   description: varchar(),
   domain: varchar().notNull(),
   customParameters: jsonb("custom_parameters"),
@@ -84,7 +84,7 @@ export const oauthRedirectUris = pgTable(
   {
     clientId: varchar("client_id", { length: 64 })
       .notNull()
-      .references(() => oauthClient.id, { onDelete: "cascade" }),
+      .references(() => oauthClients.id, { onDelete: "cascade" }),
     uri: varchar().notNull(),
   },
   (table) => [primaryKey({ columns: [table.clientId, table.uri] })],
@@ -95,7 +95,7 @@ export const oauthContacts = pgTable(
   {
     clientId: varchar("client_id", { length: 64 })
       .notNull()
-      .references(() => oauthClient.id, { onDelete: "cascade" }),
+      .references(() => oauthClients.id, { onDelete: "cascade" }),
     email: varchar().notNull(),
   },
   (table) => [primaryKey({ columns: [table.clientId, table.email] })],
@@ -142,9 +142,9 @@ export const ltiToolSupportedMessageRoles = pgTable(
  * Relations
  */
 export const ltiToolsRelations = relations(ltiTools, ({ many, one }) => ({
-  oauthClient: one(oauthClient, {
+  oauthClient: one(oauthClients, {
     fields: [ltiTools.id],
-    references: [oauthClient.id],
+    references: [oauthClients.id],
   }),
   deployments: many(ltiToolDeployments),
   supportedMessages: many(ltiToolSupportedMessages),
@@ -187,25 +187,28 @@ export const ltiToolSupportedMessageRolesRelations = relations(
   }),
 );
 
-export const oauthClientRelations = relations(oauthClient, ({ one, many }) => ({
-  ltiTool: one(ltiTools),
-  redirectUris: many(oauthRedirectUris),
-  contacts: many(oauthContacts),
-}));
+export const oauthClientRelations = relations(
+  oauthClients,
+  ({ one, many }) => ({
+    ltiTool: one(ltiTools),
+    redirectUris: many(oauthRedirectUris),
+    contacts: many(oauthContacts),
+  }),
+);
 
 export const oauthRedirectUrisRelations = relations(
   oauthRedirectUris,
   ({ one }) => ({
-    client: one(oauthClient, {
+    client: one(oauthClients, {
       fields: [oauthRedirectUris.clientId],
-      references: [oauthClient.id],
+      references: [oauthClients.id],
     }),
   }),
 );
 
 export const oauthContactsRelations = relations(oauthContacts, ({ one }) => ({
-  client: one(oauthClient, {
+  client: one(oauthClients, {
     fields: [oauthContacts.clientId],
-    references: [oauthClient.id],
+    references: [oauthClients.id],
   }),
 }));

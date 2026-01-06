@@ -1,7 +1,7 @@
 import { Global, Module } from "@nestjs/common";
 import { PeopleRepository } from "@/identity/person/people.repository";
 import { UsersRepository } from "@/identity/user/users.repository";
-import { LTIToolsRepository } from "@/lti/lti-tools.repository";
+import { LtiToolsRepository } from "@/lti/lti-tools.repository";
 import { OIDCAccountsRepository } from "@/oidc/repositories/accounts.repository";
 import { OIDCClientsRepository } from "@/oidc/repositories/clients.repository";
 import { DrizzleLtiToolsRepository } from "./lti-tools.repository";
@@ -30,7 +30,7 @@ import { DrizzleUsersRepository } from "./users.repository";
       useClass: DrizzleODICAccountsRepository,
     },
     {
-      provide: LTIToolsRepository,
+      provide: LtiToolsRepository,
       useClass: DrizzleLtiToolsRepository,
     },
   ],

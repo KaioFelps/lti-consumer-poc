@@ -15,7 +15,7 @@ import {
 } from "@/lib/fp-ts";
 import { LtiToolIdPrefix } from "@/lti";
 import { LtiTool } from "@/lti/lti-tool";
-import { LTIToolsRepository } from "@/lti/lti-tools.repository";
+import { LtiToolsRepository } from "@/lti/lti-tools.repository";
 import { ModelName } from "@/oidc/adapter/factory";
 import { OIDCClient } from "@/oidc/client";
 import { OIDCClientsRepository } from "@/oidc/repositories/clients.repository";
@@ -24,7 +24,7 @@ export class DrizzleOIDCClientAdapter implements Adapter {
   public constructor(
     name: ModelName,
     private readonly clientRepository: OIDCClientsRepository,
-    private readonly toolsRepository: LTIToolsRepository,
+    private readonly toolsRepository: LtiToolsRepository,
   ) {
     if (name !== "Client") {
       throw new IrrecoverableError(
