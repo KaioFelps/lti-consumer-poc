@@ -1,6 +1,8 @@
 import { ClassProperties } from "common/src/types/class-properties";
+import { Optional } from "common/src/types/optional";
+import { generateUUID } from "common/src/types/uuid";
 
-type Args = ClassProperties<LtiResourceLink>;
+type Args = Optional<ClassProperties<LtiResourceLink>, "id">;
 
 /**
  * A `ResourceLink` instance describes a resource link placement, i.e.,
@@ -35,9 +37,13 @@ export class LtiResourceLink {
    * on how to complete the activity).
    */
   public description?: string;
+  /**
+   * The identifier of the LTI Tool this resource link belongs to.
+   */
+  public toolId: string;
 
   protected constructor(args: Args) {
-    Object.assign(this, args);
+    Object.assign({ ...args, id: args ?? generateUUID() }, args);
   }
 
   public static create(args: Args) {
