@@ -138,6 +138,34 @@ export const ltiToolSupportedMessageRoles = pgTable(
   ],
 );
 
+export const ltiContexts = pgTable("lti_context", {
+  id: uuid().primaryKey(),
+  label: varchar(),
+  title: varchar(),
+});
+
+export const ltiContextsTypes = pgTable(
+  "lti_contexts_types",
+  {
+    contextId: uuid("context_id")
+      .notNull()
+      .references(() => ltiContexts.id),
+    type: varchar().notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.contextId, table.type] })],
+);
+
+export const ltiResourceLinks = pgTable("lti_resource_link", {
+  id: uuid().primaryKey(),
+  deploymentId: uuid("deployment_id")
+    .notNull()
+    .references(() => ltiToolDeployments.id),
+  contextId: uuid("context_id").references(() => ltiContexts.id),
+  resourceUrl: varchar("resource_url").notNull(),
+  title: varchar(), // nullable
+  description: varchar(), // nullable
+});
+
 /**
  * Relations
  */
@@ -152,11 +180,12 @@ export const ltiToolsRelations = relations(ltiTools, ({ many, one }) => ({
 
 export const ltiToolDeploymentsRelations = relations(
   ltiToolDeployments,
-  ({ one }) => ({
+  ({ one, many }) => ({
     tool: one(ltiTools, {
       fields: [ltiToolDeployments.clientId],
       references: [ltiTools.id],
     }),
+    resourceLinks: many(ltiResourceLinks),
   }),
 );
 
@@ -212,3 +241,32 @@ export const oauthContactsRelations = relations(oauthContacts, ({ one }) => ({
     references: [oauthClients.id],
   }),
 }));
+
+export const ltiResourceLinksRelations = relations(
+  ltiResourceLinks,
+  ({ one }) => ({
+    deployment: one(ltiToolDeployments, {
+      fields: [ltiResourceLinks.deploymentId],
+      references: [ltiToolDeployments.id],
+    }),
+    context: one(ltiContexts, {
+      fields: [ltiResourceLinks.contextId],
+      references: [ltiContexts.id],
+    }),
+  }),
+);
+
+export const ltiContextsRelations = relations(ltiContexts, ({ many }) => ({
+  resourceLinks: many(ltiResourceLinks),
+  types: many(ltiContextsTypes),
+}));
+
+export const ltiContextsTypesRelations = relations(
+  ltiContextsTypes,
+  ({ one }) => ({
+    context: one(ltiContexts, {
+      fields: [ltiContextsTypes.contextId],
+      references: [ltiContexts.id],
+    }),
+  }),
+);
