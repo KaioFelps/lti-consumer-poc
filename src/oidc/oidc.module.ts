@@ -3,7 +3,7 @@ import Provider from "oidc-provider";
 import { AuthModule } from "@/auth/auth.module";
 import { EnvironmentVars } from "@/config/environment-vars";
 import { FlashSessionMiddleware } from "@/lib/middlewares/flash-session.middleware";
-import { LTIToolsRepository } from "@/lti/lti-tools.repository";
+import { LtiToolsRepository } from "@/lti/lti-tools.repository";
 import { OIDCAdapterFactory } from "@/oidc/adapter/factory";
 import { OIDCAdapterModule } from "./adapter/adapter.module";
 import { OIDCController } from "./oidc.controller";
@@ -20,7 +20,7 @@ import { OIDCClientsRepository } from "./repositories/clients.repository";
       useFactory: (
         envVars: EnvironmentVars,
         clientsRepository: OIDCClientsRepository,
-        ltiToolsRepository: LTIToolsRepository,
+        ltiToolsRepository: LtiToolsRepository,
         oidcAccountsRepository: OIDCAccountsRepository,
         oidcAdapterFactory: OIDCAdapterFactory,
       ) =>
@@ -34,7 +34,7 @@ import { OIDCClientsRepository } from "./repositories/clients.repository";
       inject: [
         EnvironmentVars,
         OIDCClientsRepository,
-        LTIToolsRepository,
+        LtiToolsRepository,
         OIDCAccountsRepository,
         OIDCAdapterFactory,
       ],

@@ -7,7 +7,7 @@ import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { eitherPromiseToTaskEither } from "@/lib/fp-ts";
 import { LtiToolIdPrefix } from "@/lti";
 import { ltiToolConfigurationSchema } from "@/lti/lti-tool-config-schemas";
-import { LTIToolsRepository } from "@/lti/lti-tools.repository";
+import { LtiToolsRepository } from "@/lti/lti-tools.repository";
 import { OIDCAdapterBridge } from "@/oidc/adapter/bridge";
 import { OIDCAdapterFactory } from "@/oidc/adapter/factory";
 import { MessageType } from "$/claims/serialization";
@@ -23,7 +23,7 @@ export class OIDCProviderFactory {
   public constructor(
     private environments: EnvironmentVars,
     private clientsRepository: OIDCClientsRepository,
-    private ltiToolsRepository: LTIToolsRepository,
+    private ltiToolsRepository: LtiToolsRepository,
     private oidcAccountsRepository: OIDCAccountsRepository,
     private oidcAdapterFactory: OIDCAdapterFactory,
   ) {}

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { DrizzleOIDCClientAdapter } from "@/external/data-store/drizzle/oidc-adpaters/client-adapter";
-import { LTIToolsRepository } from "@/lti/lti-tools.repository";
+import { LtiToolsRepository } from "@/lti/lti-tools.repository";
 import { Redis } from "../../external/data-store/redis/client";
 import { OIDCRedisAdapter } from "../../external/data-store/redis/oidc-adapter";
 import { OIDCClientsRepository } from "../repositories/clients.repository";
@@ -30,7 +30,7 @@ export class OIDCAdapterFactory {
   private readonly clientsRepository: OIDCClientsRepository;
 
   @Inject()
-  private readonly ltiToolsRepository: LTIToolsRepository;
+  private readonly ltiToolsRepository: LtiToolsRepository;
 
   public getAdapter(modelName: ModelName) {
     if (modelName === "Client") {
