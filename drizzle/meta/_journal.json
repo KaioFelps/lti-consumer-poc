@@ -36,6 +36,13 @@
       "when": 1764306751939,
       "tag": "0004_add-lti-and-oauth-client-tables-and-add-tables-relations",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1767711884702,
+      "tag": "0005_drop-client-id-as-pk-from-lti-tool-deployments-table",
+      "breakpoints": true
     }
   ]
 }

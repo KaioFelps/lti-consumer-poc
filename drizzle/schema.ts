@@ -101,16 +101,12 @@ export const oauthContacts = pgTable(
   (table) => [primaryKey({ columns: [table.clientId, table.email] })],
 );
 
-export const ltiToolDeployments = pgTable(
-  "lti_deployments",
-  {
-    clientId: varchar("client_id", { length: 64 })
-      .notNull()
-      .references(() => ltiTools.id, { onDelete: "cascade" }),
-    id: uuid().notNull(),
-  },
-  (table) => [primaryKey({ columns: [table.clientId, table.id] })],
-);
+export const ltiToolDeployments = pgTable("lti_deployments", {
+  clientId: varchar("client_id", { length: 64 })
+    .notNull()
+    .references(() => ltiTools.id, { onDelete: "cascade" }),
+  id: uuid().primaryKey(),
+});
 
 export const ltiToolSupportedMessages = pgTable(
   "lti_tool_supported_messages",
