@@ -4,10 +4,12 @@ import { UsersRepository } from "@/identity/user/users.repository";
 import { LtiToolsRepository } from "@/lti/lti-tools.repository";
 import { OIDCAccountsRepository } from "@/oidc/repositories/accounts.repository";
 import { OIDCClientsRepository } from "@/oidc/repositories/clients.repository";
+import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { DrizzleLtiToolsRepository } from "./lti-tools.repository";
 import { DrizzleODICAccountsRepository } from "./oidc-accounts.repository";
 import { DrizzleOIDCClientsRepository } from "./oidc-clients.repository";
 import { DrizzlePeopleRepository } from "./people.repository";
+import { DrizzleLtiResourceLinksRepository } from "./resource-links.repository";
 import { DrizzleUsersRepository } from "./users.repository";
 
 @Global()
@@ -33,13 +35,18 @@ import { DrizzleUsersRepository } from "./users.repository";
       provide: LtiToolsRepository,
       useClass: DrizzleLtiToolsRepository,
     },
+    {
+      provide: LtiResourceLinksRepository,
+      useClass: DrizzleLtiResourceLinksRepository,
+    },
   ],
   exports: [
     UsersRepository,
     PeopleRepository,
     OIDCClientsRepository,
     OIDCAccountsRepository,
-    LTIToolsRepository,
+    LtiToolsRepository,
+    LtiResourceLinksRepository,
   ],
 })
 export class RepositoriesModule {}
