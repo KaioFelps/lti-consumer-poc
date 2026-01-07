@@ -10,6 +10,7 @@ export const environmentVariablesSchema = z.object({
   APP_SECRET: z.string(),
   APP_NAME: z.string(),
   APP_PRODUCT_NAME: z.string(),
+  PRIVATE_KEY_BASE64: z.string(),
   NODE_ENV: z
     .enum(["production", "development"])
     .optional()
