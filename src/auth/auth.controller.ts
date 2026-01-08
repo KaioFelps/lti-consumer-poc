@@ -42,7 +42,6 @@ export class AuthController {
       endpoint: "/auth/login",
       registerEndpoint: "/auth/register",
       title: await this.t.translate("auth:forms:login:title"),
-      locale: this.t.getLocale(),
       labels: {
         username: await this.t.translate("auth:forms:login:labels:username"),
         password: await this.t.translate("auth:forms:login:labels:password"),
@@ -75,7 +74,6 @@ export class AuthController {
   @Render("register")
   public async showRegisterForm() {
     return {
-      locale: this.t.getLocale(),
       title: await this.t.translate("auth:forms:register:title"),
       endpoint: "/auth/register",
       loginEndpoint: "/auth/login",

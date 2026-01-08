@@ -38,10 +38,7 @@ export class LtiController {
       LtiController.toolRegistrationEndpointFlashKey
     ] as string | undefined;
 
-    console.log(initiateRegisterEndpoint);
-
     return {
-      locale: this.t.getLocale(),
       title: await this.t.translate("lti:register-tool:title"),
       endpoint: "/lti/register",
       shallShowDockerInternalHostOption: this.vars.nodeEnv === "development",

@@ -1,13 +1,21 @@
-import { NestMiddleware } from "@nestjs/common";
+import { Inject, Injectable, NestMiddleware } from "@nestjs/common";
+import { TranslatorService } from "@/message-string/translator.service";
 import { HttpRequest, HttpResponse } from "..";
 
-export class FlashSessionMiddleware implements NestMiddleware {
-  use(
+@Injectable()
+export class SessionsAndFlashMessagesMiddleware implements NestMiddleware {
+  @Inject()
+  private readonly t: TranslatorService;
+
+  async use(
     request: HttpRequest,
     response: HttpResponse,
     next: (error?: unknown) => void,
   ) {
     const session = request["session"] as Record<string, unknown>;
+
+    // injects locales
+    response.locals.locale = this.t.getLocale();
 
     // explicitly "define" them as undefined, so that EJS won't throw errors
     response.locals.error = session.error ?? undefined;

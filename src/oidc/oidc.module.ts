@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import Provider from "oidc-provider";
 import { AuthModule } from "@/auth/auth.module";
 import { EnvironmentVars } from "@/config/environment-vars";
-import { FlashSessionMiddleware } from "@/lib/middlewares/flash-session.middleware";
+import { SessionsAndFlashMessagesMiddleware } from "@/lib/middlewares/flash-session.middleware";
 import { LtiToolsRepository } from "@/lti/lti-tools.repository";
 import { OIDCAdapterFactory } from "@/oidc/adapter/factory";
 import { OIDCAdapterModule } from "./adapter/adapter.module";
@@ -44,6 +44,8 @@ import { OIDCClientsRepository } from "./repositories/clients.repository";
 })
 export class OIDCModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(FlashSessionMiddleware).forRoutes("/oidc/interaction/*path");
+    consumer
+      .apply(SessionsAndFlashMessagesMiddleware)
+      .forRoutes("/oidc/interaction/*path");
   }
 }

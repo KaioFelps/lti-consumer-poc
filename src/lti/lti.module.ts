@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
-import { FlashSessionMiddleware } from "@/lib/middlewares/flash-session.middleware";
+import { SessionsAndFlashMessagesMiddleware } from "@/lib/middlewares/flash-session.middleware";
 import { OIDCModule } from "@/oidc/oidc.module";
 import { LtiController } from "./lti.controller";
 
@@ -9,6 +9,6 @@ import { LtiController } from "./lti.controller";
 })
 export class LtiModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(FlashSessionMiddleware).forRoutes(LtiController);
+    consumer.apply(SessionsAndFlashMessagesMiddleware).forRoutes(LtiController);
   }
 }
