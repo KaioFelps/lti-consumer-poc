@@ -1,0 +1,11 @@
+import { HttpException, HttpStatus } from "@nestjs/common";
+import { RenderableError } from "@/core/errors/renderable/renderable-error";
+
+export class RenderableException extends HttpException {
+  public constructor(
+    public error: RenderableError,
+    status: HttpStatus,
+  ) {
+    super(error, status);
+  }
+}
