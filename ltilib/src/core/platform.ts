@@ -2,6 +2,8 @@ import { ClassProperties } from "common/src/types/class-properties";
 import { JWK } from "jose";
 import { IntoLtiClaim } from "$/claims/serialization";
 
+type Args = ClassProperties<Platform>;
+
 /**
  * Represents a LTI Platform.
  */
@@ -26,12 +28,18 @@ export class Platform {
    */
   public readonly instance?: Platform.Instance;
 
-  public constructor(args: ClassProperties<Platform>) {
+  protected constructor(args: Args) {
     Object.assign(this, args);
+  }
+
+  public static create(args: Args) {
+    return new Platform(args);
   }
 }
 
 export namespace Platform {
+  type InstanceConstructorArgs = ClassProperties<Instance>;
+
   /*
    * When in multi-tenancy case, the platform instance initiating the launch can identify itself
    * through the [Platform instance claim]. If present, this `Platform.Instance` will compose
@@ -81,6 +89,14 @@ export namespace Platform {
      * @example "5.1"
      */
     public readonly version?: string;
+
+    protected constructor(args: InstanceConstructorArgs) {
+      Object.assign(this, args);
+    }
+
+    public static create(args: InstanceConstructorArgs) {
+      return new Instance(args);
+    }
 
     intoLtiClaim(): object {
       return {
