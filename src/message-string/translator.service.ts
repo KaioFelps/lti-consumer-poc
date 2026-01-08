@@ -6,10 +6,12 @@ import { translate } from "./internal/translate";
 
 @Injectable({ scope: Scope.REQUEST })
 export class TranslatorService {
-  public constructor(@Inject(REQUEST) private readonly request: HttpRequest) {}
+  // when called in a Guard, request hasn't been completely mounted yet
+  @Inject(REQUEST)
+  private readonly request?: HttpRequest;
 
   public getLocale(): string {
-    const locale = this.request.cookies.lti_consumer_poc_language ?? "pt-BR";
+    const locale = this.request?.cookies.lti_consumer_poc_language ?? "pt-BR";
     return locale;
   }
 
