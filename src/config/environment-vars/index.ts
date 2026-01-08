@@ -18,6 +18,7 @@ export class EnvironmentVars {
       readonly secret: string;
       readonly name: string;
       readonly productCode: string;
+      readonly privateKeyB64: string;
     },
     public readonly redis: {
       readonly user: string;
@@ -45,6 +46,7 @@ export class EnvironmentVars {
         secret: nestConfigService.get("APP_SECRET"),
         name: nestConfigService.get("APP_NAME"),
         productCode: nestConfigService.get("APP_PRODUCT_NAME"),
+        privateKeyB64: nestConfigService.get("PRIVATE_KEY_BASE64"),
       },
       {
         user: nestConfigService.get("REDIS_USER"),
