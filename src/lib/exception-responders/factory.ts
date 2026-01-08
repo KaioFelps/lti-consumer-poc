@@ -1,5 +1,5 @@
 import { HttpRequest } from "@/lib";
-import { HANDLER_IS_MVC_KEY } from "../interceptors/mvc-marker.interceptor";
+import mvc from "../mvc-routes";
 import { ExceptionFilterResponder } from "./responder";
 
 export abstract class ExceptionFilterResponderFactory<
@@ -7,7 +7,7 @@ export abstract class ExceptionFilterResponderFactory<
   O = unknown,
 > {
   protected isMVC(request: HttpRequest): boolean {
-    return request[HANDLER_IS_MVC_KEY] ?? false;
+    return request[mvc.requestKey] ?? false;
   }
 
   public abstract create(request: HttpRequest): ExceptionFilterResponder<B, O>;
