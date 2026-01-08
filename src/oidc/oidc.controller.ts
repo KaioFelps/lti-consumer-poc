@@ -23,8 +23,8 @@ import { AuthenticateUserService } from "@/auth/services/authenticate-user.servi
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { UnauthorizedError } from "@/core/errors/unauthorized.error";
 import { HttpRequest, HttpResponse } from "@/lib";
-import { MVC } from "@/lib/decorators/mvc-route";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
+import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { AvailableACRs } from "./consts";
 import { reasonsAreValidPromptReasons, resolveAcrValues } from "./helpers";
@@ -52,7 +52,7 @@ export class OIDCController {
    * [User flows]: https://github.com/panva/node-oidc-provider/blob/main/docs/README.md#user-flows
    */
   // This `uid` param will be used by `oidc.Provider` to obtain the interaction instance.
-  @MVC()
+  @Mvc()
   @Get("interaction/:uid")
   @Header("cache-control", "no-store")
   public async interactions(
@@ -141,7 +141,7 @@ export class OIDCController {
     }
   }
 
-  @MVC()
+  @Mvc()
   @Post("interaction/:uid/login")
   @Header("cache-control", "no-store")
   public async loginIteractionFinished(
@@ -195,7 +195,7 @@ export class OIDCController {
     });
   }
 
-  @MVC()
+  @Mvc()
   @Post("interaction/:uid/consent")
   @Header("cache-control", "no-store")
   public async consentIteractionFinished(
@@ -254,7 +254,7 @@ export class OIDCController {
     await this.provider.interactionFinished(request, response, { consent });
   }
 
-  @MVC()
+  @Mvc()
   @Post("interaction/:uid/abort")
   public async abortInteraction(
     @Req() req: HttpRequest,

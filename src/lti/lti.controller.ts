@@ -11,7 +11,7 @@ import {
 import Provider from "oidc-provider";
 import { EnvironmentVars } from "@/config/environment-vars";
 import { HttpResponse, RequestSession } from "@/lib";
-import { MVC } from "@/lib/decorators/mvc-route";
+import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { LtiRegistrationInitiationRequest } from "$/messages/initiate-register";
 import { RegisterToolDTO } from "./dtos/register-tool.dto";
@@ -30,7 +30,7 @@ export class LtiController {
   private static toolRegistrationEndpointFlashKey =
     "registerToolInitiateRegisterEndpoint";
 
-  @MVC()
+  @Mvc()
   @Get("register")
   @Render("register-new-tool")
   public async register(@Res() response: HttpResponse) {
@@ -79,7 +79,7 @@ export class LtiController {
     };
   }
 
-  @MVC()
+  @Mvc()
   @Post("register")
   public async storeToolRecord(
     @Res() response: HttpResponse,

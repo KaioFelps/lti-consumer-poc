@@ -16,14 +16,14 @@ import { PersonGender } from "@/identity/person/enums/gender";
 import { RegisterNewPersonService } from "@/identity/person/services/register-new-person.service";
 import { CPF } from "@/identity/person/value-objects/cpf";
 import { HttpResponse } from "@/lib";
-import { MVC } from "@/lib/decorators/mvc-route";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
+import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { LoginDTO } from "./dtos/login.dto";
 import { RegisterPersonDTO } from "./dtos/register-person.dto";
 import { AuthenticateUserService } from "./services/authenticate-user.service";
 
-@MVC()
+@Mvc()
 @Controller("auth")
 export class AuthController {
   @Inject()
