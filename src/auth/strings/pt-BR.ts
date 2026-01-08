@@ -2,6 +2,11 @@ import { PersonGender } from "@/identity/person/enums/gender";
 import { SystemRole } from "@/identity/user/enums/system-role";
 import { ptBR } from "@/message-string/internal/translations/pt-BR";
 
+ptBR["auth:unauthorized-access:message"] =
+  "Você não está autorizado a acessar esse recurso.";
+
+ptBR["auth:unauthorized-access:title"] = "Não autorizado";
+
 ptBR["auth:register-user:username-invalid-type"] =
   "O nome de usuário é obrigatório e deve ser formado por um conjunto de caracteres.";
 
