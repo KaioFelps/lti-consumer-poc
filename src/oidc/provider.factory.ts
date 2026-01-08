@@ -112,6 +112,12 @@ export class OIDCProviderFactory {
           initialAccessToken: false,
           issueRegistrationAccessToken: false,
         },
+        rpInitiatedLogout: {
+          enabled: true,
+          postLogoutSuccessSource(ctx) {
+            ctx.redirect("/auth/logout");
+          },
+        },
       },
       cookies: {
         names: {

@@ -1,11 +1,13 @@
 // TODO: handle sessions in a fancy manner, e.g., a middleware
 // to reflash or clean flash messages.
 import {
+  All,
   Body,
   Controller,
   Get,
   Inject,
   Post,
+  Redirect,
   Render,
   Res,
   Session,
@@ -15,13 +17,14 @@ import { pipe } from "fp-ts/lib/function";
 import { PersonGender } from "@/identity/person/enums/gender";
 import { RegisterNewPersonService } from "@/identity/person/services/register-new-person.service";
 import { CPF } from "@/identity/person/value-objects/cpf";
-import { HttpResponse } from "@/lib";
+import { User } from "@/identity/user/user.entity";
+import { HttpResponse, RequestSession } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { LoginDTO } from "./dtos/login.dto";
 import { RegisterPersonDTO } from "./dtos/register-person.dto";
-import { Public } from "./public-routes";
+import { Public, SessionUser } from "./public-routes";
 import { AuthenticateUserService } from "./services/authenticate-user.service";
 
 @Mvc()
@@ -38,9 +41,15 @@ export class AuthController {
 
   @Public()
   @Get("login")
-  @Render("login")
-  public async showLoginForm() {
-    return {
+  public async showLoginForm(
+    @Res() response: HttpResponse,
+    @SessionUser() user?: User,
+  ) {
+    const userIsLoggedIn = Boolean(user);
+
+    if (userIsLoggedIn) return response.redirect("/");
+
+    return response.render("login", {
       endpoint: "/auth/login",
       registerEndpoint: "/auth/register",
       title: await this.t.translate("auth:forms:login:title"),
@@ -54,12 +63,16 @@ export class AuthController {
           "auth:forms:login:buttons:no-account",
         ),
       },
-    };
+    });
   }
 
   @Public()
   @Post("login")
-  public async login(@Body() dto: LoginDTO) {
+  public async login(
+    @Body() dto: LoginDTO,
+    @Session() session: RequestSession,
+    @Res() response: HttpResponse,
+  ) {
     const user = pipe(
       await this.authenticateUserServer.execute(dto),
       either.match(
@@ -70,7 +83,9 @@ export class AuthController {
       ),
     );
 
-    return user;
+    session.auth = user;
+
+    return response.redirectBack();
   }
 
   @Public()
@@ -140,5 +155,13 @@ export class AuthController {
     };
 
     return response.redirectBack();
+  }
+
+  @Mvc()
+  @Public()
+  @All("logout")
+  @Redirect("/")
+  public async logout(@Session() session: RequestSession) {
+    if (session.auth) delete session.auth;
   }
 }
