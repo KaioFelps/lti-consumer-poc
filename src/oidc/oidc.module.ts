@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import Provider from "oidc-provider";
 import { AuthModule } from "@/auth/auth.module";
+import { AuthJwkSet } from "@/auth/encryption/jwks-set";
 import { EnvironmentVars } from "@/config/environment-vars";
 import { SessionsAndFlashMessagesMiddleware } from "@/lib/middlewares/flash-session.middleware";
 import { LtiToolsRepository } from "@/lti/lti-tools.repository";
@@ -23,6 +24,7 @@ import { OIDCClientsRepository } from "./repositories/clients.repository";
         ltiToolsRepository: LtiToolsRepository,
         oidcAccountsRepository: OIDCAccountsRepository,
         oidcAdapterFactory: OIDCAdapterFactory,
+        jwks: AuthJwkSet,
       ) =>
         new OIDCProviderFactory(
           envVars,
@@ -30,6 +32,7 @@ import { OIDCClientsRepository } from "./repositories/clients.repository";
           ltiToolsRepository,
           oidcAccountsRepository,
           oidcAdapterFactory,
+          jwks,
         ).create(),
       inject: [
         EnvironmentVars,
@@ -37,6 +40,7 @@ import { OIDCClientsRepository } from "./repositories/clients.repository";
         LtiToolsRepository,
         OIDCAccountsRepository,
         OIDCAdapterFactory,
+        AuthJwkSet,
       ],
     },
   ],

@@ -2,6 +2,7 @@ import { generateUUID } from "common/src/types/uuid";
 import { taskEither } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import Provider, { type Configuration, errors } from "oidc-provider";
+import { AuthJwkSet } from "@/auth/encryption/jwks-set";
 import { EnvironmentVars } from "@/config/environment-vars";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { eitherPromiseToTaskEither } from "@/lib/fp-ts";
@@ -26,6 +27,7 @@ export class OIDCProviderFactory {
     private ltiToolsRepository: LtiToolsRepository,
     private oidcAccountsRepository: OIDCAccountsRepository,
     private oidcAdapterFactory: OIDCAdapterFactory,
+    private jwks: AuthJwkSet,
   ) {}
 
   public async create(): Promise<Provider> {
@@ -62,6 +64,7 @@ export class OIDCProviderFactory {
         },
       },
       adapter,
+      jwks: this.jwks.toPrivateKeyset(),
       clients,
       findAccount: async (_ctx, id, _token) => {
         return await this.oidcAccountsRepository.findAccountById(id);
