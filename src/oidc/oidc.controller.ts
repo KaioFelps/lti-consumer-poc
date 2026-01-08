@@ -19,6 +19,7 @@ import Provider, {
   type InteractionResults,
 } from "oidc-provider";
 import { LoginDTO } from "@/auth/dtos/login.dto";
+import { Public } from "@/auth/public-routes";
 import { AuthenticateUserService } from "@/auth/services/authenticate-user.service";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { UnauthorizedError } from "@/core/errors/unauthorized.error";
@@ -32,6 +33,7 @@ import { OIDCAccountsRepository } from "./repositories/accounts.repository";
 import { ConsentViewManagerFactory } from "./view-manager/consent";
 import { LoginViewManager } from "./view-manager/login";
 
+@Public()
 @Controller("oidc")
 export class OIDCController {
   @Inject()

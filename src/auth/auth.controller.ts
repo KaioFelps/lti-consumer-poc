@@ -21,6 +21,7 @@ import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { LoginDTO } from "./dtos/login.dto";
 import { RegisterPersonDTO } from "./dtos/register-person.dto";
+import { Public } from "./public-routes";
 import { AuthenticateUserService } from "./services/authenticate-user.service";
 
 @Mvc()
@@ -35,6 +36,7 @@ export class AuthController {
   @Inject()
   private t: TranslatorService;
 
+  @Public()
   @Get("login")
   @Render("login")
   public async showLoginForm() {
@@ -55,6 +57,7 @@ export class AuthController {
     };
   }
 
+  @Public()
   @Post("login")
   public async login(@Body() dto: LoginDTO) {
     const user = pipe(
@@ -70,6 +73,7 @@ export class AuthController {
     return user;
   }
 
+  @Public()
   @Get("register")
   @Render("register")
   public async showRegisterForm() {
@@ -100,6 +104,7 @@ export class AuthController {
     };
   }
 
+  @Public()
   @Post("register")
   public async registerPerson(
     @Res() response: HttpResponse,

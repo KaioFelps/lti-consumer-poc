@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AuthModule } from "./auth/auth.module";
@@ -8,6 +8,8 @@ import { IdentityModule } from "./identity/identity.module";
 import { GlobalExceptionFiltersModule } from "./lib/globals/exception-filters.module";
 import { GlobalGuardsModule } from "./lib/globals/guards.module";
 import { GlobalInterceptorsModule } from "./lib/globals/interceptors.module";
+import { AuthUserSessionMiddleware } from "./lib/middlewares/auth-user-session.middleware";
+import { SessionsAndFlashMessagesMiddleware } from "./lib/middlewares/flash-session.middleware";
 import { LtiModule } from "./lti/lti.module";
 import { MessageStringModule } from "./message-string/message-string.module";
 import { OIDCModule } from "./oidc/oidc.module";
@@ -28,4 +30,10 @@ import { OIDCModule } from "./oidc/oidc.module";
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(SessionsAndFlashMessagesMiddleware, AuthUserSessionMiddleware)
+      .forRoutes(AppController);
+  }
+}
