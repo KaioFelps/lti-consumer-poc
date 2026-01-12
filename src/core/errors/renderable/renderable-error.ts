@@ -2,18 +2,10 @@ import { ErrorClassProperties } from "../error-base";
 
 type Args = ErrorClassProperties<RenderableError>;
 
-type RenderableErrorViewProperties =
-  | ({
-      [key: PropertyKey]: unknown;
-    } & ({
-      title: string;
-    } & { translatable?: Record<string, string> }))
-  | {
-      translatable: {
-        title: string;
-        [key: PropertyKey]: string;
-      };
-    };
+type RenderableErrorViewProperties = {
+  title: string;
+  [key: PropertyKey]: unknown;
+};
 
 /**
  * A renderable error is a MVC-only error. Instead of redirecting the user back with errors,
