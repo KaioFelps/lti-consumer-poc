@@ -3,7 +3,7 @@ import { either } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { LtiLaunchServices } from "$/core/services/launch.services";
 import { AppService } from "./app.service";
-import { SessionUser } from "./auth/public-routes";
+import { SessionUser } from "./auth/session-user";
 import { IrrecoverableError } from "./core/errors/irrecoverable-error";
 import { User } from "./identity/user/user.entity";
 import { Mvc } from "./lib/mvc-routes";

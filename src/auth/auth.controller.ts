@@ -24,8 +24,9 @@ import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { LoginDTO } from "./dtos/login.dto";
 import { RegisterPersonDTO } from "./dtos/register-person.dto";
-import { Public, SessionUser } from "./public-routes";
+import { Public } from "./public-routes";
 import { AuthenticateUserService } from "./services/authenticate-user.service";
+import sessionUser, { SessionUser } from "./session-user";
 
 @Mvc()
 @Controller("auth")
@@ -83,7 +84,7 @@ export class AuthController {
       ),
     );
 
-    session.auth = user;
+    sessionUser.saveSessionUser(request, user);
 
     return response.redirectBack();
   }
