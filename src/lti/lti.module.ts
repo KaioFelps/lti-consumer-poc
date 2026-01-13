@@ -1,8 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { AuthModule } from "@/auth/auth.module";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { AuthUserSessionMiddleware } from "@/lib/middlewares/auth-user-session.middleware";
-import { SessionsAndFlashMessagesMiddleware } from "@/lib/middlewares/flash-session.middleware";
+import middlewares from "@/lib/middlewares";
 import { OIDCModule } from "@/oidc/oidc.module";
 import { Platform } from "$/core/platform";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
@@ -40,8 +39,6 @@ import { PlatformFactory } from "./platform.factory";
 })
 export class LtiModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(SessionsAndFlashMessagesMiddleware, AuthUserSessionMiddleware)
-      .forRoutes(LtiController);
+    consumer.apply(...middlewares.mvc()).forRoutes(LtiController);
   }
 }

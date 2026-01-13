@@ -3,7 +3,7 @@ import Provider from "oidc-provider";
 import { AuthModule } from "@/auth/auth.module";
 import { AuthJwkSet } from "@/auth/encryption/jwks-set";
 import { EnvironmentVars } from "@/config/environment-vars";
-import { SessionsAndFlashMessagesMiddleware } from "@/lib/middlewares/flash-session.middleware";
+import middlewares from "@/lib/middlewares";
 import { LtiToolsRepository } from "@/lti/lti-tools.repository";
 import { OIDCAdapterFactory } from "@/oidc/adapter/factory";
 import { OIDCAdapterModule } from "./adapter/adapter.module";
@@ -48,8 +48,6 @@ import { OIDCClientsRepository } from "./repositories/clients.repository";
 })
 export class OIDCModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(SessionsAndFlashMessagesMiddleware)
-      .forRoutes("/oidc/interaction/*path");
+    consumer.apply(...middlewares.mvc()).forRoutes("/oidc/interaction/*path");
   }
 }

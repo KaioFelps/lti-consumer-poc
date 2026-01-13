@@ -8,8 +8,7 @@ import { IdentityModule } from "./identity/identity.module";
 import { GlobalExceptionFiltersModule } from "./lib/globals/exception-filters.module";
 import { GlobalGuardsModule } from "./lib/globals/guards.module";
 import { GlobalInterceptorsModule } from "./lib/globals/interceptors.module";
-import { AuthUserSessionMiddleware } from "./lib/middlewares/auth-user-session.middleware";
-import { SessionsAndFlashMessagesMiddleware } from "./lib/middlewares/flash-session.middleware";
+import middlewares from "./lib/middlewares";
 import { LtiModule } from "./lti/lti.module";
 import { MessageStringModule } from "./message-string/message-string.module";
 import { OIDCModule } from "./oidc/oidc.module";
@@ -32,8 +31,6 @@ import { OIDCModule } from "./oidc/oidc.module";
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(SessionsAndFlashMessagesMiddleware, AuthUserSessionMiddleware)
-      .forRoutes(AppController);
+    consumer.apply(...middlewares.mvc()).forRoutes(AppController);
   }
 }
