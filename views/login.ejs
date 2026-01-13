@@ -12,6 +12,7 @@
         </div>
     <% } %>
     <form action="<%= endpoint %>" method="post">
+        <input type="hidden" name="destiny" value="<%- destinyEndpoint %>">
         <label>
             <span><%= labels.username %></span>
             <% (validationErrors?.username ?? []).forEach(error => { %>

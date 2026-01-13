@@ -1,24 +1,25 @@
-// TODO: handle sessions in a fancy manner, e.g., a middleware
-// to reflash or clean flash messages.
 import {
   All,
   Body,
   Controller,
   Get,
+  HttpStatus,
   Inject,
   Post,
   Redirect,
   Render,
+  Req,
   Res,
   Session,
 } from "@nestjs/common";
 import { either } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
+import { EnvironmentVars } from "@/config/environment-vars";
 import { PersonGender } from "@/identity/person/enums/gender";
 import { RegisterNewPersonService } from "@/identity/person/services/register-new-person.service";
 import { CPF } from "@/identity/person/value-objects/cpf";
 import { User } from "@/identity/user/user.entity";
-import { HttpResponse, RequestSession } from "@/lib";
+import { HttpRequest, HttpResponse } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
@@ -40,9 +41,13 @@ export class AuthController {
   @Inject()
   private t: TranslatorService;
 
+  @Inject()
+  private env: EnvironmentVars;
+
   @Public()
   @Get("login")
   public async showLoginForm(
+    @Req() request: HttpRequest,
     @Res() response: HttpResponse,
     @SessionUser() user?: User,
   ) {
@@ -50,9 +55,12 @@ export class AuthController {
 
     if (userIsLoggedIn) return response.redirect("/");
 
+    const destiny = request.headers.referer ?? "/";
+
     return response.render("login", {
       endpoint: "/auth/login",
       registerEndpoint: "/auth/register",
+      destinyEndpoint: destiny,
       title: await this.t.translate("auth:forms:login:title"),
       labels: {
         username: await this.t.translate("auth:forms:login:labels:username"),
@@ -71,11 +79,13 @@ export class AuthController {
   @Post("login")
   public async login(
     @Body() dto: LoginDTO,
-    @Session() session: RequestSession,
+    @Req() request: HttpRequest,
     @Res() response: HttpResponse,
   ) {
+    const { destiny, ...credentials } = dto;
+
     const user = pipe(
-      await this.authenticateUserServer.execute(dto),
+      await this.authenticateUserServer.execute(credentials),
       either.match(
         (error) => {
           throw ExceptionsFactory.fromError(error);
@@ -85,6 +95,16 @@ export class AuthController {
     );
 
     sessionUser.saveSessionUser(request, user);
+
+    // An attacker may modify the form and try to redirect the user to somewhere else.
+    // This ensures the destiny URL is in the application for a simple login.
+    // If an attacker modifies the destiny URL to an invalid URL string, URL constructor
+    // may throw an error. Given any of these conditions, we redirect user back.
+    try {
+      const appUrl = new URL(this.env.app.url);
+      const isUrlSafe = new URL(destiny, this.env.app.url).host === appUrl.host;
+      if (isUrlSafe) return response.redirect(HttpStatus.SEE_OTHER, destiny);
+    } catch (_e) {}
 
     return response.redirectBack();
   }
@@ -162,7 +182,7 @@ export class AuthController {
   @Public()
   @All("logout")
   @Redirect("/")
-  public async logout(@Session() session: RequestSession) {
-    if (session.auth) delete session.auth;
+  public async logout(@Req() request: HttpRequest) {
+    sessionUser.removeSessionUser(request);
   }
 }

@@ -20,6 +20,7 @@ export class LoginDTO implements DTO {
         error: "auth:authenticate-user:password-invalid-type",
       })
       .min(1, { error: "auth:authenticate-user:password-invalid-type" }),
+    destiny: z.string().optional(),
   });
 
   @Expose()
@@ -27,6 +28,9 @@ export class LoginDTO implements DTO {
 
   @Expose()
   public readonly password: string;
+
+  @Expose()
+  public readonly destiny: string;
 
   validate(): Either<ValidationErrors, void> {
     const { success, error } = LoginDTO.loginSchema.safeParse(this);
