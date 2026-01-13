@@ -1,0 +1,79 @@
+<header id="app-header">
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li>
+                <details class="nav-dropdown">
+                    <summary>LTI</summary>
+                    <ul class="nav-dropdown-content">
+                        <li><a href="/lti/tools">Ver ferramentas</a></li>
+                        <li><a href="/lti/register">Registrar nova ferramenta</a></li>
+                    </ul>
+                </details>
+            </li>
+            <% if (auth) { %>
+                <li>
+                    <details class="nav-dropdown">
+                        <summary><%= auth.username %></summary>
+                        <ul class="nav-dropdown-content">
+                            <li><a href="/oidc/session/end">Logout</a></li>
+                        </ul>
+                    </details>
+                </li>
+            <% } %>
+        </ul>
+    </nav>
+    <div>
+
+    </div>
+</header>
+
+<script type="module">
+    // https://codepen.io/kaiofelps/pen/jOemPZd
+    document.querySelectorAll(".nav-dropdown .nav-dropdown-content").forEach((popup) => {
+        const root = popup.parentElement;
+        const trigger = root.querySelector("summary");
+
+        window.addEventListener("resize", styleCenterOrLeft)
+        window.addEventListener("load", styleCenterOrLeft)
+
+        root.addEventListener("toggle", (event) => {
+            if (root.open) {
+                styleCenterOrLeft();
+                window.addEventListener("click", closeOnClickOut);
+                return;
+            }
+
+            window.removeEventListener("click", closeOnClickOut);
+        })
+        
+        function closeOnClickOut(event) {
+            const targetElement = event.target;
+            const isNode = targetElement instanceof Node;
+            if (!isNode || !root.contains(targetElement)) root.open = false;
+        }
+
+        function styleCenterOrLeft() {
+            const availableWidthInScreen = window.visualViewport.width
+            const distanceBetweenPopupAndCorner = popup.offsetLeft
+            const popupWidth = popup.offsetWidth  
+            const distanceBetweenTheMiddleOfTriggerAndLeftCorner = trigger.offsetLeft + (trigger.offsetWidth / 2)
+            const leftInputMargin = Math.floor(distanceBetweenTheMiddleOfTriggerAndLeftCorner - (popupWidth / 2))
+            const topInputMargin = Math.ceil(trigger.offsetTop + trigger.offsetHeight) + 8
+            const visiblePopupWidthAndRightOffset = availableWidthInScreen - leftInputMargin
+
+            if (leftInputMargin <= 20 || trigger.offsetLeft <= 20) {
+                popup.style.transform = `translate3d(20px, ${topInputMargin}px, 0)`;
+                return;
+            }
+            
+            if (visiblePopupWidthAndRightOffset <= popup.offsetWidth + 20) {
+                const responsiveLeftMarginInput = availableWidthInScreen - popup.offsetWidth - 20
+                popup.style.transform = `translate3d(${responsiveLeftMarginInput}px, ${topInputMargin}px, 0)`;
+                return;
+            }
+            
+            popup.style.transform = `translate3d(${leftInputMargin}px, ${topInputMargin}px, 0)`;
+        }
+    })
+</script>
