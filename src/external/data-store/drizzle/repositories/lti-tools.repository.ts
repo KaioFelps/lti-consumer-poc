@@ -24,6 +24,7 @@ import { MessagePlacement } from "$/registration/enums/message-placement";
 import { ToolRecord } from "$/registration/tool-record";
 import { ToolSupportedMessage } from "$/registration/tool-supported-message";
 import { DrizzleClient } from "../client";
+import ltiToolPreviewsMapper from "../mappers/lti-tool-previews.mapper";
 import ltiToolsMapper from "../mappers/lti-tools.mapper";
 
 @Injectable()
@@ -273,6 +274,25 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
         },
       ),
       taskEither.map((rows) => rows.map(ltiToolsMapper.fromRow)),
+    )();
+  }
+
+  public async findManyPreviews(): Promise<
+    Either<IrrecoverableError, LtiToolPreview[]>
+  > {
+    return await pipe(
+      taskEither.tryCatch(
+        () =>
+          this.drizzle
+            .getClient()
+            .query.ltiTools.findMany(ltiToolPreviewsMapper.requiredQueryConfig),
+        (error: Error) =>
+          new IrrecoverableError(
+            `An error occurred in ${DrizzleLtiToolsRepository.name} when finding tools previews.`,
+            error,
+          ),
+      ),
+      taskEither.map((rows) => rows.map(ltiToolPreviewsMapper.fromRow)),
     )();
   }
 }
