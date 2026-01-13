@@ -46,6 +46,10 @@ export class User extends EntityBase<UserProps> {
     });
   }
 
+  public _getProps() {
+    return { ...this.props };
+  }
+
   public getId() {
     return this.props.id;
   }
