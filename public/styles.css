@@ -1,3 +1,9 @@
+:root, * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 label {
     display: block;
     margin-bottom: 12px;
@@ -39,3 +45,46 @@ label.checkbox-item > span {
 
 .success-alert a { font-weight: bold; color: green; }
 .error-alert a { font-weight: bold; color: red; }
+
+.main {
+    margin: 24px;
+}
+
+#app-header {
+    padding: 12px 24px;
+    border-bottom: 1px solid black;
+
+    nav ul {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        li {
+            list-style: none;
+        }
+    }
+
+    .nav-dropdown {
+        summary {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        ul {
+            position: absolute;
+            top: 0;
+            left: 0;
+
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+
+            background: white;
+            padding: 8px;
+            border: 1px solid black;
+
+            width: calc(100vw - 24px);
+            max-width: 200px;
+        }
+    }
+}

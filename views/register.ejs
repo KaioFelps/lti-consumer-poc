@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html lang="<%= locale %>">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/styles.css">
-    <title><%= title %></title>
-</head>
-<body>
+<main class="main">
     <h1><%= title %></h1>
 
     <% if (flash?.success) { %>
@@ -78,5 +70,4 @@
         <br>
         <a href="<%= loginEndpoint %>"><%= buttons.alreadyHasAccount %></a>
     </form>
-</body>
-</html>
+</main>

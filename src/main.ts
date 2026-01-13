@@ -5,6 +5,7 @@ import { RedisStore } from "connect-redis";
 import cookieParser from "cookie-parser";
 import { config } from "dotenv";
 import { expand } from "dotenv-expand";
+import expressEjsLayout from "express-ejs-layouts";
 import session from "express-session";
 import { AppModule } from "./app.module";
 import { EnvironmentVars } from "./config/environment-vars";
@@ -13,6 +14,8 @@ import { CoreValidationPipe } from "./lib/pipes/core-validation-pipe";
 import { loadMessageStrings } from "./message-string/loader";
 
 import "@/lib";
+
+export const DEFAULT_EJS_LAYOUT = "layouts/main";
 
 async function bootstrap() {
   expand(config());
@@ -45,6 +48,7 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, "../..", "public"));
   app.setBaseViewsDir(join(__dirname, "../..", "views"));
   app.setViewEngine("ejs");
+  app.use(expressEjsLayout);
 
   await app.listen(process.env.PORT ?? 3000);
 }
