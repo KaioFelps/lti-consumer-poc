@@ -20,3 +20,11 @@ ptBR["lti:register-tool:ready-to-go-paragraph"] =
   "Você está quase lá. Basta conectar-se com a ferramenta para finalizar o registro!";
 ptBR["lti:register-tool:buttons:finish-registration"] = "Finalizar registro";
 ptBR["lti:register-tool:popup-title"] = "Registrar ferramenta LTI";
+
+ptBR["lti:list-tools:title"] = "Gerenciar Ferramentas LTI";
+ptBR["lti:list-tools:thead:tool-name"] = "Nome da ferramenta";
+ptBR["lti:list-tools:thead:tool-details"] = "Detalhes";
+ptBR["lti:list-tools:tool-field:id"] = "ID";
+ptBR["lti:list-tools:tool-field:description"] = "Descrição";
+ptBR["lti:list-tools:tool-field:home-page-uri"] = "Site";
+ptBR["lti:list-tools:buttons:list-deployments"] = "Ver deployments";

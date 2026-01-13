@@ -1,0 +1,72 @@
+<style>
+    #tools-table {
+        width: 100%;
+        border: 1px solid black;
+        border-collapse: collapse;
+
+        thead {
+            border-bottom: 1px solid black;
+            background: #eee;
+
+            th {
+                text-align: start;
+            }
+
+            th:not(:last-child) {
+                border-right: 1px solid black;
+            }
+        }
+
+        tbody tr {
+            vertical-align: super;
+        }
+
+        tbody tr:not(:last-child) {
+            border-bottom: 1px solid black;
+        }
+
+        tbody tr td:not(:last-child) {
+            border-right: 1px solid black;
+
+            ul {
+                list-style: none;
+            }
+        }
+
+        td, th {
+            padding: 4px 8px;
+        }
+    }
+</style>
+
+<main class="main">
+    <h1><%= title %></h1>
+    <hr>
+    <br>
+    <table id="tools-table">
+        <thead>
+            <th><%= tableHeadings.toolName %></th>
+            <th><%= tableHeadings.toolDetails %></th>
+            <th><%= tableHeadings.actions %></th>
+        </thead>
+        <% tools.forEach(tool => { %>
+            <tr>
+                <td><%= tool.name %></td>
+                <td>
+                    <ul>
+                        <li><%= toolsFields.id %>: <%= tool.id %></li>
+                        <% if (tool.description) { %>
+                            <li><%= toolsFields.description %>: <%= tool.description %></li>
+                        <% } %>
+                        <% if (tool.homePageUri) { %>
+                            <li><%= toolsFields.homePageUri %>: <%= tool.homePageUri %></li>
+                        <% } %>
+                    </ul>
+                </td>
+                <td>
+                    <a href="<%= tool.endpoints.deployments %>"><%= buttons.deployments %></a>
+                </td>
+            </tr>
+        <% }) %>
+    </ul>
+</main>

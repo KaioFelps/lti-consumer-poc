@@ -7,9 +7,9 @@ import { Platform } from "$/core/platform";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiLaunchServices } from "$/core/services/launch.services";
 import { LtiController } from "./lti.controller";
-import { LtiToolsRepository } from "./lti-tools.repository";
 import { PlatformFactory } from "./platform.factory";
 import { LtiToolsRepository } from "./tools/lti-tools.repository";
+import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-previews.service";
 
 @Module({
   imports: [OIDCModule, AuthModule],
@@ -34,6 +34,7 @@ import { LtiToolsRepository } from "./tools/lti-tools.repository";
         ),
       inject: [LtiResourceLinksRepository, LtiToolsRepository, Platform],
     },
+    FindManyToolsPreviewsService,
   ],
   exports: [LtiLaunchServices, Platform],
   controllers: [LtiController],
