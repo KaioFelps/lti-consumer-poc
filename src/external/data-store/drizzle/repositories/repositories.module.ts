@@ -1,7 +1,7 @@
 import { Global, Module } from "@nestjs/common";
 import { PeopleRepository } from "@/identity/person/people.repository";
 import { UsersRepository } from "@/identity/user/users.repository";
-import { LtiToolsRepository } from "@/lti/lti-tools.repository";
+import { LtiToolsRepository } from "@/lti/tools/lti-tools.repository";
 import { OIDCAccountsRepository } from "@/oidc/repositories/accounts.repository";
 import { OIDCClientsRepository } from "@/oidc/repositories/clients.repository";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";

@@ -4,7 +4,7 @@ import { AuthModule } from "@/auth/auth.module";
 import { AuthJwkSet } from "@/auth/encryption/jwks-set";
 import { EnvironmentVars } from "@/config/environment-vars";
 import middlewares from "@/lib/middlewares";
-import { LtiToolsRepository } from "@/lti/lti-tools.repository";
+import { LtiToolsRepository } from "@/lti/tools/lti-tools.repository";
 import { OIDCAdapterFactory } from "@/oidc/adapter/factory";
 import { OIDCAdapterModule } from "./adapter/adapter.module";
 import { OIDCController } from "./oidc.controller";

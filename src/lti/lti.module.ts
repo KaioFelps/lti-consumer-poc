@@ -9,6 +9,7 @@ import { LtiLaunchServices } from "$/core/services/launch.services";
 import { LtiController } from "./lti.controller";
 import { LtiToolsRepository } from "./lti-tools.repository";
 import { PlatformFactory } from "./platform.factory";
+import { LtiToolsRepository } from "./tools/lti-tools.repository";
 
 @Module({
   imports: [OIDCModule, AuthModule],

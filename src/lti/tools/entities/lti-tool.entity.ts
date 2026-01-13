@@ -12,7 +12,7 @@ import {
 } from "$/registration/dynamic/tool-configuration";
 import { ToolRecord } from "$/registration/tool-record";
 import { ToolSupportedMessage } from "$/registration/tool-supported-message";
-import { draftLtiDynamicToolConfigurationSchema } from "./lti-tool-config-schemas";
+import { draftLtiDynamicToolConfigurationSchema } from "../lti-tool-config-schemas";
 
 export class LtiTool {
   public constructor(public record: ToolRecord) {}

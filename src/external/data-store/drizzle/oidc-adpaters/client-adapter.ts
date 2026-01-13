@@ -14,8 +14,8 @@ import {
   mapTaskEitherEitherAndFlatten,
 } from "@/lib/fp-ts";
 import { LtiToolIdPrefix } from "@/lti";
-import { LtiTool } from "@/lti/lti-tool";
-import { LtiToolsRepository } from "@/lti/lti-tools.repository";
+import { LtiTool } from "@/lti/tools/entities/lti-tool.entity";
+import { LtiToolsRepository } from "@/lti/tools/lti-tools.repository";
 import { ModelName } from "@/oidc/adapter/factory";
 import { OIDCClient } from "@/oidc/client";
 import { OIDCClientsRepository } from "@/oidc/repositories/clients.repository";
