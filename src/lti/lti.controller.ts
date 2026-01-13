@@ -136,6 +136,7 @@ export class LtiController {
     return {
       tools,
       title: await this.t.translate("lti:list-tools:title"),
+      registerNewToolEndpoint: "/lti/register",
       tableHeadings: {
         toolName: await this.t.translate("lti:list-tools:thead:tool-name"),
         toolDetails: await this.t.translate(
@@ -156,6 +157,14 @@ export class LtiController {
       buttons: {
         deployments: await this.t.translate(
           "lti:list-tools:buttons:list-deployments",
+        ),
+        registerNewTool: await this.t.translate(
+          "lti:list-tools:buttons:register-new-tool",
+        ),
+      },
+      content: {
+        noToolsMessage: await this.t.translate(
+          "lti:list-tools:no-tools-registered",
         ),
       },
     };

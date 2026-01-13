@@ -43,8 +43,15 @@ label.checkbox-item > span {
     margin-bottom: 12px;
 }
 
+.warning-alert  {
+    padding: 8px 16px;
+    background: color-mix(in oklab, #ffb300 25%, transparent);
+    color: #8a6100;
+}
+
 .success-alert a { font-weight: bold; color: green; }
 .error-alert a { font-weight: bold; color: red; }
+.warning-alert a { font-weight: bold; color: #8a6100; }
 
 .main {
     margin: 24px;

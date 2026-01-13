@@ -28,3 +28,7 @@ ptBR["lti:list-tools:tool-field:id"] = "ID";
 ptBR["lti:list-tools:tool-field:description"] = "Descrição";
 ptBR["lti:list-tools:tool-field:home-page-uri"] = "Site";
 ptBR["lti:list-tools:buttons:list-deployments"] = "Ver deployments";
+ptBR["lti:list-tools:no-tools-registered"] =
+  "Não há nenhuma ferramenta registrada ainda.";
+ptBR["lti:list-tools:buttons:register-new-tool"] =
+  "Registrar uma nova ferramenta";

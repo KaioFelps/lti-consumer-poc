@@ -43,30 +43,38 @@
     <h1><%= title %></h1>
     <hr>
     <br>
-    <table id="tools-table">
-        <thead>
-            <th><%= tableHeadings.toolName %></th>
-            <th><%= tableHeadings.toolDetails %></th>
-            <th><%= tableHeadings.actions %></th>
-        </thead>
-        <% tools.forEach(tool => { %>
-            <tr>
-                <td><%= tool.name %></td>
-                <td>
-                    <ul>
-                        <li><%= toolsFields.id %>: <%= tool.id %></li>
-                        <% if (tool.description) { %>
-                            <li><%= toolsFields.description %>: <%= tool.description %></li>
-                        <% } %>
-                        <% if (tool.homePageUri) { %>
-                            <li><%= toolsFields.homePageUri %>: <%= tool.homePageUri %></li>
-                        <% } %>
-                    </ul>
-                </td>
-                <td>
-                    <a href="<%= tool.endpoints.deployments %>"><%= buttons.deployments %></a>
-                </td>
-            </tr>
-        <% }) %>
-    </ul>
+
+    <%if (tools.length > 0) { %>
+        <table id="tools-table">
+            <thead>
+                <th><%= tableHeadings.toolName %></th>
+                <th><%= tableHeadings.toolDetails %></th>
+                <th><%= tableHeadings.actions %></th>
+            </thead>
+            <% tools.forEach(tool => { %>
+                <tr>
+                    <td><%= tool.name %></td>
+                    <td>
+                        <ul>
+                            <li><%= toolsFields.id %>: <%= tool.id %></li>
+                            <% if (tool.description) { %>
+                                <li><%= toolsFields.description %>: <%= tool.description %></li>
+                            <% } %>
+                            <% if (tool.homePageUri) { %>
+                                <li><%= toolsFields.homePageUri %>: <%= tool.homePageUri %></li>
+                            <% } %>
+                        </ul>
+                    </td>
+                    <td>
+                        <a href="<%= tool.endpoints.deployments %>"><%= buttons.deployments %></a>
+                    </td>
+                </tr>
+            <% }) %>
+    <% } else { %>
+        <div class="warning-alert">
+            <span><%= content.noToolsMessage %></span>
+            <br>
+            <a href="<%= registerNewToolEndpoint %>"><%= buttons.registerNewTool %></a>
+        </div>
+    <% } %>
 </main>
