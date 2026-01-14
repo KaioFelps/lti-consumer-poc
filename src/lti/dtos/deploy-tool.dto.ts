@@ -23,7 +23,7 @@ export class DeployToolDto implements DTO {
   public readonly activeTab?: string;
 
   @Expose()
-  public readonly withModalOpen: boolean;
+  public readonly withDeployModalOpen: boolean;
 
   validate(): Either<ValidationErrors, void> {
     const { success, error, data } =

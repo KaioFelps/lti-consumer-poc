@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -18,7 +19,7 @@ import { LtiToolPreviewPresenter } from "@/external/presenters/entities/lti-tool
 import { HttpResponse, RequestSession } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { eitherPromiseToTaskEither as teFromPromise } from "@/lib/fp-ts";
-import { Mvc } from "@/lib/mvc-routes";
+import { Mvc, Rest } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { LtiRegistrationInitiationRequest } from "$/messages/initiate-register";
 import { DeployToolDto } from "./dtos/deploy-tool.dto";
@@ -27,6 +28,7 @@ import { DeployToolService } from "./tools/services/deploy-tool.service";
 import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-previews.service";
 import { FindToolByIdService } from "./tools/services/find-tool-by-id.service";
 import { GetToolRegistrationDetailsService } from "./tools/services/get-tool-registration-details.service";
+import { RemoveToolDeploymentService } from "./tools/services/remove-tool-deployment.service";
 
 @Mvc()
 @Controller("lti")
@@ -39,6 +41,7 @@ export class LtiController {
     private findManyToolsService: FindManyToolsPreviewsService,
     private getToolDetailsService: GetToolRegistrationDetailsService,
     private deployToolService: DeployToolService,
+    private removeDeploymentService: RemoveToolDeploymentService,
   ) {}
 
   private static toolRegistrationEndpointFlashKey =
@@ -201,7 +204,13 @@ export class LtiController {
       tool: LtiToolPresenter.present(toolDetails.getTool()),
       deployments: toolDetails
         .getDeployments()
-        .map(LtiToolDeploymentPresenter.present),
+        .map(LtiToolDeploymentPresenter.present)
+        .map((deployment) => ({
+          ...deployment,
+          endpoints: {
+            delete: `/lti/deployments/${deployment.id}/delete`,
+          },
+        })),
       deploymentEndpoint: `/lti/tools/${toolDetails.getTool().record.id}/deploy`,
       buttons: {
         detailsTab: await this.t.translate(
@@ -211,6 +220,9 @@ export class LtiController {
           "lti:list-tools:buttons:list-deployments",
         ),
         deploy: await this.t.translate("lti:tools-details:buttons:new-deploy"),
+        deleteDeployment: await this.t.translate(
+          "lti:tools-details:buttons:delete-deployment",
+        ),
         confirm: await this.t.translate("buttons:confirm"),
         cancel: await this.t.translate("buttons:cancel"),
       },
@@ -220,6 +232,12 @@ export class LtiController {
         ),
         noDeploymentsMessage: await this.t.translate(
           "lti:tools-details:no-tool-deployments",
+        ),
+        deleteToolWarning: await this.t.translate(
+          "lti:delete-tool-deployment:warning-p1",
+        ),
+        unexpectedErrorMessage: await this.t.translate(
+          "core:errors:internal-error-message",
         ),
       },
       toolTableHeadings: {
@@ -256,6 +274,7 @@ export class LtiController {
         label: await this.t.translate(
           "lti:tools-details:thead:deployment-label",
         ),
+        actions: await this.t.translate("table-headings:actions"),
       },
     };
   }
@@ -287,5 +306,23 @@ export class LtiController {
     );
 
     return response.redirectBack();
+  }
+
+  @Rest()
+  @Delete("/deployments/:id/delete")
+  public async removeDeployment(@Param("id") deploymentId: string) {
+    await pipe(
+      teFromPromise(() => this.removeDeploymentService.exec({ deploymentId })),
+      te.getOrElse((error) => {
+        throw ExceptionsFactory.fromError(error);
+      }),
+    )();
+
+    return {
+      deploymentId,
+      successMessage: await this.t.translate(
+        "lti:delete-tool-deployment:success-message",
+      ),
+    };
   }
 }

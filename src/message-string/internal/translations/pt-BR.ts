@@ -4,6 +4,7 @@ export const ptBR: MessageStringTranslationMap = {
   "core:errors:internal-error-message":
     "Houve um problema com o servidor, tente novamente mais tarde.",
   "home-title": "Página Inicial",
+
   "table-headings:actions": "Ações",
 
   "buttons:cancel": "Cancelar",

@@ -15,11 +15,13 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
     <h1><%= title %></h1>
     <br>
 
-    <% if (flash.successMessage) { %>
-        <div class="success-alert">
-            <span><%= flash.successMessage %></span>
-        </div>
-    <% } %>
+    <div id="alerts-container">
+        <% if (flash.successMessage) { %>
+            <div class="success-alert">
+                <span><%= flash.successMessage %></span>
+            </div>
+        <% } %>
+    </div>
 
     <div>
         <button id="show-details"><%= buttons.detailsTab %></button>
@@ -67,21 +69,38 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
 
     <div id="deployments" style="display: hidden;">
         <% if (deployments.length > 0) { %>
-            <table class="base-table">
-                <thead>
-                    <th><%= deploymentTableHeadings.id %></th>
-                    <th><%= deploymentTableHeadings.label %></th>
-                </thead>
-                <tbody>
-                    <% deployments.forEach(deployment => { %>
-                        <tr>
-                            <td><%= deployment.id %></td>
-                            <td><%= deployment.label %></td>
-                        </tr>
-                    <% }) %>
-                </tbody>
-            </table>
-            <br>
+            <div id="deployments-table">
+                <table class="base-table">
+                    <colgroup>
+                        <col style="width: 50%;" />
+                        <col style="width: 40%;" />
+                        <col style="width: 10%;" />
+                    </colgroup>
+                    <thead>
+                        <th><%= deploymentTableHeadings.id %></th>
+                        <th><%= deploymentTableHeadings.label %></th>
+                        <th><%= deploymentTableHeadings.actions %></th>
+                    </thead>
+                    <tbody>
+                        <% deployments.forEach(deployment => { %>
+                            <tr data-deployment-id="<%= deployment.id %>">
+                                <td><%= deployment.id %></td>
+                                <td><%= deployment.label %></td>
+                                <td>
+                                    <button
+                                        class="deployment-delete-button"
+                                        data-deployment-id="<%= deployment.id %>"
+                                        data-endpoint="<%= deployment.endpoints.delete %>"
+                                    >
+                                        <%= buttons.deleteDeployment %>
+                                    </button>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+                <br>
+            </div>
         <% } else { %>
             <div class="warning-alert">
                 <span><%= content.noDeploymentsMessage %></span>
@@ -96,11 +115,11 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
     </div>
 </main>
 
-<dialog class="base-modal" id="deploy-tool-dialog" style="padding: 8px;">
+<dialog class="base-modal" id="deploy-tool-dialog">
     <h2 style="margin-bottom: 8px;"><%= deployPopupTitle %></h2>
     <form action="<%= deploymentEndpoint %>" method="post">
-        <input type="hidden" name="activeTab" id="active-tab-input" value="">
-        <input type="hidden" name="withModalOpen" value="true">
+        <input type="hidden" name="activeTab" class="active-tab-input" value="">
+        <input type="hidden" name="withDeployModalOpen" value="true">
         <label>
             <span><%= deploymentTableHeadings.label %></span>
             <% (validationErrors?.label ?? []).forEach(error => { %>
@@ -113,8 +132,93 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
     </form>
 </dialog>
 
+<dialog class="base-modal" id="delete-deployment-dialog">
+    <p><%= content.deleteToolWarning %></p>
+    <br>
+    <form id="delete-deployment-form" method="dialog">
+        <input type="hidden" name="endpoint" id="delete-deployment-form-endpoint">
+        <input type="hidden" name="activeTab" class="active-tab-input" value="">
+        <button type="submit" value="confirm"><%= buttons.confirm %></button>
+        <button id="close-deployment-removal-modal" type="reset" value="cancel"><%= buttons.cancel %></button>
+    </form>
+</dialog>
+
+<script id="delete-deployment-dialog-script" type="module">
+    const dialog = document.getElementById("delete-deployment-dialog");
+    const close = document.getElementById("close-deployment-removal-modal");
+    const endpointInput = document.getElementById("delete-deployment-form-endpoint");
+
+    const alertsContainer = document.getElementById("alerts-container");
+
+    const triggers = document
+        .querySelectorAll(".deployment-delete-button")
+        .forEach(trigger => {
+            trigger.addEventListener("click", () => {
+                endpointInput.value = trigger.getAttribute("data-endpoint");
+                dialog.showModal();
+            })
+        });
+
+    close.addEventListener("click", () => dialog.close());
+
+    dialog.addEventListener("close", async () => {
+        if (!dialog.returnValue === "confirm") return;
+
+        const endpoint = endpointInput.value;
+        const response = await fetch(endpoint, { method: "DELETE" });
+
+        const alert = document.createElement("div");
+
+        if (!response.ok) {
+            let message;
+            try {
+                const body = await response.json();
+                message = body.error;
+            } catch (_error) {
+                message = "<%= content.unexpectedErrorMessage %>";
+            }
+
+            alert.classList.add("error-alert");
+            alert.innerHTML = `<span>${message}</span>`;
+        }
+        else {
+            const { successMessage, deploymentId } = await response.json();
+            alert.classList.add("success-alert");
+            alert.innerHTML = `<span>${successMessage}</span>`;
+
+            updateTable(deploymentId);
+        }
+
+        alertsContainer.innerHTML = "";
+        alertsContainer.appendChild(alert);
+    })
+
+    function updateTable(deploymentId) {
+        const deploymentsContainer = document.getElementById("deployments");
+        const deploymentsTable = document.getElementById("deployments-table");
+        const row = deploymentsTable.querySelector(`[data-deployment-id="${deploymentId}"]`);
+        row.remove();
+
+        const tableIsEmpty = deploymentsTable.querySelector("tbody").childElementCount === 0;
+        if (!tableIsEmpty) return; 
+
+        const noDeploymentsAlert = document.createElement("div");
+        noDeploymentsAlert.classList.add("warning-alert");
+        noDeploymentsAlert.innerHTML = `<span><%= content.noDeploymentsMessage %></span>`;
+
+        deploymentsTable.remove();
+        if (deploymentsContainer.childElementCount) {
+            const firstElement = deploymentsContainer.firstElementChild;
+            firstElement.insertAdjacentElement("beforebegin", noDeploymentsAlert);
+        }
+        else {
+            deploymentsContainer.appendChild(noDeploymentsAlert);
+        }
+    }
+</script>
+
 <%# this syntax error is related to the ejs visual studio code extension; the code works tho #%>
-<script type="module">
+<script id="deploy-dialog-script" type="module">
     const trigger = document.getElementById("show-deployment-modal");
     const close = document.getElementById("close-deployment-modal");
     const dialog = document.getElementById("deploy-tool-dialog");
@@ -124,13 +228,13 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
         dialog.close();
     });
 
-    <% if(flash?.values?.withModalOpen ?? false) { %>
+    <% if(flash?.values?.withDeployModalOpen ?? false) { %>
         dialog.showModal();
     <% } %>
 </script>
 
-<script type="module">
-    const activeTabInput = document.getElementById("active-tab-input");
+<script id="sections-tabs-script" type="module">
+    const activeTabInputs = document.querySelectorAll(".active-tab-input");
 
     const Tabs = Object.freeze({
         Deployments: "#tooldeployments",
@@ -160,7 +264,8 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
 
         Containers.invalidTab.hidden = true;
         Containers[activeTab].hidden = false;
-        activeTabInput.value = activeTab;
+
+        activeTabInputs.forEach(input => input.value = activeTab);
     }
 
     window.addEventListener("hashchange", updateContent);
