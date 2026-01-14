@@ -26,9 +26,11 @@ type LtiToolRow = BuildQueryResult<
   typeof requiredQueryConfig
 >;
 
+type LtiToolRowWithoutDeployments = Omit<LtiToolRow, "deployments">;
+
 const requiredQueryConfig = {
   with: {
-    deployments: true,
+    deployments: { columns: { id: true } },
     oauthClient: { with: { contacts: true, redirectUris: true } },
     supportedMessages: { with: { roles: true } },
   },
@@ -88,7 +90,7 @@ function fromRow(row: LtiToolRow): ToolRecord {
   });
 }
 
-function intoRow(tool: ToolRecord): LtiToolRow {
+function intoRow(tool: ToolRecord): LtiToolRowWithoutDeployments {
   return {
     id: tool.id,
     claims: tool.ltiConfiguration.claims.join(" "),
@@ -118,11 +120,6 @@ function intoRow(tool: ToolRecord): LtiToolRow {
       contacts:
         tool.contacts?.map((email) => ({ clientId: tool.id, email })) ?? [],
     },
-
-    deployments: tool.ltiConfiguration.deploymentsIds.map((deploymentId) => ({
-      clientId: tool.id,
-      id: deploymentId,
-    })),
 
     supportedMessages: tool.ltiConfiguration.messages.map((message) => ({
       clientId: tool.id,

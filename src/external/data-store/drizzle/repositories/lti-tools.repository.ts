@@ -155,7 +155,6 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
   ): Promise<Either<IrrecoverableError, LtiTool>> {
     const {
       oauthClient: { contacts, redirectUris, ...oauthClient },
-      deployments: _,
       supportedMessages,
       ...record
     } = ltiToolsMapper.intoRow(tool.record);
