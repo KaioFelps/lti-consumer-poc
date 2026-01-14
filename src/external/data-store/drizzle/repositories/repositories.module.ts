@@ -2,10 +2,12 @@ import { Global, Module } from "@nestjs/common";
 import { PeopleRepository } from "@/identity/person/people.repository";
 import { UsersRepository } from "@/identity/user/users.repository";
 import { LtiToolsRepository } from "@/lti/tools/lti-tools.repository";
+import { LtiToolsDeploymentsRepository } from "@/lti/tools/lti-tools-deployments.repository";
 import { OIDCAccountsRepository } from "@/oidc/repositories/accounts.repository";
 import { OIDCClientsRepository } from "@/oidc/repositories/clients.repository";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { DrizzleLtiToolsRepository } from "./lti-tools.repository";
+import { DrizzleLtiToolsDeploymentsRepository } from "./lti-tools-deployments.repository";
 import { DrizzleODICAccountsRepository } from "./oidc-accounts.repository";
 import { DrizzleOIDCClientsRepository } from "./oidc-clients.repository";
 import { DrizzlePeopleRepository } from "./people.repository";
@@ -39,6 +41,10 @@ import { DrizzleUsersRepository } from "./users.repository";
       provide: LtiResourceLinksRepository,
       useClass: DrizzleLtiResourceLinksRepository,
     },
+    {
+      provide: LtiToolsDeploymentsRepository,
+      useClass: DrizzleLtiToolsDeploymentsRepository,
+    },
   ],
   exports: [
     UsersRepository,
@@ -47,6 +53,7 @@ import { DrizzleUsersRepository } from "./users.repository";
     OIDCAccountsRepository,
     LtiToolsRepository,
     LtiResourceLinksRepository,
+    LtiToolsDeploymentsRepository,
   ],
 })
 export class RepositoriesModule {}
