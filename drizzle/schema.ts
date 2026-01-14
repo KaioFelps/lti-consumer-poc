@@ -106,6 +106,7 @@ export const ltiToolDeployments = pgTable("lti_deployments", {
     .notNull()
     .references(() => ltiTools.id, { onDelete: "cascade" }),
   id: uuid().primaryKey(),
+  label: varchar({ length: 255 }).notNull(),
 });
 
 export const ltiToolSupportedMessages = pgTable(
