@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Inject,
   Param,
   Post,
   Render,
@@ -13,6 +12,8 @@ import { either } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import Provider from "oidc-provider";
 import { EnvironmentVars } from "@/config/environment-vars";
+import { LtiToolPresenter } from "@/external/presenters/entities/lti-tool.presenter";
+import { LtiToolDeploymentPresenter } from "@/external/presenters/entities/lti-tool-deployment.presenter";
 import { LtiToolPreviewPresenter } from "@/external/presenters/entities/lti-tool-preview.presenter";
 import { HttpResponse, RequestSession } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
@@ -21,21 +22,18 @@ import { TranslatorService } from "@/message-string/translator.service";
 import { LtiRegistrationInitiationRequest } from "$/messages/initiate-register";
 import { RegisterToolDTO } from "./dtos/register-tool.dto";
 import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-previews.service";
+import { GetToolRegistrationDetailsService } from "./tools/services/get-tool-registration-details.service";
 
 @Mvc()
 @Controller("lti")
 export class LtiController {
-  @Inject()
-  private provider: Provider;
-
-  @Inject()
-  private t: TranslatorService;
-
-  @Inject()
-  private findManyToolsService: FindManyToolsPreviewsService;
-
-  @Inject()
-  private vars: EnvironmentVars;
+  public constructor(
+    private provider: Provider,
+    private t: TranslatorService,
+    private findManyToolsService: FindManyToolsPreviewsService,
+    private getToolDetailsService: GetToolRegistrationDetailsService,
+    private vars: EnvironmentVars,
+  ) {}
 
   private static toolRegistrationEndpointFlashKey =
     "registerToolInitiateRegisterEndpoint";
@@ -122,7 +120,10 @@ export class LtiController {
       either.map((tools) =>
         tools.map(LtiToolPreviewPresenter.present).map((tool) => ({
           ...tool,
-          endpoints: { deployments: `/lti/tools/${tool.id}/deployments` },
+          endpoints: {
+            deployments: `/lti/tools/${tool.id}/details#tooldeployments`,
+            details: `/lti/tools/${tool.id}/details#tooldetails`,
+          },
         })),
       ),
       either.foldW(
@@ -158,6 +159,9 @@ export class LtiController {
         deployments: await this.t.translate(
           "lti:list-tools:buttons:list-deployments",
         ),
+        toolDetails: await this.t.translate(
+          "lti:list-tools:buttons:tool-details",
+        ),
         registerNewTool: await this.t.translate(
           "lti:list-tools:buttons:register-new-tool",
         ),
@@ -165,6 +169,83 @@ export class LtiController {
       content: {
         noToolsMessage: await this.t.translate(
           "lti:list-tools:no-tools-registered",
+        ),
+      },
+    };
+  }
+
+  @Get("/tools/:id/details")
+  @Render("tool-details")
+  public async showToolDetails(@Param("id") toolId: string) {
+    const toolDetails = pipe(
+      await this.getToolDetailsService.exec({ toolId }),
+      either.foldW(
+        (error) => {
+          throw ExceptionsFactory.fromError(error);
+        },
+        (tool) => tool,
+      ),
+    );
+
+    return {
+      title: await this.t.translate("lti:tools-details:title", {
+        toolName: toolDetails.getTool().record.name,
+      }),
+      tool: LtiToolPresenter.present(toolDetails.getTool()),
+      deployments: toolDetails
+        .getDeployments()
+        .map(LtiToolDeploymentPresenter.present),
+      deploymentEndpoint: `/tools/${toolDetails.getTool().record.id}/deploy`,
+      buttons: {
+        detailsTab: await this.t.translate(
+          "lti:list-tools:buttons:tool-details",
+        ),
+        deploymentsTab: await this.t.translate(
+          "lti:list-tools:buttons:list-deployments",
+        ),
+        deploy: await this.t.translate("lti:tools-details:buttons:new-deploy"),
+      },
+      content: {
+        invalidTabSelected: await this.t.translate(
+          "lti:tools-details:invalid-tab-selected",
+        ),
+        noDeploymentsMessage: await this.t.translate(
+          "lti:tools-details:no-tool-deployments",
+        ),
+      },
+      toolTableHeadings: {
+        id: await this.t.translate("lti:tools-details:thead:id"),
+        name: await this.t.translate("lti:tools-details:thead:name"),
+        description: await this.t.translate(
+          "lti:tools-details:thead:description",
+        ),
+        grantTypes: await this.t.translate(
+          "lti:tools-details:thead:grant-types",
+        ),
+        initiateUri: await this.t.translate(
+          "lti:tools-details:thead:initiate-uri",
+        ),
+        homePageUri: await this.t.translate(
+          "lti:tools-details:thead:home-page-uri",
+        ),
+        logoUri: await this.t.translate("lti:tools-details:thead:logo-uri"),
+        termsOfServiceUri: await this.t.translate(
+          "lti:tools-details:thead:tos-uri",
+        ),
+        policyUri: await this.t.translate("lti:tools-details:thead:policy-uri"),
+        contacts: await this.t.translate("lti:tools-details:thead:contacts"),
+        registeredMessages: await this.t.translate(
+          "lti:tools-details:thead:registered-msgs",
+        ),
+        requiredClaims: await this.t.translate(
+          "lti:tools-details:thead:required-claims",
+        ),
+      },
+
+      deploymentTableHeadings: {
+        id: await this.t.translate("lti:tools-details:thead:deployment-id"),
+        label: await this.t.translate(
+          "lti:tools-details:thead:deployment-label",
         ),
       },
     };

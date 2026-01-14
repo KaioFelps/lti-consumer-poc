@@ -10,6 +10,7 @@ import { LtiController } from "./lti.controller";
 import { PlatformFactory } from "./platform.factory";
 import { LtiToolsRepository } from "./tools/lti-tools.repository";
 import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-previews.service";
+import { GetToolRegistrationDetailsService } from "./tools/services/get-tool-registration-details.service";
 
 @Module({
   imports: [OIDCModule, AuthModule],
@@ -35,6 +36,7 @@ import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-p
       inject: [LtiResourceLinksRepository, LtiToolsRepository, Platform],
     },
     FindManyToolsPreviewsService,
+    GetToolRegistrationDetailsService,
   ],
   exports: [LtiLaunchServices, Platform],
   controllers: [LtiController],

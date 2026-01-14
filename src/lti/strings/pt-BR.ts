@@ -32,7 +32,32 @@ ptBR["lti:list-tools:tool-field:id"] = "ID";
 ptBR["lti:list-tools:tool-field:description"] = "Descrição";
 ptBR["lti:list-tools:tool-field:home-page-uri"] = "Site";
 ptBR["lti:list-tools:buttons:list-deployments"] = "Ver deployments";
+ptBR["lti:list-tools:buttons:tool-details"] = "Ver mais detalhes";
 ptBR["lti:list-tools:no-tools-registered"] =
   "Não há nenhuma ferramenta registrada ainda.";
 ptBR["lti:list-tools:buttons:register-new-tool"] =
   "Registrar uma nova ferramenta";
+
+ptBR["lti:tools-details:title"] = ({ toolName }: { toolName?: string }) => {
+  if (!toolName) return "Registro de ferramenta";
+  return `Registro da ferramenta ${toolName}`;
+};
+ptBR["lti:tools-details:invalid-tab-selected"] =
+  "Aba inválida. Escolha uma aba de visualização existente.";
+ptBR["lti:tools-details:thead:id"] = "ID";
+ptBR["lti:tools-details:thead:name"] = "Nome";
+ptBR["lti:tools-details:thead:description"] = "Descrição";
+ptBR["lti:tools-details:thead:grant-types"] = "Grant Types LTI";
+ptBR["lti:tools-details:thead:initiate-uri"] = "Link de Iniciação";
+ptBR["lti:tools-details:thead:home-page-uri"] = "Website da Ferramenta";
+ptBR["lti:tools-details:thead:logo-uri"] = "Logo";
+ptBR["lti:tools-details:thead:tos-uri"] = "Termos de Serviço";
+ptBR["lti:tools-details:thead:policy-uri"] = "Políticas da Ferramenta";
+ptBR["lti:tools-details:thead:contacts"] = "Contatos";
+ptBR["lti:tools-details:thead:registered-msgs"] = "Mensagens Registradas";
+ptBR["lti:tools-details:thead:required-claims"] = "Claims Obrigatórios";
+ptBR["lti:tools-details:buttons:new-deploy"] = "Fazer novo deploy";
+ptBR["lti:tools-details:thead:deployment-id"] = "ID";
+ptBR["lti:tools-details:thead:deployment-label"] = "Etiqueta";
+ptBR["lti:tools-details:no-tool-deployments"] =
+  "Essa ferramenta ainda não possui nenhum deployment.";

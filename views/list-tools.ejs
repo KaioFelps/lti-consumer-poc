@@ -1,51 +1,18 @@
-<style>
-    #tools-table {
-        width: 100%;
-        border: 1px solid black;
-        border-collapse: collapse;
-
-        thead {
-            border-bottom: 1px solid black;
-            background: #eee;
-
-            th {
-                text-align: start;
-            }
-
-            th:not(:last-child) {
-                border-right: 1px solid black;
-            }
-        }
-
-        tbody tr {
-            vertical-align: super;
-        }
-
-        tbody tr:not(:last-child) {
-            border-bottom: 1px solid black;
-        }
-
-        tbody tr td:not(:last-child) {
-            border-right: 1px solid black;
-
-            ul {
-                list-style: none;
-            }
-        }
-
-        td, th {
-            padding: 4px 8px;
-        }
-    }
-</style>
-
 <main class="main">
     <h1><%= title %></h1>
     <hr>
-    <br>
+
+    <% if (error) {%>
+        <br>
+        <div class="error-alert">
+            <span><%= error %></span>
+        </div>
+    <% } else { %>
+        <br>
+    <% } %>
 
     <%if (tools.length > 0) { %>
-        <table id="tools-table">
+        <table class="base-table">
             <thead>
                 <th><%= tableHeadings.toolName %></th>
                 <th><%= tableHeadings.toolDetails %></th>
@@ -66,7 +33,10 @@
                         </ul>
                     </td>
                     <td>
-                        <a href="<%= tool.endpoints.deployments %>"><%= buttons.deployments %></a>
+                        <ul>
+                            <li><a href="<%= tool.endpoints.deployments %>"><%= buttons.deployments %></a></li>
+                            <li><a href="<%= tool.endpoints.details %>"><%= buttons.toolDetails %></a></li>
+                        </ul>
                     </td>
                 </tr>
             <% }) %>

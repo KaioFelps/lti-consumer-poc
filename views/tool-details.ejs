@@ -1,0 +1,135 @@
+<% 
+function isUrl(value) {
+    try {
+        new URL(value);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
+
+const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
+%>
+
+<main class="main">
+    <h1><%= title %></h1>
+    <br>
+    <div>
+        <button id="show-details"><%= buttons.detailsTab %></button>
+        <button id="show-deployments"><%= buttons.deploymentsTab %></button>
+    </div>
+    <br>
+    <hr>
+    <br>
+    <div id="details" style="display: hidden;">
+        <div class="vertical-table">
+            <% Object
+                .keys(tool)
+                .filter(key => !toolKeysToInsertManually.includes(key))
+                .forEach((key) => {
+            %>
+                <% if (!Array.isArray(tool[key])) { %>
+                    <div class="item">
+                        <header><%= toolTableHeadings[key] %></header>
+                        <% if (isUrl(tool[key])) { %>
+                            <a href="<%= tool[key] %>" target="_blank"><%= tool[key] %></a>
+                        <% } else { %>
+                            <span><%= tool[key] %></span>
+                        <% } %>
+                    </div>
+                <% } else if (tool[key].length > 0) { %>
+                    <div class="item">
+                        <header><%= toolTableHeadings[key] %></header>
+                        <ul style="margin-left: 24px;">
+                            <% tool[key].forEach((item) => { %>
+                                <li><%= item %></li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                <% } %>
+            <% }) %>
+
+            <div class="item">
+                <header><%= toolTableHeadings.logoUri %></header>
+                <span>
+                    <img src="<%= tool.logoUri %>" alt="<%= toolTableHeadings.logoUri %>" style="max-width: 100px;">
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div id="deployments" style="display: hidden;">
+        <% if (deployments.length > 0) { %>
+            <table class="base-table">
+                <thead>
+                    <th><%= deploymentTableHeadings.id %></th>
+                    <th><%= deploymentTableHeadings.label %></th>
+                </thead>
+                <tbody>
+                    <% deployments.forEach(deployment => { %>
+                        <tr>
+                            <td><%= deployment.id %></td>
+                            <td><%= deployment.label %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <div class="warning-alert">
+                <span><%= content.noDeploymentsMessage %></span>
+            </div>
+        <% } %>
+
+        <a href="<%= deploymentEndpoint %>"><%= buttons.deploy %></a>
+    </div>
+
+    <div id="invalid-tab" class="error-alert" style="display: hidden;">
+        <span><%= content.invalidTabSelected %></span>
+    </div>
+</main>
+
+<script type="module">
+    const Tabs = Object.freeze({
+        Deployments: "#tooldeployments",
+        Details: "#tooldetails"
+    });
+
+    const availableTabs = Object.values(Tabs);
+
+    const Containers = Object.freeze({
+        [Tabs.Deployments]: document.getElementById("deployments"),
+        [Tabs.Details]: document.getElementById("details"),
+        invalidTab: document.getElementById("invalid-tab")
+    });
+
+    function updateContent() {
+        const activeTab = window.location.hash;
+
+        if (!availableTabs.includes(activeTab)) {
+            Containers.invalidTab.hidden = false;
+            return;
+        }
+
+        Containers.invalidTab.hidden = true;
+
+        Object.values(Tabs).forEach((tabContainerId) => {
+            Containers[tabContainerId].hidden = true;
+        });
+
+        Containers[activeTab].hidden = false;
+    }
+
+    window.addEventListener("hashchange", updateContent);
+    window.addEventListener("load", updateContent);
+
+    const TabTriggers = Object.freeze({
+        Deployments: document.getElementById("show-deployments"),
+        Details: document.getElementById("show-details"),
+    });
+
+    Object.keys(Tabs).forEach((tabKey) => {
+        TabTriggers[tabKey].addEventListener("click", () => {
+            window.location.hash = Tabs[tabKey];
+        })
+    })
+</script>

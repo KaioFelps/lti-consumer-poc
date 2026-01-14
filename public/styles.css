@@ -47,6 +47,7 @@ label.checkbox-item > span {
     padding: 8px 16px;
     background: color-mix(in oklab, #ffb300 25%, transparent);
     color: #8a6100;
+    margin-bottom: 12px;
 }
 
 .success-alert a { font-weight: bold; color: green; }
@@ -92,6 +93,68 @@ label.checkbox-item > span {
 
             width: calc(100vw - 24px);
             max-width: 200px;
+        }
+    }
+}
+
+.base-table {
+    width: 100%;
+    border: 1px solid black;
+    border-collapse: collapse;
+
+    thead {
+        border-bottom: 1px solid black;
+        background: #eee;
+
+        th {
+            text-align: start;
+        }
+
+        th:not(:last-child) {
+            border-right: 1px solid black;
+        }
+    }
+
+    ul {
+        list-style: none;
+    }
+
+    tbody tr {
+        vertical-align: super;
+    }
+
+    tbody tr:not(:last-child) {
+        border-bottom: 1px solid black;
+    }
+
+    tbody tr td:not(:last-child) {
+        border-right: 1px solid black;
+    }
+
+    td, th {
+        padding: 4px 8px;
+    }
+}
+
+.vertical-table {
+    border: 1px solid black;
+
+    .item {
+        display: flex;
+
+        & > * {
+            padding: 4px 8px;
+        }
+
+        &:not(:last-child) {
+            border-bottom: 1px solid black;
+        }
+
+        header {
+            background-color: #eee;
+            border-right: 1px solid black;
+            max-width: 150px;
+            width: 30%;
         }
     }
 }
