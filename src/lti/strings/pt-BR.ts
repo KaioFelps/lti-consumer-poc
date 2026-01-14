@@ -61,3 +61,11 @@ ptBR["lti:tools-details:thead:deployment-id"] = "ID";
 ptBR["lti:tools-details:thead:deployment-label"] = "Etiqueta";
 ptBR["lti:tools-details:no-tool-deployments"] =
   "Essa ferramenta ainda não possui nenhum deployment.";
+
+ptBR["lti:deploy-tool:popup-title"] = "Realizar novo deploy";
+ptBR["lti:deploy-tool:errors:label-invalid-type"] =
+  "A etiqueta precisa ser um texto válido.";
+ptBR["lti:deploy-tool:errors:label-too-short"] = "A etiqueta é muito curta.";
+ptBR["lti:deploy-tool:errors:label-too-long"] = "A etiqueta é muito longa.";
+ptBR["lti:deploy-tool:success-message"] = ({ id, label }) =>
+  `Ferramenta instalada com sucesso etiquetada como ${label} e com ID ${id}.`;

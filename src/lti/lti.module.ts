@@ -9,7 +9,9 @@ import { LtiLaunchServices } from "$/core/services/launch.services";
 import { LtiController } from "./lti.controller";
 import { PlatformFactory } from "./platform.factory";
 import { LtiToolsRepository } from "./tools/lti-tools.repository";
+import { DeployToolService } from "./tools/services/deploy-tool.service";
 import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-previews.service";
+import { FindToolByIdService } from "./tools/services/find-tool-by-id.service";
 import { GetToolRegistrationDetailsService } from "./tools/services/get-tool-registration-details.service";
 
 @Module({
@@ -36,6 +38,8 @@ import { GetToolRegistrationDetailsService } from "./tools/services/get-tool-reg
       inject: [LtiResourceLinksRepository, LtiToolsRepository, Platform],
     },
     FindManyToolsPreviewsService,
+    FindToolByIdService,
+    DeployToolService,
     GetToolRegistrationDetailsService,
   ],
   exports: [LtiLaunchServices, Platform],

@@ -5,4 +5,7 @@ export const ptBR: MessageStringTranslationMap = {
     "Houve um problema com o servidor, tente novamente mais tarde.",
   "home-title": "Página Inicial",
   "table-headings:actions": "Ações",
+
+  "buttons:cancel": "Cancelar",
+  "buttons:confirm": "Confirmar",
 };

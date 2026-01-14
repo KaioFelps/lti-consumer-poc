@@ -8,7 +8,7 @@ import {
   Res,
   Session,
 } from "@nestjs/common";
-import { either } from "fp-ts";
+import { either, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import Provider from "oidc-provider";
 import { EnvironmentVars } from "@/config/environment-vars";
@@ -17,22 +17,28 @@ import { LtiToolDeploymentPresenter } from "@/external/presenters/entities/lti-t
 import { LtiToolPreviewPresenter } from "@/external/presenters/entities/lti-tool-preview.presenter";
 import { HttpResponse, RequestSession } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
+import { eitherPromiseToTaskEither as teFromPromise } from "@/lib/fp-ts";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { LtiRegistrationInitiationRequest } from "$/messages/initiate-register";
+import { DeployToolDto } from "./dtos/deploy-tool.dto";
 import { RegisterToolDTO } from "./dtos/register-tool.dto";
+import { DeployToolService } from "./tools/services/deploy-tool.service";
 import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-previews.service";
+import { FindToolByIdService } from "./tools/services/find-tool-by-id.service";
 import { GetToolRegistrationDetailsService } from "./tools/services/get-tool-registration-details.service";
 
 @Mvc()
 @Controller("lti")
 export class LtiController {
   public constructor(
+    private vars: EnvironmentVars,
     private provider: Provider,
     private t: TranslatorService,
+    private findToolByIdService: FindToolByIdService,
     private findManyToolsService: FindManyToolsPreviewsService,
     private getToolDetailsService: GetToolRegistrationDetailsService,
-    private vars: EnvironmentVars,
+    private deployToolService: DeployToolService,
   ) {}
 
   private static toolRegistrationEndpointFlashKey =
@@ -191,11 +197,12 @@ export class LtiController {
       title: await this.t.translate("lti:tools-details:title", {
         toolName: toolDetails.getTool().record.name,
       }),
+      deployPopupTitle: await this.t.translate("lti:deploy-tool:popup-title"),
       tool: LtiToolPresenter.present(toolDetails.getTool()),
       deployments: toolDetails
         .getDeployments()
         .map(LtiToolDeploymentPresenter.present),
-      deploymentEndpoint: `/tools/${toolDetails.getTool().record.id}/deploy`,
+      deploymentEndpoint: `/lti/tools/${toolDetails.getTool().record.id}/deploy`,
       buttons: {
         detailsTab: await this.t.translate(
           "lti:list-tools:buttons:tool-details",
@@ -204,6 +211,8 @@ export class LtiController {
           "lti:list-tools:buttons:list-deployments",
         ),
         deploy: await this.t.translate("lti:tools-details:buttons:new-deploy"),
+        confirm: await this.t.translate("buttons:confirm"),
+        cancel: await this.t.translate("buttons:cancel"),
       },
       content: {
         invalidTabSelected: await this.t.translate(
@@ -251,6 +260,32 @@ export class LtiController {
     };
   }
 
-  @Get("/deploy/:id")
-  public async deployTool(@Param("id") toolId: string) {}
+  @Post("tools/:id/deploy")
+  public async deployTool(
+    @Param("id") toolId: string,
+    @Session() session: RequestSession,
+    @Body() dto: DeployToolDto,
+    @Res() response: HttpResponse,
+  ) {
+    const deployment = await pipe(
+      teFromPromise(() => this.findToolByIdService.exec({ id: toolId })),
+      te.chainW((tool) =>
+        teFromPromise(() =>
+          this.deployToolService.exec({ tool, label: dto.label }),
+        ),
+      ),
+      (a) => a,
+      te.getOrElse((error) => {
+        throw ExceptionsFactory.fromError(error);
+      }),
+    )();
+
+    session.flash.activeTab = dto.activeTab;
+    session.flash.successMessage = await this.t.translate(
+      "lti:deploy-tool:success-message",
+      { id: deployment.getId().toString(), label: deployment.getLabel() },
+    );
+
+    return response.redirectBack();
+  }
 }

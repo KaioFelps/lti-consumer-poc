@@ -14,6 +14,13 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
 <main class="main">
     <h1><%= title %></h1>
     <br>
+
+    <% if (flash.successMessage) { %>
+        <div class="success-alert">
+            <span><%= flash.successMessage %></span>
+        </div>
+    <% } %>
+
     <div>
         <button id="show-details"><%= buttons.detailsTab %></button>
         <button id="show-deployments"><%= buttons.deploymentsTab %></button>
@@ -74,13 +81,14 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
                     <% }) %>
                 </tbody>
             </table>
+            <br>
         <% } else { %>
             <div class="warning-alert">
                 <span><%= content.noDeploymentsMessage %></span>
             </div>
         <% } %>
 
-        <a href="<%= deploymentEndpoint %>"><%= buttons.deploy %></a>
+        <button id="show-deployment-modal"><%= buttons.deploy %></button>
     </div>
 
     <div id="invalid-tab" class="error-alert" style="display: hidden;">
@@ -88,7 +96,42 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
     </div>
 </main>
 
+<dialog class="base-modal" id="deploy-tool-dialog" style="padding: 8px;">
+    <h2 style="margin-bottom: 8px;"><%= deployPopupTitle %></h2>
+    <form action="<%= deploymentEndpoint %>" method="post">
+        <input type="hidden" name="activeTab" id="active-tab-input" value="">
+        <input type="hidden" name="withModalOpen" value="true">
+        <label>
+            <span><%= deploymentTableHeadings.label %></span>
+            <% (validationErrors?.label ?? []).forEach(error => { %>
+                <span class="error-span"><%= error.message %></span>
+            <% }) %>
+            <input type="text" name="label" value="<%= flash?.values?.label %>">
+        </label>
+        <button type="submit"><%= buttons.confirm %></button>
+        <button id="close-deployment-modal" type="button"><%= buttons.cancel %></button>
+    </form>
+</dialog>
+
+<%# this syntax error is related to the ejs visual studio code extension; the code works tho #%>
 <script type="module">
+    const trigger = document.getElementById("show-deployment-modal");
+    const close = document.getElementById("close-deployment-modal");
+    const dialog = document.getElementById("deploy-tool-dialog");
+
+    trigger.addEventListener("click", () => dialog.showModal());
+    close.addEventListener("click", () => {
+        dialog.close();
+    });
+
+    <% if(flash?.values?.withModalOpen ?? false) { %>
+        dialog.showModal();
+    <% } %>
+</script>
+
+<script type="module">
+    const activeTabInput = document.getElementById("active-tab-input");
+
     const Tabs = Object.freeze({
         Deployments: "#tooldeployments",
         Details: "#tooldetails"
@@ -102,25 +145,32 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
         invalidTab: document.getElementById("invalid-tab")
     });
 
+
     function updateContent() {
         const activeTab = window.location.hash;
 
-        if (!availableTabs.includes(activeTab)) {
-            Containers.invalidTab.hidden = false;
-            return;
-        }
-
-        Containers.invalidTab.hidden = true;
-
+        Containers.invalidTab.hidden = false;
         Object.values(Tabs).forEach((tabContainerId) => {
             Containers[tabContainerId].hidden = true;
         });
 
+        if (!availableTabs.includes(activeTab)) {
+            return;
+        }
+
+        Containers.invalidTab.hidden = true;
         Containers[activeTab].hidden = false;
+        activeTabInput.value = activeTab;
     }
 
     window.addEventListener("hashchange", updateContent);
-    window.addEventListener("load", updateContent);
+    window.addEventListener("load", () => {
+        const flashActiveTab = "<%= flash?.values?.activeTab ?? flash?.activeTab %>";
+
+        if (flashActiveTab) window.location.hash = flashActiveTab;
+
+        updateContent();
+    });
 
     const TabTriggers = Object.freeze({
         Deployments: document.getElementById("show-deployments"),

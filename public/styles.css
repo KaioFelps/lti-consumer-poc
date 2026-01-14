@@ -151,10 +151,24 @@ label.checkbox-item > span {
         }
 
         header {
+            font-weight: bold;
             background-color: #eee;
             border-right: 1px solid black;
             max-width: 150px;
             width: 30%;
         }
+    }
+}
+
+.base-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+
+    &::backdrop {
+        position: fixed;
+        background-color: rgba(0, 0, 0, 50%);
+        backdrop-filter: blur(3px);
     }
 }
