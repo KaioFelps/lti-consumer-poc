@@ -13,6 +13,7 @@ import { DeployToolService } from "./tools/services/deploy-tool.service";
 import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-previews.service";
 import { FindToolByIdService } from "./tools/services/find-tool-by-id.service";
 import { GetToolRegistrationDetailsService } from "./tools/services/get-tool-registration-details.service";
+import { RemoveToolDeploymentService } from "./tools/services/remove-tool-deployment.service";
 
 @Module({
   imports: [OIDCModule, AuthModule],
@@ -41,6 +42,7 @@ import { GetToolRegistrationDetailsService } from "./tools/services/get-tool-reg
     FindToolByIdService,
     DeployToolService,
     GetToolRegistrationDetailsService,
+    RemoveToolDeploymentService,
   ],
   exports: [LtiLaunchServices, Platform],
   controllers: [LtiController],

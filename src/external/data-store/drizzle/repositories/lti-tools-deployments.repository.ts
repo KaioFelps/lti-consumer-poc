@@ -1,4 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
+import { UUID } from "common/src/types/uuid";
 import { ltiToolDeployments } from "drizzle/schema";
 import { eq } from "drizzle-orm";
 import { taskEither as te } from "fp-ts";
@@ -51,6 +52,26 @@ export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRep
           ),
       ),
       te.map((rows) => rows.map(mapper.fromRow)),
+    )();
+  }
+
+  public async delete(
+    deploymentId: UUID,
+  ): Promise<Either<IrrecoverableError, void>> {
+    return await pipe(
+      te.tryCatch(
+        () =>
+          this.drizzle
+            .getClient()
+            .delete(ltiToolDeployments)
+            .where(eq(ltiToolDeployments.id, deploymentId.toString())),
+        (error: Error) =>
+          new IrrecoverableError(
+            `An error occurred in ${DrizzleLtiToolsDeploymentsRepository.name} when deleting deployment.`,
+            error,
+          ),
+      ),
+      te.map((_result) => {}),
     )();
   }
 }
