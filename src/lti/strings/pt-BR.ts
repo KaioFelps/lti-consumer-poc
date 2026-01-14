@@ -1,5 +1,9 @@
 import { ptBR } from "@/message-string/internal/translations/pt-BR";
 
+ptBR["lti:tool-not-found-by-id"] = ({ toolId }: { toolId: string }) => {
+  return `Não foi possível encontrar nenhuma ferramenta com ID ${toolId}`;
+};
+
 ptBR["lti:register-tool:title"] = "Registrar Ferramenta LTI";
 ptBR["lti:register-tool:labels:register-platform"] =
   "URL do endpoint de registro da ferramenta";

@@ -141,8 +141,8 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
         taskEither.fromOption(
           () =>
             new ResourceNotFoundError({
-              errorMessageIdentifier: `Could not find LTI tools registered with id ${id}.`,
-              messageParams: {},
+              errorMessageIdentifier: "lti:tool-not-found-by-id",
+              messageParams: { toolId: id },
             }),
         ),
       ),
