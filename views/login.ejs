@@ -1,17 +1,11 @@
 <main class="main">
     <h1><%= title %></h1>
-    <% if (flash?.success) { %>
-        <div class="success-alert">
-            <span><%= flash.success.message %></span><br>
-            <a href="<%= loginEndpoint %>"><%= flash.success.loginButtonMessage %></a>
-        </div>
-    <% } %>
     <% if (error) { %>
         <div class="error-alert">
             <span><%= error %></span><br>
         </div>
     <% } %>
-    <form action="<%= endpoint %>" method="post">
+    <form action="<%= routes.auth.login() %>" method="post">
         <input type="hidden" name="destiny" value="<%= flash?.values?.destiny ?? destinyEndpoint %>">
         <label>
             <span><%= labels.username %></span>
@@ -30,6 +24,6 @@
         
         <button><%= buttons.login %></button>
         <br>
-        <a href="<%= registerEndpoint %>"><%= buttons.noAccount %></a>
+        <a href="<%= routes.auth.registerForm() %>"><%= buttons.noAccount %></a>
     </form>
 </main>

@@ -34,17 +34,20 @@
                     </td>
                     <td>
                         <ul>
-                            <li><a href="<%= tool.endpoints.deployments %>"><%= buttons.deployments %></a></li>
-                            <li><a href="<%= tool.endpoints.details %>"><%= buttons.toolDetails %></a></li>
+                            <li><a href="<%= routes.lti.tools.details(tool.id) %>#tooldeployments"><%= buttons.deployments %></a></li>
+                            <li><a href="<%= routes.lti.tools.details(tool.id) %>#tooldetails"><%= buttons.toolDetails %></a></li>
                         </ul>
                     </td>
                 </tr>
             <% }) %>
+        </table>
+        <br/>
+        <a href="<%= routes.lti.tools.registerForm() %>"><%= buttons.registerNewTool %></a>
     <% } else { %>
         <div class="warning-alert">
             <span><%= content.noToolsMessage %></span>
             <br>
-            <a href="<%= registerNewToolEndpoint %>"><%= buttons.registerNewTool %></a>
+            <a href="<%= routes.lti.tools.registerForm() %>"><%= buttons.registerNewTool %></a>
         </div>
     <% } %>
 </main>

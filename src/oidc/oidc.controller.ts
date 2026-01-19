@@ -27,6 +27,7 @@ import { HttpRequest, HttpResponse } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
+import { Routes } from "@/routes";
 import { AvailableACRs } from "./consts";
 import { reasonsAreValidPromptReasons, resolveAcrValues } from "./helpers";
 import { OIDCAccountsRepository } from "./repositories/accounts.repository";
@@ -81,14 +82,14 @@ export class OIDCController {
     switch (interaction.prompt.name) {
       case "login": {
         const viewManager = new LoginViewManager({
-          interaction,
           translatorService: this.t,
           localeHint,
+          loginEndpoint: Routes.oidc.login(interaction.uid),
         });
 
         return response.render(
           viewManager.getView(),
-          await viewManager.getRenderData(),
+          await viewManager.getOidcRenderData(),
         );
       }
 

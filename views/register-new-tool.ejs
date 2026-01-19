@@ -10,7 +10,7 @@
             <span><%= error %></span><br>
         </div>
     <% } %>
-    <form action="<%= endpoint %>" method="post">
+    <form action="<%= routes.lti.tools.register() %>" method="post">
         <label>
             <span><%= labels.registrationEndpoint %></span>
             <% (validationErrors?.registrationEndpoint ?? []).forEach(error => { %>

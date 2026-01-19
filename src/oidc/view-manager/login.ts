@@ -1,11 +1,11 @@
-import { Interaction } from "oidc-provider";
 import { TranslatorService } from "@/message-string/translator.service";
 import { ViewManager } from ".";
 
 type LoginViewData = {
-  interaction: Interaction;
+  loginEndpoint: string;
   localeHint?: string;
   translatorService: TranslatorService;
+  destinyEndpoint?: string;
 };
 
 export class LoginViewManager extends ViewManager {
@@ -16,14 +16,55 @@ export class LoginViewManager extends ViewManager {
   public getView(): string {
     return "login";
   }
-  public async getRenderData(): Promise<object | undefined> {
-    const { interaction, translatorService: t, localeHint } = this.data;
+
+  public async getOidcRenderData(): Promise<object | undefined> {
+    const {
+      translatorService: t,
+      localeHint,
+      loginEndpoint,
+      destinyEndpoint,
+    } = this.data;
 
     return {
-      endpoint: `/oidc/interaction/${interaction.uid}/login`,
-      registerEndpoint: "/auth/register",
+      loginEndpoint,
+      destinyEndpoint,
       title: await t.translateWithHint("oidc:login:title", localeHint),
       locale: localeHint ?? t.getLocale(),
+      labels: {
+        username: await t.translateWithHint(
+          "auth:forms:login:labels:username",
+          localeHint,
+        ),
+        password: await t.translateWithHint(
+          "auth:forms:login:labels:password",
+          localeHint,
+        ),
+      },
+      buttons: {
+        login: await t.translateWithHint(
+          "auth:forms:login:buttons:login",
+          localeHint,
+        ),
+        noAccount: await t.translateWithHint(
+          "auth:forms:login:buttons:no-account",
+          localeHint,
+        ),
+      },
+    };
+  }
+
+  public async getRenderData(): Promise<object | undefined> {
+    const {
+      translatorService: t,
+      localeHint,
+      loginEndpoint,
+      destinyEndpoint,
+    } = this.data;
+
+    return {
+      loginEndpoint,
+      destinyEndpoint,
+      title: await t.translateWithHint("auth:forms:login:title", localeHint),
       labels: {
         username: await t.translateWithHint(
           "auth:forms:login:labels:username",

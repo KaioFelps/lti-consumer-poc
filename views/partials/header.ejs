@@ -1,13 +1,13 @@
 <header id="app-header">
     <nav>
         <ul>
-            <li><a href="/">Home</a></li>
+            <li><a href="<%= routes.home() %>">Home</a></li>
             <li>
                 <details class="nav-dropdown">
                     <summary>LTI</summary>
                     <ul class="nav-dropdown-content">
-                        <li><a href="/lti/tools">Ver ferramentas</a></li>
-                        <li><a href="/lti/register">Registrar nova ferramenta</a></li>
+                        <li><a href="<%= routes.lti.tools.list() %>">Ver ferramentas</a></li>
+                        <li><a href="<%= routes.lti.tools.registerForm() %>">Registrar nova ferramenta</a></li>
                     </ul>
                 </details>
             </li>
@@ -16,7 +16,7 @@
                     <details class="nav-dropdown">
                         <summary><%= auth.username %></summary>
                         <ul class="nav-dropdown-content">
-                            <li><a href="/oidc/session/end">Logout</a></li>
+                            <li><a href="<%= routes.auth.oidcLogout() %>">Logout</a></li>
                         </ul>
                     </details>
                 </li>

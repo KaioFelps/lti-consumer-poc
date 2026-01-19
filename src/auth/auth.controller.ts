@@ -23,6 +23,8 @@ import { HttpRequest, HttpResponse } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
+import { LoginViewManager } from "@/oidc/view-manager/login";
+import { Routes } from "@/routes";
 import { LoginDTO } from "./dtos/login.dto";
 import { RegisterPersonDTO } from "./dtos/register-person.dto";
 import { Public } from "./public-routes";
@@ -57,22 +59,17 @@ export class AuthController {
 
     const destiny = request.headers.referer ?? "/";
 
-    return response.render("login", {
-      endpoint: "/auth/login",
-      registerEndpoint: "/auth/register",
+    const loginView = new LoginViewManager({
+      loginEndpoint: Routes.auth.login(),
+      translatorService: this.t,
+      localeHint: this.t.getLocale(),
       destinyEndpoint: destiny,
-      title: await this.t.translate("auth:forms:login:title"),
-      labels: {
-        username: await this.t.translate("auth:forms:login:labels:username"),
-        password: await this.t.translate("auth:forms:login:labels:password"),
-      },
-      buttons: {
-        login: await this.t.translate("auth:forms:login:buttons:login"),
-        noAccount: await this.t.translate(
-          "auth:forms:login:buttons:no-account",
-        ),
-      },
     });
+
+    return response.render(
+      loginView.getView(),
+      await loginView.getRenderData(),
+    );
   }
 
   @Public()
@@ -115,8 +112,6 @@ export class AuthController {
   public async showRegisterForm() {
     return {
       title: await this.t.translate("auth:forms:register:title"),
-      endpoint: "/auth/register",
-      loginEndpoint: "/auth/login",
       labels: {
         username: await this.t.translate("auth:forms:register:labels:username"),
         password: await this.t.translate("auth:forms:register:labels:password"),

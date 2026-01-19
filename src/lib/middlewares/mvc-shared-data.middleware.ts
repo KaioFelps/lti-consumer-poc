@@ -2,6 +2,7 @@ import { NestMiddleware } from "@nestjs/common";
 import { UserPresenter } from "@/external/presenters/entities/user.presenter";
 import { User } from "@/identity/user/user.entity";
 import { DEFAULT_EJS_LAYOUT } from "@/main";
+import { Routes } from "@/routes";
 import { HttpRequest, HttpResponse, RequestSession } from "..";
 
 export class MvcSharedDataMiddleware implements NestMiddleware {
@@ -14,6 +15,7 @@ export class MvcSharedDataMiddleware implements NestMiddleware {
         : undefined;
 
     res.locals.layout = DEFAULT_EJS_LAYOUT;
+    res.locals.routes = Routes;
 
     return next();
   }

@@ -4,11 +4,11 @@
     <% if (flash?.success) { %>
         <div class="success-alert">
             <span><%= flash.success.message %></span><br>
-            <a href="<%= loginEndpoint %>"><%= flash.success.loginButtonMessage %></a>
+            <a href="<%= routes.auth.loginForm() %>"><%= flash.success.loginButtonMessage %></a>
         </div>
     <% } %>
 
-    <form action="<%= endpoint %>" method="POST">
+    <form action="<%= routes.auth.register() %>" method="POST">
         <label>
             <span><%= labels.username %></span>
             <% (validationErrors?.username ?? []).forEach(error => { %>
@@ -68,6 +68,6 @@
 
         <button><%= buttons.create %></button>
         <br>
-        <a href="<%= loginEndpoint %>"><%= buttons.alreadyHasAccount %></a>
+        <a href="<%= routes.auth.loginForm() %>"><%= buttons.alreadyHasAccount %></a>
     </form>
 </main>

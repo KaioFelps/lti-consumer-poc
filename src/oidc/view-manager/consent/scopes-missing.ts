@@ -1,4 +1,5 @@
 import { AvailableScope } from "@/oidc/consts";
+import { Routes } from "@/routes";
 import { ViewManager } from "..";
 import { ConsentViewManagerData } from ".";
 
@@ -36,8 +37,8 @@ export class ScopesAreMissingConsentViewManager extends ViewManager {
         userName: account.person.getName(),
       }),
       endpoints: {
-        abort: `/oidc/interaction/${interaction.uid}/abort`,
-        consent: `/oidc/interaction/${interaction.uid}/consent`,
+        abort: Routes.oidc.abort(interaction.uid),
+        consent: Routes.oidc.consent(interaction.uid),
       },
       clientName: client.clientName,
       content: {

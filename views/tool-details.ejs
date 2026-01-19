@@ -90,7 +90,7 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
                                     <button
                                         class="deployment-delete-button"
                                         data-deployment-id="<%= deployment.id %>"
-                                        data-endpoint="<%= deployment.endpoints.delete %>"
+                                        data-endpoint="<%= routes.lti.deployments.delete(deployment.id) %>"
                                     >
                                         <%= buttons.deleteDeployment %>
                                     </button>
@@ -117,7 +117,7 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
 
 <dialog class="base-modal" id="deploy-tool-dialog">
     <h2 style="margin-bottom: 8px;"><%= deployPopupTitle %></h2>
-    <form action="<%= deploymentEndpoint %>" method="post">
+    <form action="<%= routes.lti.deployments.deploy(tool.id) %>" method="post">
         <input type="hidden" name="activeTab" class="active-tab-input" value="">
         <input type="hidden" name="withDeployModalOpen" value="true">
         <label>
