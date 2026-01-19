@@ -6,14 +6,15 @@ import { OIDCModule } from "@/oidc/oidc.module";
 import { Platform } from "$/core/platform";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiLaunchServices } from "$/core/services/launch.services";
-import { LtiController } from "./lti.controller";
+import { LtiDeploymentsController } from "./deployments/deployments.controller";
+import { DeployToolService } from "./deployments/services/deploy-tool.service";
+import { RemoveToolDeploymentService } from "./deployments/services/remove-tool-deployment.service";
 import { PlatformFactory } from "./platform.factory";
 import { LtiToolsRepository } from "./tools/lti-tools.repository";
-import { DeployToolService } from "./tools/services/deploy-tool.service";
 import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-previews.service";
 import { FindToolByIdService } from "./tools/services/find-tool-by-id.service";
 import { GetToolRegistrationDetailsService } from "./tools/services/get-tool-registration-details.service";
-import { RemoveToolDeploymentService } from "./tools/services/remove-tool-deployment.service";
+import { LtiToolsController } from "./tools/tools.controller";
 
 @Module({
   imports: [OIDCModule, AuthModule],
@@ -45,10 +46,12 @@ import { RemoveToolDeploymentService } from "./tools/services/remove-tool-deploy
     RemoveToolDeploymentService,
   ],
   exports: [LtiLaunchServices, Platform],
-  controllers: [LtiController],
+  controllers: [LtiToolsController, LtiDeploymentsController],
 })
 export class LtiModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(...middlewares.mvc()).forRoutes(LtiController);
+    consumer
+      .apply(...middlewares.mvc())
+      .forRoutes(LtiToolsController, LtiDeploymentsController);
   }
 }

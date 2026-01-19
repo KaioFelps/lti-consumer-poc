@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Post,
@@ -9,7 +8,7 @@ import {
   Res,
   Session,
 } from "@nestjs/common";
-import { either, taskEither as te } from "fp-ts";
+import { either } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import Provider from "oidc-provider";
 import { EnvironmentVars } from "@/config/environment-vars";
@@ -18,30 +17,22 @@ import { LtiToolDeploymentPresenter } from "@/external/presenters/entities/lti-t
 import { LtiToolPreviewPresenter } from "@/external/presenters/entities/lti-tool-preview.presenter";
 import { HttpResponse, RequestSession } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { eitherPromiseToTaskEither as teFromPromise } from "@/lib/fp-ts";
-import { Mvc, Rest } from "@/lib/mvc-routes";
+import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { LtiRegistrationInitiationRequest } from "$/messages/initiate-register";
-import { DeployToolDto } from "./dtos/deploy-tool.dto";
 import { RegisterToolDTO } from "./dtos/register-tool.dto";
-import { DeployToolService } from "./tools/services/deploy-tool.service";
-import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-previews.service";
-import { FindToolByIdService } from "./tools/services/find-tool-by-id.service";
-import { GetToolRegistrationDetailsService } from "./tools/services/get-tool-registration-details.service";
-import { RemoveToolDeploymentService } from "./tools/services/remove-tool-deployment.service";
+import { FindManyToolsPreviewsService } from "./services/find-many-tools-previews.service";
+import { GetToolRegistrationDetailsService } from "./services/get-tool-registration-details.service";
 
 @Mvc()
-@Controller("lti")
-export class LtiController {
+@Controller("/lti/tools")
+export class LtiToolsController {
   public constructor(
     private vars: EnvironmentVars,
     private provider: Provider,
     private t: TranslatorService,
-    private findToolByIdService: FindToolByIdService,
     private findManyToolsService: FindManyToolsPreviewsService,
     private getToolDetailsService: GetToolRegistrationDetailsService,
-    private deployToolService: DeployToolService,
-    private removeDeploymentService: RemoveToolDeploymentService,
   ) {}
 
   private static toolRegistrationEndpointFlashKey =
@@ -51,12 +42,11 @@ export class LtiController {
   @Render("register-new-tool")
   public async register(@Res() response: HttpResponse) {
     const initiateRegisterEndpoint = response.locals.flash[
-      LtiController.toolRegistrationEndpointFlashKey
+      LtiToolsController.toolRegistrationEndpointFlashKey
     ] as string | undefined;
 
     return {
       title: await this.t.translate("lti:register-tool:title"),
-      endpoint: "/lti/register",
       shallShowDockerInternalHostOption: this.vars.nodeEnv === "development",
       labels: {
         registrationEndpoint: await this.t.translate(
@@ -115,26 +105,18 @@ export class LtiController {
       toolInitiateRegisterUri: new URL(dto.registrationEndpoint),
     });
 
-    session.flash[LtiController.toolRegistrationEndpointFlashKey] =
+    session.flash[LtiToolsController.toolRegistrationEndpointFlashKey] =
       initiateRegister.intoUrl().toString();
 
     return response.redirectBack();
   }
 
-  @Get("tools")
+  @Get()
   @Render("list-tools")
   public async showTools() {
     const tools = pipe(
       await this.findManyToolsService.exec(),
-      either.map((tools) =>
-        tools.map(LtiToolPreviewPresenter.present).map((tool) => ({
-          ...tool,
-          endpoints: {
-            deployments: `/lti/tools/${tool.id}/details#tooldeployments`,
-            details: `/lti/tools/${tool.id}/details#tooldetails`,
-          },
-        })),
-      ),
+      either.map((tools) => tools.map(LtiToolPreviewPresenter.present)),
       either.foldW(
         (error) => {
           throw ExceptionsFactory.fromError(error);
@@ -146,7 +128,6 @@ export class LtiController {
     return {
       tools,
       title: await this.t.translate("lti:list-tools:title"),
-      registerNewToolEndpoint: "/lti/register",
       tableHeadings: {
         toolName: await this.t.translate("lti:list-tools:thead:tool-name"),
         toolDetails: await this.t.translate(
@@ -183,7 +164,7 @@ export class LtiController {
     };
   }
 
-  @Get("/tools/:id/details")
+  @Get(":id/details")
   @Render("tool-details")
   public async showToolDetails(@Param("id") toolId: string) {
     const toolDetails = pipe(
@@ -204,14 +185,7 @@ export class LtiController {
       tool: LtiToolPresenter.present(toolDetails.getTool()),
       deployments: toolDetails
         .getDeployments()
-        .map(LtiToolDeploymentPresenter.present)
-        .map((deployment) => ({
-          ...deployment,
-          endpoints: {
-            delete: `/lti/deployments/${deployment.id}/delete`,
-          },
-        })),
-      deploymentEndpoint: `/lti/tools/${toolDetails.getTool().record.id}/deploy`,
+        .map(LtiToolDeploymentPresenter.present),
       buttons: {
         detailsTab: await this.t.translate(
           "lti:list-tools:buttons:tool-details",
@@ -276,53 +250,6 @@ export class LtiController {
         ),
         actions: await this.t.translate("table-headings:actions"),
       },
-    };
-  }
-
-  @Post("tools/:id/deploy")
-  public async deployTool(
-    @Param("id") toolId: string,
-    @Session() session: RequestSession,
-    @Body() dto: DeployToolDto,
-    @Res() response: HttpResponse,
-  ) {
-    const deployment = await pipe(
-      teFromPromise(() => this.findToolByIdService.exec({ id: toolId })),
-      te.chainW((tool) =>
-        teFromPromise(() =>
-          this.deployToolService.exec({ tool, label: dto.label }),
-        ),
-      ),
-      (a) => a,
-      te.getOrElse((error) => {
-        throw ExceptionsFactory.fromError(error);
-      }),
-    )();
-
-    session.flash.activeTab = dto.activeTab;
-    session.flash.successMessage = await this.t.translate(
-      "lti:deploy-tool:success-message",
-      { id: deployment.getId().toString(), label: deployment.getLabel() },
-    );
-
-    return response.redirectBack();
-  }
-
-  @Rest()
-  @Delete("/deployments/:id/delete")
-  public async removeDeployment(@Param("id") deploymentId: string) {
-    await pipe(
-      teFromPromise(() => this.removeDeploymentService.exec({ deploymentId })),
-      te.getOrElse((error) => {
-        throw ExceptionsFactory.fromError(error);
-      }),
-    )();
-
-    return {
-      deploymentId,
-      successMessage: await this.t.translate(
-        "lti:delete-tool-deployment:success-message",
-      ),
     };
   }
 }

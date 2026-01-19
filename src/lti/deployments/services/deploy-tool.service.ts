@@ -3,9 +3,9 @@ import { either } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { LtiTool } from "../entities/lti-tool.entity";
-import { LtiToolDeployment } from "../entities/lti-tool-deployment.entity";
-import { LtiToolsDeploymentsRepository } from "../lti-tools-deployments.repository";
+import { LtiTool } from "@/lti/tools/entities/lti-tool.entity";
+import { LtiToolDeployment } from "@/lti/tools/entities/lti-tool-deployment.entity";
+import { LtiToolsDeploymentsRepository } from "@/lti/tools/lti-tools-deployments.repository";
 
 type Params = {
   tool: LtiTool;
