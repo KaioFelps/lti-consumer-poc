@@ -1,17 +1,33 @@
-import { ArgumentMetadata, PipeTransform } from "@nestjs/common";
+import {
+  ArgumentMetadata,
+  Inject,
+  Injectable,
+  Paramtype,
+  PipeTransform,
+  Scope,
+} from "@nestjs/common";
+import { REQUEST } from "@nestjs/core";
 import { plainToInstance } from "class-transformer";
 import { either } from "fp-ts";
 import type { DTO } from "@/core/interfaces/dto";
 import { DTOValidationException } from "@/lib/exceptions/dto-validation/exception";
+import { HttpRequest } from "..";
+import { RenderableDtoValidationException } from "../exceptions/renderable-dto-validation/exception";
+import coreValidation from ".";
 
 /**
  * Validates the body parameter (decorated with `@Body()`).
  * The body value must be an instance of some class which
  * implements the `DTO` interface.
  */
+@Injectable({ scope: Scope.REQUEST })
 export class CoreValidationPipe implements PipeTransform {
+  @Inject(REQUEST) private request: HttpRequest;
+
   transform(value: unknown, metadata: ArgumentMetadata) {
-    if (metadata.type !== "body") return value;
+    const workableTypes: Paramtype[] = ["body", "query", "param"];
+
+    if (!workableTypes.includes(metadata.type)) return value;
 
     if (!metadata.metatype)
       throw new Error(
@@ -42,7 +58,20 @@ export class CoreValidationPipe implements PipeTransform {
     );
 
     const isValid = valueAsInstanceOfADto.validate();
-    if (either.isLeft(isValid)) throw new DTOValidationException(isValid.left);
-    return valueAsInstanceOfADto;
+    if (either.isRight(isValid)) return valueAsInstanceOfADto;
+
+    const validationErrors = isValid.left;
+
+    const config = coreValidation.getConfigsFromRequest(this.request);
+
+    if (!config.renderErrorsWithView) {
+      throw new DTOValidationException(validationErrors);
+    }
+
+    console.log("lançando renderizavel");
+    throw new RenderableDtoValidationException(
+      validationErrors,
+      config.renderErrorsWithView,
+    );
   }
 }

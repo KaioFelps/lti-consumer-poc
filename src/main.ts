@@ -10,7 +10,6 @@ import session from "express-session";
 import { AppModule } from "./app.module";
 import { EnvironmentVars } from "./config/environment-vars";
 import { Redis } from "./external/data-store/redis/client";
-import { CoreValidationPipe } from "./lib/pipes/core-validation-pipe";
 import { loadMessageStrings } from "./message-string/loader";
 
 import "@/lib";
@@ -42,8 +41,6 @@ async function bootstrap() {
       },
     }),
   );
-
-  app.useGlobalPipes(new CoreValidationPipe());
 
   app.useStaticAssets(join(__dirname, "../..", "public"));
   app.setBaseViewsDir(join(__dirname, "../..", "views"));

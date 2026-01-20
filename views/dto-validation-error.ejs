@@ -1,0 +1,17 @@
+<%
+function renderError(error) {
+    if (!error) return '';
+
+    if (Array.isArray(error)) return error.map(renderError).join('');
+
+    const isSubtree = typeof error === "object" && !("message" in error);
+    if (isSubtree) return Object.values(error).map(renderError).join('');
+
+    return `<div class="error-alert" style="margin-top: 8px; margin-bottom: 0px;"><span>${error.message}</span></div>`;
+}
+%>
+
+<main class="main">
+    <h1><%= title %></h1>
+    <%- renderError(errors) %>
+</main>

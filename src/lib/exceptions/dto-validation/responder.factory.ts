@@ -3,10 +3,7 @@ import { HttpArgumentsHost } from "@nestjs/common/interfaces";
 import { HttpRequest, HttpResponse } from "@/lib";
 import { ExceptionFilterResponderFactory } from "../../exception-responders/factory";
 import { ExceptionFilterResponder } from "../../exception-responders/responder";
-import {
-  SerializedValidationError,
-  SerializedValidationErrorsMap,
-} from "./exception-filter";
+import { SerializedValidationError, SerializedValidationErrorsMap } from ".";
 
 type Body = SerializedValidationErrorsMap | SerializedValidationError[];
 type Output = void;
