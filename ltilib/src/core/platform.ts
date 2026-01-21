@@ -2,37 +2,42 @@ import { ClassProperties } from "common/src/types/class-properties";
 import { JWK } from "jose";
 import { IntoLtiClaim } from "$/claims/serialization";
 
-type Args = ClassProperties<Platform>;
-
-/**
- * Represents a LTI Platform.
- */
-export class Platform {
+interface IPlatform {
   /**
    * The platform's URL which is used to identify itself to tools.
    */
-  public readonly issuer: string;
+  issuer: string;
   /**
    * The platform's private key used to sign JWSs.
    */
-  public readonly jsonWebKey: JWK;
+  jsonWebKey: JWK;
   /**
    * A resolver to the launch initiation endpoint in the platform.
    */
-  public readonly initiateLaunchEndpoint: (resourceLinkId: string) => string;
+  initiateLaunchEndpoint: (resourceLinkId: string) => string;
   /**
    * Represents an instance of the platform.
    *
    * @see {@link Platform.Instance}
    * @see {@link https://www.cloudflare.com/learning/cloud/what-is-multitenancy/ Multitenancy}
    */
-  public readonly instance?: Platform.Instance;
+  instance?: Platform.Instance;
+}
 
-  protected constructor(args: Args) {
+/**
+ * Represents a LTI Platform.
+ */
+export class Platform implements IPlatform {
+  public readonly issuer: string;
+  public readonly jsonWebKey: JWK;
+  public readonly initiateLaunchEndpoint: IPlatform["initiateLaunchEndpoint"];
+  public readonly instance?: Platform.Instance | undefined;
+
+  protected constructor(args: IPlatform) {
     Object.assign(this, args);
   }
 
-  public static create(args: Args) {
+  public static create(args: IPlatform) {
     return new Platform(args);
   }
 }
