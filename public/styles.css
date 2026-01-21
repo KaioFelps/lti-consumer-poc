@@ -14,6 +14,10 @@ label > span {
     margin-bottom: 8px;
 }
 
+label > input {
+    width: 100%;
+}
+
 label.checkbox-item {
     display: flex;
     justify-content: start;
