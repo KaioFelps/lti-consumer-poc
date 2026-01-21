@@ -33,9 +33,9 @@ export class AppController {
   @Render("home")
   public async home(@SessionUser() user: User) {
     const resourceLinks = await pipe(
-      await this.ltiLaunchServices.getLtiLinks(
-        getLtiRolesFromSystemRole(user.getSystemRole()),
-      ),
+      await this.ltiLaunchServices.getLaunchLinks({
+        userRoles: getLtiRolesFromSystemRole(user.getSystemRole()),
+      }),
       either.foldW(
         async (error) => ({
           error: await this.t.translate(error.errorMessageIdentifier),
