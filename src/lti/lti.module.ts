@@ -8,6 +8,7 @@ import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.r
 import { LtiLaunchServices } from "$/core/services/launch.services";
 import { LtiDeploymentsController } from "./deployments/deployments.controller";
 import { DeployToolService } from "./deployments/services/deploy-tool.service";
+import { FindDeploymentByIdService } from "./deployments/services/find-deployment-by-id.service";
 import { RemoveToolDeploymentService } from "./deployments/services/remove-tool-deployment.service";
 import { PlatformFactory } from "./platform.factory";
 import { LtiToolsRepository } from "./tools/lti-tools.repository";
@@ -44,6 +45,7 @@ import { LtiToolsController } from "./tools/tools.controller";
     DeployToolService,
     GetToolRegistrationDetailsService,
     RemoveToolDeploymentService,
+    FindDeploymentByIdService,
   ],
   exports: [LtiLaunchServices, Platform],
   controllers: [LtiToolsController, LtiDeploymentsController],

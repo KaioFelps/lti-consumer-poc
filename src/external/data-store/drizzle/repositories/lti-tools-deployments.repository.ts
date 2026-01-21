@@ -6,10 +6,12 @@ import { taskEither as te } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
 import { LtiToolDeployment } from "@/lti/tools/entities/lti-tool-deployment.entity";
 import { LtiToolsDeploymentsRepository } from "@/lti/tools/lti-tools-deployments.repository";
 import { DrizzleClient } from "../client";
 import mapper from "../mappers/lti-tools-deployments.mapper";
+import ltiToolsDeploymentsMapper from "../mappers/lti-tools-deployments.mapper";
 
 @Injectable()
 export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRepository {
@@ -72,6 +74,44 @@ export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRep
           ),
       ),
       te.map((_result) => {}),
+    )();
+  }
+
+  public async findById(
+    deploymentId: UUID,
+  ): Promise<
+    Either<IrrecoverableError | ResourceNotFoundError, LtiToolDeployment>
+  > {
+    return await pipe(
+      te.tryCatch(
+        () =>
+          this.drizzle
+            .getClient()
+            .select({
+              id: ltiToolDeployments.id,
+              clientId: ltiToolDeployments.clientId,
+              label: ltiToolDeployments.label,
+            })
+            .from(ltiToolDeployments)
+            .where(eq(ltiToolDeployments.id, deploymentId.toString()))
+            .limit(1),
+        (error: Error) =>
+          new IrrecoverableError(
+            `An error occurred in ${DrizzleLtiToolsDeploymentsRepository.name} when finding deployment by id.`,
+            error,
+          ),
+      ),
+      te.map((rows) => rows[0]),
+      te.chain(
+        te.fromNullable(
+          new ResourceNotFoundError({
+            errorMessageIdentifier:
+              LtiToolsDeploymentsRepository.messages.findById.resourceNotFound,
+            messageParams: { deploymentId: deploymentId.toString() },
+          }),
+        ),
+      ),
+      te.map(ltiToolsDeploymentsMapper.fromRow),
     )();
   }
 }
