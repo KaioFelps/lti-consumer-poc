@@ -62,6 +62,8 @@ ptBR["lti:tools-details:thead:deployment-label"] = "Etiqueta";
 ptBR["lti:tools-details:no-tool-deployments"] =
   "Essa ferramenta ainda não possui nenhum deployment.";
 ptBR["lti:tools-details:buttons:delete-deployment"] = "Apagar deployment";
+ptBR["lti:tools-details:buttons:see-assoc-resource-links"] =
+  "Ver links de recurso associados";
 
 ptBR["lti:deploy-tool:popup-title"] = "Realizar novo deploy";
 ptBR["lti:deploy-tool:errors:label-invalid-type"] =

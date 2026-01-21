@@ -9,6 +9,21 @@ function isUrl(value) {
 }
 
 const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
+
+const toolTableHeadings = {
+    id: await t.translate("lti:tools-details:thead:id"),
+    name: await t.translate("lti:tools-details:thead:name"),
+    description: await t.translate("lti:tools-details:thead:description"),
+    grantTypes: await t.translate("lti:tools-details:thead:grant-types"),
+    initiateUri: await t.translate("lti:tools-details:thead:initiate-uri"),
+    homePageUri: await t.translate("lti:tools-details:thead:home-page-uri"),
+    logoUri: await t.translate("lti:tools-details:thead:logo-uri"),
+    termsOfServiceUri: await t.translate("lti:tools-details:thead:tos-uri"),
+    policyUri: await t.translate("lti:tools-details:thead:policy-uri"),
+    contacts: await t.translate("lti:tools-details:thead:contacts"),
+    registeredMessages: await t.translate("lti:tools-details:thead:registered-msgs"),
+    requiredClaims: await t.translate("lti:tools-details:thead:required-claims"),
+}
 %>
 
 <main class="main">
@@ -24,18 +39,16 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
     </div>
 
     <div>
-        <button id="show-details"><%= buttons.detailsTab %></button>
-        <button id="show-deployments"><%= buttons.deploymentsTab %></button>
+        <button id="show-details"><%= await t.translate("lti:list-tools:buttons:tool-details") %></button>
+        <button id="show-deployments"><%= await t.translate("lti:list-tools:buttons:list-deployments") %></button>
     </div>
     <br>
     <hr>
     <br>
     <div id="details" style="display: hidden;">
         <div class="vertical-table">
-            <% Object
-                .keys(tool)
-                .filter(key => !toolKeysToInsertManually.includes(key))
-                .forEach((key) => {
+            <%  const keys = Object.keys(tool).filter(key => !toolKeysToInsertManually.includes(key));
+                for (const key of keys) {
             %>
                 <% if (!Array.isArray(tool[key])) { %>
                     <div class="item">
@@ -56,7 +69,7 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
                         </ul>
                     </div>
                 <% } %>
-            <% }) %>
+            <% } %>
 
             <div class="item">
                 <header><%= toolTableHeadings.logoUri %></header>
@@ -73,73 +86,82 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
                 <table class="base-table">
                     <colgroup>
                         <col style="width: 50%;" />
-                        <col style="width: 40%;" />
-                        <col style="width: 10%;" />
+                        <col style="width: 30%;" />
+                        <col style="width: 20%;" />
                     </colgroup>
                     <thead>
-                        <th><%= deploymentTableHeadings.id %></th>
-                        <th><%= deploymentTableHeadings.label %></th>
-                        <th><%= deploymentTableHeadings.actions %></th>
+                        <th><%= await t.translate("lti:tools-details:thead:deployment-id") %></th>
+                        <th><%= await t.translate("lti:tools-details:thead:deployment-label") %></th>
+                        <th><%= await t.translate("table-headings:actions") %></th>
                     </thead>
                     <tbody>
-                        <% deployments.forEach(deployment => { %>
+                        <% for (const deployment of deployments) { %>
                             <tr data-deployment-id="<%= deployment.id %>">
                                 <td><%= deployment.id %></td>
                                 <td><%= deployment.label %></td>
                                 <td>
-                                    <button
-                                        class="deployment-delete-button"
-                                        data-deployment-id="<%= deployment.id %>"
-                                        data-endpoint="<%= routes.lti.deployments.delete(deployment.id) %>"
-                                    >
-                                        <%= buttons.deleteDeployment %>
-                                    </button>
+                                    <ul>
+                                        <li>
+                                            <button
+                                                class="deployment-delete-button"
+                                                data-deployment-id="<%= deployment.id %>"
+                                                data-endpoint="<%= routes.lti.deployments.delete(deployment.id) %>"
+                                            >
+                                                <%= await t.translate("lti:tools-details:buttons:delete-deployment") %>
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <a href="<%= routes.lti.resourceLinks.list(deployment.id) %>">
+                                                <%= await t.translate("lti:tools-details:buttons:see-assoc-resource-links") %>
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </td>
                             </tr>
-                        <% }) %>
+                        <% } %>
                     </tbody>
                 </table>
                 <br>
             </div>
         <% } else { %>
             <div class="warning-alert">
-                <span><%= content.noDeploymentsMessage %></span>
+                <span><%= await t.translate("lti:tools-details:no-tool-deployments") %></span>
             </div>
         <% } %>
 
-        <button id="show-deployment-modal"><%= buttons.deploy %></button>
+        <button id="show-deployment-modal"><%= await t.translate("lti:tools-details:buttons:new-deploy") %></button>
     </div>
 
     <div id="invalid-tab" class="error-alert" style="display: hidden;">
-        <span><%= content.invalidTabSelected %></span>
+        <span><%= await t.translate("lti:tools-details:invalid-tab-selected") %></span>
     </div>
 </main>
 
 <dialog class="base-modal" id="deploy-tool-dialog">
-    <h2 style="margin-bottom: 8px;"><%= deployPopupTitle %></h2>
+    <h2 style="margin-bottom: 8px;"><%= await t.translate("lti:deploy-tool:popup-title") %></h2>
     <form action="<%= routes.lti.deployments.deploy(tool.id) %>" method="post">
         <input type="hidden" name="activeTab" class="active-tab-input" value="">
         <input type="hidden" name="withDeployModalOpen" value="true">
         <label>
-            <span><%= deploymentTableHeadings.label %></span>
+            <span><%= await t.translate("lti:tools-details:thead:deployment-label") %></span>
             <% (validationErrors?.label ?? []).forEach(error => { %>
                 <span class="error-span"><%= error.message %></span>
             <% }) %>
             <input type="text" name="label" value="<%= flash?.values?.label %>">
         </label>
-        <button type="submit"><%= buttons.confirm %></button>
-        <button id="close-deployment-modal" type="button"><%= buttons.cancel %></button>
+        <button type="submit"><%= await t.translate("buttons:confirm") %></button>
+        <button id="close-deployment-modal" type="button"><%= await t.translate("buttons:cancel") %></button>
     </form>
 </dialog>
 
 <dialog class="base-modal" id="delete-deployment-dialog">
-    <p><%= content.deleteToolWarning %></p>
+    <p><%= await t.translate("lti:delete-tool-deployment:warning-p1") %></p>
     <br>
     <form id="delete-deployment-form" method="dialog">
         <input type="hidden" name="endpoint" id="delete-deployment-form-endpoint">
         <input type="hidden" name="activeTab" class="active-tab-input" value="">
-        <button type="submit" value="confirm"><%= buttons.confirm %></button>
-        <button id="close-deployment-removal-modal" type="reset" value="cancel"><%= buttons.cancel %></button>
+        <button type="submit" value="confirm"><%= await t.translate("buttons:confirm") %></button>
+        <button id="close-deployment-removal-modal" type="reset" value="cancel"><%= await t.translate("buttons:cancel") %></button>
     </form>
 </dialog>
 
@@ -175,7 +197,7 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
                 const body = await response.json();
                 message = body.error;
             } catch (_error) {
-                message = "<%= content.unexpectedErrorMessage %>";
+                message = "<%= await t.translate('core:errors:internal-error-message') %>";
             }
 
             alert.classList.add("error-alert");
@@ -204,7 +226,7 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
 
         const noDeploymentsAlert = document.createElement("div");
         noDeploymentsAlert.classList.add("warning-alert");
-        noDeploymentsAlert.innerHTML = `<span><%= content.noDeploymentsMessage %></span>`;
+        noDeploymentsAlert.innerHTML = `<span><%= await t.translate("lti:tools-details:no-tool-deployments") %></span>`;
 
         deploymentsTable.remove();
         if (deploymentsContainer.childElementCount) {

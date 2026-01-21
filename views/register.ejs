@@ -10,64 +10,64 @@
 
     <form action="<%= routes.auth.register() %>" method="POST">
         <label>
-            <span><%= labels.username %></span>
+            <span><%= await t.translate("auth:forms:register:labels:username") %></span>
             <% (validationErrors?.username ?? []).forEach(error => { %>
                 <span class="error-span"><%= error.message %></span>
             <% }) %>
             <input type="text" name="username" value="<%= flash?.values?.username %>">
         </label>
         <label>
-            <span><%= labels.firstName %></span>
+            <span><%= await t.translate("auth:forms:register:labels:first-name") %></span>
             <% (validationErrors?.firstName ?? []).forEach(error => { %>
                 <span class="error-span"><%= error.message %></span>
             <% }) %>
             <input type="text" name="firstName" value="<%= flash?.values?.firstName %>">
         </label>
         <label>
-            <span><%= labels.surname %></span>
+            <span><%= await t.translate("auth:forms:register:labels:surname") %></span>
             <% (validationErrors?.surname ?? []).forEach(error => { %>
                 <span class="error-span"><%= error.message %></span>
             <% }) %>
             <input type="text" name="surname" value="<%= flash?.values?.surname %>">
         </label>
         <label>
-            <span><%= labels.cpf %></span>
+            <span><%= await t.translate("auth:forms:register:labels:cpf") %></span>
             <% (validationErrors?.cpf ?? []).forEach(error => { %>
                 <span class="error-span"><%= error.message %></span>
             <% }) %>
             <input type="text" name="cpf" value="<%= flash?.values?.cpf %>">
         </label>
         <label>
-            <span><%= labels.birthDate %></span>
-            <% (validationErrors?.birthDate ?? []).forEach(error => { %>
+            <span><%= await t.translate("auth:forms:register:labels:birth-date") %></span>
+            <% (validationErrors?.bsrthDate ?? []).forEach(error => { %>
                 <span class="error-span"><%= error.message %></span>
             <% }) %>
             <input type="date" name="birthDate" value="<%= flash?.values?.birthDate %>">
         </label>
         <label>
-            <span><%= labels.email %></span>
+            <span><%= await t.translate("auth:forms:register:labels:email") %></span>
             <% (validationErrors?.email ?? []).forEach(error => { %>
                 <span class="error-span"><%= error.message %></span>
             <% }) %>
             <input type="email" name="email" value="<%= flash?.values?.email %>">
         </label>
         <label>
-            <span><%= labels.gender %></span>
+            <span><%= await t.translate("auth:forms:register:labels:gender") %></span>
             <% (validationErrors?.gender ?? []).forEach(error => { %>
                 <span class="error-span"><%= error.message %></span>
             <% }) %>
             <input type="text" name="gender" value="<%= flash?.values?.gender %>">
         </label>
         <label>
-            <span><%= labels.password %></span>
+            <span><%= await t.translate("auth:forms:register:labels:password") %></span>
             <% (validationErrors?.password ?? []).forEach(error => { %>
                 <span class="error-span"><%= error.message %></span>
             <% }) %>
             <input type="text" name="password" value="<%= flash?.values?.password %>">
         </label>
 
-        <button><%= buttons.create %></button>
+        <button><%= await t.translate("auth:forms:register:buttons:create") %></button>
         <br>
-        <a href="<%= routes.auth.loginForm() %>"><%= buttons.alreadyHasAccount %></a>
+        <a href="<%= routes.auth.loginForm() %>"><%= await t.translate("auth:forms:register:buttons:already-has-account") %></a>
     </form>
 </main>

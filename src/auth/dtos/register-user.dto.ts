@@ -10,7 +10,9 @@ import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-
 
 export class RegisterUserDTO implements DTO {
   protected static readonly registerUserSchema = z.object({
-    username: z.string({ error: "auth:register-user:username-invalid-type" }),
+    username: z
+      .string({ error: "auth:register-user:username-invalid-type" })
+      .min(1, { error: "auth:register-user:username-invalid-type" }),
     password: z
       .string({ error: "auth:register-user:password-invalid-type" })
       .min(8, { error: "auth:register-user:password-too-short" })
