@@ -35,18 +35,11 @@ export class CoreValidationPipe implements PipeTransform {
           "type and that it is a concrete class instead of a type or interface.",
       );
 
-    if (
-      !("validate" in metadata.metatype.prototype) ||
-      typeof metadata.metatype.prototype.validate !== "function"
-    ) {
-      // Help developer find out whether the value type is a class
-      // which implements the DTO interface.
-      throw new Error(
-        metadata.metatype
-          ? `Class ${metadata.metatype.name} does not implement DTO interface.`
-          : "The body value has not received any class prototype to be validated. Either type the body parameter or remove `CoreValidationPipe` from the pipeline.",
-      );
-    }
+    const isDtoCompliant =
+      "validate" in metadata.metatype.prototype &&
+      typeof metadata.metatype.prototype.validate === "function";
+
+    if (!isDtoCompliant) return value;
 
     const valueAsInstanceOfADto: DTO = plainToInstance(
       metadata.metatype,
