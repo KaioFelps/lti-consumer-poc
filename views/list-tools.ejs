@@ -11,43 +11,43 @@
         <br>
     <% } %>
 
-    <%if (tools.length > 0) { %>
+    <% if (tools.length > 0) { %>
         <table class="base-table">
             <thead>
-                <th><%= tableHeadings.toolName %></th>
-                <th><%= tableHeadings.toolDetails %></th>
-                <th><%= tableHeadings.actions %></th>
+                <th><%= await t.translate("lti:list-tools:thead:tool-name") %></th>
+                <th><%= await t.translate("lti:list-tools:thead:tool-details") %></th>
+                <th><%= await t.translate("table-headings:actions") %></th>
             </thead>
-            <% tools.forEach(tool => { %>
+            <% for (const tool of tools) { %>
                 <tr>
                     <td><%= tool.name %></td>
                     <td>
                         <ul>
-                            <li><%= toolsFields.id %>: <%= tool.id %></li>
+                            <li><%= await t.translate("lti:list-tools:tool-field:id") %>: <%= tool.id %></li>
                             <% if (tool.description) { %>
-                                <li><%= toolsFields.description %>: <%= tool.description %></li>
+                                <li><%= await t.translate("lti:list-tools:tool-field:description") %>: <%= tool.description %></li>
                             <% } %>
                             <% if (tool.homePageUri) { %>
-                                <li><%= toolsFields.homePageUri %>: <%= tool.homePageUri %></li>
+                                <li><%= await t.translate("lti:list-tools:tool-field:home-page-uri") %>: <%= tool.description %></li>
                             <% } %>
                         </ul>
                     </td>
                     <td>
                         <ul>
-                            <li><a href="<%= routes.lti.tools.details(tool.id) %>#tooldeployments"><%= buttons.deployments %></a></li>
-                            <li><a href="<%= routes.lti.tools.details(tool.id) %>#tooldetails"><%= buttons.toolDetails %></a></li>
+                            <li><a href="<%= routes.lti.tools.details(tool.id) %>#tooldeployments"><%= await t.translate("lti:list-tools:buttons:list-deployments") %></a></li>
+                            <li><a href="<%= routes.lti.tools.details(tool.id) %>#tooldetails"><%= await t.translate("lti:list-tools:buttons:tool-details") %></a></li>
                         </ul>
                     </td>
                 </tr>
-            <% }) %>
+            <% } %>
         </table>
         <br/>
-        <a href="<%= routes.lti.tools.registerForm() %>"><%= buttons.registerNewTool %></a>
+        <a href="<%= routes.lti.tools.registerForm() %>"><%= await t.translate("lti:list-tools:buttons:register-new-tool") %></a>
     <% } else { %>
         <div class="warning-alert">
-            <span><%= content.noToolsMessage %></span>
+            <span><%= await t.translate("lti:list-tools:no-tools-registered") %></span>
             <br>
-            <a href="<%= routes.lti.tools.registerForm() %>"><%= buttons.registerNewTool %></a>
+            <a href="<%= routes.lti.tools.registerForm() %>"><%= await t.translate("lti:list-tools:buttons:register-new-tool") %></a>
         </div>
     <% } %>
 </main>
