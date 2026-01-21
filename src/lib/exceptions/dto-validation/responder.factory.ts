@@ -25,7 +25,7 @@ export class ApiResponder extends ExceptionFilterResponder<Body, Output> {
     ctx: HttpArgumentsHost,
     body: Body,
   ) {
-    return ctx.getResponse().status(status).json({ body, status });
+    return ctx.getResponse().status(status).json({ errors: body, status });
   }
 }
 
