@@ -10,6 +10,8 @@ import { RenderableExceptionFilterResponderFactory } from "./responder.factory";
       provide: APP_FILTER,
       useClass: RenderableExceptionFilter,
     },
+    RenderableExceptionFilter,
   ],
+  exports: [RenderableExceptionFilter],
 })
 export class RenderableExceptionModule {}

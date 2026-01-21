@@ -5,12 +5,11 @@ import { RedisStore } from "connect-redis";
 import cookieParser from "cookie-parser";
 import { config } from "dotenv";
 import { expand } from "dotenv-expand";
-import expressEjsLayout from "express-ejs-layouts";
+import { middleware as ejsLayoutsMiddleware } from "express-ejs-layouts";
 import session from "express-session";
 import { AppModule } from "./app.module";
 import { EnvironmentVars } from "./config/environment-vars";
 import { Redis } from "./external/data-store/redis/client";
-import { CoreValidationPipe } from "./lib/pipes/core-validation-pipe";
 import { loadMessageStrings } from "./message-string/loader";
 
 import "@/lib";
@@ -43,12 +42,14 @@ async function bootstrap() {
     }),
   );
 
-  app.useGlobalPipes(new CoreValidationPipe());
-
   app.useStaticAssets(join(__dirname, "../..", "public"));
   app.setBaseViewsDir(join(__dirname, "../..", "views"));
   app.setViewEngine("ejs");
-  app.use(expressEjsLayout);
+  app.set("view options", {
+    async: true,
+  });
+
+  app.use(ejsLayoutsMiddleware);
 
   await app.listen(process.env.PORT ?? 3000);
 }

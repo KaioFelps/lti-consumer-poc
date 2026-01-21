@@ -162,7 +162,7 @@ const toolKeysToInsertManually = ["registeredMessages", "logoUri"];
     close.addEventListener("click", () => dialog.close());
 
     dialog.addEventListener("close", async () => {
-        if (!dialog.returnValue === "confirm") return;
+        if (dialog.returnValue !== "confirm") return;
 
         const endpoint = endpointInput.value;
         const response = await fetch(endpoint, { method: "DELETE" });

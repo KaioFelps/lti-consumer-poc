@@ -3,6 +3,7 @@ import { SimpleExceptionPresenter } from "@/external/presenters/exceptions/simpl
 import { BaseExceptionModule } from "../exceptions/base/base-exception.module";
 import { DtoValidationModule } from "../exceptions/dto-validation/dto-validation.module";
 import { RenderableExceptionModule } from "../exceptions/renderable/renderable-exception.module";
+import { RenderableDtoValidationModule } from "../exceptions/renderable-dto-validation/renderable-dto-validation.module";
 
 @Global()
 @Module({
@@ -10,6 +11,7 @@ import { RenderableExceptionModule } from "../exceptions/renderable/renderable-e
     BaseExceptionModule,
     DtoValidationModule,
     RenderableExceptionModule,
+    RenderableDtoValidationModule,
   ],
   providers: [SimpleExceptionPresenter],
   exports: [SimpleExceptionPresenter],

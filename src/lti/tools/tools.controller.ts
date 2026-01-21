@@ -16,6 +16,7 @@ import { LtiToolPresenter } from "@/external/presenters/entities/lti-tool.presen
 import { LtiToolDeploymentPresenter } from "@/external/presenters/entities/lti-tool-deployment.presenter";
 import { LtiToolPreviewPresenter } from "@/external/presenters/entities/lti-tool-preview.presenter";
 import { HttpResponse, RequestSession } from "@/lib";
+import { RenderAsync } from "@/lib/async-render";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
@@ -112,55 +113,19 @@ export class LtiToolsController {
   }
 
   @Get()
-  @Render("list-tools")
+  @RenderAsync("list-tools")
   public async showTools() {
     const tools = pipe(
       await this.findManyToolsService.exec(),
       either.map((tools) => tools.map(LtiToolPreviewPresenter.present)),
-      either.foldW(
-        (error) => {
-          throw ExceptionsFactory.fromError(error);
-        },
-        (tools) => tools,
-      ),
+      either.getOrElseW((error) => {
+        throw ExceptionsFactory.fromError(error);
+      }),
     );
 
     return {
       tools,
       title: await this.t.translate("lti:list-tools:title"),
-      tableHeadings: {
-        toolName: await this.t.translate("lti:list-tools:thead:tool-name"),
-        toolDetails: await this.t.translate(
-          "lti:list-tools:thead:tool-details",
-        ),
-        actions: await this.t.translate("table-headings:actions"),
-      },
-      toolsFields: {
-        id: await this.t.translate("lti:list-tools:tool-field:id"),
-        name: await this.t.translate("lti:list-tools:tool-field:id"),
-        description: await this.t.translate(
-          "lti:list-tools:tool-field:description",
-        ),
-        homePageUri: await this.t.translate(
-          "lti:list-tools:tool-field:home-page-uri",
-        ),
-      },
-      buttons: {
-        deployments: await this.t.translate(
-          "lti:list-tools:buttons:list-deployments",
-        ),
-        toolDetails: await this.t.translate(
-          "lti:list-tools:buttons:tool-details",
-        ),
-        registerNewTool: await this.t.translate(
-          "lti:list-tools:buttons:register-new-tool",
-        ),
-      },
-      content: {
-        noToolsMessage: await this.t.translate(
-          "lti:list-tools:no-tools-registered",
-        ),
-      },
     };
   }
 

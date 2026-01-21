@@ -32,7 +32,7 @@
     "dotenv-expand": "12.0.1",
     "drizzle-orm": "0.45.1",
     "ejs": "3.1.10",
-    "express-ejs-layouts": "2.5.1",
+    "express-ejs-layouts": "https://github.com/KaioFelps/nest-express-ejs-layouts/releases/download/v1.0.0/nest-express-ejs-layouts-1.0.0.tgz",
     "express-session": "1.18.2",
     "fast-glob": "3.3.3",
     "fp-ts": "2.16.11",
