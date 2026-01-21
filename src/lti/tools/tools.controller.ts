@@ -49,37 +49,7 @@ export class LtiToolsController {
     return {
       title: await this.t.translate("lti:register-tool:title"),
       shallShowDockerInternalHostOption: this.vars.nodeEnv === "development",
-      labels: {
-        registrationEndpoint: await this.t.translate(
-          "lti:register-tool:labels:register-platform",
-        ),
-        useDockerInternalHost: await this.t.translate(
-          "lti:register-tool:labels:use-docker-internal-host",
-        ),
-      },
-      descriptions: {
-        useDockerInternalHost: await this.t.translate(
-          "lti:register-tool:descriptions:use-docker-internal-host",
-        ),
-      },
-      buttons: {
-        submit: await this.t.translate(
-          "lti:register-tool:buttons:register-tool",
-        ),
-      },
-      initiateRegister: {
-        endpoint: initiateRegisterEndpoint,
-        successMessage: await this.t.translate(
-          "lti:register-tool:registration-success-message",
-        ),
-        readyToGoParagraph: await this.t.translate(
-          "lti:register-tool:ready-to-go-paragraph",
-        ),
-        finishRegistrationButton: await this.t.translate(
-          "lti:register-tool:buttons:finish-registration",
-        ),
-        popupTitle: await this.t.translate("lti:register-tool:popup-title"),
-      },
+      initiateRegisterEndpoint,
     };
   }
 
@@ -89,9 +59,6 @@ export class LtiToolsController {
     @Body() dto: RegisterToolDTO,
     @Session() session: RequestSession,
   ) {
-    // const toolRegisterUri =
-    //   "https://127.0.0.1/enrol/lti/register.php?token=2d5793aad442548b34167c65adffe52e54feceb9315fb83163971d34cd15";
-
     const shouldUseDockerInternalHost =
       this.vars.nodeEnv === "development" && dto.useDockerInternalHost;
 

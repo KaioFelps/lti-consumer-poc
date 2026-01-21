@@ -12,11 +12,17 @@
     <% } %>
     <form action="<%= routes.lti.tools.register() %>" method="post">
         <label>
-            <span><%= labels.registrationEndpoint %></span>
+            <span><%= await t.translate("lti:register-tool:labels:register-platform") %></span>
             <% (validationErrors?.registrationEndpoint ?? []).forEach(error => { %>
                 <span class="error-span"><%- error.message %></span>
             <% }) %>
-            <input type="text" name="registrationEndpoint" id="register-endpoint-input" value="<%= flash?.values?.registrationEndpoint %>">
+            <input
+                type="text"
+                name="registrationEndpoint"
+                id="register-endpoint-input"
+                style="width: fit-content;"
+                value="<%= flash?.values?.registrationEndpoint %>"
+            >
         </label>
 
         <% if (shallShowDockerInternalHostOption) { %>
@@ -28,42 +34,45 @@
                     <input
                         type="checkbox"
                         name="useDockerInternalHost"
+                        style="width: fit-content;"
                         <% if (flash?.values?.useDockerInternalHost) { %>
                             checked
                         <% } %>
                     >
-                    <span><%= labels.useDockerInternalHost %></span>
+                    <span><%= await t.translate("lti:register-tool:labels:use-docker-internal-host") %></span>
                 </label>
-                <p style="font-size: 0.75rem;"><%- descriptions.useDockerInternalHost %></p>
+                <p style="font-size: 0.75rem;">
+                    <%- await t.translate("lti:register-tool:descriptions:use-docker-internal-host") %>
+                </p>
             </div>
         <% } %>
         
-        <button><%= buttons.submit %></button>
+        <button><%= await t.translate("lti:register-tool:buttons:register-tool") %></button>
     </form>
 
-    <% if (initiateRegister.endpoint) { %>
+    <% if (initiateRegisterEndpoint) { %>
         <br>
         <hr>
         <br>
         <div id="registration-container" class="alert alert-info">
-            <p><%- initiateRegister.readyToGoParagraph %></p>
+            <p><%- await t.translate("lti:register-tool:ready-to-go-paragraph") %></p>
             <button id="btn-start-registration" class="btn btn-primary">
-               <%= initiateRegister.finishRegistrationButton %>
+               <%= await t.translate("lti:register-tool:buttons:finish-registration") %>
             </button>
         </div>
 
         <div id="success-message" style="display: none;" class="success-alert">
-            <%- initiateRegister.successMessage %>
+            <%- await t.translate("lti:register-tool:registration-success-message") %>
         </div>
 
         <script>
-            const registerUrl = new URL("<%- initiateRegister.endpoint %>");
+            const registerUrl = new URL("<%- initiateRegisterEndpoint %>");
             const btn = document.getElementById('btn-start-registration');
 
             btn.addEventListener('click', () => {
                 const popup = window.open(
                     registerUrl, 
-                    '<%= initiateRegister.popupTitle %>', 
+                    '<%= await t.translate("lti:register-tool:popup-title") %>', 
                     'width=800,height=600,resizable,scrollbars'
                 );
 
