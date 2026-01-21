@@ -110,29 +110,7 @@ export class AuthController {
   @Get("register")
   @Render("register")
   public async showRegisterForm() {
-    return {
-      title: await this.t.translate("auth:forms:register:title"),
-      labels: {
-        username: await this.t.translate("auth:forms:register:labels:username"),
-        password: await this.t.translate("auth:forms:register:labels:password"),
-        cpf: await this.t.translate("auth:forms:register:labels:cpf"),
-        birthDate: await this.t.translate(
-          "auth:forms:register:labels:birth-date",
-        ),
-        firstName: await this.t.translate(
-          "auth:forms:register:labels:first-name",
-        ),
-        surname: await this.t.translate("auth:forms:register:labels:surname"),
-        email: await this.t.translate("auth:forms:register:labels:email"),
-        gender: await this.t.translate("auth:forms:register:labels:gender"),
-      },
-      buttons: {
-        create: await this.t.translate("auth:forms:register:buttons:create"),
-        alreadyHasAccount: await this.t.translate(
-          "auth:forms:register:buttons:already-has-account",
-        ),
-      },
-    };
+    return { title: await this.t.translate("auth:forms:register:title") };
   }
 
   @Public()

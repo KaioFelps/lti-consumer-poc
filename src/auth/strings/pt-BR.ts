@@ -8,7 +8,7 @@ ptBR["auth:unauthorized-access:message"] =
 ptBR["auth:unauthorized-access:title"] = "Não autorizado";
 
 ptBR["auth:register-user:username-invalid-type"] =
-  "O nome de usuário é obrigatório e deve ser formado por um conjunto de caracteres.";
+  "O nome de usuário é obrigatório.";
 
 ptBR["auth:register-user:password-invalid-type"] =
   "Sua senha é obrigatória; e deve ser um conjunto de caracteres.";
