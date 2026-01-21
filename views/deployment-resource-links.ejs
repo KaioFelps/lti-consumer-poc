@@ -1,0 +1,130 @@
+<main class="main">
+    <h1 style="margin-bottom: 8px;"><%= title %></h1>
+
+    <div id="alerts-container"></div>
+
+    <% if (resourceLinks.length > 0) { %>
+        
+    <% } else { %>
+        <div class="warning-alert"><span><%= await t.translate("lti:list-resource-links:no-resource-links-p1") %></span></div>
+    <% } %>
+
+    <button id="open-new-resource-link-dialog"><%= await t.translate("lti:list-resource-links:buttons:new-resource-link") %></button>
+</main>
+
+<dialog class="base-modal" id="new-resource-link-dialog">
+    <h1><%= await t.translate("lti:list-resource-links:new-resource-link-dialog-title") %></h1>
+    <form id="new-resource-link-form">
+        <label for="input-deploymentId">
+            <span><%= await t.translate("lti:create-resource-link:form:deployment-id") %></span>
+            <input id="input-deploymentId" name="deploymentId" type="text" readonly value="<%= deployment.id %>">
+        </label>
+        <label for="input-title">
+            <span><%= await t.translate("lti:create-resource-link:form:title") %></span>
+            <input id="input-title" name="title" type="text">
+        </label>
+        <label for="input-description">
+            <span><%= await t.translate("lti:create-resource-link:form:description") %></span>
+            <input id="input-description" name="description" type="text">
+        </label>
+        <label for="input-resourceLink">
+            <span><%= await t.translate("lti:create-resource-link:form:resource-link") %></span>
+            <input id="input-resourceLink" name="resourceLink" type="text">
+        </label>
+
+        <button type="submit" value="confirm">
+            <%= await t.translate("buttons:confirm") %>
+        </button>
+        <button type="reset" id="close-new-resource-link-dialog" value="cancel">
+            <%= await t.translate("buttons:cancel") %>
+        </button>
+    </form=>
+</dialog>
+
+<script id="new-resource-link-script" type="module">
+    const triggerBtn = document.getElementById("open-new-resource-link-dialog");
+    const closeBtn = document.getElementById("close-new-resource-link-dialog");
+    const dialog = document.getElementById("new-resource-link-dialog");
+    const form = document.getElementById("new-resource-link-form");
+    const alertsContainer = document.getElementById("alerts-container");
+
+    triggerBtn.addEventListener("click", () => {
+        dialog.showModal();
+    });
+
+    closeBtn.addEventListener("click", () => {
+        dialog.close();
+    });
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        removeAlerts();
+
+        const data = Object.fromEntries(
+            [...new FormData(event.currentTarget)].filter(([key, value]) => value !== "")
+        );
+
+        const response = await fetch("<%= routes.lti.resourceLinks.create() %>", {
+            credentials: "same-origin",
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+
+        const body = await response.json();
+
+        if (!response.ok) {
+            if ("errors" in body) return insertErrorSpans(body.errors);
+            if (response.status === 500) return insertErrorSpan(body.error, form);
+        }
+
+        handleSuccessCreation(body.message);
+    });
+
+    const successAlertClass = "new-resource-link-validation-success-alert";
+    const errorAlertClass = "new-resource-link-validation-error-alert";
+
+    function handleSuccessCreation(message) {
+        form.reset();
+        dialog.close();
+        
+        const successAlert = document.createElement("div");
+        successAlert.classList.add("success-alert", successAlertClass);
+        successAlert.innerHTML = `<span>${message}</span>`;
+
+        alertsContainer.appendChild(successAlert);
+    }
+
+    function removeAlerts() {
+        document
+            .querySelectorAll(`.${successAlertClass}, .${errorAlertClass}`)
+            .forEach(errorSpan => errorSpan.remove());
+    }
+
+    function insertErrorSpan(message, targetToInsertBefore) {
+        const errorSpan = document.createElement("div");
+        errorSpan.classList.add("error-alert", errorAlertClass);
+        errorSpan.innerHTML = `<span>${message}</span>`;
+        
+        targetToInsertBefore.insertAdjacentElement("beforebegin", errorSpan); 
+    }
+
+    function insertErrorSpans(errors) {
+        const isErrorObject = Boolean(errors) && !Array.isArray(errors) && typeof errors === "object";
+
+        if (!isErrorObject) return;
+
+        Object.entries(errors).forEach(([field, errors]) => {
+            if (Array.isArray(errors)) {
+                const input = document.querySelector(`input[name=${field}]`);
+                errors.forEach(error => insertErrorSpan(error.message, input));
+                return;
+            }
+
+            insertErrorSpans(errors);
+        })
+    }
+</script>
