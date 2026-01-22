@@ -34,5 +34,14 @@ export const Routes = {
       delete: (deploymentId: string) =>
         `/lti/deployments/${deploymentId}/delete`,
     },
+    resourceLinks: {
+      list: (deploymentId?: string) =>
+        deploymentId
+          ? `/lti/resource-links?deploymentId=${deploymentId}`
+          : `/lti/resource-links`,
+      create: () => `/lti/resource-links/create`,
+      initiateLaunch: (resourceLinkId: string) =>
+        `/lti/resource-links/${resourceLinkId}/initiate`,
+    },
   },
 } as const;

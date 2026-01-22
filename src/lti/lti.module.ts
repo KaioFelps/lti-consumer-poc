@@ -12,6 +12,7 @@ import { DeployToolService } from "./deployments/services/deploy-tool.service";
 import { FindDeploymentByIdService } from "./deployments/services/find-deployment-by-id.service";
 import { RemoveToolDeploymentService } from "./deployments/services/remove-tool-deployment.service";
 import { PlatformFactory } from "./platform.factory";
+import { LtiResourceLinksController } from "./resource-links/resource-links.controller";
 import { CreateResourceLinkService } from "./resource-links/services/create-resource-link.service";
 import { LtiToolsRepository } from "./tools/lti-tools.repository";
 import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-previews.service";
@@ -58,12 +59,20 @@ import { LtiToolsController } from "./tools/tools.controller";
     CreateResourceLinkService,
   ],
   exports: [LtiLaunchServices, Platform],
-  controllers: [LtiToolsController, LtiDeploymentsController],
+  controllers: [
+    LtiToolsController,
+    LtiDeploymentsController,
+    LtiResourceLinksController,
+  ],
 })
 export class LtiModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(...middlewares.mvc())
-      .forRoutes(LtiToolsController, LtiDeploymentsController);
+      .forRoutes(
+        LtiToolsController,
+        LtiDeploymentsController,
+        LtiResourceLinksController,
+      );
   }
 }
