@@ -43,7 +43,7 @@ export class LtiResourceLink {
   public toolId: string;
 
   protected constructor(args: Args) {
-    Object.assign({ ...args, id: args ?? generateUUID() }, args);
+    Object.assign(this, { ...args, id: args.id ?? generateUUID() });
   }
 
   public static create(args: Args) {
