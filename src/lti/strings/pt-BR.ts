@@ -79,3 +79,40 @@ ptBR["lti:delete-tool-deployment:warning-p1"] =
   "remoção de outras informações relacionadas a esta implantação.";
 ptBR["lti:delete-tool-deployment:success-message"] =
   "Deployment removido com sucesso.";
+
+ptBR["lti:list-resource-links:deployment-id-required"] =
+  "O parâmetro de busca 'toolId' é obrigatório.";
+ptBR["lti:list-resource-links:title"] = ({ deploymentLabel }) =>
+  `Links de recursos associados ao deployment ${deploymentLabel}`;
+ptBR["lti:list-resource-links:no-resource-links-p1"] =
+  "Ainda não existem links de recursos associados a este deployment.";
+ptBR["lti:list-resource-links:buttons:new-resource-link"] =
+  "Novo link de recurso";
+
+ptBR[
+  "lti:tools-deployments-repository:find-deployment-by-id:resource-not-found"
+] = ({ deploymentId }) =>
+  `Não foi possível encontrar um deployment com ID ${deploymentId}.`;
+
+ptBR["lti:create-resource-link:deployment-id-is-required-and-valid"] =
+  "O ID da implantação deve ser um UUID válido.";
+ptBR["lti:create-resource-link:resource-link-is-valid-url"] =
+  "O link do recurso precisa ser uma URL válida.";
+ptBR["lti:create-resource-link:title-must-be-string"] =
+  "O título do recurso precisa ser um texto.";
+ptBR["lti:create-resource-link:title-must-not-be-empty"] =
+  "O título do recurso não pode ser vazio.";
+ptBR["lti:create-resource-link:description-must-be-string"] =
+  "A descrição do recurso precisa ser um texto.";
+ptBR["lti:create-resource-link:description-must-not-be-empty"] =
+  "A descrição do recurso não pode estar vazia.";
+ptBR["lti:list-resource-links:new-resource-link-dialog-title"] =
+  "Criar novo link de recurso";
+ptBR["lti:create-resource-link:form:deployment-id"] = "ID de implantação";
+ptBR["lti:create-resource-link:form:resource-link"] = "Link do recurso";
+ptBR["lti:create-resource-link:form:title"] = "Título";
+ptBR["lti:create-resource-link:form:description"] = "Descrição";
+ptBR["lti:create-resource-link:success-message"] = ({ linkTitle, linkId }) =>
+  linkTitle
+    ? `Link de recurso ${linkTitle} criado com sucesso!`
+    : `Novo link de recurso criado com sucesso com ID ${linkId}.`;
