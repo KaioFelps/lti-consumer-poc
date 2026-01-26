@@ -4,7 +4,43 @@
     <div id="alerts-container"></div>
 
     <% if (resourceLinks.length > 0) { %>
-        
+        <table class="base-table">
+            <thead>
+                <th><%= await t.translate("lti:list-resource-links:thead:link-id") %></th>
+                <th><%= await t.translate("lti:list-resource-links:thead:link-title") %></th>
+                <th><%= await t.translate("lti:list-resource-links:thead:link-description") %></th>
+                <th><%= await t.translate("lti:list-resource-links:thead:link-url") %></th>
+                <th><%= await t.translate("lti:list-resource-links:thead:link-placements") %></th>
+                <th><%= await t.translate("table-headings:actions") %></th>
+            </thead>
+            <tbody>
+                <% resourceLinks.forEach((link) => { %>
+                    <tr>
+                        <td><%= link.id %></td>
+                        <td><%= link.title ?? "-" %></td>
+                        <td><%= link.description ?? "-" %></td>
+                        <td><%= link.url %></td>
+                        <td>
+                            <% if (link.placements?.length > 0) { %>
+                                <ul>
+                                    <% link.placements.forEach((placement) => { %>
+                                        <li><%= placement %></li>
+                                    <% }) %>
+                                </ul>
+                            <% } else { %>
+                                <div class="warning-alert" style="margin-bottom: 0;">
+                                    <%= noMessagePlacementsMsg %>
+                                </div>
+                            <% } %>
+                        </td>
+                        <td>
+                            <button id=""><%= buttonRemoveMsg %></button>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+        <br>
     <% } else { %>
         <div class="warning-alert"><span><%= await t.translate("lti:list-resource-links:no-resource-links-p1") %></span></div>
     <% } %>
