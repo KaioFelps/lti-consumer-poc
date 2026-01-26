@@ -11,4 +11,6 @@ export const ptBR: MessageStringTranslationMap = {
 
   "buttons:cancel": "Cancelar",
   "buttons:confirm": "Confirmar",
+  "buttons:add": "Adicionar",
+  "buttons:remove": "Remover",
 };

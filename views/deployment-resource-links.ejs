@@ -4,40 +4,14 @@
     <div id="alerts-container"></div>
 
     <% if (resourceLinks.length > 0) { %>
-        <table class="base-table">
+        <table id="resource-links-table" class="base-table">
             <thead>
                 <th><%= await t.translate("lti:list-resource-links:thead:link-id") %></th>
                 <th><%= await t.translate("lti:list-resource-links:thead:link-title") %></th>
                 <th><%= await t.translate("lti:list-resource-links:thead:link-description") %></th>
-                <th><%= await t.translate("lti:list-resource-links:thead:link-url") %></th>
-                <th><%= await t.translate("lti:list-resource-links:thead:link-placements") %></th>
                 <th><%= await t.translate("table-headings:actions") %></th>
             </thead>
             <tbody>
-                <% resourceLinks.forEach((link) => { %>
-                    <tr>
-                        <td><%= link.id %></td>
-                        <td><%= link.title ?? "-" %></td>
-                        <td><%= link.description ?? "-" %></td>
-                        <td><%= link.url %></td>
-                        <td>
-                            <% if (link.placements?.length > 0) { %>
-                                <ul>
-                                    <% link.placements.forEach((placement) => { %>
-                                        <li><%= placement %></li>
-                                    <% }) %>
-                                </ul>
-                            <% } else { %>
-                                <div class="warning-alert" style="margin-bottom: 0;">
-                                    <%= noMessagePlacementsMsg %>
-                                </div>
-                            <% } %>
-                        </td>
-                        <td>
-                            <button id=""><%= buttonRemoveMsg %></button>
-                        </td>
-                    </tr>
-                <% }) %>
             </tbody>
         </table>
         <br>
@@ -76,6 +50,43 @@
         </button>
     </form=>
 </dialog>
+
+<script id="handle-resource-links-table-refreshment" type="module">
+    const tbody = document.getElementById("resource-links-table").querySelector("tbody");
+
+    const resourceLinks = JSON.parse(`<%- JSON.stringify(resourceLinks) %>`);
+
+    function prepareRow(link) {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${link.id}</td>
+            <td>${link.title ?? "-"}</td>
+            <td>${link.description ?? "-"}</td>
+            <td>
+                <button id=""><%= await t.translate("buttons:remove") %></button>
+            </td>`;
+
+        return row;
+    }
+
+    function appendResourceLinkToTable(link) {
+        const row = prepareRow(link);
+        tbody.appendChild(row);
+    }
+
+    function refreshTable() {
+        tbody.innerHTML = resourceLinks.map(prepareRow).map(row => row.outerHTML).join("\n");
+    }
+
+    window.addEventListener("load", refreshTable);
+
+    window.addEventListener("push-resource-links", (event) => {
+        const resourceLink = event.detail;
+        resourceLinks.push(resourceLink);
+        refreshTable();
+    })
+</script>
 
 <script id="new-resource-link-script" type="module">
     const triggerBtn = document.getElementById("open-new-resource-link-dialog");
@@ -117,14 +128,16 @@
             if (response.status === 500) return insertErrorSpan(body.error, form);
         }
 
-        handleSuccessCreation(body.message);
+        handleSuccessCreation(body.message, body.ltiResourceLink);
     });
 
     const successAlertClass = "new-resource-link-validation-success-alert";
     const errorAlertClass = "new-resource-link-validation-error-alert";
 
-    function handleSuccessCreation(message) {
-        form.reset();
+    function handleSuccessCreation(message, newResourceLink) {
+        const formResetEvent = new CustomEvent("new-resource-link-form-reset");
+        window.dispatchEvent(formResetEvent);
+
         dialog.close();
         
         const successAlert = document.createElement("div");
@@ -132,6 +145,14 @@
         successAlert.innerHTML = `<span>${message}</span>`;
 
         alertsContainer.appendChild(successAlert);
+
+        const updateResourceLinkEvent = new CustomEvent("push-resource-links", {
+            detail: newResourceLink,
+            bubbles: true,
+            composed: true,
+            cancelable: true,
+        });
+        window.dispatchEvent(updateResourceLinkEvent);
     }
 
     function removeAlerts() {
@@ -163,4 +184,8 @@
             insertErrorSpans(errors);
         })
     }
+
+    window.addEventListener("new-resource-link-form-reset", () => {
+        form.reset();
+    })
 </script>

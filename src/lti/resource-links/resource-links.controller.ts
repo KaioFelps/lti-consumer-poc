@@ -100,6 +100,7 @@ export class LtiResourceLinksController {
       te.chain((params) =>
         teFromPromise(() => this.createResourceLinkService.exec(params)),
       ),
+      te.map((link) => presentLtiResourceLink(link, this.platform)),
       te.getOrElse((error) => {
         throw ExceptionsFactory.fromError(error);
       }),

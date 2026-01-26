@@ -88,6 +88,14 @@ ptBR["lti:list-resource-links:no-resource-links-p1"] =
   "Ainda não existem links de recursos associados a este deployment.";
 ptBR["lti:list-resource-links:buttons:new-resource-link"] =
   "Novo link de recurso";
+ptBR["lti:list-resource-links:thead:link-id"] = "ID";
+ptBR["lti:list-resource-links:thead:link-url"] = "URL";
+ptBR["lti:list-resource-links:thead:link-title"] = "Título";
+ptBR["lti:list-resource-links:thead:link-description"] = "Descrição";
+ptBR["lti:list-resource-links:thead:link-placements"] =
+  "Posicionamentos do Link";
+ptBR["lti:list-resource-links:no-message-placements"] =
+  "Não há posicionamentos definidos para este tipo de link.";
 
 ptBR[
   "lti:tools-deployments-repository:find-deployment-by-id:resource-not-found"
@@ -116,3 +124,13 @@ ptBR["lti:create-resource-link:success-message"] = ({ linkTitle, linkId }) =>
   linkTitle
     ? `Link de recurso ${linkTitle} criado com sucesso!`
     : `Novo link de recurso criado com sucesso com ID ${linkId}.`;
+ptBR["lti:create-resource-link:custom-parameters-key-must-be-string"] =
+  "As chaves dos parâmetros customizados devem ser um um texto.";
+ptBR["lti:create-resource-link:custom-parameters-value-must-be-string"] =
+  "Os valores dos parâmetros customizados devem ser textos.";
+ptBR["lti:create-resource-link:custom-parameters-must-be-a-key-value-map"] =
+  "Os parâmetros customizados devem ser um objeto chave-valor.";
+
+ptBR["lti:new-resource-link-param:form:title"] = "Parâmetros do link";
+ptBR["lti:new-resource-link-param:form:param-key"] = "Chave do parâmetro";
+ptBR["lti:new-resource-link-param:form:param-key"] = "Valor do parâmetro";
