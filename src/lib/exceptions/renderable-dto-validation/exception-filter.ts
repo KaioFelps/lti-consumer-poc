@@ -33,8 +33,6 @@ export class RenderableDtoValidationExceptionFilter implements ExceptionFilter {
       this.t,
     );
 
-    console.log(errors);
-
     const renderableError = new RenderableError(
       {
         view: exception.view,
@@ -51,8 +49,6 @@ export class RenderableDtoValidationExceptionFilter implements ExceptionFilter {
       renderableError,
       status,
     );
-
-    console.log("excecao renderizavel");
 
     return this.renderableExceptionFilter.catch(renderableException, host);
   }

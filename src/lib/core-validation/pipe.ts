@@ -61,7 +61,6 @@ export class CoreValidationPipe implements PipeTransform {
       throw new DTOValidationException(validationErrors);
     }
 
-    console.log("lançando renderizavel");
     throw new RenderableDtoValidationException(
       validationErrors,
       config.renderErrorsWithView,
