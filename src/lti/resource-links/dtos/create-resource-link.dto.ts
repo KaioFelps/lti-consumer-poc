@@ -26,17 +26,15 @@ export class CreateResourceLinkDto implements DTO {
       })
       .optional(),
     customParameters: z
-      .object(
-        z.record(
-          z.string({
-            error:
-              "lti:create-resource-link:custom-parameters-key-must-be-string",
-          }),
-          z.string({
-            error:
-              "lti:create-resource-link:custom-parameters-value-must-be-string",
-          }),
-        ),
+      .record(
+        z.string({
+          error:
+            "lti:create-resource-link:custom-parameters-key-must-be-string",
+        }),
+        z.string({
+          error:
+            "lti:create-resource-link:custom-parameters-value-must-be-string",
+        }),
         {
           error:
             "lti:create-resource-link:custom-parameters-must-be-a-key-value-map",
