@@ -14,6 +14,7 @@ import { RemoveToolDeploymentService } from "./deployments/services/remove-tool-
 import { PlatformFactory } from "./platform.factory";
 import { LtiResourceLinksController } from "./resource-links/resource-links.controller";
 import { CreateResourceLinkService } from "./resource-links/services/create-resource-link.service";
+import { DeleteResourceLinkService } from "./resource-links/services/delete-resource-link.service";
 import { LtiToolsRepository } from "./tools/lti-tools.repository";
 import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-previews.service";
 import { FindToolByIdService } from "./tools/services/find-tool-by-id.service";
@@ -57,6 +58,7 @@ import { LtiToolsController } from "./tools/tools.controller";
     RemoveToolDeploymentService,
     FindDeploymentByIdService,
     CreateResourceLinkService,
+    DeleteResourceLinkService,
   ],
   exports: [LtiLaunchServices, Platform],
   controllers: [

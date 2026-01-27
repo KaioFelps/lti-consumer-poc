@@ -42,6 +42,8 @@ export const Routes = {
       create: () => `/lti/resource-links/create`,
       initiateLaunch: (resourceLinkId: string) =>
         `/lti/resource-links/${resourceLinkId}/initiate`,
+      delete: (resourceLinkId: string) =>
+        `/lti/resource-links/${resourceLinkId}`,
     },
   },
 } as const;

@@ -1,4 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
+import { UUID } from "common/src/types/uuid";
 import { ltiResourceLinks, ltiToolDeployments } from "drizzle/schema";
 import { and, eq, inArray, SQLWrapper } from "drizzle-orm";
 import { taskEither as te } from "fp-ts";
@@ -76,6 +77,26 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
         (error: Error) =>
           new IrrecoverableError(
             `Error occurred in ${DrizzleLtiResourceLinksRepository.name} when creating resource link.`,
+            error,
+          ),
+      ),
+    )();
+  }
+
+  public async deleteById(
+    resourceLinkId: UUID,
+  ): Promise<Either<IrrecoverableError, void>> {
+    return await pipe(
+      te.tryCatch(
+        async () => {
+          await this.drizzle
+            .getClient()
+            .delete(ltiResourceLinks)
+            .where(eq(ltiResourceLinks.id, resourceLinkId.toString()));
+        },
+        (error: Error) =>
+          new IrrecoverableError(
+            `An error occurred in ${DrizzleLtiResourceLinksRepository.name} when deleting a resource link by id.`,
             error,
           ),
       ),

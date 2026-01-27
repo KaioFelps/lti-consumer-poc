@@ -16,7 +16,7 @@
         </table>
         <br>
     <% } else { %>
-        <div class="warning-alert"><span><%= await t.translate("lti:list-resource-links:no-resource-links-p1") %></span></div>
+        <div id="no-resource-links-warning" class="warning-alert"><span><%= await t.translate("lti:list-resource-links:no-resource-links-p1") %></span></div>
     <% } %>
 
     <button id="open-new-resource-link-dialog"><%= await t.translate("lti:list-resource-links:buttons:new-resource-link") %></button>
@@ -75,10 +75,92 @@
     </button>
 </dialog>
 
-<script id="handle-resource-links-table-refreshment" type="module">
-    const tbody = document.getElementById("resource-links-table").querySelector("tbody");
+<dialog class="base-modal" id="delete-resource-link-dialog">
+    <p><%= await t.translate("lti:delete-resource-link:warning-p1") %></p>
+    <br>
+    <form id="delete-resource-link-form" method="dialog">
+        <input type="hidden" name="endpoint" id="delete-resource-link-form-id-input">
+        <input type="hidden" name="activeTab" class="active-tab-input" value="">
+        <button type="submit" value="confirm"><%= await t.translate("buttons:confirm") %></button>
+        <button id="close-resource-link-removal-modal" type="reset" value="cancel"><%= await t.translate("buttons:cancel") %></button>
+    </form>
+</dialog>
 
-    const resourceLinks = JSON.parse(`<%- JSON.stringify(resourceLinks) %>`);
+<script id="delete-resource-link-dialog-script" type="module">
+    const alertsContainer = document.getElementById("alerts-container");
+    const deleteDialog = document.getElementById("delete-resource-link-dialog");
+    const close = document.getElementById("close-resource-link-removal-modal");
+    const idInput = document.getElementById("delete-resource-link-form-id-input");
+
+    function showRemovalDialog(event) {
+        const trigger = event.target;
+        idInput.value = trigger.value;
+        deleteDialog.showModal();
+    }
+
+    function setupTriggers() {
+        const triggers = document
+            .querySelectorAll(".resource-link-delete-button")
+            .forEach(trigger => trigger.addEventListener("click", showRemovalDialog));
+    }
+
+    close.addEventListener("click", () => deleteDialog.close());
+
+    deleteDialog.addEventListener("close", async () => {
+        if (deleteDialog.returnValue !== "confirm") return;
+
+        const resourceLinkId = idInput.value;
+        const endpoint = `<%= routes.lti.resourceLinks.delete(":id") %>`.replace(":id", resourceLinkId);
+        const response = await fetch(endpoint, { method: "DELETE" });
+
+        const alert = document.createElement("div");
+
+        if (!response.ok) {
+            let message;
+            try {
+                const body = await response.json();
+                message = body.error;
+            } catch (_error) {
+                message = "<%= await t.translate('core:errors:internal-error-message') %>";
+            }
+
+            alert.classList.add("error-alert");
+            alert.innerHTML = `<span>${message}</span>`;
+        }
+        else {
+            const { successMessage, resourceLinkId } = await response.json();
+            alert.classList.add("success-alert");
+            alert.innerHTML = `<span>${successMessage}</span>`;
+
+            const deletedResourceLinkEvent = new CustomEvent("remove-resource-link", {
+                detail: resourceLinkId,
+                bubbles: true,
+                cancelable: true,
+                composed: true,
+            });
+
+            window.dispatchEvent(deletedResourceLinkEvent);
+        }
+
+        alertsContainer.innerHTML = "";
+        alertsContainer.appendChild(alert);
+    });
+
+    window.addEventListener("table-refresh", () => {
+        setupTriggers();
+    });
+</script>
+
+<script id="handle-resource-links-table-refreshment" type="module">
+    const alertsContainer = document.getElementById("alerts-container");
+    let table = document.getElementById("resource-links-table");
+    let warningAlert = document.getElementById("no-resource-links-warning");
+    let tbody = table?.querySelector("tbody");
+
+    ensureWarningAlertExists();
+    ensureTableExists();
+
+    const resourceLinks = new Map(JSON.parse(`<%- JSON.stringify(resourceLinks) %>`).map((link) => [link.id, link]));
 
     function prepareRow(link) {
         const row = document.createElement("tr");
@@ -88,7 +170,7 @@
             <td>${link.title ?? "-"}</td>
             <td>${link.description ?? "-"}</td>
             <td>
-                <button id=""><%= await t.translate("buttons:remove") %></button>
+                <button class="resource-link-delete-button" value="${link.id}"><%= await t.translate("buttons:remove") %></button>
             </td>`;
 
         return row;
@@ -100,16 +182,72 @@
     }
 
     function refreshTable() {
-        tbody.innerHTML = resourceLinks.map(prepareRow).map(row => row.outerHTML).join("\n");
+        const rows = resourceLinks
+            .values()
+            .toArray()
+            .map(prepareRow)
+            .map(row => row.outerHTML)
+            .join("\n");
+
+        if (rows) {
+            warningAlert?.remove();
+            ensureTableExists();
+            tbody.innerHTML = rows;
+        } else {
+            table?.remove();
+            ensureWarningAlertExists();
+        }
+        
+        const tableRefreshEvent = new CustomEvent("table-refresh");
+        window.dispatchEvent(tableRefreshEvent);
+    }
+
+    function ensureWarningAlertExists() {
+        if (warningAlert?.isConnected) return;
+
+        warningAlert = document.createElement("div");
+        warningAlert.id = "no-resource-links-warning";
+        warningAlert.classList = "warning-alert";
+        warningAlert.innerHTML = `<span><%= await t.translate("lti:list-resource-links:no-resource-links-p1") %></span>`;
+        warningAlert.style.display = "hidden";
+
+        alertsContainer.insertAdjacentElement("afterend", warningAlert);
+    }
+
+    function ensureTableExists() {
+        if (table?.isConnected) return;
+
+        table = document.createElement("table");
+        table.id = "resource-links-table";
+        table.classList = "base-table";
+        table.innerHTML =
+            `<thead>
+                <th><%= await t.translate("lti:list-resource-links:thead:link-id") %></th>
+                <th><%= await t.translate("lti:list-resource-links:thead:link-title") %></th>
+                <th><%= await t.translate("lti:list-resource-links:thead:link-description") %></th>
+                <th><%= await t.translate("table-headings:actions") %></th>
+            </thead>
+            <tbody>
+            </tbody>`;
+        table.style.display = "hidden";
+        
+        alertsContainer.insertAdjacentElement("afterend", table);
+        tbody = table.querySelector("tbody");
     }
 
     window.addEventListener("load", refreshTable);
 
     window.addEventListener("push-resource-links", (event) => {
         const resourceLink = event.detail;
-        resourceLinks.push(resourceLink);
+        resourceLinks.set(resourceLink.id, resourceLink);
         refreshTable();
-    })
+    });
+
+    window.addEventListener("remove-resource-link", (event) => {
+        const resourceLinkId = event.detail;
+        resourceLinks.delete(resourceLinkId);
+        refreshTable();
+    });
 </script>
 
 <script id="new-resource-link-parameters-script" type="module">
@@ -197,7 +335,6 @@
     const dialog = document.getElementById("new-resource-link-dialog");
     const form = document.getElementById("new-resource-link-form");
     const alertsContainer = document.getElementById("alerts-container");
-    const resourceLinksTableBody = document.getElementById("resource-links-table").querySelector("tbody");
 
     triggerBtn.addEventListener("click", () => {
         dialog.showModal();
@@ -236,7 +373,7 @@
 
         if (!response.ok) {
             if ("errors" in body) return insertErrorSpans(body.errors);
-            if (response.status === 500) return insertErrorSpan(body.error, form);
+            if (response.status === 500) return insertErrorSpan(body.error ?? `<%= await t.translate("core:errors:internal-error-message") %>`, form);
         }
 
         handleSuccessCreation(body.message, body.ltiResourceLink);
@@ -255,6 +392,7 @@
         successAlert.classList.add("success-alert", successAlertClass);
         successAlert.innerHTML = `<span>${message}</span>`;
 
+        alertsContainer.innerHTML = "";
         alertsContainer.appendChild(successAlert);
 
         const updateResourceLinkEvent = new CustomEvent("push-resource-links", {

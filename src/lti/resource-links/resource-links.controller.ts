@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query, Render } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  Render,
+} from "@nestjs/common";
 import { either as e, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
@@ -16,6 +25,7 @@ import { FindDeploymentByIdService } from "../deployments/services/find-deployme
 import { CreateResourceLinkDto } from "./dtos/create-resource-link.dto";
 import { ListResourceLinksQueryDto } from "./dtos/list-query.dto";
 import { CreateResourceLinkService } from "./services/create-resource-link.service";
+import { DeleteResourceLinkService } from "./services/delete-resource-link.service";
 
 @Mvc()
 @Controller("/lti/resource-links")
@@ -26,6 +36,7 @@ export class LtiResourceLinksController {
     private resourceLinkServices: LtiResourceLinkServices<IrrecoverableError>,
     private findDeploymentService: FindDeploymentByIdService,
     private createResourceLinkService: CreateResourceLinkService,
+    private deleteResourceLinkService: DeleteResourceLinkService,
   ) {}
 
   @Get(":id/initiate")
@@ -113,6 +124,24 @@ export class LtiResourceLinksController {
         { linkTitle: ltiResourceLink.title, linkId: ltiResourceLink.id },
       ),
       ltiResourceLink,
+    };
+  }
+
+  @Rest()
+  @Delete(":id")
+  public async delete(@Param("id") resourceLinkId: string) {
+    const result = await this.deleteResourceLinkService.exec({
+      resourceLinkId,
+    });
+
+    if (e.isLeft(result)) throw ExceptionsFactory.fromError(result.left);
+
+    return {
+      resourceLinkId,
+      successMessage: await this.t.translate(
+        "lti:delete-resource-link:success-message",
+        { resourceLinkId },
+      ),
     };
   }
 }
