@@ -68,14 +68,10 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
     return await pipe(
       te.tryCatch(
         async () => {
-          await this.drizzle.getClient().insert(ltiResourceLinks).values({
-            deploymentId: resourceLink.deploymentId,
-            id: resourceLink.id,
-            resourceUrl: resourceLink.resource.toString(),
-            contextId: resourceLink.contextId,
-            description: resourceLink.description,
-            title: resourceLink.title,
-          });
+          await this.drizzle
+            .getClient()
+            .insert(ltiResourceLinks)
+            .values(ltiResourceLinksMapper.intoRow(resourceLink));
         },
         (error: Error) =>
           new IrrecoverableError(

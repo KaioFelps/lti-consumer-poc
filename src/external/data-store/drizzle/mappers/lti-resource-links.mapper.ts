@@ -21,6 +21,11 @@ type LtiResourceLinkRow = BuildQueryResult<
   typeof requiredQueryConfig
 >;
 
+type LtiResourceLinkPlainRow = Omit<
+  LtiResourceLinkRow,
+  "context" | "deployment"
+>;
+
 const requiredQueryConfig = {
   with: {
     context: { columns: { id: true } },
@@ -28,20 +33,33 @@ const requiredQueryConfig = {
   },
 } as const satisfies LtiToolsQueryConfig;
 
-function fromRow(link: LtiResourceLinkRow): LtiResourceLink {
-  return LtiResourceLink.create({
+function intoRow(link: LtiResourceLink): LtiResourceLinkPlainRow {
+  return {
+    deploymentId: link.deploymentId,
     id: link.id,
-    deploymentId: link.deployment.id,
-    resource: new URL(link.resourceUrl),
-    toolId: link.deployment.tool.id,
-    contextId: link.context?.id,
-    description: link.description ?? undefined,
-    title: link.title ?? undefined,
-    customParameters: link.customParameters ?? {},
+    resourceUrl: link.resource.toString(),
+    contextId: link.contextId ?? null,
+    description: link.description ?? null,
+    title: link.title ?? null,
+    customParameters: link.customParameters,
+  };
+}
+
+function fromRow(row: LtiResourceLinkRow): LtiResourceLink {
+  return LtiResourceLink.create({
+    id: row.id,
+    deploymentId: row.deployment.id,
+    resource: new URL(row.resourceUrl),
+    toolId: row.deployment.tool.id,
+    contextId: row.context?.id,
+    description: row.description ?? undefined,
+    title: row.title ?? undefined,
+    customParameters: row.customParameters ?? {},
   });
 }
 
 export default {
+  intoRow,
   fromRow,
   requiredQueryConfig,
 };

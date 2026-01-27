@@ -1,4 +1,4 @@
-import { Expose } from "class-transformer";
+import { Expose, Transform } from "class-transformer";
 import { UUID } from "common/src/types/uuid";
 import { either } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
@@ -56,6 +56,7 @@ export class CreateResourceLinkDto implements DTO {
   description?: string;
 
   @Expose()
+  @Transform(({ obj }) => obj.customParameters)
   customParameters?: Record<string, string>;
 
   validate(): Either<ValidationErrors, void> {
