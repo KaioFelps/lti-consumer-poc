@@ -94,7 +94,7 @@ function intoRow(tool: ToolRecord): LtiToolRowWithoutDeployments {
   return {
     id: tool.id,
     claims: tool.ltiConfiguration.claims.join(" "),
-    customParameters: tool.ltiConfiguration.customParameters,
+    customParameters: tool.ltiConfiguration.customParameters ?? {},
     domain: tool.ltiConfiguration.domain,
     grantTypes: tool.grantTypes.join(" "),
     initiateUri: tool.uris.initiate,

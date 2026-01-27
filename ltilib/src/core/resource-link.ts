@@ -41,6 +41,12 @@ export class LtiResourceLink {
    * The identifier of the LTI Tool this resource link belongs to.
    */
   public toolId: string;
+  /**
+   * A record of custom parameters related to this resource link instance.
+   *
+   * @see {@link https://www.imsglobal.org/spec/lti-dr/v1p0#lti-configuration-0}
+   */
+  public customParameters: Record<string, string>;
 
   protected constructor(args: Args) {
     Object.assign(this, { ...args, id: args.id ?? generateUUID() });

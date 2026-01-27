@@ -67,7 +67,7 @@ export const ltiTools = pgTable("lti_tools", {
     .references(() => oauthClients.id, { onDelete: "cascade" }),
   description: varchar(),
   domain: varchar().notNull(),
-  customParameters: jsonb("custom_parameters"),
+  customParameters: jsonb("custom_parameters").$type<Record<string, string>>(),
   responseTypes: varchar("response_types").notNull(),
   initiateUri: varchar("initiate_uri").notNull(),
   targetLinkUri: varchar("target_link_uri").notNull(),
@@ -120,7 +120,8 @@ export const ltiToolSupportedMessages = pgTable(
     label: varchar(),
     iconUri: varchar("icon_uri"),
     placements: varchar(),
-    customParameters: jsonb("custom_parameters"),
+    customParameters:
+      jsonb("custom_parameters").$type<Record<string, string>>(),
   },
   (table) => [primaryKey({ columns: [table.clientId, table.type] })],
 );
@@ -165,6 +166,7 @@ export const ltiResourceLinks = pgTable("lti_resource_link", {
   resourceUrl: varchar("resource_url").notNull(),
   title: varchar(), // nullable
   description: varchar(), // nullable
+  customParameters: jsonb("custom_parameters").$type<Record<string, string>>(),
 });
 
 /**

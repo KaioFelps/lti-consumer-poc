@@ -25,6 +25,24 @@ export class CreateResourceLinkDto implements DTO {
         error: "lti:create-resource-link:description-must-not-be-empty",
       })
       .optional(),
+    customParameters: z
+      .object(
+        z.record(
+          z.string({
+            error:
+              "lti:create-resource-link:custom-parameters-key-must-be-string",
+          }),
+          z.string({
+            error:
+              "lti:create-resource-link:custom-parameters-value-must-be-string",
+          }),
+        ),
+        {
+          error:
+            "lti:create-resource-link:custom-parameters-must-be-a-key-value-map",
+        },
+      )
+      .optional(),
   });
 
   @Expose()
@@ -38,6 +56,9 @@ export class CreateResourceLinkDto implements DTO {
 
   @Expose()
   description?: string;
+
+  @Expose()
+  customParameters?: Record<string, string>;
 
   validate(): Either<ValidationErrors, void> {
     const { success, data, error } =

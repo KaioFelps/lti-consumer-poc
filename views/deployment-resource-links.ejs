@@ -42,13 +42,37 @@
             <input id="input-resourceLink" name="resourceLink" type="text">
         </label>
 
-        <button type="submit" value="confirm">
-            <%= await t.translate("buttons:confirm") %>
-        </button>
-        <button type="reset" id="close-new-resource-link-dialog" value="cancel">
-            <%= await t.translate("buttons:cancel") %>
-        </button>
-    </form=>
+        <input type="hidden" id="resource-link-parameters-input" name="customParameters" value="{}"></input>
+    </form>
+
+    <form
+        id="new-resource-link-parameter-form"
+        style="padding: 8px; border: 2px solid;"
+    >
+        <h2><%= await t.translate("lti:new-resource-link-param:form:title") %></h2>
+        <ul id="resource-link-parameters" style="border-block: 1px solid black; margin-block: 8px; list-style: none;"></ul>
+        <label>
+            <span>
+                <%= await t.translate("lti:new-resource-link-param:form:param-key") %>
+            </span>
+            <input id="resource-link-parameters-parameter-key" name="key" type="text">
+        </label>
+        <label>
+            <span>
+                <%= await t.translate("lti:new-resource-link-param:form:param-key") %>
+            </span>
+            <input id="resource-link-parameters-parameter-value" name="value" type="text">
+        </label>
+        <button type="submit" form="new-resource-link-parameter-form"><%= await t.translate("buttons:add") %></button>
+    </form>
+    <br>
+
+    <button form="new-resource-link-form" type="submit" value="confirm">
+        <%= await t.translate("buttons:confirm") %>
+    </button>
+    <button form="new-resource-link-form" type="reset" id="close-new-resource-link-dialog" value="cancel">
+        <%= await t.translate("buttons:cancel") %>
+    </button>
 </dialog>
 
 <script id="handle-resource-links-table-refreshment" type="module">
@@ -88,12 +112,92 @@
     })
 </script>
 
+<script id="new-resource-link-parameters-script" type="module">
+    const newResourceLinkForm = document.getElementById("new-resource-link-form");
+    const newResourceLinkParameterForm = document.getElementById("new-resource-link-parameter-form");
+
+    const parametersContainer = document.getElementById("resource-link-parameters");
+    const parametersInputsContainer = document.getElementById("resource-link-parameters-input");
+
+    const parameters = new Map();
+
+    newResourceLinkParameterForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const { key, value } = Object.fromEntries(new FormData(form));
+
+        if (!key || !value) return;
+
+        parameters.set(key, value);
+        form.reset();
+
+        updateParametersDisplay();
+        updateParametersInput();
+    })
+
+    function removeByKey(event) {
+        const key = event.target.value;
+        parameters.delete(key);
+        updateParametersDisplay();
+        updateParametersInput();
+    }
+
+    function attachEventsToParametersRemovalButtons() {
+        document
+            .querySelectorAll(".remove-resource-link-parameter-by-key")
+            .forEach((button) => button.addEventListener("click", removeByKey));
+    }
+
+    function detachEventsFromParametersRemovalButtons() {
+        document
+            .querySelectorAll(".remove-resource-link-parameter-by-key")
+            .forEach((button) => button.removeEventListener("click", removeByKey));
+    }
+
+    function updateParametersDisplay() {
+        detachEventsFromParametersRemovalButtons();
+        parametersContainer.innerHTML = "";
+
+        for (const [key, value] of parameters.entries()) {
+            const parameterCard = document.createElement("li");
+            parameterCard.style = "display: flex; gap: 8px; margin-block: 2px;";
+
+            parameterCard.innerHTML =
+                `<div style="flex: 1;">
+                    <span>${key}: </span><span>${value}</span>
+                </div>
+                <div>
+                    <button class="remove-resource-link-parameter-by-key" value="${key}"><%= await t.translate("buttons:remove") %></button>
+                </div>`;
+
+            parametersContainer.appendChild(parameterCard);
+        }
+
+        attachEventsToParametersRemovalButtons();
+    }
+
+    function updateParametersInput() {
+        const stringifiedParameters = JSON.stringify(Object.fromEntries(parameters));
+        parametersInputsContainer.value = stringifiedParameters;
+    }
+
+    updateParametersDisplay();
+    updateParametersInput();
+
+    window.addEventListener("new-resource-link-form-reset", () => {
+        parameters.clear();
+        updateParametersDisplay();
+        updateParametersInput();
+    });
+</script>
+
 <script id="new-resource-link-script" type="module">
     const triggerBtn = document.getElementById("open-new-resource-link-dialog");
     const closeBtn = document.getElementById("close-new-resource-link-dialog");
     const dialog = document.getElementById("new-resource-link-dialog");
     const form = document.getElementById("new-resource-link-form");
     const alertsContainer = document.getElementById("alerts-container");
+    const resourceLinksTableBody = document.getElementById("resource-links-table").querySelector("tbody");
 
     triggerBtn.addEventListener("click", () => {
         dialog.showModal();
@@ -110,6 +214,13 @@
         const data = Object.fromEntries(
             [...new FormData(event.currentTarget)].filter(([key, value]) => value !== "")
         );
+
+        try {
+            data.customParameters = JSON.parse(data.customParameters);
+        } catch (e) {
+            console.error("Failed to serialize custom parameters.", e);
+            delete data.customParameters;
+        }
 
         const response = await fetch("<%= routes.lti.resourceLinks.create() %>", {
             credentials: "same-origin",

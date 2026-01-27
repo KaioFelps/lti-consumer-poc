@@ -50,6 +50,13 @@
       "when": 1768362479708,
       "tag": "0006_add_label_to_lti_tool_deployments",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1769472553637,
+      "tag": "0007_add_custom_parameters_field_to_resource_links",
+      "breakpoints": true
     }
   ]
 }

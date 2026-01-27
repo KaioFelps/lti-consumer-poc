@@ -74,6 +74,7 @@ export class LtiResourceLinksController {
       resourceLink,
       description,
       title,
+      customParameters,
     }: CreateResourceLinkDto,
   ) {
     const ltiResourceLink = await pipe(
@@ -96,7 +97,7 @@ export class LtiResourceLinksController {
           te.map((deployment) => ({ resourceLink, deployment })),
         ),
       ),
-      te.map((params) => ({ ...params, description, title })),
+      te.map((params) => ({ ...params, description, title, customParameters })),
       te.chain((params) =>
         teFromPromise(() => this.createResourceLinkService.exec(params)),
       ),

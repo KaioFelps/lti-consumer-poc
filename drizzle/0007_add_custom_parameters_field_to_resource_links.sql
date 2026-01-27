@@ -1,0 +1,1 @@
+ALTER TABLE "lti_resource_link" ADD COLUMN "custom_parameters" jsonb;

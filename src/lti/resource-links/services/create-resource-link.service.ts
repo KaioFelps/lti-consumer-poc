@@ -13,6 +13,7 @@ type Params = {
   deployment: LtiToolDeployment;
   title?: string;
   description?: string;
+  customParameters?: Record<string, string>;
 };
 
 @Injectable()
@@ -25,6 +26,7 @@ export class CreateResourceLinkService {
     deployment,
     description,
     title,
+    customParameters = {},
   }: Params) {
     const resourceLink = LtiResourceLink.create({
       id: generateUUID(),
@@ -34,6 +36,7 @@ export class CreateResourceLinkService {
       description,
       title,
       deploymentId: deployment.getId().toString(),
+      customParameters,
     });
 
     return pipe(

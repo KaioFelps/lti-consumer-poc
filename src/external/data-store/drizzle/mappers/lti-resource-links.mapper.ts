@@ -37,6 +37,7 @@ function fromRow(link: LtiResourceLinkRow): LtiResourceLink {
     contextId: link.context?.id,
     description: link.description ?? undefined,
     title: link.title ?? undefined,
+    customParameters: link.customParameters ?? {},
   });
 }
 
