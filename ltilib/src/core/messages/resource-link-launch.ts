@@ -47,6 +47,7 @@ type CreateFromLtiRecordArgs<CR = never> = {
   resourceLink: LtiResourceLink;
   nonce: string;
   state: string;
+  context?: Context;
 };
 
 /**
@@ -80,7 +81,7 @@ export class LTIResourceLinkLaunchRequest<
      *
      * @see {@link https://www.imsglobal.org/spec/lti/v1p3/#custom-properties-and-variable-substitution Custom Properties}
      */
-    public readonly customClaims: Map<string, string> = new Map(),
+    public readonly customClaims: Record<string, string> = {},
     private vendorClaims?: MessageRequests.VendorExtraClaims,
   ) {}
 
@@ -92,6 +93,7 @@ export class LTIResourceLinkLaunchRequest<
     userIdentity,
     resourceLink,
     userRoles: _userRoles,
+    context,
   }: CreateFromLtiRecordArgs<CustomRoles>) {
     if (
       !tool.ltiConfiguration.deploymentsIds.includes(resourceLink.deploymentId)
@@ -119,6 +121,16 @@ export class LTIResourceLinkLaunchRequest<
       resourceLinkMessage?.targetLinkUri ?? tool.ltiConfiguration.targetLinkUri,
     );
 
+    const relatedToolMessage = tool.ltiConfiguration.messages.find(
+      (msg) => msg.type === MessageType.resourceLink,
+    );
+
+    const resolvedCustomClaims = {
+      ...(tool.ltiConfiguration.customParameters ?? {}),
+      ...resourceLink.customParameters,
+      ...(relatedToolMessage?.customParameters ?? {}),
+    } satisfies Record<string, string>;
+
     return new LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>(
       state,
       nonce,
@@ -128,6 +140,10 @@ export class LTIResourceLinkLaunchRequest<
       targetLink,
       userRoles,
       userIdentity,
+      context,
+      undefined,
+      undefined,
+      resolvedCustomClaims,
     );
   }
 
