@@ -6,14 +6,16 @@ import { LtiToolsRepository } from "@/lti/tools/lti-tools.repository";
 import { LtiToolsDeploymentsRepository } from "@/lti/tools/lti-tools-deployments.repository";
 import { OIDCAccountsRepository } from "@/oidc/repositories/accounts.repository";
 import { OIDCClientsRepository } from "@/oidc/repositories/clients.repository";
+import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
 import { LtiResourceLinksRepository as BaseLtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
-import { DrizzleLtiToolsRepository } from "./lti-tools.repository";
-import { DrizzleLtiToolsDeploymentsRepository } from "./lti-tools-deployments.repository";
-import { DrizzleODICAccountsRepository } from "./oidc-accounts.repository";
-import { DrizzleOIDCClientsRepository } from "./oidc-clients.repository";
-import { DrizzlePeopleRepository } from "./people.repository";
-import { DrizzleLtiResourceLinksRepository } from "./resource-links.repository";
-import { DrizzleUsersRepository } from "./users.repository";
+import { DrizzleLtiToolsRepository } from "./drizzle/repositories/lti-tools.repository";
+import { DrizzleLtiToolsDeploymentsRepository } from "./drizzle/repositories/lti-tools-deployments.repository";
+import { DrizzleODICAccountsRepository } from "./drizzle/repositories/oidc-accounts.repository";
+import { DrizzleOIDCClientsRepository } from "./drizzle/repositories/oidc-clients.repository";
+import { DrizzlePeopleRepository } from "./drizzle/repositories/people.repository";
+import { DrizzleLtiResourceLinksRepository } from "./drizzle/repositories/resource-links.repository";
+import { DrizzleUsersRepository } from "./drizzle/repositories/users.repository";
+import { RedisLtiLaunchesRepository } from "./redis/repositories/lti-launches.repository";
 
 @Global()
 @Module({
@@ -54,6 +56,10 @@ import { DrizzleUsersRepository } from "./users.repository";
       provide: LtiToolsDeploymentsRepository,
       useClass: DrizzleLtiToolsDeploymentsRepository,
     },
+    {
+      provide: LtiLaunchesRepository,
+      useClass: RedisLtiLaunchesRepository,
+    },
   ],
   exports: [
     UsersRepository,
@@ -64,6 +70,7 @@ import { DrizzleUsersRepository } from "./users.repository";
     LtiResourceLinksRepository,
     LtiToolsDeploymentsRepository,
     BaseLtiResourceLinksRepository,
+    LtiLaunchesRepository,
   ],
 })
 export class RepositoriesModule {}

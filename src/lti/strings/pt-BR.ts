@@ -174,3 +174,8 @@ ptBR["lti:launch-login:message-hint-must-not-be-empty"] =
   "O campo 'message-hint' não pode estar vazio.";
 ptBR["lti:launch-login:prompt-must-be-within-enum"] =
   "O campo 'prompt' precisa assumir um dos valores: 'none', 'login', çonsent' ou 'select_account'.";
+
+ptBR["lti:launch:repository:launch-not-found"] = ({ launchId }) =>
+  `Não foi possível encontrar nenhum registro de lançamento LTI com id "${launchId}"`;
+ptBR["lti:launch:no-valid-launch-found-error"] = ({ launchId }) =>
+  `Não foi possível encontrar um registro de lançamento LTI válido com o id "${launchId}".`;
