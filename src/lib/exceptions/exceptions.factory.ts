@@ -3,7 +3,6 @@ import { ErrorBase } from "@/core/errors/error-base";
 import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { RenderableError } from "@/core/errors/renderable/renderable-error";
-import { RenderableUnauthorizedError } from "@/core/errors/renderable/unauthorized.error";
 import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
 import { UnauthorizedError } from "@/core/errors/unauthorized.error";
 import { ValidationErrors } from "@/core/validation/validation-errors";
@@ -31,9 +30,7 @@ export abstract class ExceptionsFactory {
 
     const status = resolveStatus(error);
 
-    if (error instanceof RenderableError) {
-      return new RenderableException(error, status);
-    }
+    if (error instanceof RenderableError) return new RenderableException(error);
 
     // Handle simple exceptions
     return new BaseException(error, status);
@@ -41,18 +38,11 @@ export abstract class ExceptionsFactory {
 }
 
 function resolveStatus(error: ErrorBase | RenderableError) {
-  let status: HttpStatus | null = null;
+  if (error instanceof RenderableError) return error.status;
 
-  if (
-    error instanceof UnauthorizedError ||
-    error instanceof RenderableUnauthorizedError
-  ) {
-    status = HttpStatus.UNAUTHORIZED;
-  }
+  if (error instanceof UnauthorizedError) return HttpStatus.UNAUTHORIZED;
 
-  if (error instanceof ResourceNotFoundError) status = HttpStatus.NOT_FOUND;
-
-  if (status) return status;
+  if (error instanceof ResourceNotFoundError) return HttpStatus.NOT_FOUND;
 
   const irrecoverableError = new IrrecoverableError(
     `ExceptionsFactory received an unregistered error ${error.errorType}.`,

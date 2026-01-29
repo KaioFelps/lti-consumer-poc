@@ -41,14 +41,12 @@ export class RenderableDtoValidationExceptionFilter implements ExceptionFilter {
           foo: { oi: "oi" },
           errors,
         },
+        status,
       },
       exception.validationErrors.constructor.name,
     );
 
-    const renderableException = new RenderableException(
-      renderableError,
-      status,
-    );
+    const renderableException = new RenderableException(renderableError);
 
     return this.renderableExceptionFilter.catch(renderableException, host);
   }

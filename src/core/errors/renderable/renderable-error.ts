@@ -1,3 +1,4 @@
+import { HttpStatus } from "@nestjs/common";
 import { ErrorClassProperties } from "../error-base";
 
 type Args = ErrorClassProperties<RenderableError>;
@@ -15,6 +16,7 @@ export class RenderableError {
   public readonly errorType: string;
   public readonly view: string;
   public readonly viewProperties: RenderableErrorViewProperties;
+  public readonly status: HttpStatus;
 
   public constructor(args: Args, errorType: string) {
     Object.assign(this, args);
