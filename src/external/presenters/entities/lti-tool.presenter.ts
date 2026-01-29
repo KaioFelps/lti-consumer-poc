@@ -37,6 +37,7 @@ export class LtiToolPresenter {
         LtiToolSupportedMessagePresenter.present,
       ),
       termsOfServiceUri: record.uris.tos,
+      redirectUris: record.uris.redirect,
     };
 
     const nonUndefinedTuples = Object.entries(presentedObject).filter(

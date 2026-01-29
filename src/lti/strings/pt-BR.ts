@@ -56,6 +56,7 @@ ptBR["lti:tools-details:thead:policy-uri"] = "Políticas da Ferramenta";
 ptBR["lti:tools-details:thead:contacts"] = "Contatos";
 ptBR["lti:tools-details:thead:registered-msgs"] = "Mensagens Registradas";
 ptBR["lti:tools-details:thead:required-claims"] = "Claims Obrigatórios";
+ptBR["lti:tools-details:thead:redirect-uris"] = "URIs de Redirecionamento";
 ptBR["lti:tools-details:buttons:new-deploy"] = "Fazer novo deploy";
 ptBR["lti:tools-details:thead:deployment-id"] = "ID";
 ptBR["lti:tools-details:thead:deployment-label"] = "Etiqueta";
