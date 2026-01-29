@@ -1,4 +1,4 @@
-import { SetMetadata } from "@nestjs/common";
+import { HttpStatus, SetMetadata } from "@nestjs/common";
 import { HttpRequest } from "..";
 import { CoreValidationInterceptor } from "./interceptor";
 import { CoreValidationPipe } from "./pipe";
@@ -7,7 +7,15 @@ const METADATA_KEY = "coreValidationErrorConfig";
 const HANDLER_KEY = "__handler_core_validation_error_config";
 
 export type CoreValidationConfig = {
+  /**
+   * When present, the error will be treated as a Renderable error and
+   * this view will be rendered with the error data.
+   */
   renderErrorsWithView?: string;
+  /**
+   * When present, this status will be forced into the response.
+   */
+  status?: HttpStatus;
 };
 
 export const ConfigCoreValidation = (config: CoreValidationConfig) => {

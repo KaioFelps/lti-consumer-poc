@@ -5,7 +5,8 @@ export class RenderableDtoValidationException extends HttpException {
   public constructor(
     public validationErrors: ValidationErrors,
     public view: string,
+    status: HttpStatus = HttpStatus.UNPROCESSABLE_ENTITY,
   ) {
-    super(validationErrors, HttpStatus.UNPROCESSABLE_ENTITY);
+    super(validationErrors, status);
   }
 }

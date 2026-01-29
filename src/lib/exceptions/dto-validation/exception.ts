@@ -7,7 +7,10 @@ import { ValidationErrors } from "@/core/validation/validation-errors";
  * `ErrorBase`. Therefore, it relies on its own presenter and exception filter.
  */
 export class DTOValidationException extends HttpException {
-  public constructor(public validationErrors: ValidationErrors) {
-    super(validationErrors, HttpStatus.UNPROCESSABLE_ENTITY);
+  public constructor(
+    public validationErrors: ValidationErrors,
+    status: HttpStatus = HttpStatus.UNPROCESSABLE_ENTITY,
+  ) {
+    super(validationErrors, status);
   }
 }
