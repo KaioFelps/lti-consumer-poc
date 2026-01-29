@@ -1,10 +1,12 @@
 import { Controller, Get, Render } from "@nestjs/common";
 import { either } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
+import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiLaunchServices } from "$/core/services/launch.services";
 import { AppService } from "./app.service";
 import { SessionUser } from "./auth/session-user";
 import { IrrecoverableError } from "./core/errors/irrecoverable-error";
+import { ResourceNotFoundError } from "./core/errors/resource-not-found.error";
 import { User } from "./identity/user/user.entity";
 import { Mvc } from "./lib/mvc-routes";
 import { getLtiRolesFromSystemRole } from "./lti/utils/convert-roles";
@@ -37,8 +39,8 @@ export class AppController {
         userRoles: getLtiRolesFromSystemRole(user.getSystemRole()),
       }),
       either.foldW(
-        async (error) => ({
-          error: await this.t.translate(error.errorMessageIdentifier),
+        async (error: LtiRepositoryError<ResourceNotFoundError>) => ({
+          error: await this.t.translate(error.cause.errorMessageIdentifier),
         }),
         async (value) => ({ data: value }),
       ),

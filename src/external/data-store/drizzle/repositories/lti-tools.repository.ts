@@ -18,6 +18,7 @@ import { LtiToolPreview } from "@/lti/tools/entities/lti-tool-preview.entity";
 import { LtiToolsRepository } from "@/lti/tools/lti-tools.repository";
 import { AnyLtiRole } from "$/claims/enums/roles";
 import { MessageType } from "$/claims/serialization";
+import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiResourceLink } from "$/core/resource-link";
 import { Contact, GrantType } from "$/registration/dynamic/tool-configuration";
 import { MessagePlacement } from "$/registration/enums/message-placement";
@@ -115,7 +116,7 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
 
   public async findToolById(
     id: string,
-  ): Promise<Either<IrrecoverableError | ResourceNotFoundError, LtiTool>> {
+  ): Promise<Either<LtiRepositoryError, ToolRecord>> {
     return await pipe(
       taskEither.tryCatch(
         () =>
@@ -124,10 +125,13 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
             where: eq(ltiTools.id, id),
           }),
         (err: Error) => {
-          return new IrrecoverableError(
-            `An error occurred in ${DrizzleLtiToolsRepository.name} when finding LTI tool by id.`,
-            err,
-          );
+          return new LtiRepositoryError({
+            type: "ExternalError",
+            cause: new IrrecoverableError(
+              `An error occurred in ${DrizzleLtiToolsRepository.name} when finding LTI tool by id.`,
+              err,
+            ),
+          });
         },
       ),
       taskEither.map((row) => {
@@ -137,16 +141,19 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
           option.map((record) => new LtiTool(record)),
         );
       }),
-      taskEither.map(
+      taskEither.chain(
         taskEither.fromOption(
           () =>
-            new ResourceNotFoundError({
-              errorMessageIdentifier: "lti:tool-not-found-by-id",
-              messageParams: { toolId: id },
+            new LtiRepositoryError({
+              type: "NotFound",
+              cause: new ResourceNotFoundError({
+                errorMessageIdentifier: "lti:tool-not-found-by-id",
+                messageParams: { toolId: id },
+              }),
             }),
         ),
       ),
-      taskEither.flattenW,
+      taskEither.map((tool) => tool.record),
     )();
   }
 
@@ -257,7 +264,7 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
 
   public async findToolsOwningResourceLinks(
     resourceLinksIds: LtiResourceLink["id"][],
-  ): Promise<Either<IrrecoverableError, ToolRecord[]>> {
+  ): Promise<Either<LtiRepositoryError, ToolRecord[]>> {
     return await pipe(
       taskEither.tryCatch(
         () =>
@@ -266,10 +273,13 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
             where: inArray(ltiTools.id, resourceLinksIds),
           }),
         (error: Error) => {
-          return new IrrecoverableError(
-            `An error occurred in ${DrizzleLtiToolsRepository.name} when finding tools by resource links IDs.`,
-            error,
-          );
+          return new LtiRepositoryError({
+            type: "ExternalError",
+            cause: new IrrecoverableError(
+              `An error occurred in ${DrizzleLtiToolsRepository.name} when finding tools by resource links IDs.`,
+              error,
+            ),
+          });
         },
       ),
       taskEither.map((rows) => rows.map(ltiToolsMapper.fromRow)),

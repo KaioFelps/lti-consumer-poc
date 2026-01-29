@@ -12,6 +12,7 @@ import { either } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import Provider from "oidc-provider";
 import { EnvironmentVars } from "@/config/environment-vars";
+import { ErrorBase } from "@/core/errors/error-base";
 import { LtiToolPresenter } from "@/external/presenters/entities/lti-tool.presenter";
 import { LtiToolDeploymentPresenter } from "@/external/presenters/entities/lti-tool-deployment.presenter";
 import { LtiToolPreviewPresenter } from "@/external/presenters/entities/lti-tool-preview.presenter";
@@ -20,6 +21,7 @@ import { RenderAsync } from "@/lib/async-render";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
+import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiRegistrationInitiationRequest } from "$/messages/initiate-register";
 import { RegisterToolDTO } from "./dtos/register-tool.dto";
 import { FindManyToolsPreviewsService } from "./services/find-many-tools-previews.service";
@@ -101,8 +103,8 @@ export class LtiToolsController {
   public async showToolDetails(@Param("id") toolId: string) {
     const toolDetails = pipe(
       await this.getToolDetailsService.exec({ toolId }),
-      either.getOrElseW((error) => {
-        throw ExceptionsFactory.fromError(error);
+      either.getOrElseW((error: LtiRepositoryError<ErrorBase>) => {
+        throw ExceptionsFactory.fromError(error.cause);
       }),
     );
 

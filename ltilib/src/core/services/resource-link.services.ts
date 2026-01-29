@@ -4,9 +4,9 @@ type GetResourceLinksOfToolParams = {
   deploymentId: string;
 };
 
-export class LtiResourceLinkServices<ExternalError> {
+export class LtiResourceLinkServices {
   public constructor(
-    private readonly resourceLinksRepository: LtiResourceLinksRepository<ExternalError>,
+    private readonly resourceLinksRepository: LtiResourceLinksRepository,
   ) {}
 
   public async getResourceLinksFromDeployment({

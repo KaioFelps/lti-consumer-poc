@@ -3,6 +3,7 @@ import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { eitherPromiseToTaskEither } from "@/lib/fp-ts";
 import { LtiToolDetails } from "../entities/aggregations/tool-details";
+import { LtiTool } from "../entities/lti-tool.entity";
 import { LtiToolsRepository } from "../lti-tools.repository";
 import { LtiToolsDeploymentsRepository } from "../lti-tools-deployments.repository";
 
@@ -24,9 +25,11 @@ export class GetToolRegistrationDetailsService {
       te.map((tool) => {
         return pipe(
           eitherPromiseToTaskEither(() =>
-            this.deploymentsRepo.findManyByToolId(tool.record.id),
+            this.deploymentsRepo.findManyByToolId(tool.id),
           ),
-          te.map((deployments) => LtiToolDetails.create({ tool, deployments })),
+          te.map((deployments) =>
+            LtiToolDetails.create({ tool: new LtiTool(tool), deployments }),
+          ),
           eitherPromiseToTaskEither,
         );
       }),

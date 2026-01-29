@@ -80,7 +80,7 @@ export class DrizzleOIDCClientAdapter implements Adapter {
             tool,
             option.match(
               () => undefined,
-              (tool) => tool.asClientMetadata(),
+              (tool) => new LtiTool(tool).asClientMetadata(),
             ),
           ),
         ),
