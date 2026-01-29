@@ -12,9 +12,9 @@ import { option, taskEither } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
 import { LtiTool } from "@/lti/tools/entities/lti-tool.entity";
 import { LtiToolPreview } from "@/lti/tools/entities/lti-tool-preview.entity";
+import { ToolNotFoundError } from "@/lti/tools/errors/tool-not-found.error";
 import { LtiToolsRepository } from "@/lti/tools/lti-tools.repository";
 import { AnyLtiRole } from "$/claims/enums/roles";
 import { MessageType } from "$/claims/serialization";
@@ -146,10 +146,7 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
           () =>
             new LtiRepositoryError({
               type: "NotFound",
-              cause: new ResourceNotFoundError({
-                errorMessageIdentifier: "lti:tool-not-found-by-id",
-                messageParams: { toolId: id },
-              }),
+              cause: new ToolNotFoundError(id),
             }),
         ),
       ),
