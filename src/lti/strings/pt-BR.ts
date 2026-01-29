@@ -139,3 +139,7 @@ ptBR["lti:delete-resource-link:success-message"] = ({ resourceLinkId }) =>
   `Link de recurso de ID "${resourceLinkId}" deletado com sucesso.`;
 ptBR["lti:delete-resource-link:warning-p1"] =
   "Deletar este link de recurso é uma ação irreversível. Tenha certeza antes de prosseguir.";
+
+ptBR["lti:resource-links:find-by-id:resource-not-found"] = ({
+  resourceLinkId,
+}) => `Não foi possível encontrar um link com ID "${resourceLinkId}".`;

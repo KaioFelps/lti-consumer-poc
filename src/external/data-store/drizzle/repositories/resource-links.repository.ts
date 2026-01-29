@@ -6,7 +6,9 @@ import { taskEither as te } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
+import { ResourceLinkNotFoundError } from "@/lti/resource-links/errors/resource-link-not-found.error";
 import { LtiResourceLinksRepository } from "@/lti/resource-links/resource-links.repository";
+import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { FindManyParams } from "$/core/repositories/resource-links.repository";
 import { LtiResourceLink } from "$/core/resource-link";
 import { DrizzleClient } from "../client";
@@ -22,7 +24,7 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
     withToolId,
     withContextId,
   }: FindManyParams = {}): Promise<
-    Either<IrrecoverableError, LtiResourceLink[]>
+    Either<LtiRepositoryError, LtiResourceLink[]>
   > {
     const rootFilters: SQLWrapper[] = [];
 
@@ -54,10 +56,13 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
             where: rootFilters.length > 0 ? and(...rootFilters) : undefined,
           }),
         (error: Error) =>
-          new IrrecoverableError(
-            `Error occurred in ${DrizzleLtiResourceLinksRepository.name} when finding many resource links from database.`,
-            error,
-          ),
+          new LtiRepositoryError({
+            type: "ExternalError",
+            cause: new IrrecoverableError(
+              `Error occurred in ${DrizzleLtiResourceLinksRepository.name} when finding many resource links from database.`,
+              error,
+            ),
+          }),
       ),
       te.map((rows) => rows.map(ltiResourceLinksMapper.fromRow)),
     )();
@@ -100,6 +105,38 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
             error,
           ),
       ),
+    )();
+  }
+
+  public async findById(
+    resourceLinkId: string,
+  ): Promise<Either<LtiRepositoryError, LtiResourceLink>> {
+    return await pipe(
+      te.tryCatch(
+        () =>
+          this.drizzle.getClient().query.ltiResourceLinks.findFirst({
+            ...ltiResourceLinksMapper.requiredQueryConfig,
+            where: eq(ltiResourceLinks.id, resourceLinkId),
+          }),
+        (error: Error) => {
+          return new LtiRepositoryError({
+            type: "ExternalError",
+            cause: new IrrecoverableError(
+              `An error occurred in ${DrizzleLtiResourceLinksRepository.name} when finding resource link by id.`,
+              error,
+            ),
+          });
+        },
+      ),
+      te.chainW(
+        te.fromNullable(
+          new LtiRepositoryError({
+            type: "NotFound",
+            cause: new ResourceLinkNotFoundError(resourceLinkId),
+          }),
+        ),
+      ),
+      te.map(ltiResourceLinksMapper.fromRow),
     )();
   }
 }
