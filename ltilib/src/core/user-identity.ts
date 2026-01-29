@@ -4,7 +4,7 @@ import { IntoLtiClaim } from "$/claims/serialization";
 
 type Args<CR> = ClassProperties<UserIdentity<CR>>;
 
-export type UserRoles<CR> = [] | [AnyLtiRole, ...(CR | AnyLtiRole)[]];
+export type UserRoles<CR = never> = [] | [AnyLtiRole, ...(CR | AnyLtiRole)[]];
 
 /**
  * Represents a User (and hence a member) who is initiating the launch.
@@ -57,6 +57,10 @@ export class UserIdentity<CustomRoles = never> implements IntoLtiClaim {
 
   private constructor(args: Args<CustomRoles>) {
     Object.assign(this, args);
+  }
+
+  public static create<CustomRoles>(args: Args<CustomRoles>) {
+    return new UserIdentity(args);
   }
 
   intoLtiClaim(): object {
