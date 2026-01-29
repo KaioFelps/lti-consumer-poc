@@ -3,7 +3,7 @@ import { AuthModule } from "@/auth/auth.module";
 import middlewares from "@/lib/middlewares";
 import { OIDCModule } from "@/oidc/oidc.module";
 import { Platform } from "$/core/platform";
-import { LtiLaunchRepository } from "$/core/repositories/launch.repository";
+import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiLaunchServices } from "$/core/services/launch.services";
 import { LtiResourceLinkServices } from "$/core/services/resource-link.services";
@@ -35,7 +35,7 @@ import { LtiToolsController } from "./tools/tools.controller";
       useFactory: (
         ltiResourceLinksRepository: LtiResourceLinksRepository,
         ltiToolsRepository: LtiToolsRepository,
-        launchRepository: LtiLaunchRepository,
+        launchRepository: LtiLaunchesRepository,
         platform: Platform,
       ) =>
         new LtiLaunchServices(
@@ -47,7 +47,7 @@ import { LtiToolsController } from "./tools/tools.controller";
       inject: [
         LtiResourceLinksRepository,
         LtiToolsRepository,
-        LtiLaunchRepository,
+        LtiLaunchesRepository,
         Platform,
       ],
     },

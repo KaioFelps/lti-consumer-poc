@@ -18,7 +18,7 @@ import {
   type PresentedLtiResourceLink,
   presentLtiResourceLink,
 } from "../presenters/resource-link.presenter";
-import { LtiLaunchRepository } from "../repositories/launch.repository";
+import { LtiLaunchesRepository } from "../repositories/launches.repository";
 import { LtiResourceLinksRepository } from "../repositories/resource-links.repository";
 import { LtiToolsRepository } from "../repositories/tools.repository";
 import { LtiResourceLink } from "../resource-link";
@@ -81,7 +81,7 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
   public constructor(
     private resourceLinksRepository: LtiResourceLinksRepository,
     private ltiToolsRepository: LtiToolsRepository,
-    private launchRepository: LtiLaunchRepository,
+    private launchRepository: LtiLaunchesRepository,
     private platform: Platform,
   ) {}
 

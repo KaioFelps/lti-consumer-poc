@@ -2,7 +2,7 @@ import { Either } from "fp-ts/lib/Either";
 import { LtiRepositoryError } from "../errors/repository.error";
 import { LtiLaunchData } from "../launch-data";
 
-export abstract class LtiLaunchRepository {
+export abstract class LtiLaunchesRepository {
   public abstract save(
     launch: LtiLaunchData,
     timeToLiveSeconds: number,
