@@ -4,7 +4,7 @@ import { either } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
+import { PersonNotFoundError } from "@/identity/errors/person-not-found.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiTool } from "../entities/lti-tool.entity";
 import { LtiToolsRepository } from "../lti-tools.repository";
@@ -13,7 +13,7 @@ type Params = {
   id: UUID;
 };
 
-type PossibleErrors = IrrecoverableError | ResourceNotFoundError;
+type PossibleErrors = IrrecoverableError | PersonNotFoundError;
 
 @Injectable()
 export class FindToolByIdService {
