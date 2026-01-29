@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { AuthModule } from "@/auth/auth.module";
+import { IdentityModule } from "@/identity/identity.module";
 import middlewares from "@/lib/middlewares";
 import { OIDCModule } from "@/oidc/oidc.module";
 import { Platform } from "$/core/platform";
@@ -15,6 +16,7 @@ import { PlatformFactory } from "./platform.factory";
 import { LtiResourceLinksController } from "./resource-links/resource-links.controller";
 import { CreateResourceLinkService } from "./resource-links/services/create-resource-link.service";
 import { DeleteResourceLinkService } from "./resource-links/services/delete-resource-link.service";
+import { LaunchLoginService } from "./resource-links/services/launch-login.service";
 import { LtiToolsRepository } from "./tools/lti-tools.repository";
 import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-previews.service";
 import { FindToolByIdService } from "./tools/services/find-tool-by-id.service";
@@ -22,7 +24,7 @@ import { GetToolRegistrationDetailsService } from "./tools/services/get-tool-reg
 import { LtiToolsController } from "./tools/tools.controller";
 
 @Module({
-  imports: [OIDCModule, AuthModule],
+  imports: [OIDCModule, AuthModule, IdentityModule],
   providers: [
     PlatformFactory,
     {
@@ -65,6 +67,7 @@ import { LtiToolsController } from "./tools/tools.controller";
     FindDeploymentByIdService,
     CreateResourceLinkService,
     DeleteResourceLinkService,
+    LaunchLoginService,
   ],
   exports: [LtiLaunchServices, Platform],
   controllers: [
