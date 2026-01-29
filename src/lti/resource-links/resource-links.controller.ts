@@ -12,6 +12,7 @@ import {
 } from "@nestjs/common";
 import { either as e, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
+import { type JOSENotSupported } from "jose/dist/types/util/errors";
 import { Public } from "@/auth/public-routes";
 import { SessionUser } from "@/auth/session-user";
 import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
@@ -104,7 +105,7 @@ export class LtiResourceLinksController {
         ),
       ),
       te.mapLeft((e) => e),
-      te.matchW(
+      te.match(
         (errorContext) => {
           const isInvalidRedirectUriError = !("redirectUri" in errorContext);
           if (isInvalidRedirectUriError)
@@ -136,7 +137,14 @@ export class LtiResourceLinksController {
 
           assertNever(error);
         },
-        (link) => res.send(link.intoForm()).type("html").status(HttpStatus.OK),
+        (link) =>
+          pipe(
+            teFromPromise(() => link.intoForm()),
+            te.match(
+              (error) => handleJoseNotSupportedError(error),
+              (form) => res.send(form).type("html").status(HttpStatus.OK),
+            ),
+          ),
       ),
     )();
   }
@@ -309,4 +317,21 @@ function handlePersonNotFoundError(
   });
 
   return response.redirect(redirectionError.intoUrl().toString());
+}
+
+function handleJoseNotSupportedError(error: JOSENotSupported) {
+  const renderable = new RenderableError(
+    {
+      view: "lti/errors/server-error",
+      viewProperties: {
+        title: "Internal Security Error",
+        message: "Could not establish a secure launch connection.",
+        code: "TOKEN_SIGNATURE_FAILED",
+      },
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+    },
+    error.constructor.name,
+  );
+
+  throw ExceptionsFactory.fromError(renderable);
 }

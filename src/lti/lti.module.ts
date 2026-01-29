@@ -1,9 +1,9 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { AuthModule } from "@/auth/auth.module";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import middlewares from "@/lib/middlewares";
 import { OIDCModule } from "@/oidc/oidc.module";
 import { Platform } from "$/core/platform";
+import { LtiLaunchRepository } from "$/core/repositories/launch.repository";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiLaunchServices } from "$/core/services/launch.services";
 import { LtiResourceLinkServices } from "$/core/services/resource-link.services";
@@ -33,23 +33,29 @@ import { LtiToolsController } from "./tools/tools.controller";
     {
       provide: LtiLaunchServices,
       useFactory: (
-        ltiResourceLinksRepository: LtiResourceLinksRepository<IrrecoverableError>,
+        ltiResourceLinksRepository: LtiResourceLinksRepository,
         ltiToolsRepository: LtiToolsRepository,
+        launchRepository: LtiLaunchRepository,
         platform: Platform,
       ) =>
         new LtiLaunchServices(
           ltiResourceLinksRepository,
           ltiToolsRepository,
+          launchRepository,
           platform,
         ),
-      inject: [LtiResourceLinksRepository, LtiToolsRepository, Platform],
+      inject: [
+        LtiResourceLinksRepository,
+        LtiToolsRepository,
+        LtiLaunchRepository,
+        Platform,
+      ],
     },
     {
       provide: LtiResourceLinkServices,
       inject: [LtiResourceLinksRepository],
-      useFactory: (
-        resourceLinksRepository: LtiResourceLinksRepository<IrrecoverableError>,
-      ) => new LtiResourceLinkServices(resourceLinksRepository),
+      useFactory: (resourceLinksRepository: LtiResourceLinksRepository) =>
+        new LtiResourceLinkServices(resourceLinksRepository),
     },
     FindManyToolsPreviewsService,
     FindToolByIdService,

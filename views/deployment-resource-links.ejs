@@ -170,7 +170,17 @@
             <td>${link.title ?? "-"}</td>
             <td>${link.description ?? "-"}</td>
             <td>
-                <button class="resource-link-delete-button" value="${link.id}"><%= await t.translate("buttons:remove") %></button>
+                <ul>
+                    <li>
+                        <button
+                            class="resource-link-delete-button"
+                            value="${link.id}"
+                        >
+                            <%= await t.translate("buttons:remove") %>
+                        </button>
+                    </li>
+                    <li><a href="${link.url}"><%= await t.translate("lti:launch:buttons:launch") %></a></li>
+                <ul>
             </td>`;
 
         return row;
