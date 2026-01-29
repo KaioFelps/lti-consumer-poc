@@ -42,7 +42,7 @@ type GetLaunchLinksFromContext = GetLaunchLinksParams & {
 };
 
 type InitiateLaunchParams = {
-  sessionUserId: string | number;
+  sessionUserId: string;
   resourceLink: LtiResourceLink;
   tool: ToolRecord;
 };
