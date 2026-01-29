@@ -140,6 +140,37 @@ ptBR["lti:delete-resource-link:success-message"] = ({ resourceLinkId }) =>
 ptBR["lti:delete-resource-link:warning-p1"] =
   "Deletar este link de recurso é uma ação irreversível. Tenha certeza antes de prosseguir.";
 
+ptBR["lti:launch:buttons:launch"] = "Iniciar lançamento";
+
 ptBR["lti:resource-links:find-by-id:resource-not-found"] = ({
   resourceLinkId,
 }) => `Não foi possível encontrar um link com ID "${resourceLinkId}".`;
+
+ptBR["lti:launch-login:scopes-must-contain-openid"] =
+  "O campo 'scope' precisa incluir o escopo 'openid'.";
+ptBR["lti:launch-login:response-type-must-be-id-token"] =
+  "O campo 'response_type' precisa ter o valor 'id_token'.";
+ptBR["lti:launch-login:response-mode-must-be-form-post"] =
+  "O campo 'response_mode' precisa assumir o valor 'form_post'.";
+ptBR["lti:launch-login:client-id-must-be-string"] =
+  "O campo 'client_id' precisa ser um texto.";
+ptBR["lti:launch-login:client-id-must-not-be-empty"] =
+  "O campo 'client_id' não pode estar vazio.";
+ptBR["lti:launch-login:state-must-be-string"] =
+  "O campo 'state' precisa ser um texto.";
+ptBR["lti:launch-login:state-must-not-be-empty"] =
+  "O campo 'state' não pode estar vazio.";
+ptBR["lti:launch-login:nonce-must-be-string"] =
+  "O campo 'nonce' precisa ser um texto.";
+ptBR["lti:launch-login:nonce-must-not-be-empty"] =
+  "O campo 'nonce' não pode estar vazio.";
+ptBR["lti:launch-login:login-hint-must-be-string"] =
+  "O campo 'login-hint' precisa ser um texto.";
+ptBR["lti:launch-login:login-hint-must-not-be-empty"] =
+  "O campo 'login-hint' não pode estar vazio.";
+ptBR["lti:launch-login:message-hint-must-be-string"] =
+  "O campo 'message-hint' precisa ser um texto.";
+ptBR["lti:launch-login:message-hint-must-not-be-empty"] =
+  "O campo 'message-hint' não pode estar vazio.";
+ptBR["lti:launch-login:prompt-must-be-within-enum"] =
+  "O campo 'prompt' precisa assumir um dos valores: 'none', 'login', çonsent' ou 'select_account'.";
