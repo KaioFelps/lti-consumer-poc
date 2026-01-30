@@ -10,7 +10,6 @@ import {
 } from "@nestjs/common";
 import { either } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
-import { EnvironmentVars } from "@/config/environment-vars";
 import { ErrorBase } from "@/core/errors/error-base";
 import { LtiToolPresenter } from "@/external/presenters/entities/lti-tool.presenter";
 import { LtiToolDeploymentPresenter } from "@/external/presenters/entities/lti-tool-deployment.presenter";
@@ -32,7 +31,6 @@ import { GetToolRegistrationDetailsService } from "./services/get-tool-registrat
 @Controller("/lti/tools")
 export class LtiToolsController {
   public constructor(
-    private vars: EnvironmentVars,
     private platform: Platform,
     private t: TranslatorService,
     private findManyToolsService: FindManyToolsPreviewsService,
@@ -51,7 +49,6 @@ export class LtiToolsController {
 
     return {
       title: await this.t.translate("lti:register-tool:title"),
-      shallShowDockerInternalHostOption: this.vars.nodeEnv === "development",
       initiateRegisterEndpoint,
     };
   }
@@ -62,17 +59,10 @@ export class LtiToolsController {
     @Body() dto: RegisterToolDTO,
     @Session() session: RequestSession,
   ) {
-    const shouldUseDockerInternalHost =
-      this.vars.nodeEnv === "development" && dto.useDockerInternalHost;
-
-    const issuer = shouldUseDockerInternalHost
-      ? "http://host.docker.internal:3000/oidc"
-      : this.platform.issuer;
-
     const initiateRegister = new LtiRegistrationInitiationRequest({
       platformOpenIdConfigurationUri: new URL(
         Routes.lti.openIdConfiguration(),
-        issuer,
+        this.platform.issuer,
       ),
       toolInitiateRegisterUri: new URL(dto.registrationEndpoint),
     });

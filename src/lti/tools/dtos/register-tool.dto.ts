@@ -11,19 +11,10 @@ export class RegisterToolDTO implements DTO {
     registrationEndpoint: z.url({
       error: "lti:register-tool:registration-endpoint-invalid-type",
     }),
-    useDockerInternalHost: z.coerce
-      .boolean({
-        error: "lti:register-tool:use-docker-internal-host-invalid-type",
-      })
-      .optional()
-      .default(false),
   });
 
   @Expose()
   public readonly registrationEndpoint: string;
-
-  @Expose()
-  public readonly useDockerInternalHost: boolean;
 
   validate(): Either<ValidationErrors, void> {
     const { success, error, data } =

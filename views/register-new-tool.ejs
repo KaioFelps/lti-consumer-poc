@@ -24,28 +24,6 @@
                 value="<%= flash?.values?.registrationEndpoint %>"
             >
         </label>
-
-        <% if (shallShowDockerInternalHostOption) { %>
-            <div>
-                <% (validationErrors?.useDockerInternalHost ?? []).forEach(error => { %>
-                    <span class="error-span"><%- error.message %></span>
-                <% }) %>
-                <label class="checkbox-item">
-                    <input
-                        type="checkbox"
-                        name="useDockerInternalHost"
-                        style="width: fit-content;"
-                        <% if (flash?.values?.useDockerInternalHost) { %>
-                            checked
-                        <% } %>
-                    >
-                    <span><%= await t.translate("lti:register-tool:labels:use-docker-internal-host") %></span>
-                </label>
-                <p style="font-size: 0.75rem;">
-                    <%- await t.translate("lti:register-tool:descriptions:use-docker-internal-host") %>
-                </p>
-            </div>
-        <% } %>
         
         <button><%= await t.translate("lti:register-tool:buttons:register-tool") %></button>
     </form>

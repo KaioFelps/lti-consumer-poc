@@ -18,6 +18,8 @@ services:
       - 443:8443
     networks:
       - moodle-network
+    extra_hosts:
+      - "localhost:host-gateway"
     volumes:
       - moodle_data:/bitnami/moodle
       - moodledata_data:/bitnami/moodledata
