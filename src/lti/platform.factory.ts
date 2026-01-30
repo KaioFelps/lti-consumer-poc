@@ -21,10 +21,10 @@ export class PlatformFactory {
 
     return Platform.create({
       jsonWebKey: this.jwks.privateJwk,
-      initiateLaunchEndpoint: Routes.lti.resourceLinks.initiateLaunch,
+      initiateLaunchEndpoint: Routes.lti.launch.initiate,
       openIdConfiguration: Platform.OpenIdConfiguration.create({
         issuer: issuer,
-        authorizationEndpoint: new URL(Routes.oidc.auth(), issuer),
+        authorizationEndpoint: new URL(Routes.lti.launch.login(), issuer),
         jwksEndpoint: new URL(Routes.oidc.jwks(), issuer),
         registrationEndpoint: new URL(Routes.oidc.registration(), issuer),
         token: {
