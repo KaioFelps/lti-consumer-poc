@@ -57,6 +57,13 @@
       "when": 1769472553637,
       "tag": "0007_add_custom_parameters_field_to_resource_links",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1769748749269,
+      "tag": "0008_remove_resource_links_on_tool_removal",
+      "breakpoints": true
     }
   ]
 }

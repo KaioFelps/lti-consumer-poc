@@ -161,7 +161,7 @@ export const ltiResourceLinks = pgTable("lti_resource_link", {
   id: uuid().primaryKey(),
   deploymentId: uuid("deployment_id")
     .notNull()
-    .references(() => ltiToolDeployments.id),
+    .references(() => ltiToolDeployments.id, { onDelete: "cascade" }),
   contextId: uuid("context_id").references(() => ltiContexts.id),
   resourceUrl: varchar("resource_url").notNull(),
   title: varchar(), // nullable
