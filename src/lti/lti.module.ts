@@ -20,6 +20,7 @@ import { PlatformFactory } from "./platform.factory";
 import { LtiResourceLinksController } from "./resource-links/resource-links.controller";
 import { CreateResourceLinkService } from "./resource-links/services/create-resource-link.service";
 import { DeleteResourceLinkService } from "./resource-links/services/delete-resource-link.service";
+import { findResourceLinkByIdService } from "./resource-links/services/find-resource-link-by-id.service";
 import { LtiToolsRepository } from "./tools/lti-tools.repository";
 import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-previews.service";
 import { FindToolByIdService } from "./tools/services/find-tool-by-id.service";
@@ -70,7 +71,9 @@ import { LtiToolsController } from "./tools/tools.controller";
     FindDeploymentByIdService,
     CreateResourceLinkService,
     DeleteResourceLinkService,
+    findResourceLinkByIdService,
     LaunchLoginService,
+    InitiateLaunchService,
   ],
   exports: [LtiLaunchServices, Platform],
   controllers: [
@@ -78,6 +81,7 @@ import { LtiToolsController } from "./tools/tools.controller";
     LtiToolsController,
     LtiDeploymentsController,
     LtiResourceLinksController,
+    LtiLaunchesController,
   ],
 })
 export class LtiModule implements NestModule {
