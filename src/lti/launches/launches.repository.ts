@@ -37,7 +37,8 @@ type IErrorContext<E> = E extends InvalidRedirectUriError
       redirectUri: URL;
     };
 
-@Controller("/lti/launch")
+@Mvc()
+@Controller("/lti/launches")
 export class LtiLaunchesController {
   public constructor(
     private launchServices: LtiLaunchServices,
@@ -52,7 +53,6 @@ export class LtiLaunchesController {
     @SessionUser() user: User,
     @Res() response: HttpResponse,
   ) {
-    console.debug("chamou initiate launch");
     return await pipe(
       teFromPromise(() =>
         this.initiateLaunchService.exec({ resourceLinkId, user }),
