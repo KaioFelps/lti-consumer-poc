@@ -8,9 +8,10 @@ import {
   Res,
   Session,
 } from "@nestjs/common";
-import { either } from "fp-ts";
+import { either, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { ErrorBase } from "@/core/errors/error-base";
+import { ErrorBaseRenderableError } from "@/core/errors/renderable/error-base.error";
 import { LtiToolPresenter } from "@/external/presenters/entities/lti-tool.presenter";
 import { LtiToolDeploymentPresenter } from "@/external/presenters/entities/lti-tool-deployment.presenter";
 import { LtiToolPreviewPresenter } from "@/external/presenters/entities/lti-tool-preview.presenter";
@@ -93,12 +94,16 @@ export class LtiToolsController {
   @Get(":id/details")
   @Render("tool-details")
   public async showToolDetails(@Param("id") toolId: string) {
-    const toolDetails = pipe(
-      await this.getToolDetailsService.exec({ toolId }),
-      either.getOrElseW((error: LtiRepositoryError<ErrorBase>) => {
-        throw ExceptionsFactory.fromError(error.cause);
+    const toolDetails = await pipe(
+      () => this.getToolDetailsService.exec({ toolId }),
+      te.getOrElseW((error: LtiRepositoryError<ErrorBase>) => async () => {
+        const renderable = await ErrorBaseRenderableError.create(
+          error.cause,
+          this.t,
+        );
+        throw ExceptionsFactory.fromError(renderable);
       }),
-    );
+    )();
 
     return {
       title: await this.t.translate("lti:tools-details:title", {
