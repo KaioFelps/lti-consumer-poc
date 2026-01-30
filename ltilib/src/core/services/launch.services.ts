@@ -85,11 +85,13 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
     private platform: Platform,
   ) {}
 
-  public async prepareLaunchInitiationRequest({
+  public async prepareLaunchInitiationRequest<ExternalError = unknown>({
     resourceLink,
     tool,
     sessionUserId,
-  }: InitiateLaunchParams) {
+  }: InitiateLaunchParams): Promise<
+    Either<LtiRepositoryError<ExternalError>, InitiateLaunchRequest>
+  > {
     const launch = LtiLaunchData.create({
       resourceLinkId: resourceLink.id,
       userId: sessionUserId,
@@ -97,7 +99,10 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
 
     const TEN_MINUTES = 600;
     const saveResult = await this.launchRepository.save(launch, TEN_MINUTES);
-    if (e.isLeft(saveResult)) return saveResult;
+
+    if (e.isLeft(saveResult)) {
+      return saveResult as e.Left<LtiRepositoryError<ExternalError>>;
+    }
 
     const launchInitiationRequest = InitiateLaunchRequest.create({
       platform: this.platform,
@@ -108,7 +113,7 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
       ltiMessageHint: launch.id.toString(),
     });
 
-    return launchInitiationRequest;
+    return e.right(launchInitiationRequest);
   }
 
   public async verifyRedirectUri({
