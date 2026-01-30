@@ -71,13 +71,12 @@ export class LtiLaunchesController {
   }
 
   @Public()
-  @Post("login")
+  @Get("login")
   public async launchLogin(
-    @Body() body: LaunchLoginDto,
+    @Query() body: LaunchLoginDto,
     @Res() res: HttpResponse,
     @SessionUser() user?: User,
   ): Promise<HttpResponse | void> {
-    console.debug("chamou launch-login");
     return await pipe(
       teFromPromise(() =>
         this.findToolByIdService.exec({ id: body.client_id }),
