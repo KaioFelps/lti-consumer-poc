@@ -1,6 +1,7 @@
 import { ClassProperties } from "common/src/types/class-properties";
 import { Optional } from "common/src/types/optional";
 import { generateUUID } from "common/src/types/uuid";
+import { IntoLtiClaim } from "$/claims/serialization";
 
 type Args = Optional<ClassProperties<LtiResourceLink>, "id">;
 
@@ -9,7 +10,7 @@ type Args = Optional<ClassProperties<LtiResourceLink>, "id">;
  * an execution of the tool somewhere in the platform (e.g., the platform
  * execution as one of the activities from some Math Class course).
  */
-export class LtiResourceLink {
+export class LtiResourceLink implements IntoLtiClaim {
   /**
    * An unique and stable ID that identifies the resource link placement inside the platform
    */
@@ -54,5 +55,13 @@ export class LtiResourceLink {
 
   public static create(args: Args) {
     return new LtiResourceLink(args);
+  }
+
+  intoLtiClaim(): object {
+    return {
+      id: this.id,
+      description: this.description,
+      title: this.title,
+    };
   }
 }

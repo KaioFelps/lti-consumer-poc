@@ -195,8 +195,10 @@ export class LTIResourceLinkLaunchRequest<
       [resolveClaimKey(LTIClaimKey.version)]: this.version.toString(),
       [resolveClaimKey(LTIClaimKey.deploymentId)]:
         this.resourceLink.deploymentId,
-      [resolveClaimKey(LTIClaimKey.targetLinkUri)]: this.resolvedTargetLink,
-      [resolveClaimKey(LTIClaimKey.resourceLink)]: this.resourceLink,
+      [resolveClaimKey(LTIClaimKey.targetLinkUri)]:
+        this.resolvedTargetLink.toString(),
+      [resolveClaimKey(LTIClaimKey.resourceLink)]:
+        this.resourceLink.intoLtiClaim(),
       [resolveClaimKey(LTIClaimKey.roles)]: this.resolvedUserRoles,
       [resolveClaimKey(LTIClaimKey.context)]: this.context?.intoLtiClaim(),
       [resolveClaimKey(LTIClaimKey.platformInstanceData)]:
