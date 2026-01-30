@@ -14,12 +14,11 @@
             <tbody>
             </tbody>
         </table>
-        <br>
     <% } else { %>
         <div id="no-resource-links-warning" class="warning-alert"><span><%= await t.translate("lti:list-resource-links:no-resource-links-p1") %></span></div>
     <% } %>
 
-    <button id="open-new-resource-link-dialog"><%= await t.translate("lti:list-resource-links:buttons:new-resource-link") %></button>
+    <button id="open-new-resource-link-dialog" style="margin-top: 1rem;"><%= await t.translate("lti:list-resource-links:buttons:new-resource-link") %></button>
 </main>
 
 <dialog class="base-modal" id="new-resource-link-dialog">
@@ -59,7 +58,7 @@
         </label>
         <label>
             <span>
-                <%= await t.translate("lti:new-resource-link-param:form:param-key") %>
+                <%= await t.translate("lti:new-resource-link-param:form:param-value") %>
             </span>
             <input id="resource-link-parameters-parameter-value" name="value" type="text">
         </label>

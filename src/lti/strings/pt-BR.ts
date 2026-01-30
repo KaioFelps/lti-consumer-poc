@@ -132,7 +132,7 @@ ptBR["lti:create-resource-link:custom-parameters-must-be-a-key-value-map"] =
 
 ptBR["lti:new-resource-link-param:form:title"] = "Parâmetros do link";
 ptBR["lti:new-resource-link-param:form:param-key"] = "Chave do parâmetro";
-ptBR["lti:new-resource-link-param:form:param-key"] = "Valor do parâmetro";
+ptBR["lti:new-resource-link-param:form:param-value"] = "Valor do parâmetro";
 
 ptBR["lti:delete-resource-link:success-message"] = ({ resourceLinkId }) =>
   `Link de recurso de ID "${resourceLinkId}" deletado com sucesso.`;
