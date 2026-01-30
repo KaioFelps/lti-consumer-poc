@@ -1,12 +1,14 @@
-import { Controller, Get, Inject } from "@nestjs/common";
+import { All, Controller, Inject } from "@nestjs/common";
+import { Public } from "@/auth/public-routes";
 import { Platform } from "$/core/platform";
 
+@Public()
 @Controller("lti")
 export class LtiController {
   @Inject()
   private readonly platform: Platform;
 
-  @Get(".well-known/openid-configuration")
+  @All(".well-known/openid-configuration")
   public async LtiAndOpenIdConfiguration() {
     return this.platform.resolvedOpenIdConfiguration;
   }
