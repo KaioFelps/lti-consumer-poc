@@ -1,5 +1,8 @@
 /**
- * A registry of all routes available for sending to views.
+ * A registry of all routes available for sending to views and/or general usage across
+ * the application.
+ *
+ * Every path must be absolute.
  */
 export const Routes = {
   home: () => `/`,
@@ -13,6 +16,13 @@ export const Routes = {
     abort: (interactionId: string) =>
       `/oidc/interaction/${interactionId}/abort`,
     logout: () => `/oidc/session/end`,
+    auth: () => `/oidc/auth`,
+    jwks: () => `/oidc/jwks`,
+    registration: () => `/oidc/reg`,
+    token: () => `/oidc/token`,
+    pushedAuthorizationRequest: () => `/oidc/request`,
+    userInfo: () => `/oidc/me`,
+    openIdConfiguration: () => `/oidc/.well-known/openid-configuration`,
   },
   auth: {
     loginForm: () => `/auth/login`,
