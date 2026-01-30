@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpStatus,
-  Param,
-  Post,
-  Res,
-} from "@nestjs/common";
+import { Controller, Get, HttpStatus, Param, Query, Res } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { type JOSENotSupported } from "jose/dist/types/util/errors";
@@ -16,9 +8,10 @@ import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { RenderableError } from "@/core/errors/renderable/renderable-error";
 import { PersonNotFoundError } from "@/identity/errors/person-not-found.error";
 import type { User } from "@/identity/user/user.entity";
-import type { HttpResponse } from "@/lib";
+import { HttpResponse } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { eitherPromiseToTaskEither as teFromPromise } from "@/lib/fp-ts";
+import { Mvc } from "@/lib/mvc-routes";
 import { assertNever } from "@/utils/assert-never";
 import type { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
 import { MalformedRequestError } from "$/core/errors/malformed-request.error";
@@ -142,7 +135,7 @@ export class LtiLaunchesController {
             teFromPromise(() => link.intoForm()),
             te.match(
               (error) => handleJoseNotSupportedError(error),
-              (form) => res.send(form).type("html").status(HttpStatus.OK),
+              (form) => res.type("html").status(HttpStatus.OK).send(form),
             ),
           )(),
       ),
