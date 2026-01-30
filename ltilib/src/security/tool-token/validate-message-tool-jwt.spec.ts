@@ -26,7 +26,7 @@ describe("validateMessageToolJwt", async () => {
     jsonWebKey: jwk,
     initiateLaunchEndpoint: () => "",
     openIdConfiguration: Platform.OpenIdConfiguration.create({
-      issuer: new URL(platformIssuer),
+      issuer: platformIssuer,
       authorizationEndpoint: new URL(`${platformIssuer}/auth`),
       claimsSupported: [],
       jwksEndpoint: new URL(`${platformIssuer}/keys`),
@@ -519,6 +519,7 @@ describe("validateMessageToolJwt", async () => {
       );
 
       expect(either.isRight(validationResult)).toBeTruthy();
+
       if (either.isRight(validationResult)) {
         const claims = validationResult.right;
         expect(

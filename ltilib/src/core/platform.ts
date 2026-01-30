@@ -50,7 +50,7 @@ export class Platform implements IPlatform {
 
   protected constructor(args: IPlatform) {
     Object.assign(this, args);
-    this.issuer = args.openIdConfiguration.issuer.toString();
+    this.issuer = args.openIdConfiguration.issuer;
     this.resolvedOpenIdConfiguration =
       args.openIdConfiguration.intoConfiguration();
   }
@@ -143,7 +143,7 @@ export namespace Platform {
      * for processes related to LTI (i.e., dynamic registration), the issuer value should
      * be the same as used in the library.
      */
-    issuer: URL;
+    issuer: string;
     /**
      * URL of the OAuth 2.0 Authorization Endpoint.
      */
@@ -256,7 +256,7 @@ export namespace Platform {
    * [LTI Dynamic Linking]: https://www.imsglobal.org/spec/lti-dr/v1p0
    */
   export class OpenIdConfiguration implements IOpenIdConfiguration {
-    public readonly issuer: URL;
+    public readonly issuer: string;
     private constructor(metadata: ClassProperties<OpenIdConfiguration>) {
       Object.assign(this, metadata);
     }
@@ -289,7 +289,7 @@ export namespace Platform {
 
     public intoConfiguration() {
       return {
-        issuer: this.issuer.toString(),
+        issuer: this.issuer,
         authorization_endpoint: this.authorizationEndpoint.toString(),
         registration_endpoint: this.registrationEndpoint.toString(),
         jwks_uri: this.jwksEndpoint.toString(),
