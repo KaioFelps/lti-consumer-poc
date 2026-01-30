@@ -2,7 +2,7 @@ import { ClassProperties } from "common/src/types/class-properties";
 import { AnyLtiRole } from "$/claims/enums/roles";
 import { IntoLtiClaim } from "$/claims/serialization";
 
-type Args<CR> = ClassProperties<UserIdentity<CR>>;
+type Args<CR> = Omit<ClassProperties<UserIdentity<CR>>, "extraClaims">;
 
 export type UserRoles<CR = never> = [] | [AnyLtiRole, ...(CR | AnyLtiRole)[]];
 

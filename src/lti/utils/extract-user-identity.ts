@@ -8,9 +8,9 @@ import utils from ".";
  */
 export function extractUserIdentity<CustomRoles = never>(
   person: Person,
-  extraClaims: UserIdentity["extraClaims"] = {},
+  extraClaims?: UserIdentity["extraClaims"],
 ) {
-  return UserIdentity.create<CustomRoles>({
+  const identity = UserIdentity.create<CustomRoles>({
     id: person.getUser().getId().toString(),
     familyName: person.getSurname(),
     email: person.getEmail(),
@@ -19,6 +19,13 @@ export function extractUserIdentity<CustomRoles = never>(
     roles: utils.getLtiRolesFromSystemRole(
       person.getUser().getSystemRole(),
     ) as UserRoles,
-    extraClaims,
   });
+
+  if (extraClaims) {
+    for (const [key, value] of Object.entries(extraClaims)) {
+      identity.addExtraClaim(key, value);
+    }
+  }
+
+  return identity;
 }
