@@ -22,9 +22,22 @@ describe("validateMessageToolJwt", async () => {
   const platformIssuer = "https://lms.uofexample.edu";
   const toolId = "s6BhdRkqt3";
 
-  const platform = new Platform({
-    issuer: platformIssuer,
+  const platform = Platform.create({
     jsonWebKey: jwk,
+    initiateLaunchEndpoint: () => "",
+    openIdConfiguration: Platform.OpenIdConfiguration.create({
+      issuer: new URL(platformIssuer),
+      authorizationEndpoint: new URL(`${platformIssuer}/auth`),
+      claimsSupported: [],
+      jwksEndpoint: new URL(`${platformIssuer}/keys`),
+      messagesSupported: [],
+      productFamilyCode: "",
+      registrationEndpoint: new URL(`${platformIssuer}/register`),
+      token: {
+        endpoint: new URL(`${platformIssuer}/token`),
+      },
+      version: "1.0.0",
+    }),
   });
 
   const toolData = {
