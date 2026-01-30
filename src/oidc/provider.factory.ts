@@ -11,10 +11,7 @@ import { ltiToolConfigurationSchema } from "@/lti/tools/lti-tool-config-schemas"
 import { LtiToolsRepository } from "@/lti/tools/lti-tools.repository";
 import { OIDCAdapterBridge } from "@/oidc/adapter/bridge";
 import { OIDCAdapterFactory } from "@/oidc/adapter/factory";
-import { MessageType } from "$/claims/serialization";
 import { LTI_TOOL_CONFIGURATION_KEY } from "$/registration/dynamic/tool-configuration";
-import { MessagePlacement } from "$/registration/enums/message-placement";
-import { PlatformConfigurationMetadata } from "$/registration/platform-configuration-metadata";
 import { ODICClientIdPrefix } from ".";
 import { AvailableACRs, AvailableScopes } from "./consts";
 import { OIDCAccountsRepository } from "./repositories/accounts.repository";
@@ -134,17 +131,6 @@ export class OIDCProviderFactory {
         console.debug(error);
         ctx.body = out;
       },
-      discovery: new PlatformConfigurationMetadata({
-        version: process.env.npm_package_version ?? "development",
-        messagesSupported: [
-          { type: MessageType.resourceLink },
-          {
-            type: MessageType.deepLinking,
-            placements: [MessagePlacement.ContentArea],
-          },
-        ],
-        productFamilyCode: this.environments.app.productCode,
-      }).intoConfiguration(),
     } satisfies Configuration;
 
     const issuerUrl = `${this.environments.app.url}/oidc`;

@@ -33,6 +33,7 @@ export const Routes = {
     oidcLogout: () => Routes.oidc.logout(),
   },
   lti: {
+    openIdConfiguration: () => `/lti/.well-known/openid-configuration`,
     tools: {
       registerForm: () => `/lti/tools/register`,
       register: () => `/lti/tools/register`,

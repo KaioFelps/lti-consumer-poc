@@ -10,7 +10,6 @@ import {
 } from "@nestjs/common";
 import { either } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
-import Provider from "oidc-provider";
 import { EnvironmentVars } from "@/config/environment-vars";
 import { ErrorBase } from "@/core/errors/error-base";
 import { LtiToolPresenter } from "@/external/presenters/entities/lti-tool.presenter";
@@ -21,7 +20,9 @@ import { RenderAsync } from "@/lib/async-render";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
+import { Routes } from "@/routes";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
+import { Platform } from "$/core/platform";
 import { LtiRegistrationInitiationRequest } from "$/messages/initiate-register";
 import { RegisterToolDTO } from "./dtos/register-tool.dto";
 import { FindManyToolsPreviewsService } from "./services/find-many-tools-previews.service";
@@ -32,7 +33,7 @@ import { GetToolRegistrationDetailsService } from "./services/get-tool-registrat
 export class LtiToolsController {
   public constructor(
     private vars: EnvironmentVars,
-    private provider: Provider,
+    private platform: Platform,
     private t: TranslatorService,
     private findManyToolsService: FindManyToolsPreviewsService,
     private getToolDetailsService: GetToolRegistrationDetailsService,
@@ -66,12 +67,13 @@ export class LtiToolsController {
 
     const issuer = shouldUseDockerInternalHost
       ? "http://host.docker.internal:3000/oidc"
-      : this.provider.issuer;
-
-    const openIdConfigurationUri = `${issuer}/.well-known/openid-configuration`;
+      : this.platform.issuer;
 
     const initiateRegister = new LtiRegistrationInitiationRequest({
-      platformOpenIdConfigurationUri: new URL(openIdConfigurationUri),
+      platformOpenIdConfigurationUri: new URL(
+        Routes.lti.openIdConfiguration(),
+        issuer,
+      ),
       toolInitiateRegisterUri: new URL(dto.registrationEndpoint),
     });
 
