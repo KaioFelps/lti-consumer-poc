@@ -33,7 +33,7 @@ os passos abaixo são necessário para conseguir replicar o experimento (que é 
 [`mkcert`]: https://github.com/FiloSottile/mkcert
 
 ### Desbloqueando URLs Inseguros (Somente em Desenvolvimento)
-- http://localhost/admin/settings.php?section=httpsecurity
+- https://127.0.0.1:8443/admin/settings.php?section=httpsecurity
     - desligue a opção "Secure cookies only"
     - remova os valores `localhost`, `127.0.0.0/8` e `192.168.0.0/16` do campo "cURL blocked hosts list"
         - `localhost` e `127.0.0.0/8` se referem a máquina local, por isso precisam ser desbloqueados em desenvolvimento;
@@ -76,7 +76,7 @@ Feito isso, utilize o registro dinâmico para registrar o Moodle como uma ferram
 1. Acesse https://127.0.0.1:8443/admin/settings.php?section=enrolsettingslti_registrations > Register a platform
     - Platform name: Lti Consumer PoC
 2. Copie o endereço do campo Registration URL.
-3. Acesse http://localhost:3000/lti/register.
+3. Acesse https://localhost:3000/lti/register.
 4. Cole o endereço de registro do Moodle no campo URL do endpoint de registro da ferramenta.
 5. Marque a opção Utilizar host interna do Docker.
     

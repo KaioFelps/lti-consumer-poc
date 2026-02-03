@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import { join } from "node:path";
 import { NestFactory } from "@nestjs/core";
 import { NestExpressApplication } from "@nestjs/platform-express";
@@ -20,7 +21,12 @@ async function bootstrap() {
   expand(config());
   await loadMessageStrings();
 
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    httpsOptions: {
+      key: fs.readFileSync(join(__dirname, "../../certs", "localhost-key.pem")),
+      cert: fs.readFileSync(join(__dirname, "../../certs", "localhost.pem")),
+    },
+  });
 
   const redis = app.get(Redis);
   const env = app.get(EnvironmentVars);
