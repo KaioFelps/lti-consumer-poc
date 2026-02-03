@@ -58,6 +58,7 @@ export const Routes = {
       initiate: (resourceLinkId: string) =>
         `/lti/launches/${resourceLinkId}/initiate`,
       login: () => `/lti/launches/login`,
+      return: () => `/lti/launches/post-launch`,
     },
   },
 } as const;

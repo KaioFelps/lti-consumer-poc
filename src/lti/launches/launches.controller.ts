@@ -1,5 +1,13 @@
-import { Controller, Get, HttpStatus, Param, Query, Res } from "@nestjs/common";
-import { taskEither as te } from "fp-ts";
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Query,
+  Render,
+  Res,
+} from "@nestjs/common";
+import { either as e, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { type JOSENotSupported } from "jose/dist/types/util/errors";
 import { Public } from "@/auth/public-routes";
@@ -12,6 +20,7 @@ import { HttpResponse } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { eitherPromiseToTaskEither as teFromPromise } from "@/lib/fp-ts";
 import { Mvc } from "@/lib/mvc-routes";
+import { TranslatorService } from "@/message-string/translator.service";
 import { assertNever } from "@/utils/assert-never";
 import type { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
 import { MalformedRequestError } from "$/core/errors/malformed-request.error";
@@ -20,6 +29,7 @@ import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiLaunchServices } from "$/core/services/launch.services";
 import { FindToolByIdService } from "../tools/services/find-tool-by-id.service";
 import { LaunchLoginDto } from "./dtos/launch-login.dto";
+import { PostLaunchDto } from "./dtos/post-launch.dto";
 import { InitiateLaunchService } from "./services/initiate-launch.service";
 import { LaunchLoginService } from "./services/launch-login.service";
 
@@ -38,7 +48,31 @@ export class LtiLaunchesController {
     private launchLoginService: LaunchLoginService,
     private initiateLaunchService: InitiateLaunchService,
     private findToolByIdService: FindToolByIdService,
+    private platform: Platform,
+    private t: TranslatorService,
   ) {}
+
+  @Render("post-launch")
+  @Get("post-launch")
+  public async postLaunch(
+    @Query() { errorLog, errorMsg, successLog, successMsg }: PostLaunchDto,
+  ) {
+    let title: string;
+    if (successMsg || successLog)
+      title = await this.t.translate("lti:post-launch:success-title");
+    else if (errorMsg || errorLog)
+      title = await this.t.translate("lti:post-launch:error-title");
+    else title = await this.t.translate("lti:post-launch:default-title");
+
+    if (errorLog) console.error(errorLog);
+    else if (successLog) console.info(successLog);
+
+    return {
+      title,
+      successMsg,
+      errorMsg,
+    };
+  }
 
   @Get(":id/initiate")
   public async initiateLaunch(

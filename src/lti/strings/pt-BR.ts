@@ -182,3 +182,15 @@ ptBR["lti:launch:repository:launch-not-found"] = ({ launchId }) =>
   `Não foi possível encontrar nenhum registro de lançamento LTI com id "${launchId}"`;
 ptBR["lti:launch:no-valid-launch-found-error"] = ({ launchId }) =>
   `Não foi possível encontrar um registro de lançamento LTI válido com o id "${launchId}".`;
+
+ptBR["lti:post-launch:success-title"] = "Lançamento concluído com sucesso";
+ptBR["lti:post-launch:error-title"] = "Lançamento mal-sucedido";
+ptBR["lti:post-launch:default-title"] = "Lançamento concluído";
+ptBR["lti:post-launch:err-msg-must-be-string"] =
+  "A mensagem de erro precisa ser um texto.";
+ptBR["lti:post-launch:msg-must-be-string"] =
+  "A mensagem de sucesso precisa ser um texto.";
+ptBR["lti:post-launch:err-log-must-be-string"] =
+  "O log de erro precisa ser um texto.";
+ptBR["lti:post-launch:log-must-be-string"] =
+  "O log de sucesso precisa ser um texto.";

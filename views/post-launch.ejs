@@ -1,0 +1,13 @@
+<main class="main">
+    <h1><%= title %></h1>
+    
+    <% if (errorMsg) { %>
+        <span style="display: inline-block;" class="error-alert"><%= errorMsg %></span>
+    <% } %>
+    
+    <% if (successMsg) { %>
+        <span style="display: inline-block;" class="error-alert"><%= successMsg %></span>
+    <% } %>
+
+    <a href="<%= routes.home() %>"><%= await t.translate("lti:") %></a>
+</main>
