@@ -11,6 +11,7 @@ import { InvalidRedirectUriError } from "../errors/invalid-redirect-uri.error";
 import { RedirectionError } from "../errors/redirection.error";
 import { LtiRepositoryError } from "../errors/repository.error";
 import { LtiLaunchData } from "../launch-data";
+import { MessageRequests } from "../messages";
 import { InitiateLaunchRequest } from "../messages/initiate-launch";
 import { LTIResourceLinkLaunchRequest } from "../messages/resource-link-launch";
 import { Platform } from "../platform";
@@ -42,12 +43,24 @@ type GetLaunchLinksFromContext = GetLaunchLinksParams & {
 };
 
 type InitiateLaunchParams = {
+  /**
+   * The identifier of the user performing the resource link launch.
+   * Will be used furthermore to authenticate the LTI Tool authorization request.
+   */
   sessionUserId: string;
   resourceLink: LtiResourceLink;
   tool: ToolRecord;
+  /**
+   * Indicates how to present this resource link launch.
+   */
+  presentation?: MessageRequests.Presentation;
+  /**
+   * If present, overrides `resourceLink.resource` URL.
+   */
+  targetLinkUri?: URL;
 };
 
-type AuthenticateLaunchLoginRequestParams<CustomRoles> = {
+type AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType> = {
   nonce: string;
   tool: ToolRecord;
   redirectUri: URL;
@@ -57,6 +70,9 @@ type AuthenticateLaunchLoginRequestParams<CustomRoles> = {
   userIdentity?: UserIdentity;
   context?: Context;
   fallbackUserRoles?: UserRoles<CustomRoles>;
+  transformLaunchRequest?: (
+    request: LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>,
+  ) => void;
   /**
    * A map of errors and URI of web pages that contains information about it.
    *
@@ -89,12 +105,15 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
     resourceLink,
     tool,
     sessionUserId,
+    presentation,
+    targetLinkUri,
   }: InitiateLaunchParams): Promise<
     Either<LtiRepositoryError<ExternalError>, InitiateLaunchRequest>
   > {
     const launch = LtiLaunchData.create({
       resourceLinkId: resourceLink.id,
       userId: sessionUserId,
+      presentation,
     });
 
     const TEN_MINUTES = 600;
@@ -108,7 +127,7 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
       platform: this.platform,
       tool,
       deploymentId: resourceLink.deploymentId,
-      targetLink: resourceLink.resource,
+      targetLink: targetLinkUri ?? resourceLink.resource,
       loginHint: launch.id.toString(),
       ltiMessageHint: launch.id.toString(),
     });
@@ -154,7 +173,11 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
     fallbackUserRoles,
     errorDescriptionsRoutes,
     tool,
-  }: AuthenticateLaunchLoginRequestParams<CustomRoles>): Promise<
+    transformLaunchRequest,
+  }: AuthenticateLaunchLoginRequestParams<
+    CustomRoles,
+    CustomContextType
+  >): Promise<
     Either<
       RedirectionError,
       LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>
@@ -256,6 +279,11 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
       context,
       userRoles: fallbackUserRoles,
     });
+
+    if (launch.presentation) launchRequest.setPresentation(launch.presentation);
+    transformLaunchRequest?.(launchRequest);
+
+    console.debug(await launchRequest.intoForm());
 
     return e.right(launchRequest);
   }

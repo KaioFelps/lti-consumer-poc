@@ -8,7 +8,6 @@
  * [custom parameter substitution]: https://www.imsglobal.org/spec/lti/v1p3/#customproperty
  */
 
-import { ClassProperties } from "common/src/types/class-properties";
 import ejs from "ejs";
 import { either } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
@@ -72,7 +71,7 @@ export class LTIResourceLinkLaunchRequest<
     private userIdentity?: Readonly<UserIdentity<CustomRoles>>,
     private context?: Context<CustomContextType>,
     private mentorScope?: string[],
-    private launchPresentation?: MessageRequests.Presentation,
+    private presentation?: MessageRequests.Presentation,
     /**
      * A platform may want to associate extra data about the resource link
      * that initiated the launch. This is the place to put these data.
@@ -168,24 +167,15 @@ export class LTIResourceLinkLaunchRequest<
     this.context = context;
   }
 
-  public setLaunchPresentation(
-    presentation:
-      | ClassProperties<MessageRequests.Presentation>
-      | MessageRequests.Presentation,
+  public setPresentation(
+    presentation: MessageRequests.IPresentation | MessageRequests.Presentation,
   ) {
     if (presentation instanceof MessageRequests.Presentation) {
-      this.launchPresentation = presentation;
+      this.presentation = presentation;
       return;
     }
 
-    const { documentTarget, height, locale, returnUrl, width } = presentation;
-    this.launchPresentation = new MessageRequests.Presentation(
-      documentTarget,
-      width,
-      height,
-      returnUrl,
-      locale,
-    );
+    this.presentation = MessageRequests.Presentation.create(presentation);
   }
 
   intoLtiClaim(): object {
@@ -205,7 +195,7 @@ export class LTIResourceLinkLaunchRequest<
         this.platform.instance?.intoLtiClaim(),
       [resolveClaimKey(LTIClaimKey.mentoredUsers)]: this.mentorScope,
       [resolveClaimKey(LTIClaimKey.launchPresentation)]:
-        this.launchPresentation?.intoLtiClaim(),
+        this.presentation?.intoLtiClaim(),
       [resolveClaimKey(LTIClaimKey.customs)]: this.customClaims,
       ...this.vendorClaims?.intoLtiClaim(),
     };

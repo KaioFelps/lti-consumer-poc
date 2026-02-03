@@ -7,46 +7,64 @@ export namespace MessageRequests {
     Window = "window",
   }
 
+  export interface IPresentation {
+    /**
+     * The kind of browser or frame from which the user started the launch in the platform.
+     */
+    documentTarget?: DocumentTarget;
+    /**
+     * The width of the frame in which the launch's response content will be displayed.
+     */
+    width?: number;
+    /**
+     * The heigh of the frame in which the launch's response content will be displayed.
+     */
+    height?: number;
+    /**
+     * If included, the tool may redirect the user to this URL when it finishes some
+     * activity or if some error occurs.
+     *
+     * If included, the platform must be prepared to treat the redirect by parsing an request
+     * with `ReturnUrlRedirectionDetails` on the endpoint that handles this URL.
+     */
+    returnUrl?: URL;
+    /**
+     * Country, language and variant represented by a valid BCP47 tag (specified in
+     * [RFC5646](https://datatracker.ietf.org/doc/html/rfc5646)).
+     */
+    locale?: string;
+  }
+
   /**
    * A collection of metadata about how the platform expects the message to displayed.
    *
    * @see {@link https://www.imsglobal.org/spec/lti/v1p3/#launch-presentation-claim Launch Presentation Claim}
    */
-  export class Presentation implements IntoLtiClaim {
-    public constructor(
-      /**
-       * The kind of browser or frame from which the user started the launch in the platform.
-       */
+  export class Presentation implements IntoLtiClaim, IPresentation {
+    private constructor(
       public readonly documentTarget?: DocumentTarget,
-      /**
-       * The width of the frame in which the launch's response content will be displayed.
-       */
       public readonly width?: number,
-      /**
-       * The heigh of the frame in which the launch's response content will be displayed.
-       */
       public readonly height?: number,
-      /**
-       * If included, the tool may redirect the user to this URL when it finishes some
-       * activity or if some error occurs.
-       *
-       * If included, the platform must be prepared to treat the redirect by parsing an request
-       * with `ReturnUrlRedirectionDetails` on the endpoint that handles this URL.
-       */
       public readonly returnUrl?: URL,
-      /**
-       * Country, language and variant represented by a valid BCP47 tag (specified in
-       * [RFC5646](https://datatracker.ietf.org/doc/html/rfc5646)).
-       */
       public readonly locale?: string,
     ) {}
+
+    public static create(args: IPresentation) {
+      return new Presentation(
+        args.documentTarget,
+        args.width,
+        args.height,
+        args.returnUrl,
+        args.locale,
+      );
+    }
 
     intoLtiClaim(): object {
       return {
         document_target: this.documentTarget,
         height: this.height,
         width: this.width,
-        return_url: this.returnUrl,
+        return_url: this.returnUrl?.toString(),
         locale: this.locale,
       };
     }
