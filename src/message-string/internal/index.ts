@@ -3,7 +3,11 @@ type ValidFormatterArgValue =
   | string
   | number
   | boolean
-  | { [key: PropertyKey]: ValidFormatterArgValue };
+  | bigint
+  | null
+  | undefined
+  | { [key: PropertyKey]: ValidFormatterArgValue }
+  | ValidFormatterArgValue[];
 
 export type MessageStringFormatterArg = {
   [key: PropertyKey]: ValidFormatterArgValue;

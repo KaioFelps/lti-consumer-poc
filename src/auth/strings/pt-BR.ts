@@ -1,4 +1,3 @@
-import { PersonGender } from "@/identity/person/enums/gender";
 import { SystemRole } from "@/identity/user/enums/system-role";
 import { ptBR } from "@/message-string/internal/translations/pt-BR";
 
@@ -17,11 +16,11 @@ ptBR["auth:register-user:username-invalid-type"] =
 ptBR["auth:register-user:password-invalid-type"] =
   "Sua senha é obrigatória; e deve ser um conjunto de caracteres.";
 
-ptBR["auth:register-user:password-too-short"] =
-  "A senha deve ter; no mínimo, 8 caracteres.";
+ptBR["auth:register-user:password-too-short"] = ({ minimum }) =>
+  `A senha deve ter; no mínimo, ${minimum} caracteres.`;
 
-ptBR["auth:register-user:password-too-long"] =
-  "A senha não deve exceder 70 caracteres.";
+ptBR["auth:register-user:password-too-long"] = ({ maximum }) =>
+  `A senha não deve exceder ${maximum} caracteres.`;
 
 ptBR["auth:user-register:system-role-invalid-type"] =
   "O cargo do usuário deve assumir um dos valores " +
@@ -33,9 +32,14 @@ ptBR["auth:register-person:date-invalid-type"] =
 ptBR["auth:register-person:email-invalid-type"] =
   "O e-mail fornecido precisa ser um endereço de e-mail válido.";
 
-ptBR["auth:register-person:gender-invalid-type"] =
+ptBR["auth:register-person:gender-invalid-type"] = ({
+  values,
+}: {
+  values: string[];
+}) =>
   "Se informado; o gênero deve ser ser representado por um dos valores válidos: " +
-  `${PersonGender.Female}; ${PersonGender.Male} ou ${PersonGender.NonBinary}`;
+  values?.join(", ") +
+  ".";
 
 ptBR["auth:register-person:cpf-invalid-type"] =
   "Informar seu CPF é obrigatório.";

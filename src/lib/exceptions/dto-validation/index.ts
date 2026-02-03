@@ -38,9 +38,12 @@ export async function serializeValidationError(
 export async function serializeFinalValidationError(
   error: Required<ValidationError>,
 ): Promise<SerializedValidationError> {
-  const { errorMessageIdentifier, argumentName } = error;
+  const { errorMessageIdentifier, argumentName, messageParams } = error;
   return {
-    message: await this.translator.translate(errorMessageIdentifier),
+    message: await this.translator.translate(
+      errorMessageIdentifier,
+      messageParams,
+    ),
     argumentName,
   };
 }
