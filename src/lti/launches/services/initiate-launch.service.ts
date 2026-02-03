@@ -6,10 +6,12 @@ import { User } from "@/identity/user/user.entity";
 import { eitherPromiseToTaskEither as teFromPromise } from "@/lib/fp-ts";
 import { findResourceLinkByIdService } from "@/lti/resource-links/services/find-resource-link-by-id.service";
 import { FindToolByIdService } from "@/lti/tools/services/find-tool-by-id.service";
+import { MessageRequests } from "$/core/messages";
 import { LtiLaunchServices } from "$/core/services/launch.services";
 
 type Params = {
   resourceLinkId: string;
+  presentation?: MessageRequests.Presentation;
   user: User;
 };
 
@@ -21,7 +23,7 @@ export class InitiateLaunchService {
     private readonly findResourceLinkByIdService: findResourceLinkByIdService,
   ) {}
 
-  public async exec({ resourceLinkId, user }: Params) {
+  public async exec({ resourceLinkId, presentation, user }: Params) {
     return await pipe(
       teFromPromise(() =>
         this.findResourceLinkByIdService.exec({ resourceLinkId }),
@@ -41,6 +43,7 @@ export class InitiateLaunchService {
               resourceLink,
               tool,
               sessionUserId: user.getId().toString(),
+              presentation,
             },
           ),
         ),

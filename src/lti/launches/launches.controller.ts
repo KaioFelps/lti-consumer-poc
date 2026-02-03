@@ -18,16 +18,19 @@ import { PersonNotFoundError } from "@/identity/errors/person-not-found.error";
 import type { User } from "@/identity/user/user.entity";
 import { HttpResponse } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { eitherPromiseToTaskEither as teFromPromise } from "@/lib/fp-ts";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
+import { Routes } from "@/routes";
 import { assertNever } from "@/utils/assert-never";
 import type { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
 import { MalformedRequestError } from "$/core/errors/malformed-request.error";
 import { RedirectionError } from "$/core/errors/redirection.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
+import { MessageRequests } from "$/core/messages";
+import { Platform } from "$/core/platform";
 import { LtiLaunchServices } from "$/core/services/launch.services";
 import { FindToolByIdService } from "../tools/services/find-tool-by-id.service";
+import { InitiateLaunchDto } from "./dtos/initiate-launch.dto";
 import { LaunchLoginDto } from "./dtos/launch-login.dto";
 import { PostLaunchDto } from "./dtos/post-launch.dto";
 import { InitiateLaunchService } from "./services/initiate-launch.service";
@@ -77,14 +80,23 @@ export class LtiLaunchesController {
   @Get(":id/initiate")
   public async initiateLaunch(
     @Param("id") resourceLinkId: string,
+    @Query() { width, height }: InitiateLaunchDto,
     @SessionUser() user: User,
     @Res() response: HttpResponse,
   ) {
-    return await pipe(
-      teFromPromise(() =>
-        this.initiateLaunchService.exec({ resourceLinkId, user }),
-      ),
-      te.match(
+    return pipe(
+      await this.initiateLaunchService.exec({
+        resourceLinkId,
+        user,
+        presentation: MessageRequests.Presentation.create({
+          documentTarget: MessageRequests.DocumentTarget.Window,
+          width,
+          height,
+          locale: this.t.getLocale(),
+          returnUrl: new URL(Routes.lti.launch.return(), this.platform.issuer),
+        }),
+      }),
+      e.match(
         (_error) => {
           const error =
             _error instanceof LtiRepositoryError ? _error.cause : _error;
@@ -94,7 +106,7 @@ export class LtiLaunchesController {
         (initiateLaunchRequest) =>
           response.redirect(initiateLaunchRequest.intoUrl().toString()),
       ),
-    )();
+    );
   }
 
   @Public()
@@ -105,27 +117,22 @@ export class LtiLaunchesController {
     @SessionUser() user?: User,
   ): Promise<HttpResponse | void> {
     return await pipe(
-      teFromPromise(() =>
-        this.findToolByIdService.exec({ id: body.client_id }),
-      ),
+      () => this.findToolByIdService.exec({ id: body.client_id }),
       te.map((tool) => tool.record),
       te.chainW((tool) =>
         pipe(
-          teFromPromise(() =>
+          () =>
             this.launchServices.verifyRedirectUri({
               tool,
               redirectUri: body.redirect_uri,
             }),
-          ),
           te.map((redirectUri) => ({ redirectUri, tool })),
         ),
       ),
       te.mapLeft((error) => ({ error }) as IErrorContext<typeof error>),
       te.chainW(({ redirectUri, tool }) =>
         pipe(
-          teFromPromise(() =>
-            this.launchLoginService.exec({ body, redirectUri, tool, user }),
-          ),
+          () => this.launchLoginService.exec({ body, redirectUri, tool, user }),
           te.mapLeft(
             (error) => ({ error, redirectUri }) as IErrorContext<typeof error>,
           ),
@@ -166,7 +173,7 @@ export class LtiLaunchesController {
         },
         (link) =>
           pipe(
-            teFromPromise(() => link.intoForm()),
+            () => link.intoForm(),
             te.match(
               (error) => handleJoseNotSupportedError(error),
               (form) => res.type("html").status(HttpStatus.OK).send(form),

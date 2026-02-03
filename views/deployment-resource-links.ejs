@@ -85,6 +85,41 @@
     </form>
 </dialog>
 
+<script id="resource-links-launch-scripts" type="module">
+    function initiateLaunch(event) {
+        const trigger = event.target;
+        const endpoint = new URL(trigger.value, window.location);
+
+        const width = 1024;
+        const height = 720;
+
+        endpoint.searchParams.set("width", width);
+        endpoint.searchParams.set("height", height);
+
+        const windowFeatures = Object.entries({
+            popup: true,
+            width,
+            height,
+            left: screen.width / 2 - width / 2,
+            top: screen.height / 2 - height / 2
+        })
+            .map(([key, value]) => `${key}=${value}`)
+            .join(",");
+
+        window.open(endpoint, "lti_popup", windowFeatures);
+    }
+
+    function setupTriggers() {
+        document
+            .querySelectorAll(".resource-link-launch-button")
+            .forEach(button => {
+                button.addEventListener("click", initiateLaunch);
+            })
+    }
+
+    window.addEventListener("table-refresh", setupTriggers);
+</script>
+
 <script id="delete-resource-link-dialog-script" type="module">
     const alertsContainer = document.getElementById("alerts-container");
     const deleteDialog = document.getElementById("delete-resource-link-dialog");
@@ -178,16 +213,18 @@
                             <%= await t.translate("buttons:remove") %>
                         </button>
                     </li>
-                    <li><a href="${link.url}"><%= await t.translate("lti:launch:buttons:launch") %></a></li>
+                    <li>
+                        <button
+                            class="resource-link-launch-button"
+                            value="${link.url}"
+                        >
+                            <%= await t.translate("lti:launch:buttons:launch") %>
+                        </button>
+                    </li>
                 <ul>
             </td>`;
 
         return row;
-    }
-
-    function appendResourceLinkToTable(link) {
-        const row = prepareRow(link);
-        tbody.appendChild(row);
     }
 
     function refreshTable() {

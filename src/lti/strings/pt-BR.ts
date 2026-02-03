@@ -149,6 +149,11 @@ ptBR["lti:resource-links:find-by-id:resource-not-found"] = ({
   resourceLinkId,
 }) => `Não foi possível encontrar um link com ID "${resourceLinkId}".`;
 
+ptBR["lti:initiate-launch:width-must-be-number"] =
+  "A largura precisa ser um valor numérico.";
+ptBR["lti:initiate-launch:height-must-be-number"] =
+  "A altura precisa ser um valor numérico.";
+
 ptBR["lti:launch-login:scopes-must-contain-openid"] =
   "O campo 'scope' precisa incluir o escopo 'openid'.";
 ptBR["lti:launch-login:response-type-must-be-id-token"] =
