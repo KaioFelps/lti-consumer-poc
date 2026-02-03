@@ -63,7 +63,7 @@ Para utilizar o Moodle como uma ferramenta LTI, foram realizadas as seguintes co
     - Preferred language: `English (en)`
     - Institution: *\<empty\>*
 - https://127.0.0.1:8443/admin/settings.php?section=logos
-    - Compact logo: e{ keys: [this.jwks.privateJwk] },nvie alguma imagem qualquer.
+    - Compact logo: envie alguma imagem qualquer.
 
         O registro dinâmico do OpenID Connect especifica que o campo `logo_uri` é opcional, mas quando presente,
         deve ser um URL válido. A atual implementação do Moodle envia uma string vazia *sempre*, o que fere
