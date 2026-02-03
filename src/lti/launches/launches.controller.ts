@@ -18,8 +18,8 @@ import { MalformedRequestError } from "$/core/errors/malformed-request.error";
 import { RedirectionError } from "$/core/errors/redirection.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiLaunchServices } from "$/core/services/launch.services";
-import { LaunchLoginDto } from "../launches/dtos/launch-login.dto";
 import { FindToolByIdService } from "../tools/services/find-tool-by-id.service";
+import { LaunchLoginDto } from "./dtos/launch-login.dto";
 import { InitiateLaunchService } from "./services/initiate-launch.service";
 import { LaunchLoginService } from "./services/launch-login.service";
 

@@ -12,7 +12,7 @@ import { LtiDeploymentsController } from "./deployments/deployments.controller";
 import { DeployToolService } from "./deployments/services/deploy-tool.service";
 import { FindDeploymentByIdService } from "./deployments/services/find-deployment-by-id.service";
 import { RemoveToolDeploymentService } from "./deployments/services/remove-tool-deployment.service";
-import { LtiLaunchesController } from "./launches/launches.repository";
+import { LtiLaunchesController } from "./launches/launches.controller";
 import { InitiateLaunchService } from "./launches/services/initiate-launch.service";
 import { LaunchLoginService } from "./launches/services/launch-login.service";
 import { LtiController } from "./lti.controller";
