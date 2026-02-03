@@ -3,6 +3,7 @@ Este documento contém as configurações necessárias para levantar a aplicaç�
 
 ## Requisitos Básicos
 - [Docker](https://docs.docker.com/engine/install/);
+    - Ative a opção "Enable host networking" em Settings > Resources no Docker Desktop.
 - [NodeJs & npm](https://nodejs.org/en/download).
 
 ### Instalação e configurações iniciais
@@ -50,14 +51,18 @@ os passos abaixo são necessário para conseguir replicar o experimento (que é 
 > Portanto, **acesse e utilize o endereço do moodle pelo IP local (`127.0.0.1`), especialmente durante o registro**.
 
 Para utilizar o Moodle como uma ferramenta LTI, foram realizadas as seguintes configurações:
-- https://127.0.0.1/admin/category.php?category=enrolltifolder
+- https://127.0.0.1:8443/admin/settings.php?section=manageauths
+    - Habilite o plugin LTI
+- https://127.0.0.1:8443/admin/settings.php?section=manageenrols
+    - Habilite o plugin Publish as LTI tool
+- https://127.0.0.1:8443/admin/category.php?category=enrolltifolder
     - Email visibility: `Visible to course participants`
     - City/town: *\<empty\>*
     - Select a country: `Brazil`
     - Timezone: `America/Sao_Paulo`
     - Preferred language: `English (en)`
     - Institution: *\<empty\>*
-- https://127.0.0.1/admin/settings.php?section=logos
+- https://127.0.0.1:8443/admin/settings.php?section=logos
     - Compact logo: e{ keys: [this.jwks.privateJwk] },nvie alguma imagem qualquer.
 
         O registro dinâmico do OpenID Connect especifica que o campo `logo_uri` é opcional, mas quando presente,
@@ -68,7 +73,7 @@ Para utilizar o Moodle como uma ferramenta LTI, foram realizadas as seguintes co
         no presente momento.
 
 Feito isso, utilize o registro dinâmico para registrar o Moodle como uma ferramenta LTI nesta plataforma:
-1. Acesse https://127.0.0.1/admin/settings.php?section=enrolsettingslti_registrations > Register a platform
+1. Acesse https://127.0.0.1:8443/admin/settings.php?section=enrolsettingslti_registrations > Register a platform
     - Platform name: Lti Consumer PoC
 2. Copie o endereço do campo Registration URL.
 3. Acesse http://localhost:3000/lti/register.

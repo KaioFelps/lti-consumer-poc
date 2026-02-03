@@ -7,19 +7,12 @@ services:
       - MOODLE_DATABASE_USER=${MOODLE_DB_USER}
       - MOODLE_DATABASE_PASSWORD=${MOODLE_DB_PASSWORD}
       - MOODLE_DATABASE_NAME=${MOODLE_DB_NAME}
-      - MOODLE_DATABASE_PORT_NUMBER=3306
-      - MOODLE_DATABASE_HOST=moodle_db
+      - MOODLE_DATABASE_PORT_NUMBER=${MOODLE_DB_PORT}
+      - MOODLE_DATABASE_HOST=127.0.0.1
       - MOODLE_USERNAME=${MOODLE_USERNAME}
       - MOODLE_PASSWORD=${MOODLE_PASSWORD}
       - MOODLE_SITE_NAME=Local Moodle
       - BITNAMI_DEBUG=true
-    ports:
-      - 80:8080
-      - 443:8443
-    networks:
-      - moodle-network
-    extra_hosts:
-      - "localhost:host-gateway"
     volumes:
       - moodle_data:/bitnami/moodle
       - moodledata_data:/bitnami/moodledata
@@ -27,10 +20,10 @@ services:
     depends_on:
       moodle_db:
         condition: service_healthy
-    links:
-      - moodle_db
     profiles:
       - full
+    command: /bin/bash -c " update-ca-certificates && echo 'openssl.cafile=/etc/ssl/certs/ca-certificates.crt' >> /opt/bitnami/php/etc/php.ini && /opt/bitnami/scripts/moodle/entrypoint.sh /opt/bitnami/scripts/moodle/run.sh "
+    network_mode: host
 
   platform_db:
     container_name: lti_experiment_consumer_pg_db
@@ -55,8 +48,6 @@ services:
       - MARIADB_DATABASE=${MOODLE_DB_NAME}
       - MARIADB_CHARACTER_SET=utf8mb4
       - MARIADB_COLLATE=utf8mb4_unicode_ci
-    networks:
-      - moodle-network
     volumes:
       - mariadb_data:/bitnami/mariadb
     ports:
@@ -82,10 +73,6 @@ services:
     profiles:
       - full
       - local
-
-networks:
-  moodle-network:
-
 
 volumes:
   moodle_data:
