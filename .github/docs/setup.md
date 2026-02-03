@@ -51,6 +51,8 @@ os passos abaixo são necessário para conseguir replicar o experimento (que é 
 > Portanto, **acesse e utilize o endereço do moodle pelo IP local (`127.0.0.1`), especialmente durante o registro**.
 
 Para utilizar o Moodle como uma ferramenta LTI, foram realizadas as seguintes configurações:
+- https://127.0.0.1:8443/admin/settings.php?section=httpsecurity
+    - Habilite a opção 'Allow frame embedding'
 - https://127.0.0.1:8443/admin/settings.php?section=manageauths
     - Habilite o plugin LTI
 - https://127.0.0.1:8443/admin/settings.php?section=manageenrols
