@@ -6,6 +6,7 @@ export const ptBR: MessageStringTranslationMap = {
   "core:errors:internal-error-message":
     "Houve um problema com o servidor, tente novamente mais tarde.",
 
+  "core:navigation:home": "Início",
   "home-title": "Página Inicial",
 
   "table-headings:actions": "Ações",

@@ -1,5 +1,9 @@
 import { ptBR } from "@/message-string/internal/translations/pt-BR";
 
+ptBR["lti:navigation:lti"] = "LTI";
+ptBR["lti:navigation:show-tools"] = "Ver ferramentas";
+ptBR["lti:navigation:register-tool"] = "Registrar nova ferramenta";
+
 ptBR["lti:tool-not-found-by-id"] = ({ toolId }: { toolId: string }) => {
   return `Não foi possível encontrar nenhuma ferramenta com ID ${toolId}`;
 };

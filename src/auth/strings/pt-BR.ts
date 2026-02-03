@@ -2,6 +2,10 @@ import { PersonGender } from "@/identity/person/enums/gender";
 import { SystemRole } from "@/identity/user/enums/system-role";
 import { ptBR } from "@/message-string/internal/translations/pt-BR";
 
+ptBR["auth:navigation:login"] = "Logar";
+ptBR["auth:navigation:logout"] = "Deslogar";
+ptBR["auth:navigation:register"] = "Criar nova conta";
+
 ptBR["auth:unauthorized-access:message"] =
   "Você não está autorizado a acessar esse recurso.";
 

@@ -1,13 +1,13 @@
 <header id="app-header">
     <nav>
         <ul>
-            <li><a href="<%= routes.home() %>">Home</a></li>
+            <li><a href="<%= routes.home() %>"><%= await t.translate("core:navigation:home") %></a></li>
             <li>
                 <details class="nav-dropdown">
-                    <summary>LTI</summary>
+                    <summary><%= await t.translate("lti:navigation:lti") %></summary>
                     <ul class="nav-dropdown-content">
-                        <li><a href="<%= routes.lti.tools.list() %>">Ver ferramentas</a></li>
-                        <li><a href="<%= routes.lti.tools.registerForm() %>">Registrar nova ferramenta</a></li>
+                        <li><a href="<%= routes.lti.tools.list() %>"><%= await t.translate("lti:navigation:show-tools") %></a></li>
+                        <li><a href="<%= routes.lti.tools.registerForm() %>"><%= await t.translate("lti:navigation:register-tool") %></a></li>
                     </ul>
                 </details>
             </li>
@@ -16,9 +16,16 @@
                     <details class="nav-dropdown">
                         <summary><%= auth.username %></summary>
                         <ul class="nav-dropdown-content">
-                            <li><a href="<%= routes.auth.oidcLogout() %>">Logout</a></li>
+                            <li><a href="<%= routes.auth.oidcLogout() %>"><%= await t.translate("auth:navigation:logout") %></a></li>
                         </ul>
                     </details>
+                </li>
+            <% } else { %>
+                <li>
+                    <a href="<%= routes.auth.registerForm() %>"><%= await t.translate("auth:navigation:register") %></a>
+                </li>
+                <li>
+                    <a href="<%= routes.auth.loginForm() %>"><%= await t.translate("auth:navigation:login") %></a>
                 </li>
             <% } %>
         </ul>
