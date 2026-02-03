@@ -246,7 +246,7 @@ function handlePersonNotFoundError(
 function handleJoseNotSupportedError(error: JOSENotSupported) {
   const renderable = new RenderableError(
     {
-      view: "lti/errors/server-error",
+      view: "errors/lti-server-error",
       viewProperties: {
         title: "Internal Security Error",
         message: "Could not establish a secure launch connection.",
