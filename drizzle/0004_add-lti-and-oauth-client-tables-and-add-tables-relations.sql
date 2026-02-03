@@ -60,7 +60,6 @@ CREATE TABLE "oauth_redirect_uris" (
 	CONSTRAINT "oauth_redirect_uris_client_id_uri_pk" PRIMARY KEY("client_id","uri")
 );
 --> statement-breakpoint
-ALTER TABLE "users" DROP CONSTRAINT "users_id_not_null";--> statement-breakpoint
 ALTER TABLE "users" DROP CONSTRAINT "users_username_not_null";--> statement-breakpoint
 ALTER TABLE "users" DROP CONSTRAINT "users_password_hash_not_null";--> statement-breakpoint
 ALTER TABLE "users" DROP CONSTRAINT "users_system_role_not_null";--> statement-breakpoint
