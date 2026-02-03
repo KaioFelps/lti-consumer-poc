@@ -22,7 +22,7 @@ export function translate(
 
   if (!msg)
     throw new IrrecoverableError(
-      `The identifier ${identifier} have not been set to ${language} translations.`,
+      `The identifier '${identifier}' have not been set to ${language} translations.`,
     );
 
   const isCallable = typeof msg === "function";
