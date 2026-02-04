@@ -4,7 +4,7 @@ import type {
   DBQueryConfig,
   ExtractTablesWithRelations,
 } from "drizzle-orm";
-import { LtiToolPreview } from "@/lti/tools/entities/lti-tool-preview.entity";
+import { LtiToolPreview } from "@/modules/lti/tools/entities/lti-tool-preview.entity";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 

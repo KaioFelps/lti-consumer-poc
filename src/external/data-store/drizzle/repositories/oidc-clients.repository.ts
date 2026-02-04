@@ -3,8 +3,8 @@ import { either } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { ClientMetadata } from "oidc-provider";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { OIDCClient } from "@/oidc/client";
-import { OIDCClientsRepository } from "@/oidc/repositories/clients.repository";
+import { OIDCClient } from "@/modules/oidc/client";
+import { OIDCClientsRepository } from "@/modules/oidc/repositories/clients.repository";
 
 @Injectable()
 export class DrizzleOIDCClientsRepository extends OIDCClientsRepository {

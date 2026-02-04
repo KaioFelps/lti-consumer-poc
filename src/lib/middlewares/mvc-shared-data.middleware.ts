@@ -1,8 +1,8 @@
 import { Injectable, NestMiddleware } from "@nestjs/common";
 import { UserPresenter } from "@/external/presenters/entities/user.presenter";
-import { User } from "@/identity/user/user.entity";
 import { DEFAULT_EJS_LAYOUT } from "@/main";
 import { TranslatorService } from "@/message-string/translator.service";
+import { User } from "@/modules/identity/user/user.entity";
 import { Routes } from "@/routes";
 import { HttpRequest, HttpResponse, RequestSession } from "..";
 

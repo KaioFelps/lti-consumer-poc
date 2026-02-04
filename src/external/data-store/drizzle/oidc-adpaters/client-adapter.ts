@@ -13,12 +13,12 @@ import {
   eitherPromiseToTaskEither,
   mapTaskEitherEitherAndFlatten,
 } from "@/lib/fp-ts";
-import { LtiToolIdPrefix } from "@/lti";
-import { LtiTool } from "@/lti/tools/entities/lti-tool.entity";
-import { LtiToolsRepository } from "@/lti/tools/lti-tools.repository";
-import { ModelName } from "@/oidc/adapter/factory";
-import { OIDCClient } from "@/oidc/client";
-import { OIDCClientsRepository } from "@/oidc/repositories/clients.repository";
+import { LtiToolIdPrefix } from "@/modules/lti";
+import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity";
+import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository";
+import { ModelName } from "@/modules/oidc/adapter/factory";
+import { OIDCClient } from "@/modules/oidc/client";
+import { OIDCClientsRepository } from "@/modules/oidc/repositories/clients.repository";
 
 export class DrizzleOIDCClientAdapter implements Adapter {
   public constructor(

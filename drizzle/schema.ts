@@ -8,8 +8,8 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { PersonGender } from "@/identity/person/enums/gender";
-import { SystemRole } from "@/identity/user/enums/system-role";
+import { PersonGender } from "@/modules/identity/person/enums/gender";
+import { SystemRole } from "@/modules/identity/user/enums/system-role";
 
 export const systemRoleEnum = pgEnum("system_role", [
   SystemRole.Admin,

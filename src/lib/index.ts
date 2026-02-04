@@ -1,6 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
 import { type Request, type Response, response } from "express";
-import { User } from "@/identity/user/user.entity";
+import { User } from "@/modules/identity/user/user.entity";
 
 // Making these aliases allow easier refactory or error search
 // if switching to fastify at some point.

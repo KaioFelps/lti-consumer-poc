@@ -1,4 +1,4 @@
-import { User } from "@/identity/user/user.entity";
+import { User } from "@/modules/identity/user/user.entity";
 
 type PresentedUser = {
   id: string;

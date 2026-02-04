@@ -7,7 +7,10 @@ import {
   sql,
 } from "drizzle-orm";
 import { pipe } from "fp-ts/lib/function";
-import { Person, PersonUncheckedProps } from "@/identity/person/person.entity";
+import {
+  Person,
+  PersonUncheckedProps,
+} from "@/modules/identity/person/person.entity";
 import { trimNullProperties } from "@/utils/trim-null-properties";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;

@@ -1,9 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { usersTable } from "drizzle/schema";
 import { sql } from "drizzle-orm";
+import {
+  Person,
+  PersonUncheckedProps,
+} from "@/modules/identity/person/person.entity";
+import { User } from "@/modules/identity/user/user.entity";
 import { DrizzleClient } from "./external/data-store/drizzle/client";
-import { Person, PersonUncheckedProps } from "./identity/person/person.entity";
-import { User } from "./identity/user/user.entity";
 import { trimNullProperties } from "./utils/trim-null-properties";
 
 @Injectable()

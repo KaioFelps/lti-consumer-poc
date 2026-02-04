@@ -6,9 +6,9 @@ import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { tryCatch } from "fp-ts/lib/TaskEither";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { PersonNotFoundError } from "@/identity/errors/person-not-found.error";
-import { PeopleRepository } from "@/identity/person/people.repository";
-import { Person } from "@/identity/person/person.entity";
+import { PersonNotFoundError } from "@/modules/identity/errors/person-not-found.error";
+import { PeopleRepository } from "@/modules/identity/person/people.repository";
+import { Person } from "@/modules/identity/person/person.entity";
 import { DrizzleClient } from "../client";
 import peopleMapper from "../mappers/people.mapper";
 

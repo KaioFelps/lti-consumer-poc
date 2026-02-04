@@ -1,4 +1,4 @@
-import { SessionUserMiddleware } from "@/auth/session-user";
+import { SessionUserMiddleware } from "@/modules/auth/session-user";
 import { SessionsAndFlashMessagesMiddleware } from "./flash-session.middleware";
 import { MvcSharedDataMiddleware } from "./mvc-shared-data.middleware";
 

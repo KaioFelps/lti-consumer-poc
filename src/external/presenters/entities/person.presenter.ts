@@ -1,4 +1,4 @@
-import { Person } from "@/identity/person/person.entity";
+import { Person } from "@/modules/identity/person/person.entity";
 
 type PresentedPerson = {
   id: string;

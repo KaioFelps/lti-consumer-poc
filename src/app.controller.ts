@@ -1,15 +1,15 @@
 import { Controller, Get, Render } from "@nestjs/common";
 import { either } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
+import { SessionUser } from "@/modules/auth/session-user";
+import { User } from "@/modules/identity/user/user.entity";
+import { getLtiRolesFromSystemRole } from "@/modules/lti/utils/convert-roles";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiLaunchServices } from "$/core/services/launch.services";
 import { AppService } from "./app.service";
-import { SessionUser } from "./auth/session-user";
 import { IrrecoverableError } from "./core/errors/irrecoverable-error";
 import { ResourceNotFoundError } from "./core/errors/resource-not-found.error";
-import { User } from "./identity/user/user.entity";
 import { Mvc } from "./lib/mvc-routes";
-import { getLtiRolesFromSystemRole } from "./lti/utils/convert-roles";
 import { TranslatorService } from "./message-string/translator.service";
 
 @Controller()

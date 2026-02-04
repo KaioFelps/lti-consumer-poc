@@ -1,4 +1,4 @@
-import { LtiTool } from "@/lti/tools/entities/lti-tool.entity";
+import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity";
 import {
   LtiToolSupportedMessagePresenter,
   PresentedLtiToolSupportedMessage,

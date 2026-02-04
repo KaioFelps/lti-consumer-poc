@@ -7,8 +7,8 @@ import { pipe } from "fp-ts/lib/function";
 import { tryCatch } from "fp-ts/lib/TaskEither";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
-import { User } from "@/identity/user/user.entity";
-import { UsersRepository } from "@/identity/user/users.repository";
+import { User } from "@/modules/identity/user/user.entity";
+import { UsersRepository } from "@/modules/identity/user/users.repository";
 import { DrizzleClient } from "../client";
 
 @Injectable()

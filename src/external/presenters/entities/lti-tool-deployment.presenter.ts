@@ -1,4 +1,4 @@
-import { LtiToolDeployment } from "@/lti/tools/entities/lti-tool-deployment.entity";
+import { LtiToolDeployment } from "@/modules/lti/tools/entities/lti-tool-deployment.entity";
 
 export type PresentedLtiToolDeployment = {
   id: string;

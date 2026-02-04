@@ -1,11 +1,11 @@
 import { Global, Module } from "@nestjs/common";
-import { PeopleRepository } from "@/identity/person/people.repository";
-import { UsersRepository } from "@/identity/user/users.repository";
-import { LtiResourceLinksRepository } from "@/lti/resource-links/resource-links.repository";
-import { LtiToolsRepository } from "@/lti/tools/lti-tools.repository";
-import { LtiToolsDeploymentsRepository } from "@/lti/tools/lti-tools-deployments.repository";
-import { OIDCAccountsRepository } from "@/oidc/repositories/accounts.repository";
-import { OIDCClientsRepository } from "@/oidc/repositories/clients.repository";
+import { PeopleRepository } from "@/modules/identity/person/people.repository";
+import { UsersRepository } from "@/modules/identity/user/users.repository";
+import { LtiResourceLinksRepository } from "@/modules/lti/resource-links/resource-links.repository";
+import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository";
+import { LtiToolsDeploymentsRepository } from "@/modules/lti/tools/lti-tools-deployments.repository";
+import { OIDCAccountsRepository } from "@/modules/oidc/repositories/accounts.repository";
+import { OIDCClientsRepository } from "@/modules/oidc/repositories/clients.repository";
 import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
 import { LtiResourceLinksRepository as BaseLtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { DrizzleLtiToolsRepository } from "./drizzle/repositories/lti-tools.repository";

@@ -5,10 +5,13 @@ import { either, option, taskEither } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { tryCatch } from "fp-ts/lib/TaskEither";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { Person, PersonUncheckedProps } from "@/identity/person/person.entity";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { OIDCAccount } from "@/oidc/account";
-import { OIDCAccountsRepository } from "@/oidc/repositories/accounts.repository";
+import {
+  Person,
+  PersonUncheckedProps,
+} from "@/modules/identity/person/person.entity";
+import { OIDCAccount } from "@/modules/oidc/account";
+import { OIDCAccountsRepository } from "@/modules/oidc/repositories/accounts.repository";
 import { trimNullProperties } from "@/utils/trim-null-properties";
 import { DrizzleClient } from "../client";
 

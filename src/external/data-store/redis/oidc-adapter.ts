@@ -9,7 +9,7 @@ import {
   resolveOIDCKey,
   uidKeyFor,
   userCodeKeyFor,
-} from "@/oidc/adapter/helpers";
+} from "@/modules/oidc/adapter/helpers";
 import { Redis } from "./client";
 
 export class OIDCRedisAdapter {

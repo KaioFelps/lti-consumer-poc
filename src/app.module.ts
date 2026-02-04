@@ -1,18 +1,18 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { AuthModule } from "@/modules/auth/auth.module";
+import { IdentityModule } from "@/modules/identity/identity.module";
+import { LtiModule } from "@/modules/lti/lti.module";
+import { OIDCModule } from "@/modules/oidc/oidc.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { AuthModule } from "./auth/auth.module";
 import { AppConfigModule } from "./config/config.module";
 import { ExternalModule } from "./external/external.module";
-import { IdentityModule } from "./identity/identity.module";
 import { GlobalExceptionFiltersModule } from "./lib/globals/exception-filters.module";
 import { GlobalGuardsModule } from "./lib/globals/guards.module";
 import { GlobalInterceptorsModule } from "./lib/globals/interceptors.module";
 import { GlobalPipesModule } from "./lib/globals/pipes.module";
 import middlewares from "./lib/middlewares";
-import { LtiModule } from "./lti/lti.module";
 import { MessageStringModule } from "./message-string/message-string.module";
-import { OIDCModule } from "./oidc/oidc.module";
 
 @Module({
   imports: [

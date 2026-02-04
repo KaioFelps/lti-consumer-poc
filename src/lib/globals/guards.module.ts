@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
-import publicRoutes from "@/auth/public-routes";
+import publicRoutes from "@/modules/auth/public-routes";
 import mvcRoutes from "../mvc-routes";
 
 @Module({
