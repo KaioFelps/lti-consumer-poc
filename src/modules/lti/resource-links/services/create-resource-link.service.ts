@@ -26,7 +26,7 @@ export class CreateResourceLinkService {
     deployment,
     description,
     title,
-    customParameters = {},
+    customParameters,
   }: Params) {
     const resourceLink = LtiResourceLink.create({
       id: generateUUID(),

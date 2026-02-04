@@ -3,7 +3,10 @@ import { Optional } from "common/src/types/optional";
 import { generateUUID } from "common/src/types/uuid";
 import { IntoLtiClaim } from "$/claims/serialization";
 
-type Args = Optional<ClassProperties<LtiResourceLink>, "id">;
+type Args = Optional<
+  ClassProperties<LtiResourceLink>,
+  "id" | "customParameters"
+>;
 
 /**
  * A `ResourceLink` instance describes a resource link placement, i.e.,
@@ -47,7 +50,7 @@ export class LtiResourceLink implements IntoLtiClaim {
    *
    * @see {@link https://www.imsglobal.org/spec/lti-dr/v1p0#lti-configuration-0}
    */
-  public customParameters: Record<string, string>;
+  public customParameters: Record<string, string> = {};
 
   protected constructor(args: Args) {
     Object.assign(this, { ...args, id: args.id ?? generateUUID() });
