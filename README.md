@@ -1,9 +1,15 @@
 # LTI Consumer
-Esse repositório contém uma pequena aplicação LTI-Compatible capaz de registrar learning tools.
+Esse repositório contém uma pequena aplicação LTI-compliant (uma plataforma LTI) capaz de registrar learning tools.
 
 ## Objetivo
 A prova de conceito (PoC ou PdC) consiste em registrar o Moodle como uma Learning Tool e obter informações sobre
-atividades realizadas em determinados cursos.
+atividades realizadas em determinados cursos. Para isso, os seguintes serviços/especificações hão de ser implementadas:
+
+- [x] [LTI Security Framework 1.0](https://www.imsglobal.org/spec/security/v1p0/#authentication-error-response)
+- [x] [LTI Dynamic Registration 1.0](https://www.imsglobal.org/spec/lti-dr/v1p0)
+- [x] [LTI Core 1.3 (Resource Links & launch)](https://www.imsglobal.org/spec/lti/v1p3/)
+- [ ] [LTI Assignment and Grade Services 2.0](https://www.imsglobal.org/spec/lti-ags/v2p0)
+- [ ] [LTI Deep Linking](https://www.imsglobal.org/spec/lti-dl/v2p0)
 
 Além disso, outros experimentos estão sendo realizados e testados neste repositório:
 - [Strings de mensagens]: um experimento para realizar traduções de mensagens e evitar strings hard-coded
@@ -39,15 +45,11 @@ as permissões (*grants*) requeridas pelo cliente.
 Para deslogar-se, acesse a rota `localhost:3000/oidc/session/end`.
 
 ## Configurações LTI 
-Boa parte das configurações para o OIDC servem para viabilizar a implementação das especificações do LTI.
+Boa parte das [configurações para o OIDC] servem para viabilizar a implementação das especificações do LTI.
 Classes e métodos específicos do LTI estão no workspace `ltilib` e são feitos para serem desacoplados da aplicação
 principal, mas não tão *batteries-included* quanto a bilbioteca oidc-provider.
 
-### LTI Dynamic Registration
-- Adicionada as configurações específicas do LTI com a classe `ToolConfigurationMetadata` nas configurações do
-  [provider] da biblioteca oidc-provider (em `discovery`);
-- habilitada a [feature `register`](https://github.com/panva/node-oidc-provider/blob/main/docs/README.md#featuresregistration)
-  no [provider] do oidc-provider para que o registro dinâmico do LTI funcione;
-- adicionados os escopos do LTI nos escopos disponíveis (propriedade `scopes` das configurações).
+Por esse motivo, o módulo `lti` contém códigos que usufruem dos mecanismos providenciados pelo NestJS para
+montar e utilizar os serviços da `ltilib`.
 
-[provider]: ./src/oidc/provider.ts
+[configurações para o OIDC]: ./src/oidc/provider.factory.ts
