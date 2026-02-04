@@ -283,8 +283,6 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
     if (launch.presentation) launchRequest.setPresentation(launch.presentation);
     transformLaunchRequest?.(launchRequest);
 
-    console.debug(await launchRequest.intoForm());
-
     return e.right(launchRequest);
   }
 
