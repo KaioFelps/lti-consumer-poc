@@ -37,6 +37,8 @@ services:
     profiles:
       - full
       - local
+    volumes:
+      - platform_data:/var/lib/postgresql/data
 
   moodle_db:
     container_name: lti_consumer_poc_moodle_mariadb
@@ -81,3 +83,4 @@ volumes:
     driver: local
   mariadb_data:
     driver: local
+  platform_data:
