@@ -45,6 +45,7 @@ export class Platform implements IPlatform {
   public readonly initiateLaunchEndpoint: IPlatform["initiateLaunchEndpoint"];
   public readonly instance?: Platform.Instance | undefined;
   public readonly openIdConfiguration: Platform.OpenIdConfiguration;
+  public readonly agsConfiguration?: Platform.LtiAssignmentAndGradeServicesConfig;
 
   protected constructor(args: IPlatform) {
     Object.assign(this, args);
