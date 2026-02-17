@@ -4,8 +4,7 @@ export type GrantType = "implicit" | "client_credentials";
 export type ResponseType = "id_token";
 export type Contact = `${string}@${string}.${string}`;
 
-export const LTI_TOOL_CONFIGURATION_KEY =
-  "https://purl.imsglobal.org/spec/lti-tool-configuration";
+export const LTI_TOOL_CONFIGURATION_KEY = "https://purl.imsglobal.org/spec/lti-tool-configuration";
 
 /**
  * This interface describes the data sent by the Tool in a client registration

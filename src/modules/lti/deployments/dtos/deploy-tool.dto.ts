@@ -26,8 +26,7 @@ export class DeployToolDto implements DTO {
   public readonly withDeployModalOpen: boolean;
 
   validate(): Either<ValidationErrors, void> {
-    const { success, error, data } =
-      DeployToolDto.deployToolSchema.safeParse(this);
+    const { success, error, data } = DeployToolDto.deployToolSchema.safeParse(this);
 
     if (!success) return either.left(mapZodErrorsToCoreValidationErrors(error));
 

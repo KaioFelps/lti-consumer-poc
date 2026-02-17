@@ -18,16 +18,11 @@ export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRep
   @Inject()
   private readonly drizzle: DrizzleClient;
 
-  public async save(
-    deployment: LtiToolDeployment,
-  ): Promise<Either<IrrecoverableError, void>> {
+  public async save(deployment: LtiToolDeployment): Promise<Either<IrrecoverableError, void>> {
     return await pipe(
       te.tryCatch(
         () =>
-          this.drizzle
-            .getClient()
-            .insert(ltiToolDeployments)
-            .values(mapper.intoRow(deployment)),
+          this.drizzle.getClient().insert(ltiToolDeployments).values(mapper.intoRow(deployment)),
         (error: Error) =>
           new IrrecoverableError(
             `Error occurred in ${DrizzleLtiToolsDeploymentsRepository.name} when deploying an LTI tool.`,
@@ -57,9 +52,7 @@ export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRep
     )();
   }
 
-  public async delete(
-    deploymentId: UUID,
-  ): Promise<Either<IrrecoverableError, void>> {
+  public async delete(deploymentId: UUID): Promise<Either<IrrecoverableError, void>> {
     return await pipe(
       te.tryCatch(
         () =>
@@ -79,9 +72,7 @@ export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRep
 
   public async findById(
     deploymentId: UUID,
-  ): Promise<
-    Either<IrrecoverableError | ResourceNotFoundError, LtiToolDeployment>
-  > {
+  ): Promise<Either<IrrecoverableError | ResourceNotFoundError, LtiToolDeployment>> {
     return await pipe(
       te.tryCatch(
         () =>

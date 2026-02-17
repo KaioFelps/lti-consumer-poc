@@ -3,8 +3,7 @@ import { Option } from "fp-ts/lib/Option";
 
 export type AnyLtiRole = InstitutionRole | MembershipRole | SystemRole;
 
-const INSTITUTION_ROLE_PREDICADE =
-  "http://purl.imsglobal.org/vocab/lis/v2/institution/person#";
+const INSTITUTION_ROLE_PREDICADE = "http://purl.imsglobal.org/vocab/lis/v2/institution/person#";
 
 export enum InstitutionRole {
   Administrator = "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator",
@@ -23,8 +22,7 @@ export enum InstitutionRole {
   ProspectiveStudent = "http://purl.imsglobal.org/vocab/lis/v2/institution/person#ProspectiveStudent",
 }
 
-const MEMBERSHIP_ROLE_PREDICADE =
-  "http://purl.imsglobal.org/vocab/lis/v2/membership#";
+const MEMBERSHIP_ROLE_PREDICADE = "http://purl.imsglobal.org/vocab/lis/v2/membership#";
 
 export enum MembershipRole {
   Administrator = "http://purl.imsglobal.org/vocab/lis/v2/membership#Administrator",
@@ -37,8 +35,7 @@ export enum MembershipRole {
   Officer = "http://purl.imsglobal.org/vocab/lis/v2/membership#Officer",
 }
 
-const SYSTEM_ROLE_PREDICADE =
-  "http://purl.imsglobal.org/vocab/lis/v2/system/person#";
+const SYSTEM_ROLE_PREDICADE = "http://purl.imsglobal.org/vocab/lis/v2/system/person#";
 
 export enum SystemRole {
   Administrator = "http://purl.imsglobal.org/vocab/lis/v2/system/person#Administrator",
@@ -70,25 +67,17 @@ export abstract class RolesHelper {
     return option.none;
   }
 
-  public static tryParseAsInstitutionRole(
-    roleUrl: string,
-  ): Option<InstitutionRole> {
+  public static tryParseAsInstitutionRole(roleUrl: string): Option<InstitutionRole> {
     if (roleUrl.startsWith(INSTITUTION_ROLE_PREDICADE)) {
-      return option.some(
-        InstitutionRole[roleUrl.replace(INSTITUTION_ROLE_PREDICADE, "")],
-      );
+      return option.some(InstitutionRole[roleUrl.replace(INSTITUTION_ROLE_PREDICADE, "")]);
     }
 
     return option.none;
   }
 
-  public static tryParseAsMembershipRole(
-    roleUrl: string,
-  ): Option<MembershipRole> {
+  public static tryParseAsMembershipRole(roleUrl: string): Option<MembershipRole> {
     if (roleUrl.startsWith(MEMBERSHIP_ROLE_PREDICADE)) {
-      return option.some(
-        MembershipRole[roleUrl.replace(MEMBERSHIP_ROLE_PREDICADE, "")],
-      );
+      return option.some(MembershipRole[roleUrl.replace(MEMBERSHIP_ROLE_PREDICADE, "")]);
     }
 
     return option.none;
@@ -96,9 +85,7 @@ export abstract class RolesHelper {
 
   public static tryParseAsSystemRole(roleUrl: string): Option<SystemRole> {
     if (roleUrl.startsWith(SYSTEM_ROLE_PREDICADE)) {
-      return option.some(
-        SystemRole[roleUrl.replace(SYSTEM_ROLE_PREDICADE, "")],
-      );
+      return option.some(SystemRole[roleUrl.replace(SYSTEM_ROLE_PREDICADE, "")]);
     }
 
     return option.none;

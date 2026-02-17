@@ -1,10 +1,7 @@
 import { ClassProperties } from "common/src/types/class-properties";
 import { MessageStringFormatterArg } from "@/message-string/internal";
 
-export type ErrorClassProperties<Class> = Omit<
-  ClassProperties<Class>,
-  "errorType"
->;
+export type ErrorClassProperties<Class> = Omit<ClassProperties<Class>, "errorType">;
 
 /**
  * `ErrorBase` is the base class for every core-level error. It models
@@ -33,10 +30,7 @@ export abstract class ErrorBase {
    */
   public readonly errorType: string;
 
-  protected constructor(
-    properties: ErrorClassProperties<ErrorBase>,
-    errorType: string,
-  ) {
+  protected constructor(properties: ErrorClassProperties<ErrorBase>, errorType: string) {
     Object.assign(this, properties);
     this.errorType = errorType;
   }

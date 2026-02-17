@@ -23,12 +23,7 @@ export class LtiInitiateThirdPartyLoginRequest implements LtiInitiationMessage {
     targetLink,
     tool,
   }: CreateInitiateThirdPartyLoginRequestArgs) {
-    return new LtiInitiateThirdPartyLoginRequest(
-      tool,
-      platform,
-      loginHint,
-      targetLink,
-    );
+    return new LtiInitiateThirdPartyLoginRequest(tool, platform, loginHint, targetLink);
   }
 
   public intoUrl(): URL {

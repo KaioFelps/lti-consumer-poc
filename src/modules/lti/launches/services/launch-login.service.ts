@@ -34,9 +34,7 @@ export class LaunchLoginService {
           opt.fromNullable,
           opt.traverse(te.ApplicativePar)((user) =>
             pipe(
-              teFromPromise(() =>
-                this.findPersonByIdService.exec({ id: user.getId() }),
-              ),
+              teFromPromise(() => this.findPersonByIdService.exec({ id: user.getId() })),
               te.map(utils.extractUserIdentity),
             ),
           ),

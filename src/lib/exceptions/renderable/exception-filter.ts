@@ -1,11 +1,4 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  Inject,
-  Injectable,
-  Scope,
-} from "@nestjs/common";
+import { ArgumentsHost, Catch, ExceptionFilter, Inject, Injectable, Scope } from "@nestjs/common";
 import { HttpRequest } from "@/lib";
 import { RenderableException } from "./exception";
 import { RenderableExceptionFilterResponderFactory } from "./responder.factory";
@@ -21,8 +14,6 @@ export class RenderableExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<HttpRequest>();
     const status = exception.getStatus();
 
-    return this.responderFactory
-      .create(request)
-      .respond(status, ctx, exception);
+    return this.responderFactory.create(request).respond(status, ctx, exception);
   }
 }

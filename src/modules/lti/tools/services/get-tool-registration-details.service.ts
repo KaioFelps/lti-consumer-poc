@@ -24,12 +24,8 @@ export class GetToolRegistrationDetailsService {
       eitherPromiseToTaskEither(() => this.toolsRepo.findToolById(toolId)),
       te.map((tool) => {
         return pipe(
-          eitherPromiseToTaskEither(() =>
-            this.deploymentsRepo.findManyByToolId(tool.id),
-          ),
-          te.map((deployments) =>
-            LtiToolDetails.create({ tool: new LtiTool(tool), deployments }),
-          ),
+          eitherPromiseToTaskEither(() => this.deploymentsRepo.findManyByToolId(tool.id)),
+          te.map((deployments) => LtiToolDetails.create({ tool: new LtiTool(tool), deployments })),
           eitherPromiseToTaskEither,
         );
       }),

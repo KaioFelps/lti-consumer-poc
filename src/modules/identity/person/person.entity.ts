@@ -27,18 +27,13 @@ export type PersonUncheckedProps = UserUncheckedProps &
  * Used to parse an raw response from Drizzle
  */
 export type PersonNullableProps = UserUncheckedProps &
-  Nullable<
-    PersonUncheckedProps,
-    "cpf" | "birthDate" | "gender" | "firstName" | "surname"
-  >;
+  Nullable<PersonUncheckedProps, "cpf" | "birthDate" | "gender" | "firstName" | "surname">;
 
 export class Person extends EntityBase<PersonProps> {
   public static create(
-    props_: Omit<PersonProps, "user"> &
-      Omit<Optional<UserProps, "systemRole">, "id">,
+    props_: Omit<PersonProps, "user"> & Omit<Optional<UserProps, "systemRole">, "id">,
   ) {
-    const { passwordHash, username, profilePictureUrl, systemRole, ...props } =
-      props_;
+    const { passwordHash, username, profilePictureUrl, systemRole, ...props } = props_;
 
     const user = User.create({
       passwordHash,
@@ -50,10 +45,7 @@ export class Person extends EntityBase<PersonProps> {
     return Person.createFromUser(user, props);
   }
 
-  public static createFromUser(
-    user: User,
-    props: Omit<PersonProps, "user">,
-  ): Person {
+  public static createFromUser(user: User, props: Omit<PersonProps, "user">): Person {
     return new Person({ user, ...props });
   }
 
@@ -84,10 +76,7 @@ export class Person extends EntityBase<PersonProps> {
    * @returns `None` if it's not a valid person. `Some(Person)` otherwise.
    */
   public static tryCreateUnchecked(
-    partialProps: Optional<
-      PersonUncheckedProps,
-      "birthDate" | "cpf" | "firstName" | "surname"
-    >,
+    partialProps: Optional<PersonUncheckedProps, "birthDate" | "cpf" | "firstName" | "surname">,
   ): Option<Person> {
     if (
       typeof partialProps.birthDate === "undefined" ||

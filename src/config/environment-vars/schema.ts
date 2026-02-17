@@ -11,16 +11,11 @@ export const environmentVariablesSchema = z.object({
   APP_NAME: z.string(),
   APP_PRODUCT_NAME: z.string(),
   PRIVATE_KEY_BASE64: z.string(),
-  NODE_ENV: z
-    .enum(["production", "development"])
-    .optional()
-    .default("production"),
+  NODE_ENV: z.enum(["production", "development"]).optional().default("production"),
   REDIS_PASSWORD: z.string(),
   REDIS_USER: z.string(),
   REDIS_PORT: z.coerce.number(),
   REDIS_HOST: z.string(),
 });
 
-export type EnvironmentVariablesSchema = z.infer<
-  typeof environmentVariablesSchema
->;
+export type EnvironmentVariablesSchema = z.infer<typeof environmentVariablesSchema>;

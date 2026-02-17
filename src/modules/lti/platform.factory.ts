@@ -40,9 +40,7 @@ export class PlatformFactory {
           "name",
           "nickname",
         ],
-        extraScopesSupported: AvailableScopes.filter(
-          (scope) => scope !== "openid",
-        ),
+        extraScopesSupported: AvailableScopes.filter((scope) => scope !== "openid"),
         version: process.env.npm_package_version ?? "development",
         messagesSupported: [
           { type: MessageType.resourceLink },

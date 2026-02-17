@@ -13,12 +13,7 @@ export class LtiLaunchData {
     public readonly presentation?: MessageRequests.Presentation,
   ) {}
 
-  public static create({
-    resourceLinkId,
-    userId,
-    presentation,
-    id = generateUUID(),
-  }: Args) {
+  public static create({ resourceLinkId, userId, presentation, id = generateUUID() }: Args) {
     return new LtiLaunchData(id, resourceLinkId, userId, presentation);
   }
 }

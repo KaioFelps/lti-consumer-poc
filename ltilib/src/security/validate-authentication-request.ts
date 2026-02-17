@@ -26,8 +26,7 @@ export function validateAuthenticationRequest(
     return e.left(error);
   }
 
-  const { response_mode, response_type, prompt, scope } =
-    args as ValidateAuthenticationRequestArgs;
+  const { response_mode, response_type, prompt, scope } = args as ValidateAuthenticationRequestArgs;
 
   const hasOpenIdScope = typeof scope === "string" && scope.includes("openid");
   if (!hasOpenIdScope) {
@@ -49,19 +48,13 @@ export function validateAuthenticationRequest(
   }
 
   if (response_type !== "id_token") {
-    const error = new MalformedRequestError(
-      "'response_type' must be 'id_token'.",
-      "response_type",
-    );
+    const error = new MalformedRequestError("'response_type' must be 'id_token'.", "response_type");
 
     return e.left(error);
   }
 
   if (prompt !== "none") {
-    const error = new MalformedRequestError(
-      "'prompt' must be 'none'.",
-      "prompt",
-    );
+    const error = new MalformedRequestError("'prompt' must be 'none'.", "prompt");
 
     return e.left(error);
   }

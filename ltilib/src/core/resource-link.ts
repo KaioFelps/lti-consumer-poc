@@ -3,10 +3,7 @@ import { Optional } from "common/src/types/optional";
 import { generateUUID } from "common/src/types/uuid";
 import { IntoLtiClaim } from "$/claims/serialization";
 
-type Args = Optional<
-  ClassProperties<LtiResourceLink>,
-  "id" | "customParameters"
->;
+type Args = Optional<ClassProperties<LtiResourceLink>, "id" | "customParameters">;
 
 /**
  * A `ResourceLink` instance describes a resource link placement, i.e.,

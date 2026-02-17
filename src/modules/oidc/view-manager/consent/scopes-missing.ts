@@ -9,22 +9,14 @@ export class ScopesAreMissingConsentViewManager extends ViewManager {
   }
 
   public async getRenderData(): Promise<object> {
-    const {
-      translatorService: t,
-      localeHint,
-      account,
-      client,
-      interaction,
-    } = this.data;
+    const { translatorService: t, localeHint, account, client, interaction } = this.data;
 
-    const missingScopes = (
-      interaction.prompt.details.missingOIDCScope as string[]
-    ).filter((scope) => scope !== AvailableScope.openId);
+    const missingScopes = (interaction.prompt.details.missingOIDCScope as string[]).filter(
+      (scope) => scope !== AvailableScope.openId,
+    );
 
     const missingScopesDescriptions = await Promise.all(
-      missingScopes.map((scope) =>
-        t.translate(`oidc:scopes:scopes-descriptions:${scope}`),
-      ),
+      missingScopes.map((scope) => t.translate(`oidc:scopes:scopes-descriptions:${scope}`)),
     );
 
     const paragraph1 =
@@ -48,14 +40,8 @@ export class ScopesAreMissingConsentViewManager extends ViewManager {
         missingScopes: missingScopesDescriptions,
       },
       buttons: {
-        authorize: await t.translateWithHint(
-          "oidc:confirm:buttons:authorize",
-          localeHint,
-        ),
-        cancel: await t.translateWithHint(
-          "oidc:confirm:buttons:cancel",
-          localeHint,
-        ),
+        authorize: await t.translateWithHint("oidc:confirm:buttons:authorize", localeHint),
+        cancel: await t.translateWithHint("oidc:confirm:buttons:cancel", localeHint),
       },
     };
   }

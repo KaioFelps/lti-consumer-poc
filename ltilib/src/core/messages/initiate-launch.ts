@@ -5,23 +5,22 @@ import {
 } from "$/security/messages/initiate-third-party-login";
 import type { LTIResourceLinkLaunchRequest } from "./resource-link-launch";
 
-type CreateInitiateLaunchRequestArgs =
-  CreateInitiateThirdPartyLoginRequestArgs & {
-    /**
-     * The same deployment ID that will be passed to the {@link LTIResourceLinkLaunchRequest}
-     * further on.
-     *
-     * @see {@link https://www.imsglobal.org/spec/lti/v1p3/#lti_deployment_id-login-parameter}
-     */
-    deploymentId?: string;
-    /**
-     * Information a platform may want or need to receive back in the subsequent
-     * message.
-     *
-     * @see {@link https://www.imsglobal.org/spec/lti/v1p3/#lti_message_hint-login-parameter}
-     */
-    ltiMessageHint?: string;
-  };
+type CreateInitiateLaunchRequestArgs = CreateInitiateThirdPartyLoginRequestArgs & {
+  /**
+   * The same deployment ID that will be passed to the {@link LTIResourceLinkLaunchRequest}
+   * further on.
+   *
+   * @see {@link https://www.imsglobal.org/spec/lti/v1p3/#lti_deployment_id-login-parameter}
+   */
+  deploymentId?: string;
+  /**
+   * Information a platform may want or need to receive back in the subsequent
+   * message.
+   *
+   * @see {@link https://www.imsglobal.org/spec/lti/v1p3/#lti_message_hint-login-parameter}
+   */
+  ltiMessageHint?: string;
+};
 
 export class InitiateLaunchRequest implements LtiInitiationMessage {
   protected constructor(
@@ -31,11 +30,7 @@ export class InitiateLaunchRequest implements LtiInitiationMessage {
     private ltiMessageHint?: string,
   ) {}
 
-  public static create({
-    deploymentId,
-    ltiMessageHint,
-    ...args
-  }: CreateInitiateLaunchRequestArgs) {
+  public static create({ deploymentId, ltiMessageHint, ...args }: CreateInitiateLaunchRequestArgs) {
     const initiateLoginRequest = LtiInitiateThirdPartyLoginRequest.create(args);
     return new InitiateLaunchRequest(
       initiateLoginRequest,

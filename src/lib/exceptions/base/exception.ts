@@ -13,9 +13,7 @@ import { ErrorBase } from "@/core/errors/error-base";
  * may not fit in, and therefore must implement their own
  * presenters and filters.
  */
-export class BaseException<
-  E extends ErrorBase = ErrorBase,
-> extends HttpException {
+export class BaseException<E extends ErrorBase = ErrorBase> extends HttpException {
   public constructor(
     public error: E,
     status: HttpStatus,

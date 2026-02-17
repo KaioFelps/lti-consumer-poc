@@ -1,25 +1,12 @@
 import type * as schema from "drizzle/schema";
-import type {
-  BuildQueryResult,
-  DBQueryConfig,
-  ExtractTablesWithRelations,
-} from "drizzle-orm";
+import type { BuildQueryResult, DBQueryConfig, ExtractTablesWithRelations } from "drizzle-orm";
 import { LtiToolPreview } from "@/modules/lti/tools/entities/lti-tool-preview.entity";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 
-type LtiToolPreviewsQueryConfig = DBQueryConfig<
-  "many",
-  boolean,
-  Schema,
-  Schema["ltiTools"]
->;
+type LtiToolPreviewsQueryConfig = DBQueryConfig<"many", boolean, Schema, Schema["ltiTools"]>;
 
-type LtiToolPreviewRow = BuildQueryResult<
-  Schema,
-  Schema["ltiTools"],
-  typeof requiredQueryConfig
->;
+type LtiToolPreviewRow = BuildQueryResult<Schema, Schema["ltiTools"], typeof requiredQueryConfig>;
 
 const requiredQueryConfig = {
   columns: {

@@ -27,8 +27,7 @@ export class AuthenticateUserService {
     password,
   }: AuthenticateUserParams): Promise<Either<PossibleErrors, User>> {
     const errorMessageIdentifier = "auth:authenticate-user:invalid-credentials";
-    const userFromDatastore =
-      await this.usersRepository.findUserByUsername(username);
+    const userFromDatastore = await this.usersRepository.findUserByUsername(username);
 
     if (either.isLeft(userFromDatastore)) {
       const error = userFromDatastore.left;
@@ -41,10 +40,7 @@ export class AuthenticateUserService {
 
     const user = userFromDatastore.right;
 
-    const passwordsMatch = await this.passwordComparator.compare(
-      password,
-      user.getPasswordHash(),
-    );
+    const passwordsMatch = await this.passwordComparator.compare(password, user.getPasswordHash());
 
     if (!passwordsMatch)
       return either.left(

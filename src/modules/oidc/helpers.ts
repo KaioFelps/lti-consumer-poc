@@ -52,9 +52,7 @@ const possibleConsentPromptReasons = [
 
 export type ConsentPromptReason = (typeof possibleConsentPromptReasons)[number];
 
-export function reasonsAreValidPromptReasons(
-  reasons: string[],
-): reasons is ConsentPromptReason[] {
+export function reasonsAreValidPromptReasons(reasons: string[]): reasons is ConsentPromptReason[] {
   return reasons.every((reason) =>
     possibleConsentPromptReasons.includes(reason as ConsentPromptReason),
   );

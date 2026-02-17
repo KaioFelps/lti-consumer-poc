@@ -15,12 +15,7 @@ describe("CPF value-object", () => {
   });
 
   it("should not parse CPFs with invalid characters or invalid sizes", () => {
-    const cpfs = [
-      "123.456.789-1a",
-      "123.456.@89-10",
-      "1235456.789-13",
-      "123.456.78-10",
-    ];
+    const cpfs = ["123.456.789-1a", "123.456.@89-10", "1235456.789-13", "123.456.78-10"];
 
     for (const cpf of cpfs) {
       expect(either.left(CPF.parseFromString(cpf))).toBeTruthy();

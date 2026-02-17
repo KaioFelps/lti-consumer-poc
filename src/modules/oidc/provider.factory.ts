@@ -48,8 +48,7 @@ export class OIDCProviderFactory {
           if (key === LTI_TOOL_CONFIGURATION_KEY) {
             if (!value) return;
 
-            const { success, error } =
-              ltiToolConfigurationSchema.safeParse(value);
+            const { success, error } = ltiToolConfigurationSchema.safeParse(value);
 
             if (!success) {
               const firstError = error.issues[0];
@@ -69,15 +68,7 @@ export class OIDCProviderFactory {
       // this option specify claims returned according to given scopes
       claims: {
         email: ["email"],
-        profile: [
-          "birthdate",
-          "family_name",
-          "gender",
-          "given_name",
-          "locale",
-          "name",
-          "nickname",
-        ],
+        profile: ["birthdate", "family_name", "gender", "given_name", "locale", "name", "nickname"],
       },
       interactions: {
         url: (_, interaction) => `/oidc/interaction/${interaction.uid}`,
@@ -91,8 +82,7 @@ export class OIDCProviderFactory {
         registration: {
           enabled: true,
           idFactory: (ctx) => {
-            const isLtiTool =
-              LTI_TOOL_CONFIGURATION_KEY in (ctx.oidc.body ?? {});
+            const isLtiTool = LTI_TOOL_CONFIGURATION_KEY in (ctx.oidc.body ?? {});
 
             /**
              * We ensure every tool or client be prefixed according to what it its.
@@ -160,9 +150,7 @@ export class OIDCProviderFactory {
       taskEither.map((tools) => {
         return pipe(
           eitherPromiseToTaskEither(() => this.clientsRepository.getClients()),
-          taskEither.map((clients) =>
-            clients.map((client) => client.asClientMetadata()),
-          ),
+          taskEither.map((clients) => clients.map((client) => client.asClientMetadata())),
           taskEither.map((clients) => [...tools, ...clients]),
         );
       }),

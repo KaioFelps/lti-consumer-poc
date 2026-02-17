@@ -99,10 +99,7 @@ interface IOpenIdConfiguration {
   version: string;
   messagesSupported: {
     type: MessageType;
-    placements?: (
-      | MessagePlacement.ContentArea
-      | MessagePlacement.RichTextEditor
-    )[];
+    placements?: (MessagePlacement.ContentArea | MessagePlacement.RichTextEditor)[];
   }[];
   /**
    * An optional list of variables available for variable substitution parameters.
@@ -142,10 +139,7 @@ export class OpenIdConfiguration implements IOpenIdConfiguration {
   public readonly version: string;
   public readonly messagesSupported: {
     type: MessageType;
-    placements?: (
-      | MessagePlacement.ContentArea
-      | MessagePlacement.RichTextEditor
-    )[];
+    placements?: (MessagePlacement.ContentArea | MessagePlacement.RichTextEditor)[];
   }[];
   public readonly variables?: string[] | undefined;
 
@@ -169,10 +163,7 @@ export class OpenIdConfiguration implements IOpenIdConfiguration {
         ...(this.token.extraSigningAlgValuesSupported ?? []),
       ],
       scopes_supported: ["openid", ...(this.extraScopesSupported ?? [])],
-      response_types_supported: [
-        "id_token",
-        ...(this.extraResponseTypesSupported ?? []),
-      ],
+      response_types_supported: ["id_token", ...(this.extraResponseTypesSupported ?? [])],
       id_token_signing_alg_values_supported: [
         "RS256",
         ...(this.extraIdTokenSigningAlgValuesSupported ?? []),

@@ -17,8 +17,7 @@ export class RegisterToolDTO implements DTO {
   public readonly registrationEndpoint: string;
 
   validate(): Either<ValidationErrors, void> {
-    const { success, error, data } =
-      RegisterToolDTO.registerToolSchema.safeParse(this);
+    const { success, error, data } = RegisterToolDTO.registerToolSchema.safeParse(this);
 
     if (!success) return either.left(mapZodErrorsToCoreValidationErrors(error));
 

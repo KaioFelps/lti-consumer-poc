@@ -1,19 +1,10 @@
 import type * as schema from "drizzle/schema";
-import type {
-  BuildQueryResult,
-  DBQueryConfig,
-  ExtractTablesWithRelations,
-} from "drizzle-orm";
+import type { BuildQueryResult, DBQueryConfig, ExtractTablesWithRelations } from "drizzle-orm";
 import { LtiResourceLink } from "$/core/resource-link";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 
-type LtiToolsQueryConfig = DBQueryConfig<
-  "many",
-  boolean,
-  Schema,
-  Schema["ltiResourceLinks"]
->;
+type LtiToolsQueryConfig = DBQueryConfig<"many", boolean, Schema, Schema["ltiResourceLinks"]>;
 
 type LtiResourceLinkRow = BuildQueryResult<
   Schema,
@@ -21,10 +12,7 @@ type LtiResourceLinkRow = BuildQueryResult<
   typeof requiredQueryConfig
 >;
 
-type LtiResourceLinkPlainRow = Omit<
-  LtiResourceLinkRow,
-  "context" | "deployment"
->;
+type LtiResourceLinkPlainRow = Omit<LtiResourceLinkRow, "context" | "deployment">;
 
 const requiredQueryConfig = {
   with: {

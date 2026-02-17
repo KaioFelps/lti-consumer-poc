@@ -16,9 +16,7 @@ export function extractUserIdentity<CustomRoles = never>(
     email: person.getEmail(),
     givenName: person.getFirstName(),
     name: person.getName(),
-    roles: utils.getLtiRolesFromSystemRole(
-      person.getUser().getSystemRole(),
-    ) as UserRoles,
+    roles: utils.getLtiRolesFromSystemRole(person.getUser().getSystemRole()) as UserRoles,
   });
 
   if (extraClaims) {

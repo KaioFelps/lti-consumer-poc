@@ -1,11 +1,4 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  Inject,
-  Injectable,
-  Scope,
-} from "@nestjs/common";
+import { ArgumentsHost, Catch, ExceptionFilter, Inject, Injectable, Scope } from "@nestjs/common";
 import { RenderableError } from "@/core/errors/renderable/renderable-error";
 import { TranslatorService } from "@/message-string/translator.service";
 import { serializeValidationError } from "../dto-validation";
@@ -22,16 +15,10 @@ export class RenderableDtoValidationExceptionFilter implements ExceptionFilter {
   @Inject()
   private renderableExceptionFilter: RenderableExceptionFilter;
 
-  async catch(
-    exception: RenderableDtoValidationException,
-    host: ArgumentsHost,
-  ) {
+  async catch(exception: RenderableDtoValidationException, host: ArgumentsHost) {
     const status = exception.getStatus();
 
-    const errors = await serializeValidationError(
-      exception.validationErrors.getErrors(),
-      this.t,
-    );
+    const errors = await serializeValidationError(exception.validationErrors.getErrors(), this.t);
 
     const renderableError = new RenderableError(
       {

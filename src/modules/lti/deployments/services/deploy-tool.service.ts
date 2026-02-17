@@ -19,10 +19,7 @@ export class DeployToolService {
   @Inject()
   private readonly deploymentRepo: LtiToolsDeploymentsRepository;
 
-  public async exec({
-    tool,
-    label,
-  }: Params): Promise<Either<PossibleErrors, LtiToolDeployment>> {
+  public async exec({ tool, label }: Params): Promise<Either<PossibleErrors, LtiToolDeployment>> {
     const deployment = LtiToolDeployment.create({
       label,
       toolId: tool.record.id,

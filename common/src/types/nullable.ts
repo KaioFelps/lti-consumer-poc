@@ -16,5 +16,4 @@ type NullableProperties<T> = {
  * Nullable<Post, 'id' | 'email'>
  * ```
  **/
-export type Nullable<T, K extends keyof T> = Pick<NullableProperties<T>, K> &
-  Omit<T, K>;
+export type Nullable<T, K extends keyof T> = Pick<NullableProperties<T>, K> & Omit<T, K>;

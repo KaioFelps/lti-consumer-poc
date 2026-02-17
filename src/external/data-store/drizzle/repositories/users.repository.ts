@@ -32,8 +32,7 @@ export class DrizzleUsersRepository extends UsersRepository {
             .execute(),
         (error: Error) =>
           new IrrecoverableError(
-            "An error occurred in DrizzleUsersRepository when " +
-              "finding a user by its username.",
+            "An error occurred in DrizzleUsersRepository when " + "finding a user by its username.",
             error,
           ),
       ),
@@ -48,8 +47,7 @@ export class DrizzleUsersRepository extends UsersRepository {
 
     if (option.isNone(optionalUser)) {
       const error = new ResourceNotFoundError({
-        errorMessageIdentifier:
-          UsersRepository.messages.findUserByUsername.resourceNotFound,
+        errorMessageIdentifier: UsersRepository.messages.findUserByUsername.resourceNotFound,
         messageParams: { username },
       });
       return either.left(error);

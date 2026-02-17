@@ -1,9 +1,5 @@
 import type * as schema from "drizzle/schema";
-import type {
-  BuildQueryResult,
-  DBQueryConfig,
-  ExtractTablesWithRelations,
-} from "drizzle-orm";
+import type { BuildQueryResult, DBQueryConfig, ExtractTablesWithRelations } from "drizzle-orm";
 import { AnyLtiRole } from "$/claims/enums/roles";
 import { MessageType } from "$/claims/serialization";
 import { Contact, GrantType } from "$/registration/dynamic/tool-configuration";
@@ -13,18 +9,9 @@ import { ToolSupportedMessage } from "$/registration/tool-supported-message";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 
-type LtiToolsQueryConfig = DBQueryConfig<
-  "many",
-  boolean,
-  Schema,
-  Schema["ltiTools"]
->;
+type LtiToolsQueryConfig = DBQueryConfig<"many", boolean, Schema, Schema["ltiTools"]>;
 
-type LtiToolRow = BuildQueryResult<
-  Schema,
-  Schema["ltiTools"],
-  typeof requiredQueryConfig
->;
+type LtiToolRow = BuildQueryResult<Schema, Schema["ltiTools"], typeof requiredQueryConfig>;
 
 type LtiToolRowWithoutDeployments = Omit<LtiToolRow, "deployments">;
 
@@ -39,9 +26,7 @@ const requiredQueryConfig = {
 function fromRow(row: LtiToolRow): ToolRecord {
   return ToolRecord.createUnchecked({
     applicationType: row.oauthClient.applicationType as "web",
-    contacts: row.oauthClient.contacts.map(
-      (contact) => contact.email as Contact,
-    ),
+    contacts: row.oauthClient.contacts.map((contact) => contact.email as Contact),
     grantTypes: row.grantTypes.split(" ") as GrantType[],
     id: row.id,
     ltiConfiguration: {
@@ -52,16 +37,12 @@ function fromRow(row: LtiToolRow): ToolRecord {
         (message) =>
           ({
             type: message.type as MessageType,
-            customParameters: message.customParameters as Record<
-              string,
-              string
-            >,
+            customParameters: message.customParameters as Record<string, string>,
             iconUri: message.iconUri ?? undefined,
             label: message.label ?? undefined,
             placements:
-              message.placements
-                ?.split(" ")
-                .map((placement) => placement as MessagePlacement) ?? undefined,
+              message.placements?.split(" ").map((placement) => placement as MessagePlacement) ??
+              undefined,
             roles:
               message.roles?.length === 0
                 ? undefined
@@ -117,8 +98,7 @@ function intoRow(tool: ToolRecord): LtiToolRowWithoutDeployments {
         uri,
         clientId: tool.id,
       })),
-      contacts:
-        tool.contacts?.map((email) => ({ clientId: tool.id, email })) ?? [],
+      contacts: tool.contacts?.map((email) => ({ clientId: tool.id, email })) ?? [],
     },
 
     supportedMessages: tool.ltiConfiguration.messages.map((message) => ({

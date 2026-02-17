@@ -16,8 +16,7 @@ type Payload = {
 };
 
 function intoPayload(launch: LtiLaunchData): Payload {
-  const { documentTarget, height, locale, width, returnUrl } =
-    launch.presentation ?? {};
+  const { documentTarget, height, locale, width, returnUrl } = launch.presentation ?? {};
 
   return {
     launchId: launch.id.toString(),
@@ -38,8 +37,7 @@ function fromPayload(payload: Payload): LtiLaunchData {
 
   if (payload.presentation) {
     presentation = MessageRequests.Presentation.create({
-      documentTarget: payload.presentation
-        .documentTarget as MessageRequests.DocumentTarget,
+      documentTarget: payload.presentation.documentTarget as MessageRequests.DocumentTarget,
       width: payload.presentation.width,
       height: payload.presentation.height,
       locale: payload.presentation.locale,

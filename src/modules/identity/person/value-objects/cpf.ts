@@ -45,9 +45,7 @@ export class CPF {
    * @param argumentName an optional name of the argument for a possible error message string
    * @returns either an `CPF` instance or an `InvalidArgumentError` if the string is not a valid CPF.
    */
-  public static parseFromString(
-    cpfString: string,
-  ): Either<InvalidArgumentError, CPF> {
+  public static parseFromString(cpfString: string): Either<InvalidArgumentError, CPF> {
     return pipe(
       CPF.validateCPFString(cpfString),
       option.fold(
@@ -58,9 +56,7 @@ export class CPF {
   }
 
   // TODO: *really* validate a CPF, what goes beyond checking if its numeric and has 11 chars
-  public static validateCPFString(
-    cpfString: string,
-  ): Option<InvalidArgumentError> {
+  public static validateCPFString(cpfString: string): Option<InvalidArgumentError> {
     const trimmedCPF = cpfString.replaceAll(".", "").replace("-", "").trim();
 
     if (Number.isNaN(Number(trimmedCPF))) {

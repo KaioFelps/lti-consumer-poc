@@ -28,11 +28,9 @@ export class RegisterPersonDTO extends RegisterUserDTO implements DTO {
         error: "auth:register-person:first-name-invalid-type",
       }),
 
-    surname: z
-      .string({ error: "auth:register-person:surname-invalid-type" })
-      .min(1, {
-        error: "auth:register-person:first-name-invalid-type",
-      }),
+    surname: z.string({ error: "auth:register-person:surname-invalid-type" }).min(1, {
+      error: "auth:register-person:first-name-invalid-type",
+    }),
     email: z.email({ error: "auth:register-person:email-invalid-type" }),
     gender: z
       .enum([PersonGender.Female, PersonGender.Male, PersonGender.NonBinary], {
@@ -67,11 +65,7 @@ export class RegisterPersonDTO extends RegisterUserDTO implements DTO {
   public validate(): Either<ValidationErrors, undefined> {
     const userValidation = super.validate();
 
-    const {
-      success,
-      error: errors,
-      data,
-    } = RegisterPersonDTO.registerPersonSchema.safeParse(this);
+    const { success, error: errors, data } = RegisterPersonDTO.registerPersonSchema.safeParse(this);
 
     if (success && either.isRight(userValidation)) {
       Object.assign(this, data);
@@ -80,11 +74,9 @@ export class RegisterPersonDTO extends RegisterUserDTO implements DTO {
 
     const validationErrors = new ValidationErrors();
 
-    if (either.isLeft(userValidation))
-      validationErrors.merge(userValidation.left);
+    if (either.isLeft(userValidation)) validationErrors.merge(userValidation.left);
 
-    if (errors)
-      validationErrors.merge(mapZodErrorsToCoreValidationErrors(errors));
+    if (errors) validationErrors.merge(mapZodErrorsToCoreValidationErrors(errors));
 
     return either.left(validationErrors);
   }

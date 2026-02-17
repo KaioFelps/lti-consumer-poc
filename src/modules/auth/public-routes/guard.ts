@@ -1,9 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Inject,
-  Injectable,
-} from "@nestjs/common";
+import { CanActivate, ExecutionContext, Inject, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { RenderableUnauthorizedError } from "@/core/errors/renderable/unauthorized.error";
 import { UnauthorizedError } from "@/core/errors/unauthorized.error";
@@ -24,20 +19,20 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<HttpRequest>();
 
-    const isPublicRoute = this.reflector.getAllAndOverride<boolean>(
-      publicRoutes.metadataKey,
-      [context.getHandler(), context.getClass()],
-    );
+    const isPublicRoute = this.reflector.getAllAndOverride<boolean>(publicRoutes.metadataKey, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     if (isPublicRoute) return true;
 
     const session = request["session"] as RequestSession;
     if (session.auth) return true;
 
-    const isMvcRoute = this.reflector.getAllAndOverride<boolean>(
-      mvcRoutes.metadataKey,
-      [context.getHandler(), context.getClass()],
-    );
+    const isMvcRoute = this.reflector.getAllAndOverride<boolean>(mvcRoutes.metadataKey, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     const errorMessageIdentifier = "auth:unauthorized-access:message";
 
@@ -49,9 +44,7 @@ export class AuthGuard implements CanActivate {
             errorMessage: await this.t.translate(errorMessageIdentifier),
             login: {
               href: "/auth/login",
-              label: await this.t.translate(
-                "auth:forms:register:buttons:go-login",
-              ),
+              label: await this.t.translate("auth:forms:register:buttons:go-login"),
             },
           },
         })

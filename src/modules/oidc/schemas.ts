@@ -3,10 +3,7 @@ import z from "zod";
 
 export const clientConfigurationSchema = z.object({
   client_id: z.string().optional(),
-  application_type: z.enum([
-    "web",
-    "native",
-  ] satisfies ClientMetadata["application_type"][]),
+  application_type: z.enum(["web", "native"] satisfies ClientMetadata["application_type"][]),
   client_name: z.string(),
   scope: z.string(),
   redirect_uris: z.array(z.string()).min(1),

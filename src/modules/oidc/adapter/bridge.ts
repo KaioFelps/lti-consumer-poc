@@ -18,15 +18,10 @@ export class OIDCAdapterBridge implements Adapter {
       );
     }
 
-    this.internalAdapter =
-      OIDCAdapterBridge.internalAdapterFactory.getAdapter(modelName);
+    this.internalAdapter = OIDCAdapterBridge.internalAdapterFactory.getAdapter(modelName);
   }
 
-  public async upsert(
-    id: string,
-    payload: AdapterPayload,
-    expiresIn: number,
-  ): Promise<undefined> {
+  public async upsert(id: string, payload: AdapterPayload, expiresIn: number): Promise<undefined> {
     await this.internalAdapter.upsert(id, payload, expiresIn);
   }
 
@@ -34,9 +29,7 @@ export class OIDCAdapterBridge implements Adapter {
     return (await this.internalAdapter.find(id)) ?? undefined;
   }
 
-  public async findByUserCode(
-    userCode: string,
-  ): Promise<AdapterPayload | undefined> {
+  public async findByUserCode(userCode: string): Promise<AdapterPayload | undefined> {
     return (await this.internalAdapter.findByUserCode(userCode)) ?? undefined;
   }
 

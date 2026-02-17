@@ -6,8 +6,7 @@ expand(config());
 
 const dbConnectionUrl = process.env.DB_CONNECTION_URL;
 
-if (!dbConnectionUrl)
-  throw Error("DB_CONNECTION_URL environment variable hasn't been set.");
+if (!dbConnectionUrl) throw Error("DB_CONNECTION_URL environment variable hasn't been set.");
 
 export default defineConfig({
   out: "./drizzle",

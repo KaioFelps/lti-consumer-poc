@@ -36,14 +36,10 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
   public async findManyTools(): Promise<Either<IrrecoverableError, LtiTool[]>> {
     return await pipe(
       taskEither.tryCatch(
-        () =>
-          this.drizzle
-            .getClient()
-            .query.ltiTools.findMany(ltiToolsMapper.requiredQueryConfig),
+        () => this.drizzle.getClient().query.ltiTools.findMany(ltiToolsMapper.requiredQueryConfig),
         (error: Error) => {
           return new IrrecoverableError(
-            `An error occurred in ${DrizzleLtiToolsRepository.name} on ` +
-              "finding many tools.",
+            `An error occurred in ${DrizzleLtiToolsRepository.name} on ` + "finding many tools.",
             error,
           );
         },
@@ -52,32 +48,24 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
         return rows.map((row) => {
           const ltiRecord = ToolRecord.createUnchecked({
             applicationType: row.oauthClient.applicationType as "web",
-            contacts: row.oauthClient.contacts.map(
-              (contact) => contact.email as Contact,
-            ),
+            contacts: row.oauthClient.contacts.map((contact) => contact.email as Contact),
             grantTypes: row.grantTypes.split(" ") as GrantType[],
             id: row.id,
             ltiConfiguration: {
               claims: row.claims.split(" "),
-              deploymentsIds: row.deployments.map(
-                (deployment) => deployment.id,
-              ),
+              deploymentsIds: row.deployments.map((deployment) => deployment.id),
               domain: row.domain,
               messages: row.supportedMessages.map(
                 (message) =>
                   ({
                     type: message.type as MessageType,
-                    customParameters: message.customParameters as Record<
-                      string,
-                      string
-                    >,
+                    customParameters: message.customParameters as Record<string, string>,
                     iconUri: message.iconUri ?? undefined,
                     label: message.label ?? undefined,
                     placements:
                       message.placements
                         ?.split(" ")
-                        .map((placement) => placement as MessagePlacement) ??
-                      undefined,
+                        .map((placement) => placement as MessagePlacement) ?? undefined,
                     roles:
                       message.roles?.length === 0
                         ? undefined
@@ -108,15 +96,11 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
           return ltiRecord;
         });
       }),
-      taskEither.map((ltiRecords) =>
-        ltiRecords.map((record) => new LtiTool(record)),
-      ),
+      taskEither.map((ltiRecords) => ltiRecords.map((record) => new LtiTool(record))),
     )();
   }
 
-  public async findToolById(
-    id: string,
-  ): Promise<Either<LtiRepositoryError, ToolRecord>> {
+  public async findToolById(id: string): Promise<Either<LtiRepositoryError, ToolRecord>> {
     return await pipe(
       taskEither.tryCatch(
         () =>
@@ -154,9 +138,7 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
     )();
   }
 
-  public async upsertTool(
-    tool: LtiTool,
-  ): Promise<Either<IrrecoverableError, LtiTool>> {
+  public async upsertTool(tool: LtiTool): Promise<Either<IrrecoverableError, LtiTool>> {
     const {
       oauthClient: { contacts, redirectUris, ...oauthClient },
       supportedMessages,
@@ -173,17 +155,13 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
        * an option for small sets is to simply delete everything and insert just the fresh data
        */
 
-      await tx
-        .delete(oauthRedirectUris)
-        .where(eq(oauthRedirectUris.clientId, record.id));
+      await tx.delete(oauthRedirectUris).where(eq(oauthRedirectUris.clientId, record.id));
 
       if (redirectUris.length) {
         await tx.insert(oauthRedirectUris).values(redirectUris);
       }
 
-      await tx
-        .delete(oauthContacts)
-        .where(eq(oauthContacts.clientId, record.id));
+      await tx.delete(oauthContacts).where(eq(oauthContacts.clientId, record.id));
 
       if (contacts.length) await tx.insert(oauthContacts).values(contacts);
 
@@ -238,16 +216,10 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
     )();
   }
 
-  public async deleteToolById(
-    id: string,
-  ): Promise<Either<IrrecoverableError, void>> {
+  public async deleteToolById(id: string): Promise<Either<IrrecoverableError, void>> {
     return await pipe(
       taskEither.tryCatch(
-        () =>
-          this.drizzle
-            .getClient()
-            .delete(oauthClients)
-            .where(eq(oauthClients.id, id)),
+        () => this.drizzle.getClient().delete(oauthClients).where(eq(oauthClients.id, id)),
         (err: Error) => {
           return new IrrecoverableError(
             `An error occurred in ${DrizzleLtiToolsRepository.name} when deleting the LTI Tool with ID ${id}.`,
@@ -283,9 +255,7 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
     )();
   }
 
-  public async findManyPreviews(): Promise<
-    Either<IrrecoverableError, LtiToolPreview[]>
-  > {
+  public async findManyPreviews(): Promise<Either<IrrecoverableError, LtiToolPreview[]>> {
     return await pipe(
       taskEither.tryCatch(
         () =>

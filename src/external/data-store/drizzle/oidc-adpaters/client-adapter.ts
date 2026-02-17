@@ -9,10 +9,7 @@ import { Adapter, AdapterPayload, errors } from "oidc-provider";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ValidationErrors } from "@/core/validation/validation-errors";
 import { OIDCServerErrorException } from "@/lib/exceptions/oidc/exception";
-import {
-  eitherPromiseToTaskEither,
-  mapTaskEitherEitherAndFlatten,
-} from "@/lib/fp-ts";
+import { eitherPromiseToTaskEither, mapTaskEitherEitherAndFlatten } from "@/lib/fp-ts";
 import { LtiToolIdPrefix } from "@/modules/lti";
 import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity";
 import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository";
@@ -33,11 +30,7 @@ export class DrizzleOIDCClientAdapter implements Adapter {
     }
   }
 
-  public async upsert(
-    id: string,
-    payload: AdapterPayload,
-    _expiresIn: number,
-  ): Promise<undefined> {
+  public async upsert(id: string, payload: AdapterPayload, _expiresIn: number): Promise<undefined> {
     const isLtiTool = id.startsWith(LtiToolIdPrefix);
     payload.client_id = id;
 
@@ -45,9 +38,7 @@ export class DrizzleOIDCClientAdapter implements Adapter {
       await pipe(
         LtiTool.tryCreateFromClientMetadata(payload),
         taskEither.fromEither,
-        mapTaskEitherEitherAndFlatten((tool) =>
-          this.toolsRepository.upsertTool(tool),
-        ),
+        mapTaskEitherEitherAndFlatten((tool) => this.toolsRepository.upsertTool(tool)),
         taskEither.mapError(handleUpsertErrors),
       )();
 
@@ -57,9 +48,7 @@ export class DrizzleOIDCClientAdapter implements Adapter {
     await pipe(
       OIDCClient.tryCreateFromMetadata(payload),
       taskEither.fromEither,
-      mapTaskEitherEitherAndFlatten((metadata) =>
-        this.clientRepository.upsertClient(metadata),
-      ),
+      mapTaskEitherEitherAndFlatten((metadata) => this.clientRepository.upsertClient(metadata)),
       taskEither.mapError(handleUpsertErrors),
     )();
   }
@@ -95,24 +84,16 @@ export class DrizzleOIDCClientAdapter implements Adapter {
     }
   }
 
-  public async findByUserCode(
-    _userCode: string,
-  ): Promise<AdapterPayload | undefined> {
-    throw new Error(
-      `findByUserCode not implemented for ${DrizzleOIDCClientAdapter.name}`,
-    );
+  public async findByUserCode(_userCode: string): Promise<AdapterPayload | undefined> {
+    throw new Error(`findByUserCode not implemented for ${DrizzleOIDCClientAdapter.name}`);
   }
 
   public async findByUid(_uid: string): Promise<AdapterPayload | undefined> {
-    throw new Error(
-      `findByUid not implemented for ${DrizzleOIDCClientAdapter.name}`,
-    );
+    throw new Error(`findByUid not implemented for ${DrizzleOIDCClientAdapter.name}`);
   }
 
   public async consume(_id: string): Promise<undefined> {
-    throw new Error(
-      `consume not implemented for ${DrizzleOIDCClientAdapter.name}`,
-    );
+    throw new Error(`consume not implemented for ${DrizzleOIDCClientAdapter.name}`);
   }
 
   public async destroy(id: string): Promise<undefined> {
@@ -124,9 +105,7 @@ export class DrizzleOIDCClientAdapter implements Adapter {
   }
 
   public async revokeByGrantId(_grantId: string): Promise<undefined> {
-    throw new Error(
-      `revokeByGrantId not implemented for ${DrizzleOIDCClientAdapter.name}`,
-    );
+    throw new Error(`revokeByGrantId not implemented for ${DrizzleOIDCClientAdapter.name}`);
   }
 }
 

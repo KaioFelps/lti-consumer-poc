@@ -18,11 +18,7 @@ export class OIDCRedisAdapter {
     private readonly name: string,
   ) {}
 
-  public async upsert(
-    id: string,
-    payload: AdapterPayload,
-    expiresIn: number,
-  ): Promise<undefined> {
+  public async upsert(id: string, payload: AdapterPayload, expiresIn: number): Promise<undefined> {
     const key = resolveOIDCKey(id);
     const multi = this.redis.client.multi();
 
@@ -62,9 +58,7 @@ export class OIDCRedisAdapter {
     if (data) return JSON.parse(data as string);
   }
 
-  public async findByUserCode(
-    userCode: string,
-  ): Promise<AdapterPayload | undefined> {
+  public async findByUserCode(userCode: string): Promise<AdapterPayload | undefined> {
     const id = await this.redis.client.get(userCodeKeyFor(userCode));
     if (id) return await this.find(id);
   }
@@ -75,11 +69,7 @@ export class OIDCRedisAdapter {
   }
 
   public async consume(id: string): Promise<undefined> {
-    await this.redis.client.json.set(
-      resolveOIDCKey(id),
-      "consumed",
-      Math.floor(Date.now() / 1000),
-    );
+    await this.redis.client.json.set(resolveOIDCKey(id), "consumed", Math.floor(Date.now() / 1000));
   }
 
   public async destroy(id: string): Promise<undefined> {

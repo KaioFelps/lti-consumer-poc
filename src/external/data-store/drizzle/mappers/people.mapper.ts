@@ -7,26 +7,14 @@ import {
   sql,
 } from "drizzle-orm";
 import { pipe } from "fp-ts/lib/function";
-import {
-  Person,
-  PersonUncheckedProps,
-} from "@/modules/identity/person/person.entity";
+import { Person, PersonUncheckedProps } from "@/modules/identity/person/person.entity";
 import { trimNullProperties } from "@/utils/trim-null-properties";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 
-type PeopleQueryConfig = DBQueryConfig<
-  "many",
-  boolean,
-  Schema,
-  Schema["usersTable"]
->;
+type PeopleQueryConfig = DBQueryConfig<"many", boolean, Schema, Schema["usersTable"]>;
 
-type PersonRow = BuildQueryResult<
-  Schema,
-  Schema["usersTable"],
-  typeof requiredQueryConfig
->;
+type PersonRow = BuildQueryResult<Schema, Schema["usersTable"], typeof requiredQueryConfig>;
 
 const requiredQueryConfig = {
   where: sql`${[

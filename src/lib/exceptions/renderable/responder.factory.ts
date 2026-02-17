@@ -24,11 +24,7 @@ export class RenderableExceptionFilterResponderFactory extends ExceptionFilterRe
 }
 
 class MVCStrategy extends ExceptionFilterResponder<unknown, void> {
-  public async respond(
-    _status: number,
-    ctx: HttpArgumentsHost,
-    exception: Body,
-  ): Promise<void> {
+  public async respond(_status: number, ctx: HttpArgumentsHost, exception: Body): Promise<void> {
     const response = ctx.getResponse<HttpResponse>();
 
     const renderableError = exception.error;

@@ -1,20 +1,9 @@
 import { relations } from "drizzle-orm";
-import {
-  jsonb,
-  pgEnum,
-  pgTable,
-  primaryKey,
-  timestamp,
-  uuid,
-  varchar,
-} from "drizzle-orm/pg-core";
+import { jsonb, pgEnum, pgTable, primaryKey, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { PersonGender } from "@/modules/identity/person/enums/gender";
 import { SystemRole } from "@/modules/identity/user/enums/system-role";
 
-export const systemRoleEnum = pgEnum("system_role", [
-  SystemRole.Admin,
-  SystemRole.User,
-]);
+export const systemRoleEnum = pgEnum("system_role", [SystemRole.Admin, SystemRole.User]);
 
 export const personGenderEnum = pgEnum("person_gender", [
   PersonGender.Female,
@@ -47,10 +36,7 @@ export const usersTable = pgTable("users", {
   email: varchar({ length: 255 }).unique(),
 });
 
-export const oauthApplicationTypeEnum = pgEnum("oauth_application_type", [
-  "web",
-  "native",
-]);
+export const oauthApplicationTypeEnum = pgEnum("oauth_application_type", ["web", "native"]);
 
 export const oauthClients = pgTable("oauth_client", {
   id: varchar({ length: 64 }).primaryKey(),
@@ -120,8 +106,7 @@ export const ltiToolSupportedMessages = pgTable(
     label: varchar(),
     iconUri: varchar("icon_uri"),
     placements: varchar(),
-    customParameters:
-      jsonb("custom_parameters").$type<Record<string, string>>(),
+    customParameters: jsonb("custom_parameters").$type<Record<string, string>>(),
   },
   (table) => [primaryKey({ columns: [table.clientId, table.type] })],
 );
@@ -135,9 +120,7 @@ export const ltiToolSupportedMessageRoles = pgTable(
     messageType: varchar("msg_type").notNull(),
     role: varchar().notNull(),
   },
-  (table) => [
-    primaryKey({ columns: [table.clientId, table.messageType, table.role] }),
-  ],
+  (table) => [primaryKey({ columns: [table.clientId, table.messageType, table.role] })],
 );
 
 export const ltiContexts = pgTable("lti_context", {
@@ -181,16 +164,13 @@ export const ltiToolsRelations = relations(ltiTools, ({ many, one }) => ({
   supportedMessages: many(ltiToolSupportedMessages),
 }));
 
-export const ltiToolDeploymentsRelations = relations(
-  ltiToolDeployments,
-  ({ one, many }) => ({
-    tool: one(ltiTools, {
-      fields: [ltiToolDeployments.clientId],
-      references: [ltiTools.id],
-    }),
-    resourceLinks: many(ltiResourceLinks),
+export const ltiToolDeploymentsRelations = relations(ltiToolDeployments, ({ one, many }) => ({
+  tool: one(ltiTools, {
+    fields: [ltiToolDeployments.clientId],
+    references: [ltiTools.id],
   }),
-);
+  resourceLinks: many(ltiResourceLinks),
+}));
 
 export const ltiToolSupportedMessagesRelations = relations(
   ltiToolSupportedMessages,
@@ -207,36 +187,24 @@ export const ltiToolSupportedMessageRolesRelations = relations(
   ltiToolSupportedMessageRoles,
   ({ one }) => ({
     message: one(ltiToolSupportedMessages, {
-      fields: [
-        ltiToolSupportedMessageRoles.clientId,
-        ltiToolSupportedMessageRoles.messageType,
-      ],
-      references: [
-        ltiToolSupportedMessages.clientId,
-        ltiToolSupportedMessages.type,
-      ],
+      fields: [ltiToolSupportedMessageRoles.clientId, ltiToolSupportedMessageRoles.messageType],
+      references: [ltiToolSupportedMessages.clientId, ltiToolSupportedMessages.type],
     }),
   }),
 );
 
-export const oauthClientRelations = relations(
-  oauthClients,
-  ({ one, many }) => ({
-    ltiTool: one(ltiTools),
-    redirectUris: many(oauthRedirectUris),
-    contacts: many(oauthContacts),
-  }),
-);
+export const oauthClientRelations = relations(oauthClients, ({ one, many }) => ({
+  ltiTool: one(ltiTools),
+  redirectUris: many(oauthRedirectUris),
+  contacts: many(oauthContacts),
+}));
 
-export const oauthRedirectUrisRelations = relations(
-  oauthRedirectUris,
-  ({ one }) => ({
-    client: one(oauthClients, {
-      fields: [oauthRedirectUris.clientId],
-      references: [oauthClients.id],
-    }),
+export const oauthRedirectUrisRelations = relations(oauthRedirectUris, ({ one }) => ({
+  client: one(oauthClients, {
+    fields: [oauthRedirectUris.clientId],
+    references: [oauthClients.id],
   }),
-);
+}));
 
 export const oauthContactsRelations = relations(oauthContacts, ({ one }) => ({
   client: one(oauthClients, {
@@ -245,31 +213,25 @@ export const oauthContactsRelations = relations(oauthContacts, ({ one }) => ({
   }),
 }));
 
-export const ltiResourceLinksRelations = relations(
-  ltiResourceLinks,
-  ({ one }) => ({
-    deployment: one(ltiToolDeployments, {
-      fields: [ltiResourceLinks.deploymentId],
-      references: [ltiToolDeployments.id],
-    }),
-    context: one(ltiContexts, {
-      fields: [ltiResourceLinks.contextId],
-      references: [ltiContexts.id],
-    }),
+export const ltiResourceLinksRelations = relations(ltiResourceLinks, ({ one }) => ({
+  deployment: one(ltiToolDeployments, {
+    fields: [ltiResourceLinks.deploymentId],
+    references: [ltiToolDeployments.id],
   }),
-);
+  context: one(ltiContexts, {
+    fields: [ltiResourceLinks.contextId],
+    references: [ltiContexts.id],
+  }),
+}));
 
 export const ltiContextsRelations = relations(ltiContexts, ({ many }) => ({
   resourceLinks: many(ltiResourceLinks),
   types: many(ltiContextsTypes),
 }));
 
-export const ltiContextsTypesRelations = relations(
-  ltiContextsTypes,
-  ({ one }) => ({
-    context: one(ltiContexts, {
-      fields: [ltiContextsTypes.contextId],
-      references: [ltiContexts.id],
-    }),
+export const ltiContextsTypesRelations = relations(ltiContextsTypes, ({ one }) => ({
+  context: one(ltiContexts, {
+    fields: [ltiContextsTypes.contextId],
+    references: [ltiContexts.id],
   }),
-);
+}));

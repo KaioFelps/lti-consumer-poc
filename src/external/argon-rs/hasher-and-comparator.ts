@@ -4,9 +4,7 @@ import { PasswordComparator } from "@/modules/auth/password/comparator";
 import { PasswordHasher } from "@/modules/auth/password/hasher";
 
 @Injectable()
-export class ArgonRSPasswordHasherAndComparator
-  implements PasswordComparator, PasswordHasher
-{
+export class ArgonRSPasswordHasherAndComparator implements PasswordComparator, PasswordHasher {
   async hash(plain: string): Promise<string> {
     return await hash(plain);
   }

@@ -11,9 +11,7 @@ export type PresentedLtiToolSupportedMessage = {
 };
 
 export class LtiToolSupportedMessagePresenter {
-  public static present(
-    entity: ToolSupportedMessage,
-  ): PresentedLtiToolSupportedMessage {
+  public static present(entity: ToolSupportedMessage): PresentedLtiToolSupportedMessage {
     return {
       type: entity.type.toString(),
       targetLinkUri: entity.targetLinkUri,

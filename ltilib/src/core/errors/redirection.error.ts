@@ -1,9 +1,6 @@
 import { ClassProperties } from "common/src/types/class-properties";
 
-type RedirectionErrorCode =
-  | "invalid_request"
-  | "server_error"
-  | "login_required";
+type RedirectionErrorCode = "invalid_request" | "server_error" | "login_required";
 
 /**
  * Authentication error redirect responses as described as per [OIDC Core 3.1.2.6].

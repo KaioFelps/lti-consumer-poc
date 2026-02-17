@@ -28,16 +28,13 @@ export class CreateResourceLinkDto implements DTO {
     customParameters: z
       .record(
         z.string({
-          error:
-            "lti:create-resource-link:custom-parameters-key-must-be-string",
+          error: "lti:create-resource-link:custom-parameters-key-must-be-string",
         }),
         z.string({
-          error:
-            "lti:create-resource-link:custom-parameters-value-must-be-string",
+          error: "lti:create-resource-link:custom-parameters-value-must-be-string",
         }),
         {
-          error:
-            "lti:create-resource-link:custom-parameters-must-be-a-key-value-map",
+          error: "lti:create-resource-link:custom-parameters-must-be-a-key-value-map",
         },
       )
       .optional(),
@@ -60,8 +57,7 @@ export class CreateResourceLinkDto implements DTO {
   customParameters?: Record<string, string>;
 
   validate(): Either<ValidationErrors, void> {
-    const { success, data, error } =
-      CreateResourceLinkDto.createResourceLinkSchema.safeParse(this);
+    const { success, data, error } = CreateResourceLinkDto.createResourceLinkSchema.safeParse(this);
 
     if (!success) return either.left(mapZodErrorsToCoreValidationErrors(error));
 

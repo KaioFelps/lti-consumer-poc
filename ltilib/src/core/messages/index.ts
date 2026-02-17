@@ -88,10 +88,7 @@ export namespace MessageRequests {
       private readonly claims: Record<string, ValidClaimValue>,
     ) {
       if (vendorPredicade.endsWith("/"))
-        this.vendorPredicade = vendorPredicade.slice(
-          0,
-          vendorPredicade.length - 1,
-        );
+        this.vendorPredicade = vendorPredicade.slice(0, vendorPredicade.length - 1);
     }
 
     intoLtiClaim(): object {

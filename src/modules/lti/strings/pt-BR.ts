@@ -9,10 +9,8 @@ ptBR["lti:tool-not-found-by-id"] = ({ toolId }: { toolId: string }) => {
 };
 
 ptBR["lti:register-tool:title"] = "Registrar Ferramenta LTI";
-ptBR["lti:register-tool:labels:register-platform"] =
-  "URL do endpoint de registro da ferramenta";
-ptBR["lti:register-tool:labels:use-docker-internal-host"] =
-  "Utilizar host interna do Docker";
+ptBR["lti:register-tool:labels:register-platform"] = "URL do endpoint de registro da ferramenta";
+ptBR["lti:register-tool:labels:use-docker-internal-host"] = "Utilizar host interna do Docker";
 ptBR["lti:register-tool:descriptions:use-docker-internal-host"] =
   "Substitui o domínio do <i>issuer</i> pelo endereço interno do Docker que será " +
   "mapeado para o verdadeiro localhost. Necessário caso o registro seja de uma " +
@@ -20,8 +18,7 @@ ptBR["lti:register-tool:descriptions:use-docker-internal-host"] =
 ptBR["lti:register-tool:buttons:register-tool"] = "Registrar ferramenta LTI";
 ptBR["lti:register-tool:registration-endpoint-invalid-type"] =
   "O endpoint de registro da plataforma precisa ser um URL válido.";
-ptBR["lti:register-tool:registration-success-message"] =
-  "Ferramenta registrada com successo!";
+ptBR["lti:register-tool:registration-success-message"] = "Ferramenta registrada com successo!";
 ptBR["lti:register-tool:ready-to-go-paragraph"] =
   "Você está quase lá. Basta conectar-se com a ferramenta para finalizar o registro!";
 ptBR["lti:register-tool:buttons:finish-registration"] = "Finalizar registro";
@@ -35,10 +32,8 @@ ptBR["lti:list-tools:tool-field:description"] = "Descrição";
 ptBR["lti:list-tools:tool-field:home-page-uri"] = "Site";
 ptBR["lti:list-tools:buttons:list-deployments"] = "Ver deployments";
 ptBR["lti:list-tools:buttons:tool-details"] = "Ver mais detalhes";
-ptBR["lti:list-tools:no-tools-registered"] =
-  "Não há nenhuma ferramenta registrada ainda.";
-ptBR["lti:list-tools:buttons:register-new-tool"] =
-  "Registrar uma nova ferramenta";
+ptBR["lti:list-tools:no-tools-registered"] = "Não há nenhuma ferramenta registrada ainda.";
+ptBR["lti:list-tools:buttons:register-new-tool"] = "Registrar uma nova ferramenta";
 
 ptBR["lti:tools-details:title"] = ({ toolName }: { toolName?: string }) => {
   if (!toolName) return "Registro de ferramenta";
@@ -65,12 +60,10 @@ ptBR["lti:tools-details:thead:deployment-label"] = "Etiqueta";
 ptBR["lti:tools-details:no-tool-deployments"] =
   "Essa ferramenta ainda não possui nenhum deployment.";
 ptBR["lti:tools-details:buttons:delete-deployment"] = "Apagar deployment";
-ptBR["lti:tools-details:buttons:see-assoc-resource-links"] =
-  "Ver links de recurso associados";
+ptBR["lti:tools-details:buttons:see-assoc-resource-links"] = "Ver links de recurso associados";
 
 ptBR["lti:deploy-tool:popup-title"] = "Realizar novo deploy";
-ptBR["lti:deploy-tool:errors:label-invalid-type"] =
-  "A etiqueta precisa ser um texto válido.";
+ptBR["lti:deploy-tool:errors:label-invalid-type"] = "A etiqueta precisa ser um texto válido.";
 ptBR["lti:deploy-tool:errors:label-too-short"] = "A etiqueta é muito curta.";
 ptBR["lti:deploy-tool:errors:label-too-long"] = "A etiqueta é muito longa.";
 ptBR["lti:deploy-tool:success-message"] = ({ id, label }) =>
@@ -80,8 +73,7 @@ ptBR["lti:delete-tool-deployment:"];
 ptBR["lti:delete-tool-deployment:warning-p1"] =
   "Deletar esse deployment é uma ação irreversível e acarretará na " +
   "remoção de outras informações relacionadas a esta implantação.";
-ptBR["lti:delete-tool-deployment:success-message"] =
-  "Deployment removido com sucesso.";
+ptBR["lti:delete-tool-deployment:success-message"] = "Deployment removido com sucesso.";
 
 ptBR["lti:list-resource-links:deployment-id-required"] =
   "O parâmetro de busca 'toolId' é obrigatório.";
@@ -89,36 +81,31 @@ ptBR["lti:list-resource-links:title"] = ({ deploymentLabel }) =>
   `Links de recursos associados ao deployment ${deploymentLabel}`;
 ptBR["lti:list-resource-links:no-resource-links-p1"] =
   "Ainda não existem links de recursos associados a este deployment.";
-ptBR["lti:list-resource-links:buttons:new-resource-link"] =
-  "Novo link de recurso";
+ptBR["lti:list-resource-links:buttons:new-resource-link"] = "Novo link de recurso";
 ptBR["lti:list-resource-links:thead:link-id"] = "ID";
 ptBR["lti:list-resource-links:thead:link-url"] = "URL";
 ptBR["lti:list-resource-links:thead:link-title"] = "Título";
 ptBR["lti:list-resource-links:thead:link-description"] = "Descrição";
-ptBR["lti:list-resource-links:thead:link-placements"] =
-  "Posicionamentos do Link";
+ptBR["lti:list-resource-links:thead:link-placements"] = "Posicionamentos do Link";
 ptBR["lti:list-resource-links:no-message-placements"] =
   "Não há posicionamentos definidos para este tipo de link.";
 
-ptBR[
-  "lti:tools-deployments-repository:find-deployment-by-id:resource-not-found"
-] = ({ deploymentId }) =>
-  `Não foi possível encontrar um deployment com ID ${deploymentId}.`;
+ptBR["lti:tools-deployments-repository:find-deployment-by-id:resource-not-found"] = ({
+  deploymentId,
+}) => `Não foi possível encontrar um deployment com ID ${deploymentId}.`;
 
 ptBR["lti:create-resource-link:deployment-id-is-required-and-valid"] =
   "O ID da implantação deve ser um UUID válido.";
 ptBR["lti:create-resource-link:resource-link-is-valid-url"] =
   "O link do recurso precisa ser uma URL válida.";
-ptBR["lti:create-resource-link:title-must-be-string"] =
-  "O título do recurso precisa ser um texto.";
+ptBR["lti:create-resource-link:title-must-be-string"] = "O título do recurso precisa ser um texto.";
 ptBR["lti:create-resource-link:title-must-not-be-empty"] =
   "O título do recurso não pode ser vazio.";
 ptBR["lti:create-resource-link:description-must-be-string"] =
   "A descrição do recurso precisa ser um texto.";
 ptBR["lti:create-resource-link:description-must-not-be-empty"] =
   "A descrição do recurso não pode estar vazia.";
-ptBR["lti:list-resource-links:new-resource-link-dialog-title"] =
-  "Criar novo link de recurso";
+ptBR["lti:list-resource-links:new-resource-link-dialog-title"] = "Criar novo link de recurso";
 ptBR["lti:create-resource-link:form:deployment-id"] = "ID de implantação";
 ptBR["lti:create-resource-link:form:resource-link"] = "Link do recurso";
 ptBR["lti:create-resource-link:form:title"] = "Título";
@@ -145,14 +132,11 @@ ptBR["lti:delete-resource-link:warning-p1"] =
 
 ptBR["lti:launch:buttons:launch"] = "Iniciar lançamento";
 
-ptBR["lti:resource-links:find-by-id:resource-not-found"] = ({
-  resourceLinkId,
-}) => `Não foi possível encontrar um link com ID "${resourceLinkId}".`;
+ptBR["lti:resource-links:find-by-id:resource-not-found"] = ({ resourceLinkId }) =>
+  `Não foi possível encontrar um link com ID "${resourceLinkId}".`;
 
-ptBR["lti:initiate-launch:width-must-be-number"] =
-  "A largura precisa ser um valor numérico.";
-ptBR["lti:initiate-launch:height-must-be-number"] =
-  "A altura precisa ser um valor numérico.";
+ptBR["lti:initiate-launch:width-must-be-number"] = "A largura precisa ser um valor numérico.";
+ptBR["lti:initiate-launch:height-must-be-number"] = "A altura precisa ser um valor numérico.";
 
 ptBR["lti:launch-login:scopes-must-contain-openid"] =
   "O campo 'scope' precisa incluir o escopo 'openid'.";
@@ -160,20 +144,13 @@ ptBR["lti:launch-login:response-type-must-be-id-token"] =
   "O campo 'response_type' precisa ter o valor 'id_token'.";
 ptBR["lti:launch-login:response-mode-must-be-form-post"] =
   "O campo 'response_mode' precisa assumir o valor 'form_post'.";
-ptBR["lti:launch-login:client-id-must-be-string"] =
-  "O campo 'client_id' precisa ser um texto.";
-ptBR["lti:launch-login:client-id-must-not-be-empty"] =
-  "O campo 'client_id' não pode estar vazio.";
-ptBR["lti:launch-login:state-must-be-string"] =
-  "O campo 'state' precisa ser um texto.";
-ptBR["lti:launch-login:state-must-not-be-empty"] =
-  "O campo 'state' não pode estar vazio.";
-ptBR["lti:launch-login:nonce-must-be-string"] =
-  "O campo 'nonce' precisa ser um texto.";
-ptBR["lti:launch-login:nonce-must-not-be-empty"] =
-  "O campo 'nonce' não pode estar vazio.";
-ptBR["lti:launch-login:login-hint-must-be-string"] =
-  "O campo 'login-hint' precisa ser um texto.";
+ptBR["lti:launch-login:client-id-must-be-string"] = "O campo 'client_id' precisa ser um texto.";
+ptBR["lti:launch-login:client-id-must-not-be-empty"] = "O campo 'client_id' não pode estar vazio.";
+ptBR["lti:launch-login:state-must-be-string"] = "O campo 'state' precisa ser um texto.";
+ptBR["lti:launch-login:state-must-not-be-empty"] = "O campo 'state' não pode estar vazio.";
+ptBR["lti:launch-login:nonce-must-be-string"] = "O campo 'nonce' precisa ser um texto.";
+ptBR["lti:launch-login:nonce-must-not-be-empty"] = "O campo 'nonce' não pode estar vazio.";
+ptBR["lti:launch-login:login-hint-must-be-string"] = "O campo 'login-hint' precisa ser um texto.";
 ptBR["lti:launch-login:login-hint-must-not-be-empty"] =
   "O campo 'login-hint' não pode estar vazio.";
 ptBR["lti:launch-login:message-hint-must-be-string"] =
@@ -191,11 +168,7 @@ ptBR["lti:launch:no-valid-launch-found-error"] = ({ launchId }) =>
 ptBR["lti:post-launch:success-title"] = "Lançamento concluído com sucesso";
 ptBR["lti:post-launch:error-title"] = "Lançamento mal-sucedido";
 ptBR["lti:post-launch:default-title"] = "Lançamento concluído";
-ptBR["lti:post-launch:err-msg-must-be-string"] =
-  "A mensagem de erro precisa ser um texto.";
-ptBR["lti:post-launch:msg-must-be-string"] =
-  "A mensagem de sucesso precisa ser um texto.";
-ptBR["lti:post-launch:err-log-must-be-string"] =
-  "O log de erro precisa ser um texto.";
-ptBR["lti:post-launch:log-must-be-string"] =
-  "O log de sucesso precisa ser um texto.";
+ptBR["lti:post-launch:err-msg-must-be-string"] = "A mensagem de erro precisa ser um texto.";
+ptBR["lti:post-launch:msg-must-be-string"] = "A mensagem de sucesso precisa ser um texto.";
+ptBR["lti:post-launch:err-log-must-be-string"] = "O log de erro precisa ser um texto.";
+ptBR["lti:post-launch:log-must-be-string"] = "O log de sucesso precisa ser um texto.";

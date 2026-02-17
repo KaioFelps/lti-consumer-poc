@@ -64,13 +64,7 @@ type ToolJwtValidationError =
   | jerr.JWTExpired
   | jerr.JOSEAlgNotAllowed;
 
-const ltiMinimalRequiredClaimsSet = Object.freeze([
-  "iss",
-  "aud",
-  "exp",
-  "iat",
-  "nonce",
-]);
+const ltiMinimalRequiredClaimsSet = Object.freeze(["iss", "aud", "exp", "iat", "nonce"]);
 
 const ltiMinimalOptionalClaimsSet = Object.freeze(["azp"]);
 
@@ -131,33 +125,20 @@ export async function validateMessageToolJwt<T extends jose.JWTPayload>(
       );
       return [payload, allowedClaims] as const;
     }),
-    te.map(([payload, allowedClaims]) =>
-      discardUnknownClaims<T>(payload, allowedClaims),
-    ),
+    te.map(([payload, allowedClaims]) => discardUnknownClaims<T>(payload, allowedClaims)),
     mapAndFlatten((claims) => validateAudienceAndAzp(claims, platform.issuer)),
     mapAndFlatten((claims) => validateNonce(claims, options.nonceIsFresh)),
     mapAndFlatten(validateMessageSpecificClaims),
     mapAndFlatten((claims) =>
-      performVendorValidations<T>(
-        claims,
-        options.vendorPrefix,
-        options.vendorClaimsValidator,
-      ),
+      performVendorValidations<T>(claims, options.vendorPrefix, options.vendorClaimsValidator),
     ),
   )();
 
   return claims;
 }
 
-function validateAudienceAndAzp<T extends jose.JWTPayload>(
-  claims: T,
-  issuer: string,
-) {
-  if (
-    Array.isArray(claims.aud) &&
-    claims.aud.length > 1 &&
-    claims["azp"] === undefined
-  ) {
+function validateAudienceAndAzp<T extends jose.JWTPayload>(claims: T, issuer: string) {
+  if (Array.isArray(claims.aud) && claims.aud.length > 1 && claims["azp"] === undefined) {
     const error = new jerr.JWTClaimValidationFailed(
       "Since claim contains multiple audiences, `azp` must be present",
       claims,
@@ -239,9 +220,7 @@ function resolveAllowedClaims(
   const allowedClaims = [
     ...minimal,
     ...(extra ?? []),
-    ...(allowancePrefix
-      ? existingClaims.filter((key) => key.startsWith(allowancePrefix!))
-      : []),
+    ...(allowancePrefix ? existingClaims.filter((key) => key.startsWith(allowancePrefix!)) : []),
   ];
 
   return allowedClaims;
@@ -250,10 +229,7 @@ function resolveAllowedClaims(
 /**
  * Filters away every unknown claims present in the payload, as specified by LTI Security Framework.
  */
-function discardUnknownClaims<T>(
-  claims: Record<string, unknown>,
-  allowedClaims: string[],
-) {
+function discardUnknownClaims<T>(claims: Record<string, unknown>, allowedClaims: string[]) {
   const filtredPairs = Object.entries(claims).filter(([key, _]) => {
     return allowedClaims.includes(key);
   });

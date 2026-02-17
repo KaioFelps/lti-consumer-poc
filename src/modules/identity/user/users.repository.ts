@@ -12,8 +12,7 @@ export abstract class UsersRepository {
    */
   protected static messages = {
     findUserByUsername: {
-      resourceNotFound:
-        "identity:users-repository:find-user-by-username:resource-not-found",
+      resourceNotFound: "identity:users-repository:find-user-by-username:resource-not-found",
     },
   } as const;
 

@@ -23,10 +23,7 @@ import { LtiResourceLink } from "$/core/resource-link";
 import { UserIdentity, UserRoles } from "$/core/user-identity";
 import { ToolRecord } from "$/registration/tool-record";
 import { LtiSubmittableMessage } from "$/security/lti-message";
-import {
-  PrepareIdTokenError,
-  prepareIdToken,
-} from "$/security/prepare-id-token";
+import { PrepareIdTokenError, prepareIdToken } from "$/security/prepare-id-token";
 import { Platform } from "../platform";
 import { MessageRequests } from ".";
 
@@ -52,10 +49,8 @@ type CreateFromLtiRecordArgs<CR = never> = {
 /**
  * @see {@link https://www.imsglobal.org/spec/lti/v1p3/#resource-link-launch-request-message Resource Link Launch Request Message}
  */
-export class LTIResourceLinkLaunchRequest<
-  CustomRoles = never,
-  CustomContextType = never,
-> implements IntoLtiClaim, LtiSubmittableMessage<PrepareIdTokenError>
+export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType = never>
+  implements IntoLtiClaim, LtiSubmittableMessage<PrepareIdTokenError>
 {
   private readonly version = AvailableLtiVersion["1p3"];
   private readonly messageType = MessageType.resourceLink;
@@ -94,9 +89,7 @@ export class LTIResourceLinkLaunchRequest<
     userRoles: _userRoles,
     context,
   }: CreateFromLtiRecordArgs<CustomRoles>) {
-    if (
-      !tool.ltiConfiguration.deploymentsIds.includes(resourceLink.deploymentId)
-    ) {
+    if (!tool.ltiConfiguration.deploymentsIds.includes(resourceLink.deploymentId)) {
       // TODO: return some error
     }
 
@@ -183,19 +176,14 @@ export class LTIResourceLinkLaunchRequest<
       ...this.userIdentity?.intoLtiClaim(),
       [resolveClaimKey(LTIClaimKey.messageType)]: this.messageType.toString(),
       [resolveClaimKey(LTIClaimKey.version)]: this.version.toString(),
-      [resolveClaimKey(LTIClaimKey.deploymentId)]:
-        this.resourceLink.deploymentId,
-      [resolveClaimKey(LTIClaimKey.targetLinkUri)]:
-        this.resolvedTargetLink.toString(),
-      [resolveClaimKey(LTIClaimKey.resourceLink)]:
-        this.resourceLink.intoLtiClaim(),
+      [resolveClaimKey(LTIClaimKey.deploymentId)]: this.resourceLink.deploymentId,
+      [resolveClaimKey(LTIClaimKey.targetLinkUri)]: this.resolvedTargetLink.toString(),
+      [resolveClaimKey(LTIClaimKey.resourceLink)]: this.resourceLink.intoLtiClaim(),
       [resolveClaimKey(LTIClaimKey.roles)]: this.resolvedUserRoles,
       [resolveClaimKey(LTIClaimKey.context)]: this.context?.intoLtiClaim(),
-      [resolveClaimKey(LTIClaimKey.platformInstanceData)]:
-        this.platform.instance?.intoLtiClaim(),
+      [resolveClaimKey(LTIClaimKey.platformInstanceData)]: this.platform.instance?.intoLtiClaim(),
       [resolveClaimKey(LTIClaimKey.mentoredUsers)]: this.mentorScope,
-      [resolveClaimKey(LTIClaimKey.launchPresentation)]:
-        this.presentation?.intoLtiClaim(),
+      [resolveClaimKey(LTIClaimKey.launchPresentation)]: this.presentation?.intoLtiClaim(),
       [resolveClaimKey(LTIClaimKey.customs)]: this.customClaims,
       ...this.vendorClaims?.intoLtiClaim(),
     };

@@ -7,14 +7,10 @@
 export const Routes = {
   home: () => `/`,
   oidc: {
-    interaction: (interactionId: string) =>
-      `/oidc/interaction/${interactionId}`,
-    login: (interactionId: string) =>
-      `/oidc/interaction/${interactionId}/login`,
-    consent: (interactionId: string) =>
-      `/oidc/interaction/${interactionId}/consent`,
-    abort: (interactionId: string) =>
-      `/oidc/interaction/${interactionId}/abort`,
+    interaction: (interactionId: string) => `/oidc/interaction/${interactionId}`,
+    login: (interactionId: string) => `/oidc/interaction/${interactionId}/login`,
+    consent: (interactionId: string) => `/oidc/interaction/${interactionId}/consent`,
+    abort: (interactionId: string) => `/oidc/interaction/${interactionId}/abort`,
     logout: () => `/oidc/session/end`,
     auth: () => `/oidc/auth`,
     jwks: () => `/oidc/jwks`,
@@ -42,21 +38,16 @@ export const Routes = {
     },
     deployments: {
       deploy: (toolId: string) => `/lti/deployments/${toolId}/deploy`,
-      delete: (deploymentId: string) =>
-        `/lti/deployments/${deploymentId}/delete`,
+      delete: (deploymentId: string) => `/lti/deployments/${deploymentId}/delete`,
     },
     resourceLinks: {
       list: (deploymentId?: string) =>
-        deploymentId
-          ? `/lti/resource-links?deploymentId=${deploymentId}`
-          : `/lti/resource-links`,
+        deploymentId ? `/lti/resource-links?deploymentId=${deploymentId}` : `/lti/resource-links`,
       create: () => `/lti/resource-links/create`,
-      delete: (resourceLinkId: string) =>
-        `/lti/resource-links/${resourceLinkId}`,
+      delete: (resourceLinkId: string) => `/lti/resource-links/${resourceLinkId}`,
     },
     launch: {
-      initiate: (resourceLinkId: string) =>
-        `/lti/launches/${resourceLinkId}/initiate`,
+      initiate: (resourceLinkId: string) => `/lti/launches/${resourceLinkId}/initiate`,
       login: () => `/lti/launches/login`,
       return: () => `/lti/launches/post-launch`,
     },

@@ -23,9 +23,7 @@ interface ILtiAssignmentAndGradeServicesConfig {
  * Must be enabled in the `Platform` configurations in order to
  * use ltilib implementations of the LTI AGS specification.
  */
-export class LtiAssignmentAndGradeServicesConfig
-  implements ILtiAssignmentAndGradeServicesConfig
-{
+export class LtiAssignmentAndGradeServicesConfig implements ILtiAssignmentAndGradeServicesConfig {
   public readonly lineItemsEndpoint: ILtiAssignmentAndGradeServicesConfig["lineItemsEndpoint"];
 
   public readonly deadlinesEnabled: ILtiAssignmentAndGradeServicesConfig["deadlinesEnabled"];

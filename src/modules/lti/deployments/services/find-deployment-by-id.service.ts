@@ -7,9 +7,7 @@ type Params = {
 
 @Injectable()
 export class FindDeploymentByIdService {
-  public constructor(
-    private deploymentsRepository: LtiToolsDeploymentsRepository,
-  ) {}
+  public constructor(private deploymentsRepository: LtiToolsDeploymentsRepository) {}
 
   public async exec({ deploymentId }: Params) {
     return await this.deploymentsRepository.findById(deploymentId);

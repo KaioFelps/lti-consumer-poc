@@ -67,11 +67,7 @@ describe("validateMessageToolJwt", async () => {
       .setProtectedHeader(protectedHeader)
       .sign(privateKey);
 
-    const jwtValidationResult = await validateMessageToolJwt(
-      jwt,
-      platform,
-      toolData,
-    );
+    const jwtValidationResult = await validateMessageToolJwt(jwt, platform, toolData);
 
     expect(either.isRight(jwtValidationResult)).toBeTruthy();
   });
@@ -93,11 +89,7 @@ describe("validateMessageToolJwt", async () => {
         .setProtectedHeader(protectedHeader)
         .sign(privateKey);
 
-      const jwtValidationResult = await validateMessageToolJwt(
-        jwt,
-        platform,
-        toolData,
-      );
+      const jwtValidationResult = await validateMessageToolJwt(jwt, platform, toolData);
 
       expect(either.isLeft(jwtValidationResult)).toBeTruthy();
 
@@ -163,9 +155,7 @@ describe("validateMessageToolJwt", async () => {
       expect(_error).toBeInstanceOf(jose.errors.JWTClaimValidationFailed);
 
       const error = _error as jose.errors.JWTClaimValidationFailed;
-      expect(error.reason).toBe(
-        JoseJwtClaimValidationFailureReason.CheckFailed,
-      );
+      expect(error.reason).toBe(JoseJwtClaimValidationFailureReason.CheckFailed);
       expect(error.claim).toBe("iss");
     }
   });
@@ -196,9 +186,7 @@ describe("validateMessageToolJwt", async () => {
 
       const error = _error as jose.errors.JWTClaimValidationFailed;
       expect(error.claim).toBe("aud");
-      expect(error.reason).toBe(
-        JoseJwtClaimValidationFailureReason.CheckFailed,
-      );
+      expect(error.reason).toBe(JoseJwtClaimValidationFailureReason.CheckFailed);
     }
   });
 
@@ -242,15 +230,9 @@ describe("validateMessageToolJwt", async () => {
     };
 
     payload["azp"] = "some invalid value";
-    let jwt = await new jose.SignJWT(payload)
-      .setProtectedHeader(protectedHeader)
-      .sign(privateKey);
+    let jwt = await new jose.SignJWT(payload).setProtectedHeader(protectedHeader).sign(privateKey);
 
-    let jwtValidationResult = await validateMessageToolJwt(
-      jwt,
-      platform,
-      toolData,
-    );
+    let jwtValidationResult = await validateMessageToolJwt(jwt, platform, toolData);
 
     expect(either.isLeft(jwtValidationResult)).toBeTruthy();
     if (either.isLeft(jwtValidationResult)) {
@@ -259,15 +241,11 @@ describe("validateMessageToolJwt", async () => {
 
       const error = _error as jose.errors.JWTClaimValidationFailed;
       expect(error.claim).toBe("azp");
-      expect(error.reason).toBe(
-        JoseJwtClaimValidationFailureReason.CheckFailed,
-      );
+      expect(error.reason).toBe(JoseJwtClaimValidationFailureReason.CheckFailed);
     }
 
     payload["azp"] = platformIssuer;
-    jwt = await new jose.SignJWT(payload)
-      .setProtectedHeader(protectedHeader)
-      .sign(privateKey);
+    jwt = await new jose.SignJWT(payload).setProtectedHeader(protectedHeader).sign(privateKey);
 
     jwtValidationResult = await validateMessageToolJwt(jwt, platform, toolData);
 
@@ -288,11 +266,7 @@ describe("validateMessageToolJwt", async () => {
       .setProtectedHeader(protectedHeader)
       .sign(privateKey);
 
-    const jwtValidationResult = await validateMessageToolJwt(
-      expiredToken,
-      platform,
-      toolData,
-    );
+    const jwtValidationResult = await validateMessageToolJwt(expiredToken, platform, toolData);
 
     const isError = either.isLeft(jwtValidationResult);
     expect(isError).toBeTruthy();
@@ -339,9 +313,7 @@ describe("validateMessageToolJwt", async () => {
 
       const error = _error as jose.errors.JWTClaimValidationFailed;
       expect(error.claim).toBe("nonce");
-      expect(error.reason).toBe(
-        JoseJwtClaimValidationFailureReason.CheckFailed,
-      );
+      expect(error.reason).toBe(JoseJwtClaimValidationFailureReason.CheckFailed);
     }
 
     payload["nonce"] = (Date.now() - 12000).toString();
@@ -349,14 +321,9 @@ describe("validateMessageToolJwt", async () => {
       .setProtectedHeader(protectedHeader)
       .sign(privateKey);
 
-    jwtValidationResult = await validateMessageToolJwt(
-      tokenWithValidNonce,
-      platform,
-      toolData,
-      {
-        nonceIsFresh: checkNonceIsValid,
-      },
-    );
+    jwtValidationResult = await validateMessageToolJwt(tokenWithValidNonce, platform, toolData, {
+      nonceIsFresh: checkNonceIsValid,
+    });
 
     expect(either.isRight(jwtValidationResult)).toBeTruthy();
   });
@@ -375,11 +342,7 @@ describe("validateMessageToolJwt", async () => {
       .setProtectedHeader(protectedHeader)
       .sign(privateKey);
 
-    const jwtValidationResult = await validateMessageToolJwt(
-      jwt,
-      platform,
-      toolData,
-    );
+    const jwtValidationResult = await validateMessageToolJwt(jwt, platform, toolData);
 
     expect(either.isRight(jwtValidationResult)).toBeTruthy();
     if (either.isRight(jwtValidationResult)) {
@@ -416,23 +379,16 @@ describe("validateMessageToolJwt", async () => {
       .setProtectedHeader(protectedHeader)
       .sign(privateKey);
 
-    let jwtValidationResult = await validateMessageToolJwt(
-      invalidJwt,
-      platform,
-      toolData,
-      {
-        messageSpecificClaims: [customClaim],
-        validateMessageSpecificClaims: customValidation,
-      },
-    );
+    let jwtValidationResult = await validateMessageToolJwt(invalidJwt, platform, toolData, {
+      messageSpecificClaims: [customClaim],
+      validateMessageSpecificClaims: customValidation,
+    });
 
     expect(either.isLeft(jwtValidationResult)).toBeTruthy();
     if (either.isLeft(jwtValidationResult)) {
       const error = jwtValidationResult.left;
       expect(error).toBeInstanceOf(jose.errors.JWTClaimValidationFailed);
-      expect((error as jose.errors.JWTClaimValidationFailed).claim).toBe(
-        customClaim,
-      );
+      expect((error as jose.errors.JWTClaimValidationFailed).claim).toBe(customClaim);
     }
 
     payload[customClaim] = "claim";
@@ -440,15 +396,10 @@ describe("validateMessageToolJwt", async () => {
       .setProtectedHeader(protectedHeader)
       .sign(privateKey);
 
-    jwtValidationResult = await validateMessageToolJwt(
-      jwt,
-      platform,
-      toolData,
-      {
-        messageSpecificClaims: [customClaim],
-        validateMessageSpecificClaims: customValidation,
-      },
-    );
+    jwtValidationResult = await validateMessageToolJwt(jwt, platform, toolData, {
+      messageSpecificClaims: [customClaim],
+      validateMessageSpecificClaims: customValidation,
+    });
 
     expect(either.isRight(jwtValidationResult)).toBeTruthy();
     if (either.isRight(jwtValidationResult)) {
@@ -464,9 +415,7 @@ describe("validateMessageToolJwt", async () => {
       [key in `${typeof vendorPrefix}/someCustomParameter`]: boolean;
     };
 
-    const validator = (
-      claims: Payload,
-    ): Either<jose.errors.JWTClaimValidationFailed, Payload> => {
+    const validator = (claims: Payload): Either<jose.errors.JWTClaimValidationFailed, Payload> => {
       const claimKey = `${vendorPrefix}/someCustomParameter`;
       const claim = claims[claimKey];
       if (claim === undefined) {
@@ -501,30 +450,22 @@ describe("validateMessageToolJwt", async () => {
         exp: validExpiration,
         iat: validIssuedAt,
         nonce: validNonce,
-        "http://lti-consumer.poc/someCustomParameter":
-          "foo" as unknown as boolean,
+        "http://lti-consumer.poc/someCustomParameter": "foo" as unknown as boolean,
       } satisfies Payload;
 
       const jwt = await new jose.SignJWT(payload)
         .setProtectedHeader(protectedHeader)
         .sign(privateKey);
 
-      const validationResult = await validateMessageToolJwt<Payload>(
-        jwt,
-        platform,
-        toolData,
-        {
-          vendorPrefix,
-        },
-      );
+      const validationResult = await validateMessageToolJwt<Payload>(jwt, platform, toolData, {
+        vendorPrefix,
+      });
 
       expect(either.isRight(validationResult)).toBeTruthy();
 
       if (either.isRight(validationResult)) {
         const claims = validationResult.right;
-        expect(
-          claims[`${vendorPrefix}/someCustomParameter`],
-        ).not.toBeUndefined();
+        expect(claims[`${vendorPrefix}/someCustomParameter`]).not.toBeUndefined();
       }
     });
 
@@ -535,23 +476,17 @@ describe("validateMessageToolJwt", async () => {
         exp: validExpiration,
         iat: validIssuedAt,
         nonce: validNonce,
-        "http://lti-consumer.poc/someCustomParameter":
-          "foo" as unknown as boolean,
+        "http://lti-consumer.poc/someCustomParameter": "foo" as unknown as boolean,
       } satisfies Payload;
 
       const jwt = await new jose.SignJWT(payload)
         .setProtectedHeader(protectedHeader)
         .sign(privateKey);
 
-      const validationResult = await validateMessageToolJwt<Payload>(
-        jwt,
-        platform,
-        toolData,
-        {
-          vendorPrefix,
-          vendorClaimsValidator: validator,
-        },
-      );
+      const validationResult = await validateMessageToolJwt<Payload>(jwt, platform, toolData, {
+        vendorPrefix,
+        vendorClaimsValidator: validator,
+      });
 
       expect(either.isLeft(validationResult)).toBeTruthy();
 
@@ -580,15 +515,10 @@ describe("validateMessageToolJwt", async () => {
         .setProtectedHeader(protectedHeader)
         .sign(privateKey);
 
-      const validationResult = await validateMessageToolJwt<Payload>(
-        jwt,
-        platform,
-        toolData,
-        {
-          vendorPrefix,
-          vendorClaimsValidator: validator,
-        },
-      );
+      const validationResult = await validateMessageToolJwt<Payload>(jwt, platform, toolData, {
+        vendorPrefix,
+        vendorClaimsValidator: validator,
+      });
 
       expect(either.isRight(validationResult)).toBeTruthy();
     });
@@ -606,11 +536,7 @@ describe("validateMessageToolJwt", async () => {
     // has { alg: "none" } header
     const jwt = new jose.UnsecuredJWT(conformantPayload).setIssuedAt().encode();
 
-    const validationResult = await validateMessageToolJwt(
-      jwt,
-      platform,
-      toolData,
-    );
+    const validationResult = await validateMessageToolJwt(jwt, platform, toolData);
 
     expect(either.isLeft(validationResult)).toBeTruthy();
 

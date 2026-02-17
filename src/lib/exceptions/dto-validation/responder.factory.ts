@@ -20,21 +20,13 @@ export class DtoValidationExceptionFilterResponderFactory extends ExceptionFilte
 }
 
 export class ApiResponder extends ExceptionFilterResponder<Body, Output> {
-  public override async respond(
-    status: number,
-    ctx: HttpArgumentsHost,
-    body: Body,
-  ) {
+  public override async respond(status: number, ctx: HttpArgumentsHost, body: Body) {
     return ctx.getResponse().status(status).json({ errors: body, status });
   }
 }
 
 export class MvcResponder extends ExceptionFilterResponder<Body, Output> {
-  public override async respond(
-    _status: number,
-    ctx: HttpArgumentsHost,
-    errors: Body,
-  ) {
+  public override async respond(_status: number, ctx: HttpArgumentsHost, errors: Body) {
     const request = ctx.getRequest<HttpRequest>();
     const response = ctx.getResponse<HttpResponse>();
     const session = request["session"] as Record<string, unknown>;

@@ -1,8 +1,7 @@
 import { ClassProperties } from "common/src/types/class-properties";
 import { LtiInitiationMessage } from "$/security/lti-message";
 
-type LtiRegistrationInitiationRequestArgs =
-  ClassProperties<LtiRegistrationInitiationRequest>;
+type LtiRegistrationInitiationRequestArgs = ClassProperties<LtiRegistrationInitiationRequest>;
 
 export class LtiRegistrationInitiationRequest implements LtiInitiationMessage {
   /**
@@ -28,16 +27,10 @@ export class LtiRegistrationInitiationRequest implements LtiInitiationMessage {
   public intoUrl(): URL {
     const url = new URL(this.toolInitiateRegisterUri);
 
-    url.searchParams.set(
-      "openid_configuration",
-      this.platformOpenIdConfigurationUri.toString(),
-    );
+    url.searchParams.set("openid_configuration", this.platformOpenIdConfigurationUri.toString());
 
     if (this.platformRegistrationToken) {
-      url.searchParams.set(
-        "registration_token",
-        this.platformRegistrationToken,
-      );
+      url.searchParams.set("registration_token", this.platformRegistrationToken);
     }
 
     return url;

@@ -66,10 +66,7 @@ export class AuthController {
       destinyEndpoint: destiny,
     });
 
-    return response.render(
-      loginView.getView(),
-      await loginView.getRenderData(),
-    );
+    return response.render(loginView.getView(), await loginView.getRenderData());
   }
 
   @Public()
@@ -143,9 +140,7 @@ export class AuthController {
       message: await this.t.translate("auth:forms:register:success-message", {
         id: person.getUser().getId().toString(),
       }),
-      loginButtonMessage: await this.t.translate(
-        "auth:forms:register:buttons:go-login",
-      ),
+      loginButtonMessage: await this.t.translate("auth:forms:register:buttons:go-login"),
     };
 
     return response.redirectBack();

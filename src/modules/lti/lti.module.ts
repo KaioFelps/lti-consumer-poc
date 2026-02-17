@@ -50,12 +50,7 @@ import { LtiToolsController } from "./tools/tools.controller";
           launchRepository,
           platform,
         ),
-      inject: [
-        LtiResourceLinksRepository,
-        LtiToolsRepository,
-        LtiLaunchesRepository,
-        Platform,
-      ],
+      inject: [LtiResourceLinksRepository, LtiToolsRepository, LtiLaunchesRepository, Platform],
     },
     {
       provide: LtiResourceLinkServices,

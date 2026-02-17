@@ -143,21 +143,14 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
     // therefore we must ensure it's valid and we're safe to redirect users to it.
     if (!tool.uris.redirect.includes(redirectUri)) {
       return e.left(
-        new InvalidRedirectUriError(
-          "Given redirect URI is not registered.",
-          redirectUri,
-        ),
+        new InvalidRedirectUriError("Given redirect URI is not registered.", redirectUri),
       );
     }
 
     return pipe(
       e.tryCatch(
         () => new URL(redirectUri),
-        (_error) =>
-          new InvalidRedirectUriError(
-            "Given redirect URI is not valid.",
-            redirectUri,
-          ),
+        (_error) => new InvalidRedirectUriError("Given redirect URI is not valid.", redirectUri),
       ),
     );
   }
@@ -174,14 +167,8 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
     errorDescriptionsRoutes,
     tool,
     transformLaunchRequest,
-  }: AuthenticateLaunchLoginRequestParams<
-    CustomRoles,
-    CustomContextType
-  >): Promise<
-    Either<
-      RedirectionError,
-      LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>
-    >
+  }: AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType>): Promise<
+    Either<RedirectionError, LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>>
   > {
     if (loginHint !== messageHint) {
       const invalidRequestError = new RedirectionError({
@@ -245,13 +232,11 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
     let loginRequiredError: string | undefined;
 
     if (!userIdentity) {
-      loginRequiredError =
-        "There's no authenticated user attached to this launch.";
+      loginRequiredError = "There's no authenticated user attached to this launch.";
     }
 
     if (launch.userId !== userIdentity?.id) {
-      loginRequiredError =
-        "The user who started the launch is not the current user.";
+      loginRequiredError = "The user who started the launch is not the current user.";
     }
 
     if (loginRequiredError) {
@@ -266,10 +251,7 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
       return e.left(loginRequiredRedirection);
     }
 
-    const launchRequest = LTIResourceLinkLaunchRequest.create<
-      CustomRoles,
-      CustomContextType
-    >({
+    const launchRequest = LTIResourceLinkLaunchRequest.create<CustomRoles, CustomContextType>({
       tool,
       nonce,
       platform: this.platform,
@@ -331,33 +313,22 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
     return e.right(presentedLaunchLinks);
   }
 
-  public async getLaunchLinksFromContext({
-    userRoles,
-    contextId,
-  }: GetLaunchLinksFromContext) {
+  public async getLaunchLinksFromContext({ userRoles, contextId }: GetLaunchLinksFromContext) {
     return await pipe(
-      teFromPromise(() =>
-        this.resourceLinksRepository.findMany({ withContextId: contextId }),
-      ),
+      teFromPromise(() => this.resourceLinksRepository.findMany({ withContextId: contextId })),
       te.chainW((resourceLinks) =>
-        teFromPromise(() =>
-          this.getLaunchLinksFromResourceLinks({ resourceLinks, userRoles }),
-        ),
+        teFromPromise(() => this.getLaunchLinksFromResourceLinks({ resourceLinks, userRoles })),
       ),
     )();
   }
 
   public async getLaunchLinks({
     userRoles,
-  }: GetLaunchLinksParams): Promise<
-    Either<LtiRepositoryError, PresentedLtiResourceLink[]>
-  > {
+  }: GetLaunchLinksParams): Promise<Either<LtiRepositoryError, PresentedLtiResourceLink[]>> {
     return await pipe(
       teFromPromise(() => this.resourceLinksRepository.findMany()),
       te.chain((resourceLinks) =>
-        teFromPromise(() =>
-          this.getLaunchLinksFromResourceLinks({ resourceLinks, userRoles }),
-        ),
+        teFromPromise(() => this.getLaunchLinksFromResourceLinks({ resourceLinks, userRoles })),
       ),
     )();
   }

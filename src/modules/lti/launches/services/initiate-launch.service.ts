@@ -25,27 +25,21 @@ export class InitiateLaunchService {
 
   public async exec({ resourceLinkId, presentation, user }: Params) {
     return await pipe(
-      teFromPromise(() =>
-        this.findResourceLinkByIdService.exec({ resourceLinkId }),
-      ),
+      teFromPromise(() => this.findResourceLinkByIdService.exec({ resourceLinkId })),
       te.chainW((resourceLink) =>
         pipe(
-          teFromPromise(() =>
-            this.findToolByIdService.exec({ id: resourceLink.toolId }),
-          ),
+          teFromPromise(() => this.findToolByIdService.exec({ id: resourceLink.toolId })),
           te.map((tool) => ({ tool: tool.record, resourceLink })),
         ),
       ),
       te.chainW(({ tool, resourceLink }) =>
         teFromPromise(() =>
-          this.launchServices.prepareLaunchInitiationRequest<IrrecoverableError>(
-            {
-              resourceLink,
-              tool,
-              sessionUserId: user.getId().toString(),
-              presentation,
-            },
-          ),
+          this.launchServices.prepareLaunchInitiationRequest<IrrecoverableError>({
+            resourceLink,
+            tool,
+            sessionUserId: user.getId().toString(),
+            presentation,
+          }),
         ),
       ),
     )();

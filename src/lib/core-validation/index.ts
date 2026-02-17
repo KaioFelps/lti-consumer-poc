@@ -22,10 +22,7 @@ export const ConfigCoreValidation = (config: CoreValidationConfig) => {
   return SetMetadata(METADATA_KEY, config);
 };
 
-function attachConfigsToRequest(
-  request: HttpRequest,
-  config: CoreValidationConfig = {},
-) {
+function attachConfigsToRequest(request: HttpRequest, config: CoreValidationConfig = {}) {
   request[HANDLER_KEY] = config;
 }
 

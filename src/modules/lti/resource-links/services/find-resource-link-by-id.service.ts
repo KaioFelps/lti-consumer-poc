@@ -19,10 +19,7 @@ export class findResourceLinkByIdService {
     return pipe(
       await this.resourceLinksRepo.findById(resourceLinkId),
       e.mapLeft(
-        (error) =>
-          error as LtiRepositoryError<
-            IrrecoverableError | ResourceLinkNotFoundError
-          >,
+        (error) => error as LtiRepositoryError<IrrecoverableError | ResourceLinkNotFoundError>,
       ),
     );
   }

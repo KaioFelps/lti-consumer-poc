@@ -1,9 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Inject,
-  Injectable,
-} from "@nestjs/common";
+import { CanActivate, ExecutionContext, Inject, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { Observable } from "rxjs";
 import mvc from ".";
@@ -19,18 +14,16 @@ export class MvcGuard implements CanActivate {
   @Inject()
   private reflector: Reflector;
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
 
     const handler = context.getHandler();
     const controller = context.getClass();
 
-    const isMVCRoute = this.reflector.getAllAndOverride<boolean>(
-      mvc.metadataKey,
-      [handler, controller],
-    );
+    const isMVCRoute = this.reflector.getAllAndOverride<boolean>(mvc.metadataKey, [
+      handler,
+      controller,
+    ]);
 
     request[mvc.requestKey] = isMVCRoute;
 

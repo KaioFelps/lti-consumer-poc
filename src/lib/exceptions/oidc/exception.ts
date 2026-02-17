@@ -10,8 +10,7 @@ export class OIDCServerErrorException extends HttpException {
     super(
       {
         error: "server_error",
-        error_description:
-          "Something went wrong in our server. Try again later.",
+        error_description: "Something went wrong in our server. Try again later.",
       },
       HttpStatus.INTERNAL_SERVER_ERROR,
     );

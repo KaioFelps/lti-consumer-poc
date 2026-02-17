@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpStatus,
-  Param,
-  Query,
-  Render,
-  Res,
-} from "@nestjs/common";
+import { Controller, Get, HttpStatus, Param, Query, Render, Res } from "@nestjs/common";
 import { either as e, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { type JOSENotSupported } from "jose/dist/types/util/errors";
@@ -57,14 +49,10 @@ export class LtiLaunchesController {
 
   @Render("post-launch")
   @Get("post-launch")
-  public async postLaunch(
-    @Query() { errorLog, errorMsg, successLog, successMsg }: PostLaunchDto,
-  ) {
+  public async postLaunch(@Query() { errorLog, errorMsg, successLog, successMsg }: PostLaunchDto) {
     let title: string;
-    if (successMsg || successLog)
-      title = await this.t.translate("lti:post-launch:success-title");
-    else if (errorMsg || errorLog)
-      title = await this.t.translate("lti:post-launch:error-title");
+    if (successMsg || successLog) title = await this.t.translate("lti:post-launch:success-title");
+    else if (errorMsg || errorLog) title = await this.t.translate("lti:post-launch:error-title");
     else title = await this.t.translate("lti:post-launch:default-title");
 
     if (errorLog) console.error(errorLog);
@@ -98,13 +86,11 @@ export class LtiLaunchesController {
       }),
       e.match(
         (_error) => {
-          const error =
-            _error instanceof LtiRepositoryError ? _error.cause : _error;
+          const error = _error instanceof LtiRepositoryError ? _error.cause : _error;
 
           throw ExceptionsFactory.fromError(error);
         },
-        (initiateLaunchRequest) =>
-          response.redirect(initiateLaunchRequest.intoUrl().toString()),
+        (initiateLaunchRequest) => response.redirect(initiateLaunchRequest.intoUrl().toString()),
       ),
     );
   }
@@ -133,30 +119,25 @@ export class LtiLaunchesController {
       te.chainW(({ redirectUri, tool }) =>
         pipe(
           () => this.launchLoginService.exec({ body, redirectUri, tool, user }),
-          te.mapLeft(
-            (error) => ({ error, redirectUri }) as IErrorContext<typeof error>,
-          ),
+          te.mapLeft((error) => ({ error, redirectUri }) as IErrorContext<typeof error>),
         ),
       ),
       te.mapLeft((e) => e),
       te.match(
         (errorContext) => {
           const isInvalidRedirectUriError = !("redirectUri" in errorContext);
-          if (isInvalidRedirectUriError)
-            return handleInvalidRedurectUriError(errorContext.error);
+          if (isInvalidRedirectUriError) return handleInvalidRedurectUriError(errorContext.error);
 
           const { error, redirectUri } = errorContext;
 
-          if (error instanceof MalformedRequestError)
-            return handleMalformedRequestError(error);
+          if (error instanceof MalformedRequestError) return handleMalformedRequestError(error);
 
           if (error instanceof RedirectionError) {
             return res.redirect(error.intoUrl().toString());
           }
 
           const isLtiRepositoryExternalError =
-            error instanceof LtiRepositoryError &&
-            error.type === "ExternalError";
+            error instanceof LtiRepositoryError && error.type === "ExternalError";
 
           if (isLtiRepositoryExternalError) {
             const { cause } = error;

@@ -6,9 +6,6 @@ type Args = Omit<ErrorClassProperties<RenderableUnauthorizedError>, "status">;
 
 export class RenderableUnauthorizedError extends RenderableError {
   public constructor(args: Args) {
-    super(
-      { ...args, status: HttpStatus.UNAUTHORIZED },
-      RenderableUnauthorizedError.name,
-    );
+    super({ ...args, status: HttpStatus.UNAUTHORIZED }, RenderableUnauthorizedError.name);
   }
 }

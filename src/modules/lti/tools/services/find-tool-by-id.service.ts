@@ -24,9 +24,7 @@ export class FindToolByIdService {
     return pipe(
       await this.toolsRepo.findToolById(id.toString()),
       either.map((record) => new LtiTool(record)),
-      either.mapLeft(
-        (error: LtiRepositoryError<PossibleErrors>) => error.cause,
-      ),
+      either.mapLeft((error: LtiRepositoryError<PossibleErrors>) => error.cause),
     );
   }
 }

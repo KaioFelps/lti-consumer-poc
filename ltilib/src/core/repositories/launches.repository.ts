@@ -8,7 +8,5 @@ export abstract class LtiLaunchesRepository {
     timeToLiveSeconds: number,
   ): Promise<Either<LtiRepositoryError, void>>;
 
-  public abstract findById(
-    launchId: string,
-  ): Promise<Either<LtiRepositoryError, LtiLaunchData>>;
+  public abstract findById(launchId: string): Promise<Either<LtiRepositoryError, LtiLaunchData>>;
 }

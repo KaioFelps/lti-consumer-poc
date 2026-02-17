@@ -7,11 +7,7 @@ export class SessionsAndFlashMessagesMiddleware implements NestMiddleware {
   @Inject()
   private readonly t: TranslatorService;
 
-  async use(
-    request: HttpRequest,
-    response: HttpResponse,
-    next: (error?: unknown) => void,
-  ) {
+  async use(request: HttpRequest, response: HttpResponse, next: (error?: unknown) => void) {
     const session = request["session"] as Record<string, unknown>;
 
     // injects locales

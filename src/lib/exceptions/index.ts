@@ -7,8 +7,7 @@ import { UnauthorizedError } from "@/core/errors/unauthorized.error";
 import { IrrecoverableException } from "./irrecoverable/exception";
 
 export function resolveStatus(error: ErrorBase | RenderableError) {
-  if (error instanceof IrrecoverableError)
-    return HttpStatus.INTERNAL_SERVER_ERROR;
+  if (error instanceof IrrecoverableError) return HttpStatus.INTERNAL_SERVER_ERROR;
 
   if (error instanceof RenderableError) return error.status;
 

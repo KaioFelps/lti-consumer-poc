@@ -23,9 +23,7 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
     withDeploymentId,
     withToolId,
     withContextId,
-  }: FindManyParams = {}): Promise<
-    Either<LtiRepositoryError, LtiResourceLink[]>
-  > {
+  }: FindManyParams = {}): Promise<Either<LtiRepositoryError, LtiResourceLink[]>> {
     const rootFilters: SQLWrapper[] = [];
 
     if (withDeploymentId) {
@@ -43,9 +41,7 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
         .from(ltiToolDeployments)
         .where(eq(ltiToolDeployments.clientId, withToolId));
 
-      rootFilters.push(
-        inArray(ltiResourceLinks.deploymentId, deploymentsFromTool),
-      );
+      rootFilters.push(inArray(ltiResourceLinks.deploymentId, deploymentsFromTool));
     }
 
     return await pipe(
@@ -68,9 +64,7 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
     )();
   }
 
-  public async create(
-    resourceLink: LtiResourceLink,
-  ): Promise<Either<IrrecoverableError, void>> {
+  public async create(resourceLink: LtiResourceLink): Promise<Either<IrrecoverableError, void>> {
     return await pipe(
       te.tryCatch(
         async () => {
@@ -88,9 +82,7 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
     )();
   }
 
-  public async deleteById(
-    resourceLinkId: UUID,
-  ): Promise<Either<IrrecoverableError, void>> {
+  public async deleteById(resourceLinkId: UUID): Promise<Either<IrrecoverableError, void>> {
     return await pipe(
       te.tryCatch(
         async () => {

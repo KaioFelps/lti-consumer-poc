@@ -1,15 +1,7 @@
 import z from "zod";
-import {
-  AnyLtiRole,
-  InstitutionRole,
-  MembershipRole,
-  SystemRole,
-} from "$/claims/enums/roles";
+import { AnyLtiRole, InstitutionRole, MembershipRole, SystemRole } from "$/claims/enums/roles";
 import { MessageType } from "$/claims/serialization";
-import {
-  GrantType,
-  LTI_TOOL_CONFIGURATION_KEY,
-} from "$/registration/dynamic/tool-configuration";
+import { GrantType, LTI_TOOL_CONFIGURATION_KEY } from "$/registration/dynamic/tool-configuration";
 import { MessagePlacement } from "$/registration/enums/message-placement";
 
 /**
@@ -27,10 +19,7 @@ export const ltiToolConfigurationSchema = z.object({
   custom_parameters: z.record(z.string(), z.string()).optional(),
   messages: z.array(
     z.object({
-      type: z.enum([
-        MessageType.deepLinking,
-        MessageType.resourceLink,
-      ] satisfies MessageType[]),
+      type: z.enum([MessageType.deepLinking, MessageType.resourceLink] satisfies MessageType[]),
       target_link_uri: z.url().optional(),
       label: z.string().optional(),
       icon_uri: z.url().optional(),
@@ -95,9 +84,7 @@ export const ltiToolConfigurationSchema = z.object({
 export const draftLtiDynamicToolConfigurationSchema = z.object({
   client_id: z.string().optional(),
   application_type: z.enum(["web"]),
-  grant_types: z
-    .array(z.enum(["client_credentials", "implicit"] satisfies GrantType[]))
-    .min(2),
+  grant_types: z.array(z.enum(["client_credentials", "implicit"] satisfies GrantType[])).min(2),
   response_types: z.array(z.enum(["id_token"])).min(1),
   redirect_uris: z.array(z.url()).min(1),
   initiate_login_uri: z.url(),

@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Query,
-  Render,
-} from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Query, Render } from "@nestjs/common";
 import { either as e, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
@@ -50,9 +41,7 @@ export class LtiResourceLinksController {
       await this.resourceLinkServices.getResourceLinksFromDeployment({
         deploymentId,
       }),
-      e.map((links) =>
-        links.map((link) => presentLtiResourceLink(link, this.platform)),
-      ),
+      e.map((links) => links.map((link) => presentLtiResourceLink(link, this.platform))),
       e.getOrElseW((error: LtiRepositoryError<IrrecoverableError>) => {
         throw ExceptionsFactory.fromError(error.cause);
       }),
@@ -91,8 +80,7 @@ export class LtiResourceLinksController {
         () => new URL(resourceLink),
         (_) =>
           new InvalidArgumentError({
-            errorMessageIdentifier:
-              "lti:create-resource-link:resource-link-is-valid-url",
+            errorMessageIdentifier: "lti:create-resource-link:resource-link-is-valid-url",
           }),
       ),
       te.fromEither,
@@ -107,9 +95,7 @@ export class LtiResourceLinksController {
         ),
       ),
       te.map((params) => ({ ...params, description, title, customParameters })),
-      te.chain((params) =>
-        teFromPromise(() => this.createResourceLinkService.exec(params)),
-      ),
+      te.chain((params) => teFromPromise(() => this.createResourceLinkService.exec(params))),
       te.map((link) => presentLtiResourceLink(link, this.platform)),
       te.getOrElse((error) => {
         throw ExceptionsFactory.fromError(error);
@@ -117,10 +103,10 @@ export class LtiResourceLinksController {
     )();
 
     return {
-      message: await this.t.translate(
-        "lti:create-resource-link:success-message",
-        { linkTitle: ltiResourceLink.title, linkId: ltiResourceLink.id },
-      ),
+      message: await this.t.translate("lti:create-resource-link:success-message", {
+        linkTitle: ltiResourceLink.title,
+        linkId: ltiResourceLink.id,
+      }),
       ltiResourceLink,
     };
   }
@@ -136,10 +122,9 @@ export class LtiResourceLinksController {
 
     return {
       resourceLinkId,
-      successMessage: await this.t.translate(
-        "lti:delete-resource-link:success-message",
-        { resourceLinkId },
-      ),
+      successMessage: await this.t.translate("lti:delete-resource-link:success-message", {
+        resourceLinkId,
+      }),
     };
   }
 }

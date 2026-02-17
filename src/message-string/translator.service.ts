@@ -24,10 +24,7 @@ export class TranslatorService {
     return await this.translateToLanguage(identifier, language, args);
   }
 
-  public async translate(
-    identifier: string,
-    args?: MessageStringFormatterArg,
-  ): Promise<string> {
+  public async translate(identifier: string, args?: MessageStringFormatterArg): Promise<string> {
     const language = this.getLocale();
     return await this.translateToLanguage(identifier, language, args);
   }

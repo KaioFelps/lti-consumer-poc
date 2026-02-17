@@ -22,12 +22,7 @@ export type PrepareIdTokenError = JOSENotSupported;
  *
  * [LTI Security Framework 1.0]: https://www.imsglobal.org/spec/security/v1p0/#id-token
  */
-export async function prepareIdToken({
-  platform,
-  targetTool,
-  claims,
-  nonce,
-}: PrepareIdTokenArgs) {
+export async function prepareIdToken({ platform, targetTool, claims, nonce }: PrepareIdTokenArgs) {
   const algorithm = platform.jsonWebKey.alg ?? "RS256";
 
   const idToken = await pipe(

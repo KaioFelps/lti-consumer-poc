@@ -1,10 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { usersTable } from "drizzle/schema";
 import { sql } from "drizzle-orm";
-import {
-  Person,
-  PersonUncheckedProps,
-} from "@/modules/identity/person/person.entity";
+import { Person, PersonUncheckedProps } from "@/modules/identity/person/person.entity";
 import { User } from "@/modules/identity/user/user.entity";
 import { DrizzleClient } from "./external/data-store/drizzle/client";
 import { trimNullProperties } from "./utils/trim-null-properties";
@@ -14,11 +11,7 @@ export class AppService {
   public constructor(private drizzle: DrizzleClient) {}
 
   async getUsers(): Promise<User[]> {
-    const rawUser = await this.drizzle
-      .getClient()
-      .select()
-      .from(usersTable)
-      .execute();
+    const rawUser = await this.drizzle.getClient().select().from(usersTable).execute();
 
     const users = rawUser.map(User.createUnchecked);
     return users;

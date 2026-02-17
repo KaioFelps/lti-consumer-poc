@@ -5,8 +5,7 @@ ptBR["oidc:login:title"] = "[OIDC] Logue-se";
 ptBR["oidc:accounts:account-not-found"] = ({ id }: { id: string }) =>
   `Não foi encontrada nenhuma conta com id ${id}.`;
 
-ptBR["oidc:confirm:title"] = ({ userName }: { userName: string }) =>
-  `[OIDC] Olá, ${userName}`;
+ptBR["oidc:confirm:title"] = ({ userName }: { userName: string }) => `[OIDC] Olá, ${userName}`;
 
 ptBR["oidc:error-descriptions:no-client-id-parameter"] =
   "O parâmetro `client_id` é obrigatório, mas não foi fornecido.";
@@ -22,10 +21,8 @@ ptBR["oidc:scopes:content:p1-many-scopes"] = (args: { clientName: string }) =>
 ptBR["oidc:confirm:buttons:authorize"] = "Eu autorizo";
 ptBR["oidc:confirm:buttons:cancel"] = "Deixa baixo";
 
-ptBR[`oidc:scopes:scopes-descriptions:${AvailableScope.openId}`] =
-  "Acessar recursos em seu nome";
-ptBR[`oidc:scopes:scopes-descriptions:${AvailableScope.email}`] =
-  "Acessar seu e-mail";
+ptBR[`oidc:scopes:scopes-descriptions:${AvailableScope.openId}`] = "Acessar recursos em seu nome";
+ptBR[`oidc:scopes:scopes-descriptions:${AvailableScope.email}`] = "Acessar seu e-mail";
 ptBR[`oidc:scopes:scopes-descriptions:${AvailableScope.profile}`] =
   "Acessar seu nome, data de nascimento, apelido, gênero e outras informações do seu perfil";
 ptBR[`oidc:scopes:scopes-descriptions:${AvailableScope.offlineAccess}`] =
@@ -33,5 +30,4 @@ ptBR[`oidc:scopes:scopes-descriptions:${AvailableScope.offlineAccess}`] =
 
 ptBR["oidc:client-error-codes:access_denied"] =
   "O cliente não pode prosseguir sem que o acesso seja concedido.";
-ptBR["oidc:client-error-codes:invalid_token"] =
-  "O seu acesso expirou. Faça login novamente.";
+ptBR["oidc:client-error-codes:invalid_token"] = "O seu acesso expirou. Faça login novamente.";

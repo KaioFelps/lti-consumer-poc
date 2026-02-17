@@ -6,10 +6,7 @@ import type { ZodError } from "zod";
 import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
 import { ValidationErrors } from "@/core/validation/validation-errors";
 import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
-import {
-  Contact,
-  LTI_TOOL_CONFIGURATION_KEY,
-} from "$/registration/dynamic/tool-configuration";
+import { Contact, LTI_TOOL_CONFIGURATION_KEY } from "$/registration/dynamic/tool-configuration";
 import { ToolRecord } from "$/registration/tool-record";
 import { ToolSupportedMessage } from "$/registration/tool-supported-message";
 import { draftLtiDynamicToolConfigurationSchema } from "../lti-tool-config-schemas";

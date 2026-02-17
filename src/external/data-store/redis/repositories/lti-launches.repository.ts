@@ -47,9 +47,7 @@ export class RedisLtiLaunchesRepository extends LtiLaunchesRepository {
     launchId: string,
   ): Promise<
     Either<
-      LtiRepositoryError<
-        IrrecoverableError | LaunchNotFoundError | NoValidLaunchFoundError
-      >,
+      LtiRepositoryError<IrrecoverableError | LaunchNotFoundError | NoValidLaunchFoundError>,
       LtiLaunchData
     >
   > {

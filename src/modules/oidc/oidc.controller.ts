@@ -1,23 +1,9 @@
-import {
-  All,
-  Body,
-  Controller,
-  Get,
-  Header,
-  Inject,
-  Post,
-  Req,
-  Res,
-} from "@nestjs/common";
+import { All, Body, Controller, Get, Header, Inject, Post, Req, Res } from "@nestjs/common";
 import { Request, Response } from "express";
 import { either } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
-import Provider, {
-  Client,
-  Interaction,
-  type InteractionResults,
-} from "oidc-provider";
+import Provider, { Client, Interaction, type InteractionResults } from "oidc-provider";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { UnauthorizedError } from "@/core/errors/unauthorized.error";
 import { HttpRequest, HttpResponse } from "@/lib";
@@ -58,24 +44,15 @@ export class OIDCController {
   @Mvc()
   @Get("interaction/:uid")
   @Header("cache-control", "no-store")
-  public async interactions(
-    @Req() request: Request,
-    @Res() response: Response,
-  ) {
-    const interaction = await this.provider.interactionDetails(
-      request,
-      response,
-    );
+  public async interactions(@Req() request: Request, @Res() response: Response) {
+    const interaction = await this.provider.interactionDetails(request, response);
     const localeHint = interaction.params.ui_locales as string | undefined;
 
     const clientResult = await this.getClient(interaction);
     if (either.isLeft(clientResult)) {
-      return await this.provider.interactionFinished(
-        request,
-        response,
-        clientResult.left,
-        { mergeWithLastSubmission: false },
-      );
+      return await this.provider.interactionFinished(request, response, clientResult.left, {
+        mergeWithLastSubmission: false,
+      });
     }
     const client = clientResult.right;
 
@@ -87,10 +64,7 @@ export class OIDCController {
           loginEndpoint: Routes.oidc.login(interaction.uid),
         });
 
-        return response.render(
-          viewManager.getView(),
-          await viewManager.getOidcRenderData(),
-        );
+        return response.render(viewManager.getView(), await viewManager.getOidcRenderData());
       }
 
       case "consent": {
@@ -113,9 +87,7 @@ export class OIDCController {
 
         const reasons = interaction.prompt.reasons;
         if (!reasonsAreValidPromptReasons(reasons)) {
-          throw new IrrecoverableError(
-            "Unexpected prompt reason triggered consent interaction.",
-          );
+          throw new IrrecoverableError("Unexpected prompt reason triggered consent interaction.");
         }
 
         // Solves one reason per time. This is allowed since oidc-provider recursively
@@ -131,16 +103,11 @@ export class OIDCController {
           interaction,
         });
 
-        return response.render(
-          viewManager.getView(),
-          await viewManager.getRenderData(),
-        );
+        return response.render(viewManager.getView(), await viewManager.getRenderData());
       }
 
       default:
-        throw new IrrecoverableError(
-          "Received unsupported OIDC prompt interaction.",
-        );
+        throw new IrrecoverableError("Received unsupported OIDC prompt interaction.");
     }
   }
 
@@ -155,9 +122,7 @@ export class OIDCController {
     const details = await this.provider.interactionDetails(request, response);
 
     if (details.prompt.name !== "login") {
-      throw new IrrecoverableError(
-        "A non-login prompt request has reached login final endpoint.",
-      );
+      throw new IrrecoverableError("A non-login prompt request has reached login final endpoint.");
     }
 
     const authentication = pipe(
@@ -201,10 +166,7 @@ export class OIDCController {
   @Mvc()
   @Post("interaction/:uid/consent")
   @Header("cache-control", "no-store")
-  public async consentIteractionFinished(
-    @Req() request: Request,
-    @Res() response: Response,
-  ) {
+  public async consentIteractionFinished(@Req() request: Request, @Res() response: Response) {
     const details = await this.provider.interactionDetails(request, response);
     const accountId = details.session?.accountId;
     const clientId = details.params.client_id as string;
@@ -259,10 +221,7 @@ export class OIDCController {
 
   @Mvc()
   @Post("interaction/:uid/abort")
-  public async abortInteraction(
-    @Req() req: HttpRequest,
-    @Res() res: HttpResponse,
-  ) {
+  public async abortInteraction(@Req() req: HttpRequest, @Res() res: HttpResponse) {
     const result = {
       error: "access_denied",
       error_description: "end-user aborted interaction",
@@ -279,9 +238,7 @@ export class OIDCController {
     return this.provider.callback()(req, res);
   }
 
-  private async getClient(
-    interaction: Interaction,
-  ): Promise<Either<InteractionResults, Client>> {
+  private async getClient(interaction: Interaction): Promise<Either<InteractionResults, Client>> {
     // TODO: find out whether oidc-provider does ensure client_id exists
     // before even calling this endpoint and, if this is the case,
     // remove this validation.

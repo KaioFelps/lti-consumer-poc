@@ -8,7 +8,5 @@ export abstract class LtiToolsRepository {
     resourceLinksIds: LtiResourceLink["id"][],
   ): Promise<Either<LtiRepositoryError, ToolRecord[]>>;
 
-  public abstract findToolById(
-    id: string,
-  ): Promise<Either<LtiRepositoryError, ToolRecord>>;
+  public abstract findToolById(id: string): Promise<Either<LtiRepositoryError, ToolRecord>>;
 }

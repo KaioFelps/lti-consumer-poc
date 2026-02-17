@@ -52,10 +52,7 @@ export class ValidationErrors {
     this.recursivelyInsertError(error, path);
   }
 
-  private recursivelyInsertError(
-    error: Required<ValidationError>,
-    path: string[],
-  ) {
+  private recursivelyInsertError(error: Required<ValidationError>, path: string[]) {
     let errorsWindow = this.errors;
     const lastSegment = path[path.length - 1];
     path = path.slice(0, path.length - 1);

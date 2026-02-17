@@ -1,9 +1,4 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor,
-} from "@nestjs/common";
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
 import { PARAMTYPES_METADATA } from "@nestjs/common/constants";
 import { Reflector } from "@nestjs/core";
 import { Observable } from "rxjs";
@@ -18,11 +13,7 @@ export class CoreValidationInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler<unknown>,
   ): Observable<unknown> | Promise<Observable<unknown>> {
-    const targets = [
-      context.getClass(),
-      ...this.getDtoTargets(context),
-      context.getHandler(),
-    ];
+    const targets = [context.getClass(), ...this.getDtoTargets(context), context.getHandler()];
 
     const config = this.getMergedValidatorConfigurations(targets);
 
@@ -44,11 +35,7 @@ export class CoreValidationInterceptor implements NestInterceptor {
 
   private getDtoTargets(context: ExecutionContext) {
     const paramTypes =
-      Reflect.getMetadata(
-        PARAMTYPES_METADATA,
-        context.getClass(),
-        context.getHandler().name,
-      ) || [];
+      Reflect.getMetadata(PARAMTYPES_METADATA, context.getClass(), context.getHandler().name) || [];
 
     const dtoTargets = paramTypes.filter((paramType) => {
       return (

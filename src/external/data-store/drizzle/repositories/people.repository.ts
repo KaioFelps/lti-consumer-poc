@@ -17,16 +17,11 @@ export class DrizzlePeopleRepository extends PeopleRepository {
   @Inject()
   private drizzle: DrizzleClient;
 
-  public async createPerson(
-    person: Person,
-  ): Promise<Either<IrrecoverableError, Person>> {
+  public async createPerson(person: Person): Promise<Either<IrrecoverableError, Person>> {
     return pipe(
       tryCatch(
         () => {
-          return this.drizzle
-            .getClient()
-            .insert(usersTable)
-            .values(peopleMapper.intoRow(person));
+          return this.drizzle.getClient().insert(usersTable).values(peopleMapper.intoRow(person));
         },
         (error: Error) =>
           new IrrecoverableError(
@@ -50,12 +45,7 @@ export class DrizzlePeopleRepository extends PeopleRepository {
             .select()
             .from(usersTable)
             // ensure only valid person are fetched from database
-            .where(
-              and(
-                eq(usersTable.id, personId),
-                peopleMapper.requiredQueryConfig.where,
-              ),
-            )
+            .where(and(eq(usersTable.id, personId), peopleMapper.requiredQueryConfig.where))
             .limit(1)
             .execute(),
         (error: Error) =>

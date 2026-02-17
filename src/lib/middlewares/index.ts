@@ -4,9 +4,5 @@ import { MvcSharedDataMiddleware } from "./mvc-shared-data.middleware";
 
 export default {
   mvc: () =>
-    [
-      SessionUserMiddleware,
-      SessionsAndFlashMessagesMiddleware,
-      MvcSharedDataMiddleware,
-    ] as const,
+    [SessionUserMiddleware, SessionsAndFlashMessagesMiddleware, MvcSharedDataMiddleware] as const,
 };

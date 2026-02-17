@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Render,
-  Res,
-  Session,
-} from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Render, Res, Session } from "@nestjs/common";
 import { either, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { ErrorBase } from "@/core/errors/error-base";
@@ -38,8 +29,7 @@ export class LtiToolsController {
     private getToolDetailsService: GetToolRegistrationDetailsService,
   ) {}
 
-  private static toolRegistrationEndpointFlashKey =
-    "registerToolInitiateRegisterEndpoint";
+  private static toolRegistrationEndpointFlashKey = "registerToolInitiateRegisterEndpoint";
 
   @Get("register")
   @Render("register-new-tool")
@@ -68,8 +58,9 @@ export class LtiToolsController {
       toolInitiateRegisterUri: new URL(dto.registrationEndpoint),
     });
 
-    session.flash[LtiToolsController.toolRegistrationEndpointFlashKey] =
-      initiateRegister.intoUrl().toString();
+    session.flash[LtiToolsController.toolRegistrationEndpointFlashKey] = initiateRegister
+      .intoUrl()
+      .toString();
 
     return response.redirectBack();
   }
@@ -97,10 +88,7 @@ export class LtiToolsController {
     const toolDetails = await pipe(
       () => this.getToolDetailsService.exec({ toolId }),
       te.getOrElseW((error: LtiRepositoryError<ErrorBase>) => async () => {
-        const renderable = await ErrorBaseRenderableError.create(
-          error.cause,
-          this.t,
-        );
+        const renderable = await ErrorBaseRenderableError.create(error.cause, this.t);
         throw ExceptionsFactory.fromError(renderable);
       }),
     )();
@@ -110,9 +98,7 @@ export class LtiToolsController {
         toolName: toolDetails.getTool().record.name,
       }),
       tool: LtiToolPresenter.present(toolDetails.getTool()),
-      deployments: toolDetails
-        .getDeployments()
-        .map(LtiToolDeploymentPresenter.present),
+      deployments: toolDetails.getDeployments().map(LtiToolDeploymentPresenter.present),
     };
   }
 }

@@ -5,11 +5,7 @@ import { LtiResourceLinksRepository as BaseLtiResourceLinksRepository } from "$/
 import { LtiResourceLink } from "$/core/resource-link";
 
 export abstract class LtiResourceLinksRepository extends BaseLtiResourceLinksRepository {
-  public abstract create(
-    resourceLink: LtiResourceLink,
-  ): Promise<Either<IrrecoverableError, void>>;
+  public abstract create(resourceLink: LtiResourceLink): Promise<Either<IrrecoverableError, void>>;
 
-  public abstract deleteById(
-    resourceLinkId: UUID,
-  ): Promise<Either<IrrecoverableError, void>>;
+  public abstract deleteById(resourceLinkId: UUID): Promise<Either<IrrecoverableError, void>>;
 }

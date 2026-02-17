@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Param,
-  Post,
-  Res,
-  Session,
-} from "@nestjs/common";
+import { Body, Controller, Delete, Param, Post, Res, Session } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { HttpResponse, RequestSession } from "@/lib";
@@ -39,9 +31,7 @@ export class LtiDeploymentsController {
     const deployment = await pipe(
       teFromPromise(() => this.findToolByIdService.exec({ id: toolId })),
       te.chainW((tool) =>
-        teFromPromise(() =>
-          this.deployToolService.exec({ tool, label: dto.label }),
-        ),
+        teFromPromise(() => this.deployToolService.exec({ tool, label: dto.label })),
       ),
       (a) => a,
       te.getOrElse((error) => {
@@ -50,10 +40,10 @@ export class LtiDeploymentsController {
     )();
 
     session.flash.activeTab = dto.activeTab;
-    session.flash.successMessage = await this.t.translate(
-      "lti:deploy-tool:success-message",
-      { id: deployment.getId().toString(), label: deployment.getLabel() },
-    );
+    session.flash.successMessage = await this.t.translate("lti:deploy-tool:success-message", {
+      id: deployment.getId().toString(),
+      label: deployment.getLabel(),
+    });
 
     return response.redirectBack();
   }
@@ -70,9 +60,7 @@ export class LtiDeploymentsController {
 
     return {
       deploymentId,
-      successMessage: await this.t.translate(
-        "lti:delete-tool-deployment:success-message",
-      ),
+      successMessage: await this.t.translate("lti:delete-tool-deployment:success-message"),
     };
   }
 }

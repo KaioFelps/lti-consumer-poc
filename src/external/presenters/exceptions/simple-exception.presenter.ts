@@ -12,9 +12,7 @@ type PresentedSimpleException = {
  * A presenter for `SimpleException`s.
  */
 @Injectable({ scope: Scope.REQUEST })
-export class SimpleExceptionPresenter<E extends BaseException>
-  implements ExceptionPresenter<E>
-{
+export class SimpleExceptionPresenter<E extends BaseException> implements ExceptionPresenter<E> {
   @Inject()
   private translator: TranslatorService;
 

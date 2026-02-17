@@ -6,10 +6,7 @@ import { pipe } from "fp-ts/lib/function";
 import { tryCatch } from "fp-ts/lib/TaskEither";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import {
-  Person,
-  PersonUncheckedProps,
-} from "@/modules/identity/person/person.entity";
+import { Person, PersonUncheckedProps } from "@/modules/identity/person/person.entity";
 import { OIDCAccount } from "@/modules/oidc/account";
 import { OIDCAccountsRepository } from "@/modules/oidc/repositories/accounts.repository";
 import { trimNullProperties } from "@/utils/trim-null-properties";
@@ -30,12 +27,8 @@ export class DrizzleODICAccountsRepository extends OIDCAccountsRepository {
     return account;
   }
 
-  public async findAccountByUsername(
-    username: string,
-  ): Promise<OIDCAccount | undefined> {
-    const account = await this.findAccountGivenCondition(
-      eq(usersTable.username, username),
-    );
+  public async findAccountByUsername(username: string): Promise<OIDCAccount | undefined> {
+    const account = await this.findAccountGivenCondition(eq(usersTable.username, username));
     return account;
   }
 

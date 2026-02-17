@@ -4,9 +4,7 @@ import { PersonNotFoundError } from "../errors/person-not-found.error";
 import { Person } from "./person.entity";
 
 export abstract class PeopleRepository {
-  public abstract createPerson(
-    person: Person,
-  ): Promise<Either<IrrecoverableError, Person>>;
+  public abstract createPerson(person: Person): Promise<Either<IrrecoverableError, Person>>;
 
   public abstract findById(
     personId: string,

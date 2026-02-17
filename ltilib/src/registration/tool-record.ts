@@ -16,8 +16,7 @@ type ToolRecordArgs = ClassProperties<ToolRecord>;
 
 export class ToolRecord implements IntoLtiClaim {
   public readonly applicationType: "web" = "web";
-  public readonly tokenEndpointAuthMethod: "private_key_jwt" =
-    "private_key_jwt";
+  public readonly tokenEndpointAuthMethod: "private_key_jwt" = "private_key_jwt";
 
   /**
    * It is not stated by Open ID to be a UUID. oidc-provider uses nanoids, for instance.
@@ -62,8 +61,7 @@ export class ToolRecord implements IntoLtiClaim {
     if (!data.uris.jwks && !data.clientSecret) {
       return either.left(
         new InvalidToolConfigurationError({
-          client_secret:
-            "Tool must have at least `client_secret` if `jwks_uri` is not present",
+          client_secret: "Tool must have at least `client_secret` if `jwks_uri` is not present",
         }),
       );
     }
@@ -71,8 +69,7 @@ export class ToolRecord implements IntoLtiClaim {
     if (data.applicationType !== "web") {
       return either.left(
         new InvalidToolConfigurationError({
-          application_type:
-            'LTI Tools must have `application_type` set to "web"',
+          application_type: 'LTI Tools must have `application_type` set to "web"',
         }),
       );
     }
@@ -104,13 +101,11 @@ export class ToolRecord implements IntoLtiClaim {
       client_id: this.id.toString(),
       application_type: this.applicationType,
       client_name: this.name,
-      grant_types: this
-        .grantTypes as DraftLtiDynamicToolConfiguration["grant_types"],
+      grant_types: this.grantTypes as DraftLtiDynamicToolConfiguration["grant_types"],
       jwks_uri: this.uris.jwks,
       redirect_uris: this.uris.redirect,
       initiate_login_uri: this.uris.initiate,
-      response_types: this
-        .responseTypes as DraftLtiDynamicToolConfiguration["response_types"],
+      response_types: this.responseTypes as DraftLtiDynamicToolConfiguration["response_types"],
       scope: this.scope,
       token_endpoint_auth_method: this.tokenEndpointAuthMethod,
       contacts: this.contacts?.length === 0 ? undefined : this.contacts,
@@ -137,9 +132,7 @@ export class ToolRecord implements IntoLtiClaim {
    *
    * @param deploymentId
    */
-  intoLtiClaimWithDeployment(
-    deploymentId: string,
-  ): LtiDynamicToolConfiguration {
+  intoLtiClaimWithDeployment(deploymentId: string): LtiDynamicToolConfiguration {
     const claims = this.intoLtiClaim();
 
     if (this.ltiConfiguration.deploymentsIds.includes(deploymentId)) {

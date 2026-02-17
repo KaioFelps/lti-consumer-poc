@@ -41,14 +41,10 @@ export class CoreValidationPipe implements PipeTransform {
 
     if (!isDtoCompliant) return value;
 
-    const valueAsInstanceOfADto: DTO = plainToInstance(
-      metadata.metatype,
-      value,
-      {
-        excludeExtraneousValues: true,
-        strategy: "excludeAll",
-      },
-    );
+    const valueAsInstanceOfADto: DTO = plainToInstance(metadata.metatype, value, {
+      excludeExtraneousValues: true,
+      strategy: "excludeAll",
+    });
 
     const isValid = valueAsInstanceOfADto.validate();
     if (either.isRight(isValid)) return valueAsInstanceOfADto;

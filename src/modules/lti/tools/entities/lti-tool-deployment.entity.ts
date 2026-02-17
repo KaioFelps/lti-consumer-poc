@@ -13,10 +13,7 @@ export class LtiToolDeployment extends EntityBase<LtiToolDeploymentProps> {
     super(props);
   }
 
-  public static create({
-    id = generateUUID(),
-    ...props
-  }: Optional<LtiToolDeploymentProps, "id">) {
+  public static create({ id = generateUUID(), ...props }: Optional<LtiToolDeploymentProps, "id">) {
     return new LtiToolDeployment({ id, ...props });
   }
 

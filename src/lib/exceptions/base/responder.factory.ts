@@ -34,11 +34,7 @@ class MVCStrategy extends ExceptionFilterResponder<unknown, void> {
     super();
   }
 
-  public async respond(
-    _status: number,
-    ctx: HttpArgumentsHost,
-    exception: Body,
-  ): Promise<void> {
+  public async respond(_status: number, ctx: HttpArgumentsHost, exception: Body): Promise<void> {
     const request = ctx.getRequest<HttpRequest>();
     const response = ctx.getResponse<HttpResponse>();
     const session = request["session"] as Record<string, unknown>;
@@ -65,11 +61,7 @@ export class APIStrategy extends ExceptionFilterResponder<Body, Output> {
     super();
   }
 
-  public async respond(
-    status: number,
-    ctx: HttpArgumentsHost,
-    exception: Body,
-  ): Promise<object> {
+  public async respond(status: number, ctx: HttpArgumentsHost, exception: Body): Promise<object> {
     return ctx
       .getResponse<HttpResponse>()
       .status(status)
