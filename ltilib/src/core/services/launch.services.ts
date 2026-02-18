@@ -7,8 +7,8 @@ import { MessageType } from "$/claims/serialization";
 import { ToolRecord } from "$/registration/tool-record";
 import { ToolSupportedMessage } from "$/registration/tool-supported-message";
 import { Context } from "../context";
+import { AuthenticationRedirectionError } from "../errors/authentication-redirection.error";
 import { InvalidRedirectUriError } from "../errors/invalid-redirect-uri.error";
-import { RedirectionError } from "../errors/redirection.error";
 import { LtiRepositoryError } from "../errors/repository.error";
 import { LtiLaunchData } from "../launch-data";
 import { MessageRequests } from "../messages";
@@ -168,10 +168,13 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
     tool,
     transformLaunchRequest,
   }: AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType>): Promise<
-    Either<RedirectionError, LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>>
+    Either<
+      AuthenticationRedirectionError,
+      LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>
+    >
   > {
     if (loginHint !== messageHint) {
-      const invalidRequestError = new RedirectionError({
+      const invalidRequestError = new AuthenticationRedirectionError({
         code: "invalid_request",
         description: "Initiated launch is malformed.",
         errorPageUri: errorDescriptionsRoutes?.malformedLaunch,
@@ -186,7 +189,7 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
       teFromPromise(() => this.launchRepository.findById(messageHint)),
       te.mapLeft((error) => {
         if (error.type === "ExternalError") return error;
-        return new RedirectionError({
+        return new AuthenticationRedirectionError({
           code: "invalid_request",
           description: "Launch is invalid or might be expired.",
           errorPageUri: errorDescriptionsRoutes?.invalidRequest,
@@ -202,7 +205,7 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
           }),
           te.mapLeft((error) => {
             if (error.type === "ExternalError") return error;
-            return new RedirectionError({
+            return new AuthenticationRedirectionError({
               code: "invalid_request",
               description: "The resource does not exist or could not be found.",
               errorPageUri: errorDescriptionsRoutes?.linkNotFound,
@@ -214,8 +217,8 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
         ),
       ),
       te.mapLeft((error) => {
-        if (error instanceof RedirectionError) return error;
-        return new RedirectionError({
+        if (error instanceof AuthenticationRedirectionError) return error;
+        return new AuthenticationRedirectionError({
           code: "server_error",
           description: "Something went wrong while retrieving the launch data.",
           errorPageUri: errorDescriptionsRoutes?.serverError,
@@ -240,7 +243,7 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
     }
 
     if (loginRequiredError) {
-      const loginRequiredRedirection = new RedirectionError({
+      const loginRequiredRedirection = new AuthenticationRedirectionError({
         code: "login_required",
         errorPageUri: errorDescriptionsRoutes?.unauthorizedRedirectUri,
         description: loginRequiredError,

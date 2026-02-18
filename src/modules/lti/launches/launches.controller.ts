@@ -14,9 +14,9 @@ import { PersonNotFoundError } from "@/modules/identity/errors/person-not-found.
 import type { User } from "@/modules/identity/user/user.entity";
 import { Routes } from "@/routes";
 import { assertNever } from "@/utils/assert-never";
+import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
 import type { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
 import { MalformedRequestError } from "$/core/errors/malformed-request.error";
-import { RedirectionError } from "$/core/errors/redirection.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { MessageRequests } from "$/core/messages";
 import { Platform } from "$/core/platform";
@@ -132,7 +132,7 @@ export class LtiLaunchesController {
 
           if (error instanceof MalformedRequestError) return handleMalformedRequestError(error);
 
-          if (error instanceof RedirectionError) {
+          if (error instanceof AuthenticationRedirectionError) {
             return res.redirect(error.intoUrl().toString());
           }
 
@@ -205,7 +205,7 @@ function handleIrrecoverableError(
   redirectUri: URL,
   response: HttpResponse,
 ) {
-  const redirectionError = new RedirectionError({
+  const redirectionError = new AuthenticationRedirectionError({
     code: "server_error",
     description: "Something went wrong in the server. Try again later.",
     redirectUri,
@@ -221,7 +221,7 @@ function handlePersonNotFoundError(
   redirectUri: URL,
   response: HttpResponse,
 ) {
-  const redirectionError = new RedirectionError({
+  const redirectionError = new AuthenticationRedirectionError({
     code: "login_required",
     description: "User could not be found.",
     redirectUri,
