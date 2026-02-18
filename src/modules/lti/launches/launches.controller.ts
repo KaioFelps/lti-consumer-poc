@@ -173,7 +173,7 @@ function handleInvalidRedurectUriError(error: InvalidRedirectUriError) {
         title: "LTI Error",
         message: error.message,
       },
-      status: HttpStatus.BAD_REQUEST,
+      status: error.httpStatusCode,
     },
     error.constructor.name,
   );
@@ -191,7 +191,7 @@ function handleMalformedRequestError(error: MalformedRequestError) {
         message,
         cause,
       },
-      status: HttpStatus.BAD_REQUEST,
+      status: error.httpStatusCode,
     },
     error.constructor.name,
   );

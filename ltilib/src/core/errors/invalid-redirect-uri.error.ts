@@ -1,8 +1,10 @@
-export class InvalidRedirectUriError extends Error {
+import { LtilibError } from "./bases/ltilib.error";
+
+export class InvalidRedirectUriError extends LtilibError {
   public constructor(
     message: string,
     public readonly invalidRedirectUri: string,
   ) {
-    super(message);
+    super(400, message);
   }
 }
