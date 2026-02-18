@@ -207,6 +207,10 @@ export class LtiLineItemServices {
           },
         ),
       ),
+      te.mapError((error) => {
+        const isNotFoundError = error instanceof LtiRepositoryError && error.type === "NotFound";
+        return isNotFoundError ? new CannotAttachResourceLinkError("doesnt_belong_to_tool") : error;
+      }),
       te.map(o.toUndefined),
     );
   }
