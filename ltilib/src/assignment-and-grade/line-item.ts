@@ -87,17 +87,17 @@ interface ILtiLineItem {
  * @see {@link https://www.imsglobal.org/spec/lti-ags/v2p0 LTI AGS specification}
  */
 export class LtiLineItem implements ILtiLineItem {
-  public readonly startDateTime?: Date | undefined;
-  public readonly endDateTime?: Date | undefined;
+  public startDateTime?: Date | undefined;
+  public endDateTime?: Date | undefined;
 
   private constructor(
     public readonly id: number | UUID | string,
-    public readonly label: string,
-    public readonly scoreMaximum: number,
-    public readonly resourceLink?: LtiResourceLink | undefined,
+    public label: string,
+    public scoreMaximum: number,
+    public resourceLink?: LtiResourceLink | undefined,
     public readonly externalResource?: ExternalLtiResource | undefined,
     public readonly tag?: string,
-    public readonly gradesReleased?: boolean | undefined,
+    public gradesReleased?: boolean | undefined,
     startDateTime?: Date | undefined,
     endDateTime?: Date | undefined,
   ) {
