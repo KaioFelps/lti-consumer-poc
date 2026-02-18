@@ -31,7 +31,7 @@ export function presentLtiLineItem(
     tag: lineitem.tag,
     scoreMaximum: lineitem.scoreMaximum,
     gradesReleased: lineitem.gradesReleased,
-    resourceId: lineitem.resource?.externalToolResourceId,
+    resourceId: lineitem.externalResource?.externalToolResourceId,
     resourceLinkId: lineitem.resourceLink?.id,
     startDateTime: lineitem.startDateTime?.toISOString(),
     endDateTime: lineitem.endDateTime?.toISOString(),

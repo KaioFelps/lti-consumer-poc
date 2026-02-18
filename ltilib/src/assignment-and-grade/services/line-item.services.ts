@@ -1,7 +1,12 @@
 import { either as e, option as o, taskEither as te } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
+import { InvalidMediaTypeError } from "$/advantage/errors/invalid-media-type.error";
+import { MissingScopeError } from "$/advantage/errors/missing-scope.error";
+import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
+import { ensureAcceptHeaderIsValid } from "$/advantage/utils/ensure-accept-header-is-valid";
+import { ensureHasAnyScope } from "$/advantage/utils/ensure-has-any-scope";
 import { Context } from "$/core/context";
 import { MisconfiguredPlatformError } from "$/core/errors/misconfigured-platform.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
@@ -13,15 +18,11 @@ import { InvalidLineItemArgumentError } from "../errors/invalid-line-item-argume
 import { MissingPlatformAgsConfiguration } from "../errors/missing-platform-ags-configuration.error";
 import { LtiLineItem } from "../line-item";
 import { LtiLineItemsRepository } from "../repositories/line-items.repository";
+import { AssignmentAndGradeServiceScopes } from "../scopes";
 
-type CreateLineItemParams = {
-  /**
-   * The LTI tool which is trying to create this line item.
-   */
-  tool: ToolRecord;
+type RawLineItemsPayload = {
   resourceId?: string;
   resourceLinkId?: string;
-  context: Context;
   startDateTime?: Date | null;
   endDateTime?: Date | null;
   label: string;
@@ -29,6 +30,15 @@ type CreateLineItemParams = {
   tag?: string;
   gradesReleased?: boolean;
 };
+
+type CreateLineItemParams = {
+  acceptHeader: string | undefined;
+  /**
+   * The LTI tool which is trying to create this line item.
+   */
+  tool: ToolRecord;
+  context: Context;
+} & RawLineItemsPayload;
 
 type DiscoverLineItemParams = {
   resourceId: string;
@@ -49,13 +59,14 @@ export class LtiLineItemServices {
 
   public async createLineItem({
     tool,
-    resourceId,
-    resourceLinkId,
     context,
-    tag,
+    resourceId,
+    acceptHeader,
     ...args
   }: CreateLineItemParams): Promise<
     Either<
+      | MissingScopeError
+      | InvalidMediaTypeError
       | InvalidLineItemArgumentError
       | CannotAttachResourceLinkError
       | MisconfiguredPlatformError
@@ -63,15 +74,38 @@ export class LtiLineItemServices {
       LtiLineItem
     >
   > {
-    if (!this.platform.agsConfiguration) {
-      return e.left(new MissingPlatformAgsConfiguration());
-    }
-
+    if (!this.platform.agsConfiguration) return e.left(new MissingPlatformAgsConfiguration());
     const { agsConfiguration } = this.platform;
 
-    tag = tag?.trim() || undefined;
+    args.tag = args.tag?.trim() || undefined;
 
-    const existingLineitem = pipe(
+    return await pipe(
+      ensureHasAnyScope({ tool, requiredScopes: AssignmentAndGradeServiceScopes.Lineitem }),
+      e.chainW(() =>
+        ensureAcceptHeaderIsValid({
+          acceptHeader,
+          requiredMediaType: LtiAdvantageMediaType.LineItem,
+        }),
+      ),
+      te.fromEither,
+      te.chainW(() =>
+        pipe(
+          this.findExistingLineItemFromResourceAndTag(resourceId, args.tag),
+          te.chainW((existingLineitem) => {
+            if (existingLineitem) return te.right(existingLineitem);
+            return this.createNewLineItem(context, tool, agsConfiguration, { resourceId, ...args });
+          }),
+        ),
+      ),
+      (a) => a,
+    )();
+  }
+
+  private findExistingLineItemFromResourceAndTag(
+    resourceId: string | undefined,
+    tag: RawLineItemsPayload["tag"],
+  ) {
+    return pipe(
       o.fromNullable(resourceId),
       o.map((resourceId) => () => this.discoverLineItem({ resourceId, tag })),
       o.sequence(te.ApplicativePar),
@@ -83,54 +117,50 @@ export class LtiLineItemServices {
         (lineitem) => e.right(o.toUndefined(lineitem)),
       ),
     );
+  }
 
-    return await pipe(
-      existingLineitem,
-      te.chainW((existingLineitem) => {
-        if (existingLineitem) return te.right(existingLineitem);
+  private createNewLineItem(
+    context: Context,
+    tool: ToolRecord,
+    agsConfig: Platform.LtiAssignmentAndGradeServicesConfig,
+    { resourceId, resourceLinkId, ...args }: RawLineItemsPayload,
+  ) {
+    return pipe(
+      te.Do,
+      te.apS(
+        "externalResource",
+        pipe(
+          o.fromNullable(resourceId),
+          o.map((id) => () => this.externalResourcesRepo.findById(id)),
+          o.sequence(te.ApplicativePar),
+          te.map(o.toUndefined),
+        ),
+      ),
+      te.apS("resourceLink", this.maybeGetAndValidateResourceLink(context, tool, resourceLinkId)),
+      te.chainW(({ externalResource, resourceLink }) => {
+        const { resolvedEndDate, resolvedStartDate } = this.getResolvedDates(
+          agsConfig,
+          args.startDateTime,
+          args.endDateTime,
+        );
 
-        return pipe(
-          te.Do,
-          te.apS(
-            "externalResource",
-            pipe(
-              o.fromNullable(resourceId),
-              o.map((id) => () => this.externalResourcesRepo.findById(id)),
-              o.sequence(te.ApplicativePar),
-              te.map(o.toUndefined),
-            ),
-          ),
-          te.apS(
-            "resourceLinkItem",
-            this.maybeGetAndValidateResourceLink(context, tool, resourceLinkId),
-          ),
-          te.chainW(({ externalResource, resourceLinkItem }) => {
-            const { resolvedEndDate, resolvedStartDate } = this.getResolvedDates(
-              agsConfiguration,
-              args.startDateTime,
-              args.endDateTime,
-            );
-
-            return te.fromEither(
-              LtiLineItem.create({
-                ...args,
-                tag,
-                resource: externalResource,
-                resourceLink: resourceLinkItem,
-                startDateTime: resolvedStartDate,
-                endDateTime: resolvedEndDate,
-              }),
-            );
+        return te.fromEither(
+          LtiLineItem.create({
+            ...args,
+            externalResource,
+            resourceLink,
+            startDateTime: resolvedStartDate,
+            endDateTime: resolvedEndDate,
           }),
-          te.chain((lineitem) =>
-            pipe(
-              () => this.lineItemsRepo.save(lineitem),
-              te.map(() => lineitem),
-            ),
-          ),
         );
       }),
-    )();
+      te.chainW((lineitem) =>
+        pipe(
+          () => this.lineItemsRepo.save(lineitem),
+          te.map(() => lineitem),
+        ),
+      ),
+    );
   }
 
   private getResolvedDates(

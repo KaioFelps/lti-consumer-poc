@@ -43,7 +43,7 @@ interface ILtiLineItem {
    *
    * @see {@link https://www.imsglobal.org/spec/lti-ags/v2p0 LTI AGS specification}
    */
-  resource?: ExternalLtiResource;
+  externalResource?: ExternalLtiResource;
   /**
    * A tag the LTI tool may set to this line item.
    *
@@ -95,7 +95,7 @@ export class LtiLineItem implements ILtiLineItem {
     public readonly label: string,
     public readonly scoreMaximum: number,
     public readonly resourceLink?: LtiResourceLink | undefined,
-    public readonly resource?: ExternalLtiResource | undefined,
+    public readonly externalResource?: ExternalLtiResource | undefined,
     public readonly tag?: string,
     public readonly gradesReleased?: boolean | undefined,
     startDateTime?: Date | undefined,
@@ -122,7 +122,7 @@ export class LtiLineItem implements ILtiLineItem {
         label,
         args.scoreMaximum,
         args.resourceLink,
-        args.resource,
+        args.externalResource,
         args.tag,
         args.gradesReleased,
         args.startDateTime,
