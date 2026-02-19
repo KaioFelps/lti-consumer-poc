@@ -13,5 +13,8 @@
   "dependencies": {
     "uuid": "13.0.0",
     "fp-ts": "2.16.11"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "10.3.0"
   }
 }
