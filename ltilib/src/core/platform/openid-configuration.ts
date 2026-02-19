@@ -2,7 +2,7 @@ import { ClassProperties } from "common/src/types/class-properties";
 import { MessageType } from "$/claims/serialization";
 import { MessagePlacement } from "$/registration/enums/message-placement";
 
-interface IOpenIdConfiguration {
+export interface IOpenIdConfiguration {
   /**
    * Platform's issuer value. Must be a URL using HTTPS scheme and contain no
    * query or fragment components.

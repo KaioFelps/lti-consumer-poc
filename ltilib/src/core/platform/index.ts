@@ -1,7 +1,7 @@
 import { JWK } from "jose";
 import * as platformNamespace from "./namespace";
 
-interface IPlatform {
+export interface IPlatform {
   /**
    * The platform's private key used to sign JWSs.
    */
@@ -63,7 +63,11 @@ export namespace Platform {
     platformNamespace;
 
   export type Instance = platformNamespace.Instance;
+  export type IInstance = platformNamespace.IInstance;
+
   export type OpenIdConfiguration = platformNamespace.OpenIdConfiguration;
+  export type IOpenIdConfiguration = platformNamespace.IOpenIdConfiguration;
+
   export type LtiAssignmentAndGradeServicesConfig =
     platformNamespace.LtiAssignmentAndGradeServicesConfig;
 }
