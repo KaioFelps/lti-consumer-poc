@@ -13,6 +13,11 @@ export function ensureHasAnyScope({
   requiredScopes,
 }: Params): Either<MissingScopeError, void> {
   const scopes = Array.isArray(requiredScopes) ? requiredScopes : [requiredScopes];
-  const hasAnyScope = scopes.some((scope) => tool.scope.includes(scope));
+
+  const hasAnyScope = scopes.some((scope) => {
+    const toolScopes = tool.scope.split(" ");
+    return toolScopes.includes(scope);
+  });
+
   return hasAnyScope ? e.right(undefined) : e.left(new MissingAnyScopeError(requiredScopes));
 }
