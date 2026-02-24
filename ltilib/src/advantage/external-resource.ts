@@ -25,8 +25,19 @@ export interface IExternalLtiResource {
  * will represent it.
  */
 export class ExternalLtiResource implements IExternalLtiResource {
-  public readonly tool: ToolRecord;
-  public readonly context?: Context<never> | undefined;
+  public tool: ToolRecord;
+  public context?: Context<never> | undefined;
   public readonly externalToolResourceId: string;
   public readonly localResourceId: string;
+
+  protected constructor(args: IExternalLtiResource) {
+    this.tool = args.tool;
+    this.context = args.context;
+    this.localResourceId = args.localResourceId;
+    this.externalToolResourceId = args.externalToolResourceId;
+  }
+
+  public static create(args: IExternalLtiResource) {
+    return new ExternalLtiResource(args);
+  }
 }
