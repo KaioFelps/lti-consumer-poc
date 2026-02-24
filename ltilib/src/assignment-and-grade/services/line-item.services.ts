@@ -131,7 +131,7 @@ export class LtiLineItemServices {
         "externalResource",
         pipe(
           o.fromNullable(resourceId),
-          o.map((id) => () => this.externalResourcesRepo.findById(id)),
+          o.map((id) => () => this.externalResourcesRepo.findById(id, tool.id)),
           o.sequence(te.ApplicativePar),
           te.map(o.toUndefined),
         ),
