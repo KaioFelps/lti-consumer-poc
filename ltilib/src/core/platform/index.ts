@@ -23,6 +23,11 @@ export interface IPlatform {
    * @see {@link Platform.OpenIdConfiguration}
    */
   openIdConfiguration: Platform.OpenIdConfiguration;
+  /**
+   * The configuration of LTI Assignment and Grade Services.
+   * Required in order to enable these services.
+   */
+  agsConfiguration?: Platform.LtiAssignmentAndGradeServicesConfig;
 }
 
 /**
