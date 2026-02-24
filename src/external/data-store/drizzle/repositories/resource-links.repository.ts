@@ -125,6 +125,7 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
           new LtiRepositoryError({
             type: "NotFound",
             cause: new ResourceLinkNotFoundError(resourceLinkId),
+            subject: LtiResourceLink.name,
           }),
         ),
       ),

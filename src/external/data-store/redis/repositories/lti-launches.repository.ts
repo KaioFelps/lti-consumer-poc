@@ -70,6 +70,7 @@ export class RedisLtiLaunchesRepository extends LtiLaunchesRepository {
           new LtiRepositoryError({
             type: "NotFound",
             cause: new LaunchNotFoundError(launchId),
+            subject: LtiLaunchData.name,
           }),
         ),
       ),
@@ -80,6 +81,7 @@ export class RedisLtiLaunchesRepository extends LtiLaunchesRepository {
             new LtiRepositoryError({
               type: "NotFound",
               cause: new NoValidLaunchFoundError(launchId),
+              subject: LtiLaunchData.name,
             }),
         ),
       ),

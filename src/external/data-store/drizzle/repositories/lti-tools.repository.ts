@@ -131,6 +131,7 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
             new LtiRepositoryError({
               type: "NotFound",
               cause: new ToolNotFoundError(id),
+              subject: ToolRecord.name,
             }),
         ),
       ),
