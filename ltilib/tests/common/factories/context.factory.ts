@@ -1,9 +1,8 @@
 import { faker } from "@faker-js/faker";
-import { AllOptional } from "common/src/types/optional";
 import { generateUUID } from "common/src/types/uuid";
 import { Context, ContextType, IContext } from "$/core/context";
 
-type CreateContextConstructorArgs<CT> = AllOptional<IContext<CT>>;
+type CreateContextConstructorArgs<CT> = Partial<IContext<CT>>;
 
 export const DEFAULT_CONTEXT_TYPE = [ContextType.CourseSection] as const;
 

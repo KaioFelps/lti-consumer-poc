@@ -1,10 +1,9 @@
-import { AllOptional } from "common/src/types/optional";
 import { generateUUID } from "common/src/types/uuid";
 import { ExternalLtiResource, IExternalLtiResource } from "$/advantage/external-resource";
 import { createContext } from "./context.factory";
 import { createTool } from "./tool.factory";
 
-type CreateExternalLtiResourceConstructorArgs = AllOptional<IExternalLtiResource>;
+type CreateExternalLtiResourceConstructorArgs = Partial<IExternalLtiResource>;
 
 export function createExternalLtiResource({
   context = createContext(),

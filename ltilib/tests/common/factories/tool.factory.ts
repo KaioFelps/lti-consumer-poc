@@ -1,11 +1,10 @@
 import { faker } from "@faker-js/faker";
-import { AllOptional } from "common/src/types/optional";
 import { generateUUID } from "common/src/types/uuid";
 import { either, option as o } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { type IToolRecord, ToolRecord } from "$/registration/tool-record";
 
-type ToolUrisConstructorArgs = AllOptional<IToolRecord["uris"]>;
+type ToolUrisConstructorArgs = Partial<IToolRecord["uris"]>;
 
 export function createToolUris(
   { homePage, initiate, jwks, logo, policy, redirect, tos }: ToolUrisConstructorArgs = {},
@@ -39,7 +38,7 @@ export function createToolUris(
   };
 }
 
-type ToolLtiConfigurationConstructorArgs = AllOptional<IToolRecord["ltiConfiguration"]>;
+type ToolLtiConfigurationConstructorArgs = Partial<IToolRecord["ltiConfiguration"]>;
 
 export const DEFAULT_MOCK_CLAIMS = [
   "iss",
@@ -72,7 +71,7 @@ export function createToolLtiConfiguration({
   };
 }
 
-type ToolRecordConstructorArgs = AllOptional<
+type ToolRecordConstructorArgs = Partial<
   Omit<
     IToolRecord,
     "applicationType" | "tokenEndpointAuthMethod" | "grantTypes" | "responseTypes" | "scope"
@@ -91,7 +90,7 @@ export function createTool({
   name = faker.company.name(),
   uris,
   scopes = [],
-}: AllOptional<ToolRecordConstructorArgs> = {}) {
+}: Partial<ToolRecordConstructorArgs> = {}) {
   const platformFakeUrl = new URL(faker.internet.url({ protocol: "https", appendSlash: false }));
 
   ltiConfiguration ??= createToolLtiConfiguration({ domain: platformFakeUrl.hostname });

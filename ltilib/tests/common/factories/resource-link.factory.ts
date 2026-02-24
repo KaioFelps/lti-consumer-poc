@@ -1,11 +1,10 @@
 import { faker } from "@faker-js/faker";
-import { AllOptional } from "common/src/types/optional";
 import { generateUUID } from "common/src/types/uuid";
 import { ILtiResourceLink, LtiResourceLink } from "$/core/resource-link";
 import { ToolRecord } from "$/registration/tool-record";
 import { createTool } from "./tool.factory";
 
-type CreateResourceLinkConstructorArgs = Omit<AllOptional<ILtiResourceLink>, "toolId"> & {
+type CreateResourceLinkConstructorArgs = Omit<Partial<ILtiResourceLink>, "toolId"> & {
   tool?: ToolRecord;
 };
 

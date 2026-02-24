@@ -1,5 +1,4 @@
 import { faker } from "@faker-js/faker";
-import { AllOptional } from "common/src/types/optional";
 import { createMockKeySet } from "ltilib/tests/utils/create-jwks";
 import { IPlatform, Platform } from "$/core/platform";
 
@@ -15,7 +14,7 @@ export async function createPlatformOpenIdConfiguration({
     endpoint: new URL("/token", issuer),
   },
   version = faker.system.semver(),
-}: AllOptional<Platform.IOpenIdConfiguration> = {}) {
+}: Partial<Platform.IOpenIdConfiguration> = {}) {
   return Platform.OpenIdConfiguration.create({
     issuer,
     authorizationEndpoint,
@@ -30,7 +29,7 @@ export async function createPlatformOpenIdConfiguration({
 }
 
 type CreatePlatformAgsConfigurationConstructorArgs =
-  AllOptional<Platform.LtiAssignmentAndGradeServicesConfig> & { baseUrl?: URL };
+  Partial<Platform.LtiAssignmentAndGradeServicesConfig> & { baseUrl?: URL };
 
 export function createPlatformAgsConfiguration({
   deadlinesEnabled,
@@ -53,7 +52,7 @@ export async function createPlatform({
   openIdConfiguration,
   instance,
   agsConfiguration = createPlatformAgsConfiguration(),
-}: AllOptional<IPlatform> = {}) {
+}: Partial<IPlatform> = {}) {
   const issuer = faker.internet.url({ protocol: "https", appendSlash: false });
 
   initiateLaunchEndpoint ??= (resourceLinkId) =>
