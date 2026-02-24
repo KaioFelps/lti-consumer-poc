@@ -10,6 +10,7 @@ import { ensureHasAnyScope } from "$/advantage/utils/ensure-has-any-scope";
 import { Context } from "$/core/context";
 import { MisconfiguredPlatformError } from "$/core/errors/misconfigured-platform.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
+import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { ToolRecord } from "$/registration/tool-record";
@@ -17,6 +18,7 @@ import { CannotAttachResourceLinkError } from "../errors/cannot-attach-resource-
 import { InvalidLineItemArgumentError } from "../errors/invalid-line-item-argument.error";
 import { MissingPlatformAgsConfiguration } from "../errors/missing-platform-ags-configuration.error";
 import { LtiLineItem } from "../line-item";
+import { PresentedLtiLineItem, presentLtiLineItem } from "../presenters/line-item.presenter";
 import { LtiLineItemsRepository } from "../repositories/line-items.repository";
 import { AssignmentAndGradeServiceScopes } from "../scopes";
 
@@ -71,7 +73,7 @@ export class LtiLineItemServices {
       | CannotAttachResourceLinkError
       | MisconfiguredPlatformError
       | LtiRepositoryError<unknown>,
-      LtiLineItem
+      HttpResponseWrapper<LtiLineItem, PresentedLtiLineItem>
     >
   > {
     if (!this.platform.agsConfiguration) return e.left(new MissingPlatformAgsConfiguration());
@@ -97,7 +99,18 @@ export class LtiLineItemServices {
           }),
         ),
       ),
-      (a) => a,
+      te.chainW((lineitem) =>
+        pipe(
+          async () => presentLtiLineItem(lineitem, context, this.platform),
+          te.map((presentedLineItem) => ({ lineitem, presentedLineItem })),
+        ),
+      ),
+      te.map(
+        ({ lineitem, presentedLineItem }) =>
+          new HttpResponseWrapper(presentedLineItem, 201, lineitem, {
+            "Content-Type": LtiAdvantageMediaType.LineItem,
+          }),
+      ),
     )();
   }
 
