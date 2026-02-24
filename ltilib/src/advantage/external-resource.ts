@@ -1,7 +1,7 @@
 import { Context } from "$/core/context";
 import { ToolRecord } from "$/registration/tool-record";
 
-interface IExternalLtiResource {
+export interface IExternalLtiResource {
   /**
    * The platform which the resource belongs to.
    */

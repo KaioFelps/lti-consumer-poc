@@ -1,4 +1,3 @@
-import { ClassProperties } from "common/src/types/class-properties";
 import { either } from "fp-ts";
 import { IntoLtiClaim } from "$/claims/serialization";
 import {
@@ -12,20 +11,18 @@ import {
 import { InvalidToolConfigurationError } from "./errors/invalid-tool-configuration.error";
 import { ToolSupportedMessage } from "./tool-supported-message";
 
-type ToolRecordArgs = ClassProperties<ToolRecord>;
-
-export class ToolRecord implements IntoLtiClaim {
-  public readonly applicationType: "web" = "web";
-  public readonly tokenEndpointAuthMethod: "private_key_jwt" = "private_key_jwt";
-
+export interface IToolRecord {
+  readonly applicationType: "web";
+  readonly tokenEndpointAuthMethod: "private_key_jwt";
   /**
-   * It is not stated by Open ID to be a UUID. oidc-provider uses nanoids, for instance.
+   * The identifier of this tool within the platform.
+   * Note it is not stated by OpenID nor LTI to be a UUID. oidc-provider uses nanoids, for instance.
    */
-  public readonly id: string;
-  public name: string;
-  public responseTypes: ResponseType[];
-  public grantTypes: GrantType[];
-  public uris: {
+  readonly id: string;
+  name: string;
+  responseTypes: ResponseType[];
+  grantTypes: GrantType[];
+  uris: {
     initiate: string;
     jwks: string;
     redirect: string[];
@@ -34,9 +31,9 @@ export class ToolRecord implements IntoLtiClaim {
     tos?: string;
     policy?: string;
   };
-  public scope: string;
-  public contacts?: Contact[];
-  public ltiConfiguration: {
+  scope: string;
+  contacts?: Contact[];
+  ltiConfiguration: {
     domain: string;
     description?: string;
     deploymentsIds: string[];
@@ -51,13 +48,27 @@ export class ToolRecord implements IntoLtiClaim {
     messages: ToolSupportedMessage[];
     claims: string[];
   };
+  clientSecret?: string;
+}
+
+export class ToolRecord implements IToolRecord, IntoLtiClaim {
+  public readonly applicationType: "web" = "web";
+  public readonly tokenEndpointAuthMethod: "private_key_jwt" = "private_key_jwt";
+  public readonly id: string;
+  public name: string;
+  public responseTypes: ResponseType[];
+  public grantTypes: GrantType[];
+  public uris: IToolRecord["uris"];
+  public scope: string;
+  public contacts?: Contact[];
+  public ltiConfiguration: IToolRecord["ltiConfiguration"];
   public clientSecret?: string;
 
-  protected constructor(args: ToolRecordArgs) {
+  protected constructor(args: IToolRecord) {
     Object.assign(this, args);
   }
 
-  public static create(data: ToolRecordArgs) {
+  public static create(data: IToolRecord) {
     if (!data.uris.jwks && !data.clientSecret) {
       return either.left(
         new InvalidToolConfigurationError({
@@ -86,7 +97,7 @@ export class ToolRecord implements IntoLtiClaim {
     return either.right(new ToolRecord(data));
   }
 
-  public static createUnchecked(data: ToolRecordArgs) {
+  public static createUnchecked(data: IToolRecord) {
     return new ToolRecord(data);
   }
 
