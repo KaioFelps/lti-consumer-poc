@@ -4,7 +4,7 @@ import { pipe } from "fp-ts/lib/function";
 import { eitherPromiseToTaskEither as teFromPromise } from "@/lib/fp-ts";
 import { FindPersonByIdService } from "@/modules/identity/person/services/find-person-by-id.service";
 import { User } from "@/modules/identity/user/user.entity";
-import utils from "@/modules/lti/utils";
+import mappers from "@/modules/lti/mappers";
 import { LtiLaunchServices } from "$/core/services/launch.services";
 import { ToolRecord } from "$/registration/tool-record";
 import { validateAuthenticationRequest } from "$/security/validate-authentication-request";
@@ -35,7 +35,7 @@ export class LaunchLoginService {
           opt.traverse(te.ApplicativePar)((user) =>
             pipe(
               teFromPromise(() => this.findPersonByIdService.exec({ id: user.getId() })),
-              te.map(utils.extractUserIdentity),
+              te.map(mappers.mapPersonToUserIdentity),
             ),
           ),
           te.map(opt.toUndefined),

@@ -5,7 +5,7 @@ import {
   //   MembershipRole,
 } from "$/claims/enums/roles";
 
-export function getLtiRolesFromSystemRole(sysRole: SystemRole) {
+export function mapRolesToLtiSystemRoles(sysRole: SystemRole) {
   switch (sysRole) {
     case SystemRole.Admin:
       return [LtiSystemRole.Administrator, LtiSystemRole.SysAdmin];

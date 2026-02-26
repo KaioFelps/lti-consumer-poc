@@ -6,7 +6,7 @@ import utils from ".";
  * Extracts a ltilib {@link UserIdentity `UserIdentity`} from
  * an instance of {@link Person `Person`}.
  */
-export function extractUserIdentity<CustomRoles = never>(
+export function mapPersonToUserIdentity<CustomRoles = never>(
   person: Person,
   extraClaims?: UserIdentity["extraClaims"],
 ) {
@@ -16,7 +16,7 @@ export function extractUserIdentity<CustomRoles = never>(
     email: person.getEmail(),
     givenName: person.getFirstName(),
     name: person.getName(),
-    roles: utils.getLtiRolesFromSystemRole(person.getUser().getSystemRole()) as UserRoles,
+    roles: utils.mapRolesToLtiSystemRoles(person.getUser().getSystemRole()) as UserRoles,
   });
 
   if (extraClaims) {

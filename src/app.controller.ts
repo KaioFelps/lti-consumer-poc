@@ -3,7 +3,7 @@ import { either } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { SessionUser } from "@/modules/auth/session-user";
 import { User } from "@/modules/identity/user/user.entity";
-import { getLtiRolesFromSystemRole } from "@/modules/lti/utils/convert-roles";
+import { mapRolesToLtiSystemRoles } from "@/modules/lti/mappers/convert-roles";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiLaunchServices } from "$/core/services/launch.services";
 import { AppService } from "./app.service";
@@ -36,7 +36,7 @@ export class AppController {
   public async home(@SessionUser() user: User) {
     const resourceLinks = await pipe(
       await this.ltiLaunchServices.getLaunchLinks({
-        userRoles: getLtiRolesFromSystemRole(user.getSystemRole()),
+        userRoles: mapRolesToLtiSystemRoles(user.getSystemRole()),
       }),
       either.foldW(
         async (error: LtiRepositoryError<ResourceNotFoundError>) => ({
