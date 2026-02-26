@@ -13,10 +13,12 @@ import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
+import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
 import { ToolRecord } from "$/registration/tool-record";
 import { CannotAttachResourceLinkError } from "../errors/cannot-attach-resource-link.error";
 import { InvalidLineItemArgumentError } from "../errors/invalid-line-item-argument.error";
 import { MissingPlatformAgsConfiguration } from "../errors/missing-platform-ags-configuration.error";
+import { ToolIsNotDeployedInContextError } from "../errors/tool-is-not-deployed-in-context.error";
 import { LtiLineItem } from "../line-item";
 import { PresentedLtiLineItem, presentLtiLineItem } from "../presenters/line-item.presenter";
 import { LtiLineItemsRepository } from "../repositories/line-items.repository";
@@ -53,6 +55,7 @@ export class LtiLineItemServices {
     private readonly resourceLinksRepo: LtiResourceLinksRepository,
     private readonly externalResourcesRepo: ExternalLtiResourcesRepository,
     private readonly lineItemsRepo: LtiLineItemsRepository,
+    private readonly deploymentsRepo: LtiToolDeploymentsRepository,
   ) {}
 
   public async discoverLineItem({ resourceId, tag }: DiscoverLineItemParams) {
@@ -90,6 +93,7 @@ export class LtiLineItemServices {
         }),
       ),
       te.fromEither,
+      te.chainW(() => this.ensureToolIsDeployedInContext(tool, context)),
       te.chainW(() =>
         pipe(
           this.findExistingLineItemFromResourceAndTag(resourceId, args.tag),
@@ -173,6 +177,17 @@ export class LtiLineItemServices {
           te.map(() => lineitem),
         ),
       ),
+    );
+  }
+
+  private ensureToolIsDeployedInContext(tool: ToolRecord, context: Context) {
+    return pipe(
+      () => this.deploymentsRepo.findDeploymentInContextOrGlobal(tool.id, context.id),
+      te.map((_) => {}),
+      te.mapLeft((err) => {
+        if (err.type === "NotFound") return new ToolIsNotDeployedInContextError(tool, context);
+        return err;
+      }),
     );
   }
 
