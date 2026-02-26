@@ -1,12 +1,16 @@
+import { JsonValue } from "common/src/types/json-value";
 import { Optional } from "common/src/types/optional";
 import { generateUUID, UUID } from "common/src/types/uuid";
 import { either as e } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
+import { pipe } from "fp-ts/lib/function";
 import { LtiResourceLink } from "$/core/resource-link";
 import { ExternalLtiResource } from "../advantage/external-resource";
 import { InvalidLineItemArgumentError } from "./errors/invalid-line-item-argument.error";
 
-interface ILtiLineItem {
+type CustomParameters = Record<string, JsonValue>;
+
+export interface ILtiLineItem {
   /**
    * The _real_ ID of the line item within the platform. Note that this *is not* the
    * line item ID described by the [LTI AGS specification].
@@ -79,6 +83,12 @@ interface ILtiLineItem {
    * @see {@link https://www.imsglobal.org/spec/lti-ags/v2p0 LTI AGS specification}
    */
   gradesReleased?: boolean;
+  /**
+   * Optional custom parameters as per [section 3.1.2 of LTI AGS specification].
+   *
+   * [section 3.1.2 of LTI AGS specification]: https://www.imsglobal.org/spec/lti-ags/v2p0#extensions
+   */
+  customParameters?: CustomParameters;
 }
 
 /**
@@ -89,6 +99,7 @@ interface ILtiLineItem {
 export class LtiLineItem implements ILtiLineItem {
   public startDateTime?: Date | undefined;
   public endDateTime?: Date | undefined;
+  protected _customParameters: CustomParameters = {};
 
   private constructor(
     public readonly id: number | UUID | string,
@@ -107,6 +118,7 @@ export class LtiLineItem implements ILtiLineItem {
 
   public static create({
     id = generateUUID(),
+    customParameters = {},
     ...args
   }: Optional<ILtiLineItem, "id">): Either<InvalidLineItemArgumentError, LtiLineItem> {
     if (args.scoreMaximum <= 0) {
@@ -116,18 +128,42 @@ export class LtiLineItem implements ILtiLineItem {
     const label = args.label.trim();
     if (!label) return e.left(new InvalidLineItemArgumentError("label", "required"));
 
-    return e.right(
-      new LtiLineItem(
-        id,
-        label,
-        args.scoreMaximum,
-        args.resourceLink,
-        args.externalResource,
-        args.tag,
-        args.gradesReleased,
-        args.startDateTime,
-        args.endDateTime,
-      ),
+    const lineitem = new LtiLineItem(
+      id,
+      label,
+      args.scoreMaximum,
+      args.resourceLink,
+      args.externalResource,
+      args.tag,
+      args.gradesReleased,
+      args.startDateTime,
+      args.endDateTime,
     );
+
+    // silently ignore invalid keys
+    Object.entries(customParameters).map(([key, value]) => lineitem.addCustomParameter(key, value));
+
+    return e.right(lineitem);
+  }
+
+  public get customParameters(): Readonly<CustomParameters> {
+    return this._customParameters;
+  }
+
+  public addCustomParameter(key: string, value: JsonValue) {
+    return pipe(
+      e.tryCatch(
+        () => new URL(key),
+        (_) =>
+          new InvalidLineItemArgumentError("customParameters", "key_must_be_fully_qualified_url"),
+      ),
+      e.map(() => {
+        this._customParameters[key] = value;
+      }),
+    );
+  }
+
+  public removeCustomParameter(key: string) {
+    delete this._customParameters[key];
   }
 }

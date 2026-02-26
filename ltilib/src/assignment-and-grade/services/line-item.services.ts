@@ -19,7 +19,7 @@ import { CannotAttachResourceLinkError } from "../errors/cannot-attach-resource-
 import { InvalidLineItemArgumentError } from "../errors/invalid-line-item-argument.error";
 import { MissingPlatformAgsConfiguration } from "../errors/missing-platform-ags-configuration.error";
 import { ToolIsNotDeployedInContextError } from "../errors/tool-is-not-deployed-in-context.error";
-import { LtiLineItem } from "../line-item";
+import { ILtiLineItem, LtiLineItem } from "../line-item";
 import { PresentedLtiLineItem, presentLtiLineItem } from "../presenters/line-item.presenter";
 import { LtiLineItemsRepository } from "../repositories/line-items.repository";
 import { AssignmentAndGradeServiceScopes } from "../scopes";
@@ -33,6 +33,7 @@ type RawLineItemsPayload = {
   scoreMaximum: number;
   tag?: string;
   gradesReleased?: boolean;
+  customParameters?: ILtiLineItem["customParameters"];
 };
 
 type CreateLineItemParams = {
