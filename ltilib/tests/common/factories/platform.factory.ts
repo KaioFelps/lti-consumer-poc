@@ -1,6 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { createMockKeySet } from "ltilib/tests/utils/create-jwks";
+import { resolveFactoryOptional } from "ltilib/tests/utils/resolve-nullified-optional";
 import { IPlatform, Platform } from "$/core/platform";
+import { NullifyUndefined } from "../types/nullify";
 
 export async function createPlatformOpenIdConfiguration({
   issuer = faker.internet.url({ appendSlash: false, protocol: "https" }),
@@ -46,13 +48,15 @@ export function createPlatformAgsConfiguration({
   });
 }
 
+type CreatePlatformConstructorArgs = Partial<NullifyUndefined<IPlatform>>;
+
 export async function createPlatform({
   initiateLaunchEndpoint,
   jsonWebKey,
   openIdConfiguration,
   instance,
-  agsConfiguration = createPlatformAgsConfiguration(),
-}: Partial<IPlatform> = {}) {
+  agsConfiguration,
+}: CreatePlatformConstructorArgs = {}) {
   const issuer = faker.internet.url({ protocol: "https", appendSlash: false });
 
   initiateLaunchEndpoint ??= (resourceLinkId) =>
@@ -65,8 +69,8 @@ export async function createPlatform({
     initiateLaunchEndpoint,
     jsonWebKey,
     openIdConfiguration,
-    instance,
-    agsConfiguration,
+    instance: resolveFactoryOptional(instance, undefined),
+    agsConfiguration: resolveFactoryOptional(agsConfiguration, createPlatformAgsConfiguration),
   });
 }
 
