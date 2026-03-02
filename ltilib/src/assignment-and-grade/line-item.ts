@@ -121,11 +121,15 @@ export class LtiLineItem implements ILtiLineItem {
     customParameters = {},
     ...args
   }: Optional<ILtiLineItem, "id">): Either<InvalidLineItemArgumentError, LtiLineItem> {
+    if (args.scoreMaximum === null || args.scoreMaximum === undefined) {
+      return e.left(new InvalidLineItemArgumentError("scoreMaximum", "required"));
+    }
+
     if (args.scoreMaximum <= 0) {
       return e.left(new InvalidLineItemArgumentError("scoreMaximum", "must_be_greater_than_zero"));
     }
 
-    const label = args.label.trim();
+    const label = (args.label as string | undefined)?.trim();
     if (!label) return e.left(new InvalidLineItemArgumentError("label", "required"));
 
     const lineitem = new LtiLineItem(
