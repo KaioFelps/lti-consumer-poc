@@ -84,6 +84,8 @@ export class LtiLineItemServices {
     const { agsConfiguration } = this.platform;
 
     args.tag = args.tag?.trim() || undefined;
+    resourceId = resourceId?.trim() || undefined;
+    args.resourceLinkId = args.resourceLinkId?.trim() || undefined;
 
     return await pipe(
       ensureHasAnyScope({ tool, requiredScopes: AssignmentAndGradeServiceScopes.Lineitem }),

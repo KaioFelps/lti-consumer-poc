@@ -344,88 +344,156 @@ describe("[AGS] Create Line Item Service", async () => {
     }
   });
 
-  it("should create a line item associated to a resource link if `resourceLinkId` property is present", async () => {
-    const { context, tool, resourceLink } = getValidCompleteLineItemCreationArgs();
-
-    ltiResourceLinksRepo.resourceLinks.push(resourceLink);
-
-    const response = await sut.createLineItem({
-      acceptHeader: LtiAdvantageMediaType.LineItem,
-      context,
-      tool,
-      resourceLinkId: resourceLink.id,
-      label: faker.lorem.sentence(),
-      scoreMaximum: 60,
-    });
-
-    assert(e.isRight(response));
-    const persistedLineItem = lineItemsRepo.lineItems[0];
-    assert(!!persistedLineItem.resourceLink);
-    expect(persistedLineItem.resourceLink).toEqual(resourceLink);
-  });
-
-  it("should not create the line item if the mentioned resource link doesn't belong to the same context as the line item itself", async () => {
-    const { context, deployment, tool } = getValidCompleteLineItemCreationArgs();
-    const resourceLinkWithUnrelatedContext = createResourceLink({
-      tool,
-      deploymentId: deployment.id,
-    });
-    ltiResourceLinksRepo.resourceLinks.push(resourceLinkWithUnrelatedContext);
-
-    const response = await sut.createLineItem({
-      acceptHeader: LtiAdvantageMediaType.LineItem,
-      context,
-      tool,
-      resourceLinkId: resourceLinkWithUnrelatedContext.id,
-      label: faker.lorem.sentence(),
-      scoreMaximum: 100,
-    });
-
-    assert(e.isLeft(response));
-    expect(response.left).toBeInstanceOf(CannotAttachResourceLinkError);
-  });
-
-  describe("Requests to create line items should be responded with not found error when resource link to be bound", () => {
-    test("does not exist", async () => {
-      const { tool, context } = getValidCompleteLineItemCreationArgs();
-      const nonPersistedResourceLink = createResourceLink({ tool, contextId: context.id });
+  describe("[3.2.9] `resourceLinkId`", () => {
+    it("should consider blank strings as if the field was omitted", async () => {
+      const { context, tool } = getValidCompleteLineItemCreationArgs();
 
       const response = await sut.createLineItem({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         tool,
-        resourceLinkId: nonPersistedResourceLink.id,
+        resourceLinkId: "",
+        label: faker.lorem.sentence(),
+        scoreMaximum: 60,
+      });
+
+      assert(e.isRight(response));
+      expect(lineItemsRepo.lineItems[0].resourceLink).toBeUndefined();
+    });
+
+    it("should consider `null` as if the field was omitted", async () => {
+      const { context, tool } = getValidCompleteLineItemCreationArgs();
+
+      const response = await sut.createLineItem({
+        acceptHeader: LtiAdvantageMediaType.LineItem,
+        context,
+        tool,
+        resourceLinkId: null as unknown as undefined,
+        label: faker.lorem.sentence(),
+        scoreMaximum: 60,
+      });
+
+      assert(e.isRight(response));
+      expect(lineItemsRepo.lineItems[0].resourceLink).toBeUndefined();
+    });
+
+    it("should create a line item associated to a resource link if `resourceLinkId` property is present", async () => {
+      const { context, tool, resourceLink } = getValidCompleteLineItemCreationArgs();
+
+      ltiResourceLinksRepo.resourceLinks.push(resourceLink);
+
+      const response = await sut.createLineItem({
+        acceptHeader: LtiAdvantageMediaType.LineItem,
+        context,
+        tool,
+        resourceLinkId: resourceLink.id,
+        label: faker.lorem.sentence(),
+        scoreMaximum: 60,
+      });
+
+      assert(e.isRight(response));
+      const persistedLineItem = lineItemsRepo.lineItems[0];
+      assert(!!persistedLineItem.resourceLink);
+      expect(persistedLineItem.resourceLink).toEqual(resourceLink);
+    });
+
+    it("should not create the line item if the mentioned resource link doesn't belong to the same context as the line item itself", async () => {
+      const { context, deployment, tool } = getValidCompleteLineItemCreationArgs();
+      const resourceLinkWithUnrelatedContext = createResourceLink({
+        tool,
+        deploymentId: deployment.id,
+      });
+      ltiResourceLinksRepo.resourceLinks.push(resourceLinkWithUnrelatedContext);
+
+      const response = await sut.createLineItem({
+        acceptHeader: LtiAdvantageMediaType.LineItem,
+        context,
+        tool,
+        resourceLinkId: resourceLinkWithUnrelatedContext.id,
         label: faker.lorem.sentence(),
         scoreMaximum: 100,
       });
 
       assert(e.isLeft(response));
       expect(response.left).toBeInstanceOf(CannotAttachResourceLinkError);
-      expect(response.left.httpStatusCode).toBe(404);
     });
 
-    test("does not belong to the same tool which is trying to create the line item", async () => {
-      const tool = createTool({ scopes: [AssignmentAndGradeServiceScopes.Lineitem] });
-      const {
-        context,
-        resourceLink: differentToolsResourceLink,
-        tool: _originalOwningTool,
-      } = getValidCompleteLineItemCreationArgs();
-      const deployment = createToolDeployment({ context, tool });
-      toolDeploymentsRepo.deployments.push(deployment);
+    describe("Requests to create line items should be responded with not found error when resource link to be bound", () => {
+      test("does not exist", async () => {
+        const { tool, context } = getValidCompleteLineItemCreationArgs();
+        const nonPersistedResourceLink = createResourceLink({ tool, contextId: context.id });
+
+        const response = await sut.createLineItem({
+          acceptHeader: LtiAdvantageMediaType.LineItem,
+          context,
+          tool,
+          resourceLinkId: nonPersistedResourceLink.id,
+          label: faker.lorem.sentence(),
+          scoreMaximum: 100,
+        });
+
+        assert(e.isLeft(response));
+        expect(response.left).toBeInstanceOf(CannotAttachResourceLinkError);
+        expect(response.left.httpStatusCode).toBe(404);
+      });
+
+      test("does not belong to the same tool which is trying to create the line item", async () => {
+        const tool = createTool({ scopes: [AssignmentAndGradeServiceScopes.Lineitem] });
+        const {
+          context,
+          resourceLink: differentToolsResourceLink,
+          tool: _originalOwningTool,
+        } = getValidCompleteLineItemCreationArgs();
+        const deployment = createToolDeployment({ context, tool });
+        toolDeploymentsRepo.deployments.push(deployment);
+
+        const response = await sut.createLineItem({
+          acceptHeader: LtiAdvantageMediaType.LineItem,
+          context,
+          tool,
+          resourceLinkId: differentToolsResourceLink.id,
+          label: faker.lorem.sentence(),
+          scoreMaximum: 100,
+        });
+
+        assert(e.isLeft(response));
+        expect(response.left.httpStatusCode).toBe(404);
+        expect(response.left).toBeInstanceOf(CannotAttachResourceLinkError);
+      });
+    });
+  });
+
+  describe("[3.2.10] `resourceId`", () => {
+    it("should consider blank strings as if the field was omitted", async () => {
+      const { context, tool } = getValidCompleteLineItemCreationArgs();
 
       const response = await sut.createLineItem({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         tool,
-        resourceLinkId: differentToolsResourceLink.id,
+        resourceId: "",
         label: faker.lorem.sentence(),
-        scoreMaximum: 100,
+        scoreMaximum: 60,
       });
 
-      assert(e.isLeft(response));
-      expect(response.left.httpStatusCode).toBe(404);
-      expect(response.left).toBeInstanceOf(CannotAttachResourceLinkError);
+      assert(e.isRight(response));
+      expect(lineItemsRepo.lineItems[0].resourceLink).toBeUndefined();
+    });
+
+    it("should consider `null` as if the field was omitted", async () => {
+      const { context, tool } = getValidCompleteLineItemCreationArgs();
+
+      const response = await sut.createLineItem({
+        acceptHeader: LtiAdvantageMediaType.LineItem,
+        context,
+        tool,
+        resourceId: null as unknown as undefined,
+        label: faker.lorem.sentence(),
+        scoreMaximum: 60,
+      });
+
+      assert(e.isRight(response));
+      expect(lineItemsRepo.lineItems[0].resourceLink).toBeUndefined();
     });
   });
 
