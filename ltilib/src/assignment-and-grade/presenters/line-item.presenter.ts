@@ -1,3 +1,4 @@
+import { JsonValue } from "common/src/types/json-value";
 import { either } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { Context } from "$/core/context";
@@ -18,11 +19,13 @@ export type PresentedLtiLineItem = {
   gradesReleased?: boolean;
 };
 
-export function presentLtiLineItem(
+export function presentLtiLineItem<
+  CustomParameters extends Record<string, JsonValue> = Record<string, JsonValue>,
+>(
   lineitem: LtiLineItem,
   context: Context,
   platform: Platform,
-): Either<MisconfiguredPlatformError, PresentedLtiLineItem> {
+): Either<MisconfiguredPlatformError, PresentedLtiLineItem & CustomParameters> {
   if (!platform.agsConfiguration) {
     return either.left(new MissingPlatformAgsConfiguration());
   }
@@ -36,6 +39,7 @@ export function presentLtiLineItem(
     : undefined;
 
   const presentedLineItem = {
+    ...(lineitem.customParameters as CustomParameters),
     id: platform.agsConfiguration.lineItemsEndpoint(context, lineitem.id).toString(),
     label: lineitem.label,
     tag: lineitem.tag,
@@ -45,7 +49,7 @@ export function presentLtiLineItem(
     resourceLinkId: lineitem.resourceLink?.id,
     startDateTime: resolvedStartDateTime,
     endDateTime: resolvedEndDateTime,
-  } satisfies PresentedLtiLineItem;
+  } satisfies PresentedLtiLineItem & CustomParameters;
 
   return either.right(presentedLineItem);
 }
