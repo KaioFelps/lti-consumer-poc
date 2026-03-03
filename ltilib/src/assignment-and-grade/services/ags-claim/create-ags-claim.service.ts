@@ -31,18 +31,24 @@ export class CreateService {
     Either<LtiRepositoryError, Option<AssignmentAndGradeServiceClaim>>
   > {
     if (!this.platform.agsConfiguration) return e.right(o.none);
-
-    const agsConfig = this.platform.agsConfiguration;
-
-    if (!agsPolicies.toolHasAccessToAgs(tool, this.platform, context)) return e.right(o.none);
     if (!context) return e.right(o.none);
 
+    const agsConfig = this.platform.agsConfiguration;
+    const scopes = await this.resolveScopes(agsConfig, tool, context, resourceLink);
+    const toolHasAccessToAgs = await agsPolicies.toolHasAccessToAgs(
+      tool,
+      this.platform,
+      context,
+      scopes,
+    );
+
+    if (!toolHasAccessToAgs) return e.right(o.none);
+
     return await pipe(
-      te.Do,
-      te.apS("lineItem", pipe(this.tryGetLineItem(resourceLink), te.map(o.toUndefined))),
-      te.apS("scopes", te.fromTask(this.resolveScopes(agsConfig, tool, context, resourceLink))),
-      te.chainW(({ lineItem, scopes }) =>
-        pipe(
+      this.tryGetLineItem(resourceLink),
+      te.map(o.toUndefined),
+      te.chainW((lineItem) => {
+        return pipe(
           AssignmentAndGradeServiceClaim.create({
             context,
             agsConfig,
@@ -51,12 +57,12 @@ export class CreateService {
           }),
           e.map(o.some),
           te.fromEither,
-        ),
-      ),
+        );
+      }),
     )();
   }
 
-  private resolveScopes(
+  private async resolveScopes(
     agsConfig: Platform.LtiAssignmentAndGradeServicesConfig,
     tool: ToolRecord,
     context: Context,
@@ -64,7 +70,7 @@ export class CreateService {
   ) {
     const toolScopes = tool.scope.split(" ");
 
-    return pipe(
+    return await pipe(
       () =>
         agsConfig.pickAllowedScopes({
           tool,
@@ -72,13 +78,13 @@ export class CreateService {
           deploymentId: resourceLink.deploymentId,
         }),
       t.map((scopes) => scopes.filter((scope) => toolScopes.includes(scope))),
-    );
+    )();
   }
 
   private tryGetLineItem(resourceLink: LtiResourceLink) {
     return pipe(
-      () => this.lineItemsRepo.findByResourceLink(resourceLink.id),
-      te.map(o.some),
+      () => this.lineItemsRepo.findManyByResourceLink(resourceLink.id, 2),
+      te.map((lineItems) => (lineItems.length === 1 ? o.some(lineItems[0]) : o.none)),
       te.orElse((error) => (error.type === "NotFound" ? te.right(o.none) : te.left(error))),
     );
   }

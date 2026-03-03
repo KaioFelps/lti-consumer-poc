@@ -1,6 +1,8 @@
 import { either as e, option as o } from "fp-ts";
 import { createContext } from "ltilib/tests/common/factories/context.factory";
-import { createFullLineItem } from "ltilib/tests/common/factories/line-item.factory";
+import lineItemFactory, {
+  createFullLineItem,
+} from "ltilib/tests/common/factories/line-item.factory";
 import { createPlatform } from "ltilib/tests/common/factories/platform.factory";
 import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
 import { createTool } from "ltilib/tests/common/factories/tool.factory";
@@ -15,7 +17,8 @@ describe("[AGS] Create Ags Claim Service", async () => {
   const basicPlatform = await createPlatform();
 
   const context = createContext();
-  const tool = createTool();
+  const tool = createTool({ scopes: [...ASSIGNMENT_AND_GRADE_SERVICES_SCOPES] });
+
   const deployment = createToolDeployment();
   const resourceLink = createResourceLink({
     tool,
@@ -100,5 +103,41 @@ describe("[AGS] Create Ags Claim Service", async () => {
 
     expect(Array.isArray(scopes)).toBeTruthy();
     expect((scopes as Array<string>).every((scope) => allowedScopes.includes(scope)));
+  });
+
+  it.each(
+    [
+      { description: "there is no line items", shouldDisplay: false, lineItemsCount: 0 },
+      { description: "there is one line item", shouldDisplay: true, lineItemsCount: 1 },
+      { description: "there are many line items", shouldDisplay: false, lineItemsCount: 2 },
+    ].map((args) => ({
+      ...args,
+      testName: `should ${args.shouldDisplay ? "" : "not"} display lineitem endpoint when $description related to the given resource link`,
+    })),
+  )("$testName", async ({ lineItemsCount, shouldDisplay }) => {
+    for (let i = 0; i < lineItemsCount; i++) {
+      const lineItem = lineItemFactory.createFull({ context, tool }, { resourceLink });
+      lineItemsRepo.lineItems.push(lineItem);
+    }
+
+    const result = await sut.execute({ resourceLink, tool, context });
+
+    assert(e.isRight(result));
+    assert(o.isSome(result.right));
+
+    const claims = result.right.value.intoLtiClaim()[AssignmentAndGradeServiceClaim.KEY] as object;
+
+    const PROPERTY = "lineitem";
+    if (shouldDisplay) expect(claims).toHaveProperty(PROPERTY);
+    else expect(claims).not.toHaveProperty(PROPERTY);
+  });
+
+  it("should return `none` if tool has not any of AGS scopes", async () => {
+    const tool = createTool();
+
+    const result = await sut.execute({ resourceLink, tool, context });
+
+    assert(e.isRight(result), "it should be a valid AGS claim creation request");
+    assert(o.isNone(result.right), "it should return `none` since not any AGS scope is present");
   });
 });
