@@ -4,3 +4,12 @@ export enum AssignmentAndGradeServiceScopes {
   ResultReadonly = "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
   Score = "https://purl.imsglobal.org/spec/lti-ags/scope/score",
 }
+
+export const ASSIGNMENT_AND_GRADE_SERVICES_SCOPES = [
+  AssignmentAndGradeServiceScopes.Lineitem,
+  AssignmentAndGradeServiceScopes.LineitemReadonly,
+  AssignmentAndGradeServiceScopes.ResultReadonly,
+  AssignmentAndGradeServiceScopes.Score,
+] as const;
+
+Object.freeze(ASSIGNMENT_AND_GRADE_SERVICES_SCOPES);
