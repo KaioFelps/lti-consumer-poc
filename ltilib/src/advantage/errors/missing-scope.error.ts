@@ -7,12 +7,13 @@ type Options = {
 
 export class MissingScopeError extends OAuthBearerError {
   public constructor(
-    public readonly missingScopes: string | string[],
+    public readonly missingScopes: string | readonly string[],
     public readonly which: "any" | "every",
     message: string,
     options?: Options,
   ) {
-    const resolvedScopes = Array.isArray(missingScopes) ? missingScopes.join(" ") : missingScopes;
+    const scopes = missingScopes as string | string[];
+    const resolvedScopes = Array.isArray(scopes) ? scopes.join(" ") : scopes;
 
     super({
       error: "insufficient_scope",
@@ -32,7 +33,7 @@ export class MissingScopeError extends OAuthBearerError {
 }
 
 export class MissingAnyScopeError extends MissingScopeError {
-  public constructor(scopes: string | string[], options?: Options) {
+  public constructor(scopes: string | readonly string[], options?: Options) {
     super(
       scopes,
       "any",
@@ -53,7 +54,7 @@ export class MissingEveryScopesError extends MissingScopeError {
   }
 }
 
-function listScopes(scopes: string | string[]): string {
+function listScopes(scopes: string | readonly string[]): string {
   const quoteScope = (scope: string) => `"${scope}"`;
   const stringifiedScopes = (Array.isArray(scopes) ? scopes : [scopes]).map(quoteScope);
   const scopesList = new Intl.ListFormat("en-US").format(stringifiedScopes);

@@ -4,7 +4,7 @@ import { ToolRecord } from "$/registration/tool-record";
 import { MissingAnyScopeError, MissingScopeError } from "../errors/missing-scope.error";
 
 type Params = {
-  requiredScopes: string | string[];
+  requiredScopes: string | readonly string[];
   tool: ToolRecord;
 };
 
