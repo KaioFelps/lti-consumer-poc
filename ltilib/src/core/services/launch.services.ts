@@ -1,7 +1,9 @@
-import { either as e, taskEither as te } from "fp-ts";
+import { either as e, option as o, taskEither as te } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { eitherPromiseToTaskEither as teFromPromise } from "@/lib/fp-ts";
+import { MissingPlatformAgsConfiguration } from "$/assignment-and-grade/errors/missing-platform-ags-configuration.error";
+import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim";
 import { AnyLtiRole } from "$/claims/enums/roles";
 import { MessageType } from "$/claims/serialization";
 import { ToolRecord } from "$/registration/tool-record";
@@ -99,6 +101,7 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
     private ltiToolsRepository: LtiToolsRepository,
     private launchRepository: LtiLaunchesRepository,
     private platform: Platform,
+    private agsClaimServices?: LtiAgsClaimServices,
   ) {}
 
   public async prepareLaunchInitiationRequest<ExternalError = unknown>({
@@ -169,7 +172,7 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
     transformLaunchRequest,
   }: AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType>): Promise<
     Either<
-      AuthenticationRedirectionError,
+      AuthenticationRedirectionError | LtiRepositoryError | MissingPlatformAgsConfiguration,
       LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>
     >
   > {
@@ -254,21 +257,27 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
       return e.left(loginRequiredRedirection);
     }
 
-    const launchRequest = LTIResourceLinkLaunchRequest.create<CustomRoles, CustomContextType>({
-      tool,
-      nonce,
-      platform: this.platform,
-      resourceLink,
-      state,
-      userIdentity,
-      context,
-      userRoles: fallbackUserRoles,
-    });
-
-    if (launch.presentation) launchRequest.setPresentation(launch.presentation);
-    transformLaunchRequest?.(launchRequest);
-
-    return e.right(launchRequest);
+    return await pipe(
+      this.prepareAgsClaimIfEnabled(tool, context, resourceLink),
+      te.map((agsClaim) =>
+        LTIResourceLinkLaunchRequest.create<CustomRoles, CustomContextType>({
+          tool,
+          nonce,
+          platform: this.platform,
+          resourceLink,
+          state,
+          userIdentity,
+          context,
+          userRoles: fallbackUserRoles,
+          agsClaim,
+        }),
+      ),
+      te.map((launchRequest) => {
+        if (launch.presentation) launchRequest.setPresentation(launch.presentation);
+        transformLaunchRequest?.(launchRequest);
+        return launchRequest;
+      }),
+    )();
   }
 
   public async getLaunchLinksFromResourceLinks({
@@ -346,5 +355,18 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
     });
 
     return presentedResourceLinks;
+  }
+
+  private prepareAgsClaimIfEnabled(
+    tool: ToolRecord,
+    context: Context | undefined,
+    resourceLink: LtiResourceLink,
+  ) {
+    return pipe(
+      this.agsClaimServices
+        ? () => this.agsClaimServices!.create({ tool, context, resourceLink })
+        : te.right(o.none),
+      te.map(o.toUndefined),
+    );
   }
 }
