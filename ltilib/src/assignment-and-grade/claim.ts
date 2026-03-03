@@ -37,15 +37,27 @@ export class AssignmentAndGradeServiceClaim implements IntoLtiClaim {
 
   public intoLtiClaim(): object {
     const agsClaim = {
-      ...this.getlineItemField(),
-      lineitems: this.agsConfig.lineItemsContainerEndpoint(this.context).toString(),
+      ...this.resolveLineitemField(),
+      ...this.resolveLineitemsContainerField(),
       scope: this.scopes,
     };
 
     return { [AGS_CLAIM_KEY]: agsClaim };
   }
 
-  private getlineItemField() {
+  private resolveLineitemsContainerField() {
+    const requiredScopes = [
+      AssignmentAndGradeServiceScopes.Lineitem,
+      AssignmentAndGradeServiceScopes.LineitemReadonly,
+    ];
+
+    const canSeeContainerEndpoint = this.scopes.some((scope) => requiredScopes.includes(scope));
+    if (!canSeeContainerEndpoint) return {};
+
+    return { lineitems: this.agsConfig.lineItemsContainerEndpoint(this.context).toString() };
+  }
+
+  private resolveLineitemField() {
     if (!this.specificLineItem) return {};
 
     return {
