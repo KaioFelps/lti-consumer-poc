@@ -4,6 +4,7 @@ import { pipe } from "fp-ts/lib/function";
 import { LtiLineItem } from "$/assignment-and-grade/line-item";
 import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
+import { LtiResourceLink } from "$/core/resource-link";
 
 export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
   public lineItems: LtiLineItem[] = [];
@@ -33,6 +34,20 @@ export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
           ),
         (lineitem) => e.right(lineitem),
       ),
+    );
+  }
+
+  public async findByResourceLink(
+    resourceLinkId: LtiResourceLink["id"],
+  ): Promise<Either<LtiRepositoryError, LtiLineItem>> {
+    const lineitem = this.lineItems.find(
+      (lineitem) => lineitem.resourceLink?.id === resourceLinkId,
+    );
+
+    if (lineitem) return e.right(lineitem);
+
+    return e.left(
+      new LtiRepositoryError({ type: "NotFound", subject: LtiLineItem.name, cause: undefined }),
     );
   }
 }

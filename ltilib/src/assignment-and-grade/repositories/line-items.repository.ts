@@ -1,5 +1,6 @@
 import { Either } from "fp-ts/lib/Either";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
+import { LtiResourceLink } from "$/core/resource-link";
 import { LtiLineItem } from "../line-item";
 
 export abstract class LtiLineItemsRepository {
@@ -8,5 +9,9 @@ export abstract class LtiLineItemsRepository {
   public abstract findByExternalResourceAndTag(
     resourceId: string,
     tag: string | undefined,
+  ): Promise<Either<LtiRepositoryError, LtiLineItem>>;
+
+  public abstract findByResourceLink(
+    resourceLinkId: LtiResourceLink["id"],
   ): Promise<Either<LtiRepositoryError, LtiLineItem>>;
 }
