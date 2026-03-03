@@ -31,6 +31,8 @@ interface ILtiAssignmentAndGradeServicesConfig {
   };
   /**
    * Whether the [AGS Claim] should be included in the current launch message.
+   * E.g., the platform may decide to allow or deny access to Assignment and Grade Services
+   * based on the `tool` and/or `context` of the current launch.
    *
    * [AGS Claim]: https://www.imsglobal.org/spec/lti-ags/v2p0#assignment-and-grade-service-claim
    *
@@ -39,15 +41,15 @@ interface ILtiAssignmentAndGradeServicesConfig {
    *
    * @example
    * ```ts
-   * async ({ tool }) => {
-   *    const requiredScopes = ASSIGNMENT_AND_GRADE_SERVICES_SCOPES;
-   *    return tool.scope.split(" ").some((scope) => requiredScopes.includes(scope));
+   * async ({ toolAgsScopes }) => {
+   *    return toolAgsScopes.length > 0;
    * };
    * ```
    */
   authorizeServicesClaim?: (ctx: {
     context: Context<unknown>;
     tool: ToolRecord;
+    toolAgsScopes: AssignmentAndGradeServiceScopes[];
   }) => Promise<boolean>;
   /**
    * Filters which of the AGS scopes the tool already has will be allowed during the current launch.
@@ -89,10 +91,7 @@ export class LtiAssignmentAndGradeServicesConfig implements ILtiAssignmentAndGra
   public readonly authorizeServicesClaim: Exclude<
     ILtiAssignmentAndGradeServicesConfig["authorizeServicesClaim"],
     undefined
-  > = async ({ tool }) => {
-    const requiredScopes = ASSIGNMENT_AND_GRADE_SERVICES_SCOPES as readonly string[];
-    return tool.scope.split(" ").some((scope) => requiredScopes.includes(scope));
-  };
+  > = async ({ toolAgsScopes }) => toolAgsScopes.length > 0;
 
   public readonly pickAllowedScopes: Exclude<
     ILtiAssignmentAndGradeServicesConfig["pickAllowedScopes"],
