@@ -18,6 +18,7 @@ import {
   MessageType,
   resolveClaimKey,
 } from "ltilib/src/claims/serialization";
+import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim";
 import { Context } from "$/core/context";
 import { LtiResourceLink } from "$/core/resource-link";
 import { UserIdentity, UserRoles } from "$/core/user-identity";
@@ -44,6 +45,11 @@ type CreateFromLtiRecordArgs<CR = never> = {
   nonce: string;
   state: string;
   context?: Context;
+  /**
+   * If and only if `tool` has access to any Assignment and Grade service, be sure
+   * to provide an instance of {@link AssignmentAndGradeServiceClaim}.
+   */
+  agsClaim?: AssignmentAndGradeServiceClaim;
 };
 
 /**
@@ -77,6 +83,7 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
      */
     public readonly customClaims: Record<string, string> = {},
     private vendorClaims: MessageRequests.VendorExtraClaims | undefined,
+    private agsClaim: AssignmentAndGradeServiceClaim | undefined,
   ) {}
 
   public static create<CustomRoles = never, CustomContextType = never>({
@@ -88,6 +95,7 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
     resourceLink,
     userRoles: _userRoles,
     context,
+    agsClaim,
   }: CreateFromLtiRecordArgs<CustomRoles>) {
     if (!tool.ltiConfiguration.deploymentsIds.includes(resourceLink.deploymentId)) {
       // TODO: return some error
@@ -136,6 +144,8 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
       undefined,
       undefined,
       resolvedCustomClaims,
+      undefined,
+      agsClaim,
     );
   }
 
@@ -172,7 +182,7 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
   }
 
   intoLtiClaim(): object {
-    return {
+    const claims = {
       ...this.userIdentity?.intoLtiClaim(),
       [resolveClaimKey(LTIClaimKey.messageType)]: this.messageType.toString(),
       [resolveClaimKey(LTIClaimKey.version)]: this.version.toString(),
@@ -186,7 +196,10 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
       [resolveClaimKey(LTIClaimKey.launchPresentation)]: this.presentation?.intoLtiClaim(),
       [resolveClaimKey(LTIClaimKey.customs)]: this.customClaims,
       ...this.vendorClaims?.intoLtiClaim(),
+      ...(this.agsClaim?.intoLtiClaim() ?? {}),
     };
+
+    return claims;
   }
 
   public async intoForm() {
