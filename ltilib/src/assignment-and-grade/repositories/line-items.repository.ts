@@ -11,7 +11,8 @@ export abstract class LtiLineItemsRepository {
     tag: string | undefined,
   ): Promise<Either<LtiRepositoryError, LtiLineItem>>;
 
-  public abstract findByResourceLink(
+  public abstract findManyByResourceLink(
     resourceLinkId: LtiResourceLink["id"],
-  ): Promise<Either<LtiRepositoryError, LtiLineItem>>;
+    limit: number,
+  ): Promise<Either<LtiRepositoryError, LtiLineItem[]>>;
 }

@@ -37,17 +37,14 @@ export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
     );
   }
 
-  public async findByResourceLink(
+  public async findManyByResourceLink(
     resourceLinkId: LtiResourceLink["id"],
-  ): Promise<Either<LtiRepositoryError, LtiLineItem>> {
-    const lineitem = this.lineItems.find(
-      (lineitem) => lineitem.resourceLink?.id === resourceLinkId,
-    );
+    limit: number,
+  ): Promise<Either<LtiRepositoryError, LtiLineItem[]>> {
+    const lineitems = this.lineItems
+      .filter((lineitem) => lineitem.resourceLink?.id === resourceLinkId)
+      .slice(0, limit);
 
-    if (lineitem) return e.right(lineitem);
-
-    return e.left(
-      new LtiRepositoryError({ type: "NotFound", subject: LtiLineItem.name, cause: undefined }),
-    );
+    return e.right(lineitems);
   }
 }
