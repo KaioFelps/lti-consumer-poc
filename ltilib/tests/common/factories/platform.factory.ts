@@ -35,15 +35,20 @@ type CreatePlatformAgsConfigurationConstructorArgs =
 
 export function createPlatformAgsConfiguration({
   deadlinesEnabled,
-  lineItemsEndpoint,
+  lineItemEndpoint,
+  lineItemsContainerEndpoint,
   baseUrl,
 }: CreatePlatformAgsConfigurationConstructorArgs = {}) {
   baseUrl ??= new URL(faker.internet.url({ protocol: "https" }));
-  lineItemsEndpoint ??= (context, lineItemId) =>
+
+  lineItemEndpoint ??= (context, lineItemId) =>
     new URL(`/context/${context.id}/lineitems/${lineItemId.toString()}`, baseUrl);
 
+  lineItemsContainerEndpoint ??= (context) => new URL(`/context/${context.id}/lineitems`, baseUrl);
+
   return Platform.LtiAssignmentAndGradeServicesConfig.create({
-    lineItemsEndpoint,
+    lineItemEndpoint,
+    lineItemsContainerEndpoint,
     deadlinesEnabled,
   });
 }

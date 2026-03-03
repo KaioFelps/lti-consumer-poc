@@ -40,7 +40,7 @@ export function presentLtiLineItem<
 
   const presentedLineItem = {
     ...(lineitem.customParameters as CustomParameters),
-    id: platform.agsConfiguration.lineItemsEndpoint(context, lineitem.id).toString(),
+    id: platform.agsConfiguration.lineItemEndpoint(context, lineitem.id).toString(),
     label: lineitem.label,
     tag: lineitem.tag,
     scoreMaximum: lineitem.scoreMaximum,
