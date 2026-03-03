@@ -15,14 +15,15 @@ import { Platform } from "$/core/platform";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
 import { ToolRecord } from "$/registration/tool-record";
-import { CannotAttachResourceLinkError } from "../errors/cannot-attach-resource-link.error";
-import { InvalidLineItemArgumentError } from "../errors/invalid-line-item-argument.error";
-import { MissingPlatformAgsConfiguration } from "../errors/missing-platform-ags-configuration.error";
-import { ToolIsNotDeployedInContextError } from "../errors/tool-is-not-deployed-in-context.error";
-import { ILtiLineItem, LtiLineItem } from "../line-item";
-import { PresentedLtiLineItem, presentLtiLineItem } from "../presenters/line-item.presenter";
-import { LtiLineItemsRepository } from "../repositories/line-items.repository";
-import { AssignmentAndGradeServiceScopes } from "../scopes";
+import { CannotAttachResourceLinkError } from "../../errors/cannot-attach-resource-link.error";
+import { InvalidLineItemArgumentError } from "../../errors/invalid-line-item-argument.error";
+import { MissingPlatformAgsConfiguration } from "../../errors/missing-platform-ags-configuration.error";
+import { ToolIsNotDeployedInContextError } from "../../errors/tool-is-not-deployed-in-context.error";
+import { ILtiLineItem, LtiLineItem } from "../../line-item";
+import { PresentedLtiLineItem, presentLtiLineItem } from "../../presenters/line-item.presenter";
+import { LtiLineItemsRepository } from "../../repositories/line-items.repository";
+import { AssignmentAndGradeServiceScopes } from "../../scopes";
+import { DiscoverService } from "./discover-line-item.service";
 
 type RawLineItemsPayload = {
   resourceId?: string;
@@ -36,7 +37,7 @@ type RawLineItemsPayload = {
   customParameters?: ILtiLineItem["customParameters"];
 };
 
-type CreateLineItemParams = {
+export type CreateLineItemServiceParams = {
   acceptHeader: string | undefined;
   /**
    * The LTI tool which is trying to create this line item.
@@ -45,31 +46,23 @@ type CreateLineItemParams = {
   context: Context;
 } & RawLineItemsPayload;
 
-type DiscoverLineItemParams = {
-  resourceId: string;
-  tag?: string;
-};
-
-export class LtiLineItemServices {
+export class CreateService {
   public constructor(
     private readonly platform: Platform,
     private readonly resourceLinksRepo: LtiResourceLinksRepository,
     private readonly externalResourcesRepo: ExternalLtiResourcesRepository,
     private readonly lineItemsRepo: LtiLineItemsRepository,
     private readonly deploymentsRepo: LtiToolDeploymentsRepository,
+    private readonly discoverService: DiscoverService,
   ) {}
 
-  public async discoverLineItem({ resourceId, tag }: DiscoverLineItemParams) {
-    return await this.lineItemsRepo.findByExternalResourceAndTag(resourceId, tag);
-  }
-
-  public async createLineItem({
+  public async execute({
     tool,
     context,
     resourceId,
     acceptHeader,
     ...args
-  }: CreateLineItemParams): Promise<
+  }: CreateLineItemServiceParams): Promise<
     Either<
       | MissingScopeError
       | InvalidMediaTypeError
@@ -127,7 +120,7 @@ export class LtiLineItemServices {
   ) {
     return pipe(
       o.fromNullable(resourceId),
-      o.map((resourceId) => () => this.discoverLineItem({ resourceId, tag })),
+      o.map((resourceId) => () => this.discoverService.execute({ resourceId, tag })),
       o.sequence(te.ApplicativePar),
       te.match(
         (error) => {

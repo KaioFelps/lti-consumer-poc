@@ -25,7 +25,7 @@ import { CannotAttachResourceLinkError } from "$/assignment-and-grade/errors/can
 import { MissingPlatformAgsConfiguration } from "$/assignment-and-grade/errors/missing-platform-ags-configuration.error";
 import { ToolIsNotDeployedInContextError } from "$/assignment-and-grade/errors/tool-is-not-deployed-in-context.error";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
-import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item.services";
+import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
 import { InvalidArgumentError } from "$/core/errors/invalid-argument.error";
 import { Platform } from "$/core/platform";
 
@@ -82,7 +82,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
       const { context, resource, resourceLink, tool } = getValidCompleteLineItemCreationArgs();
 
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         tool,
         context,
         resourceLinkId: resourceLink.id,
@@ -102,7 +102,7 @@ describe("[AGS] Create Line Item Service", async () => {
     test("line item creation response should enforce 201 HTTP status code", async () => {
       const { context, tool } = getValidCompleteLineItemCreationArgs();
 
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         scoreMaximum: 100,
@@ -117,7 +117,7 @@ describe("[AGS] Create Line Item Service", async () => {
     test("line item creation response contains the newly created line item", async () => {
       const { context, resource, resourceLink, tool } = getValidCompleteLineItemCreationArgs();
 
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         tool,
         context,
         resourceLinkId: resourceLink.id,
@@ -154,7 +154,7 @@ describe("[AGS] Create Line Item Service", async () => {
     test("line item creation response contains the correct line item media type", async () => {
       const { context, tool } = getValidCompleteLineItemCreationArgs();
 
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         scoreMaximum: 100,
@@ -169,7 +169,7 @@ describe("[AGS] Create Line Item Service", async () => {
     it("should contain the newly created line item's ID", async () => {
       const { context, tool } = getValidCompleteLineItemCreationArgs();
 
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         scoreMaximum: 100,
@@ -193,7 +193,7 @@ describe("[AGS] Create Line Item Service", async () => {
       const context = createContext();
       const tool = createTool({ scopes });
 
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         label: faker.lorem.sentence(),
@@ -219,7 +219,7 @@ describe("[AGS] Create Line Item Service", async () => {
     ];
 
     for (const mediaType of INVALID_MEDIA_TYPES_CASES) {
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         acceptHeader: mediaType,
         context,
         label: faker.lorem.sentence(),
@@ -243,7 +243,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
     const id = generateUUID();
 
-    const response = await sut.createLineItem({
+    const response = await sut.create({
       acceptHeader: LtiAdvantageMediaType.LineItem,
       context,
       scoreMaximum: 100,
@@ -267,7 +267,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
     await recreateSutWithPlatform(platform);
 
-    const response = await sut.createLineItem({
+    const response = await sut.create({
       acceptHeader: LtiAdvantageMediaType.LineItem,
       context,
       label: faker.lorem.sentence(),
@@ -297,7 +297,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
     await recreateSutWithPlatform(platform);
 
-    const response = await sut.createLineItem({
+    const response = await sut.create({
       acceptHeader: LtiAdvantageMediaType.LineItem,
       context,
       label: faker.lorem.sentence(),
@@ -326,7 +326,7 @@ describe("[AGS] Create Line Item Service", async () => {
       resource.tool = tool;
       externalLtiResourcesRepo.externalLtiResources.push(resource);
 
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         tool,
@@ -348,7 +348,7 @@ describe("[AGS] Create Line Item Service", async () => {
     it("should consider blank strings as if the field was omitted", async () => {
       const { context, tool } = getValidCompleteLineItemCreationArgs();
 
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         tool,
@@ -364,7 +364,7 @@ describe("[AGS] Create Line Item Service", async () => {
     it("should consider `null` as if the field was omitted", async () => {
       const { context, tool } = getValidCompleteLineItemCreationArgs();
 
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         tool,
@@ -382,7 +382,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
       ltiResourceLinksRepo.resourceLinks.push(resourceLink);
 
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         tool,
@@ -405,7 +405,7 @@ describe("[AGS] Create Line Item Service", async () => {
       });
       ltiResourceLinksRepo.resourceLinks.push(resourceLinkWithUnrelatedContext);
 
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         tool,
@@ -423,7 +423,7 @@ describe("[AGS] Create Line Item Service", async () => {
         const { tool, context } = getValidCompleteLineItemCreationArgs();
         const nonPersistedResourceLink = createResourceLink({ tool, contextId: context.id });
 
-        const response = await sut.createLineItem({
+        const response = await sut.create({
           acceptHeader: LtiAdvantageMediaType.LineItem,
           context,
           tool,
@@ -447,7 +447,7 @@ describe("[AGS] Create Line Item Service", async () => {
         const deployment = createToolDeployment({ context, tool });
         toolDeploymentsRepo.deployments.push(deployment);
 
-        const response = await sut.createLineItem({
+        const response = await sut.create({
           acceptHeader: LtiAdvantageMediaType.LineItem,
           context,
           tool,
@@ -467,7 +467,7 @@ describe("[AGS] Create Line Item Service", async () => {
     it("should consider blank strings as if the field was omitted", async () => {
       const { context, tool } = getValidCompleteLineItemCreationArgs();
 
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         tool,
@@ -483,7 +483,7 @@ describe("[AGS] Create Line Item Service", async () => {
     it("should consider `null` as if the field was omitted", async () => {
       const { context, tool } = getValidCompleteLineItemCreationArgs();
 
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         tool,
@@ -518,7 +518,7 @@ describe("[AGS] Create Line Item Service", async () => {
       ];
 
       for (const payload of INVALID_PARTIAL_PAYLOADS) {
-        const response = await sut.createLineItem(payload);
+        const response = await sut.create(payload);
 
         assert(e.isLeft(response));
         expect(response.left).toBeInstanceOf(InvalidArgumentError);
@@ -542,14 +542,14 @@ describe("[AGS] Create Line Item Service", async () => {
         label: faker.lorem.sentence(),
         scoreMaximum: 100,
         resourceId: resource.externalToolResourceId,
-      } satisfies Parameters<typeof sut.createLineItem>[0];
+      } satisfies Parameters<typeof sut.create>[0];
 
-      let response = await sut.createLineItem(payload);
+      let response = await sut.create(payload);
 
       assert(e.isRight(response));
       expect(lineItemsRepo.lineItems.length).toBe(1);
 
-      response = await sut.createLineItem(payload);
+      response = await sut.create(payload);
       assert(e.isRight(response));
       expect(
         lineItemsRepo.lineItems.length,
@@ -568,7 +568,7 @@ describe("[AGS] Create Line Item Service", async () => {
     toolDeploymentsRepo.deployments.push(deployment);
 
     for (const tool of [toolWithNoDeployment, toolDeployedInAnotherContext]) {
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         tool,
@@ -592,7 +592,7 @@ describe("[AGS] Create Line Item Service", async () => {
     const deployment = createToolDeployment({ tool });
     toolDeploymentsRepo.deployments.push(deployment);
 
-    const response = await sut.createLineItem({
+    const response = await sut.create({
       acceptHeader: LtiAdvantageMediaType.LineItem,
       context,
       tool,
@@ -615,7 +615,7 @@ describe("[AGS] Create Line Item Service", async () => {
         submissionUrl: "https://www.toolexample.com/lti/score/54/5893/essay.pdf",
       };
 
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         tool,
@@ -647,7 +647,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
       const INVALID_KEY = "invalid-key";
 
-      const response = await sut.createLineItem({
+      const response = await sut.create({
         acceptHeader: LtiAdvantageMediaType.LineItem,
         context,
         tool,
