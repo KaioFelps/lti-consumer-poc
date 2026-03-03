@@ -7,7 +7,6 @@ import { createTool } from "ltilib/tests/common/factories/tool.factory";
 import { createToolDeployment } from "ltilib/tests/common/factories/tool-deployment.factory";
 import { InMemoryLtiLineItemsRepository } from "ltilib/tests/common/in-memory-repositories/line-items.repository";
 import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim";
-import { MissingPlatformAgsConfiguration } from "$/assignment-and-grade/errors/missing-platform-ags-configuration.error";
 import { ASSIGNMENT_AND_GRADE_SERVICES_SCOPES } from "$/assignment-and-grade/scopes";
 import { Platform } from "$/core/platform";
 import { CreateService } from "./create-ags-claim.service";
@@ -37,14 +36,14 @@ describe("[AGS] Create Ags Claim Service", async () => {
     createSutWithPlatform(basicPlatform);
   });
 
-  it("should require AGS configurations to execute", async () => {
+  it("should return no AGS claim when AGS is not enabled (there is no AGS config in the `Platform` instance)", async () => {
     const platform = await createPlatform({ agsConfiguration: null });
     createSutWithPlatform(platform);
 
     const result = await sut.execute({ tool, context, resourceLink });
 
-    assert(e.isLeft(result), "it should not execute when AGS is not enabled");
-    expect(result.left).toBeInstanceOf(MissingPlatformAgsConfiguration);
+    assert(e.isRight(result), "it should execute even when AGS is not enabled");
+    expect(result.right).toBe(o.none);
   });
 
   it("should return no AGS claim when there is no context", async () => {

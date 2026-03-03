@@ -2,7 +2,6 @@ import { either as e } from "fp-ts";
 import { IntoLtiClaim } from "$/claims/serialization";
 import { Context } from "$/core/context";
 import { Platform } from "$/core/platform";
-import { MissingPlatformAgsConfiguration } from "./errors/missing-platform-ags-configuration.error";
 import { LtiLineItem } from "./line-item";
 import { AssignmentAndGradeServiceScopes } from "./scopes";
 
@@ -11,7 +10,7 @@ const AGS_CLAIM_KEY = "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint";
 interface AgsClaimConstructorArgs {
   specificLineItem: LtiLineItem | undefined;
   context: Context;
-  platform: Platform;
+  agsConfig: Platform.LtiAssignmentAndGradeServicesConfig;
   scopes: AssignmentAndGradeServiceScopes[];
 }
 
@@ -25,13 +24,11 @@ export class AssignmentAndGradeServiceClaim implements IntoLtiClaim {
     private scopes: AssignmentAndGradeServiceScopes[],
   ) {}
 
-  public static create({ context, platform, scopes, specificLineItem }: AgsClaimConstructorArgs) {
-    if (!platform.agsConfiguration) return e.left(new MissingPlatformAgsConfiguration());
-
+  public static create({ context, agsConfig, scopes, specificLineItem }: AgsClaimConstructorArgs) {
     const agsClaim = new AssignmentAndGradeServiceClaim(
       specificLineItem,
       context,
-      platform.agsConfiguration,
+      agsConfig,
       scopes,
     );
 

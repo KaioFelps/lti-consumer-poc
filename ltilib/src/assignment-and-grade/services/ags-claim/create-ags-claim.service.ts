@@ -4,7 +4,6 @@ import { pipe } from "fp-ts/lib/function";
 import { Option } from "fp-ts/lib/Option";
 import agsPolicies from "$/assignment-and-grade/ags-policies";
 import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim";
-import { MissingPlatformAgsConfiguration } from "$/assignment-and-grade/errors/missing-platform-ags-configuration.error";
 import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
 import { Context } from "$/core/context";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
@@ -29,12 +28,9 @@ export class CreateService {
     context,
     resourceLink,
   }: CreateClaimParams): Promise<
-    Either<
-      MissingPlatformAgsConfiguration | LtiRepositoryError,
-      Option<AssignmentAndGradeServiceClaim>
-    >
+    Either<LtiRepositoryError, Option<AssignmentAndGradeServiceClaim>>
   > {
-    if (!this.platform.agsConfiguration) return e.left(new MissingPlatformAgsConfiguration());
+    if (!this.platform.agsConfiguration) return e.right(o.none);
 
     const agsConfig = this.platform.agsConfiguration;
 
@@ -49,7 +45,7 @@ export class CreateService {
         pipe(
           AssignmentAndGradeServiceClaim.create({
             context,
-            platform: this.platform,
+            agsConfig,
             scopes,
             specificLineItem: lineItem,
           }),
