@@ -63,10 +63,10 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
     private tool: Readonly<ToolRecord>,
     private resolvedTargetLink: URL,
     private resolvedUserRoles: Readonly<UserRoles<CustomRoles>>,
-    private userIdentity?: Readonly<UserIdentity<CustomRoles>>,
-    private context?: Context<CustomContextType>,
-    private mentorScope?: string[],
-    private presentation?: MessageRequests.Presentation,
+    private userIdentity: Readonly<UserIdentity<CustomRoles>> | undefined,
+    private context: Context<CustomContextType> | undefined,
+    private mentorScope: string[] | undefined,
+    private presentation: MessageRequests.Presentation | undefined,
     /**
      * A platform may want to associate extra data about the resource link
      * that initiated the launch. This is the place to put these data.
@@ -76,7 +76,7 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
      * @see {@link https://www.imsglobal.org/spec/lti/v1p3/#custom-properties-and-variable-substitution Custom Properties}
      */
     public readonly customClaims: Record<string, string> = {},
-    private vendorClaims?: MessageRequests.VendorExtraClaims,
+    private vendorClaims: MessageRequests.VendorExtraClaims | undefined,
   ) {}
 
   public static create<CustomRoles = never, CustomContextType = never>({
