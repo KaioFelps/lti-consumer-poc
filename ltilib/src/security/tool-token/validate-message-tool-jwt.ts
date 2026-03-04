@@ -229,10 +229,8 @@ function resolveAllowedClaims(
 /**
  * Filters away every unknown claims present in the payload, as specified by LTI Security Framework.
  */
-function discardUnknownClaims<T>(claims: Record<string, unknown>, allowedClaims: string[]) {
-  const filtredPairs = Object.entries(claims).filter(([key, _]) => {
-    return allowedClaims.includes(key);
-  });
-
-  return Object.fromEntries(filtredPairs) as T;
+function discardUnknownClaims<T>(claims: Record<string, unknown>, _allowedClaims: string[]) {
+  const allowedClaims = new Set(_allowedClaims);
+  const claimsToKeep = Object.entries(claims).filter(([key, _]) => allowedClaims.has(key));
+  return Object.fromEntries(claimsToKeep) as T;
 }
