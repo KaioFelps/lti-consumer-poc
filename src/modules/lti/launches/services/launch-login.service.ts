@@ -1,3 +1,6 @@
+/**
+ * TODO: move this to ltilib
+ */
 import { Injectable } from "@nestjs/common";
 import { option as opt, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
@@ -5,7 +8,7 @@ import { eitherPromiseToTaskEither as teFromPromise } from "@/lib/fp-ts";
 import { FindPersonByIdService } from "@/modules/identity/person/services/find-person-by-id.service";
 import { User } from "@/modules/identity/user/user.entity";
 import mappers from "@/modules/lti/mappers";
-import { LtiLaunchServices } from "$/core/services/launch.services";
+import { LtiLaunchServices } from "$/core/services/launch";
 import { ToolRecord } from "$/registration/tool-record";
 import { validateAuthenticationRequest } from "$/security/validate-authentication-request";
 import { LaunchLoginDto } from "../../launches/dtos/launch-login.dto";
@@ -44,7 +47,7 @@ export class LaunchLoginService {
       ),
       te.chainW((userIdentity) =>
         teFromPromise(() =>
-          this.launchServices.prepareLaunchRequest({
+          this.launchServices.authenticateLaunch({
             tool,
             redirectUri,
             userIdentity,

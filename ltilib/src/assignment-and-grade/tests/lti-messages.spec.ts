@@ -19,7 +19,7 @@ import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositor
 import { ASSIGNMENT_AND_GRADE_SERVICES_SCOPES } from "$/assignment-and-grade/scopes";
 import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim";
 import { LtiLaunchData } from "$/core/launch-data";
-import { LtiLaunchServices } from "$/core/services/launch.services";
+import { LtiLaunchServices } from "$/core/services/launch";
 import { UserIdentity } from "$/core/user-identity";
 
 describe("[AGS] LTI Launch Messages with AGS claim", async () => {
@@ -89,7 +89,7 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
     async (scope) => {
       const { launch, toolRedirectUri, userId, tool } = getValidEntities({ scopes: [scope] });
 
-      const launchRequest = await launchServices.prepareLaunchRequest({
+      const launchRequest = await launchServices.authenticateLaunch({
         loginHint: launch.id.toString(),
         messageHint: launch.id.toString(),
         nonce: randomBytes(1024).toString("base64"),
@@ -112,7 +112,7 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
   it("should not contain the service's claim if the tool does not have access to any of them", async () => {
     const { tool, toolRedirectUri, userId, launch } = getValidEntities({ scopes: [] });
 
-    const launchRequest = await launchServices.prepareLaunchRequest({
+    const launchRequest = await launchServices.authenticateLaunch({
       loginHint: launch.id.toString(),
       messageHint: launch.id.toString(),
       nonce: randomBytes(1024).toString("base64"),

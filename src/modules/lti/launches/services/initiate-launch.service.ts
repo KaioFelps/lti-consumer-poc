@@ -7,7 +7,7 @@ import { User } from "@/modules/identity/user/user.entity";
 import { findResourceLinkByIdService } from "@/modules/lti/resource-links/services/find-resource-link-by-id.service";
 import { FindToolByIdService } from "@/modules/lti/tools/services/find-tool-by-id.service";
 import { MessageRequests } from "$/core/messages";
-import { LtiLaunchServices } from "$/core/services/launch.services";
+import { LtiLaunchServices } from "$/core/services/launch";
 
 type Params = {
   resourceLinkId: string;
@@ -34,7 +34,7 @@ export class InitiateLaunchService {
       ),
       te.chainW(({ tool, resourceLink }) =>
         teFromPromise(() =>
-          this.launchServices.prepareLaunchInitiationRequest<IrrecoverableError>({
+          this.launchServices.initiateLaunch<IrrecoverableError>({
             resourceLink,
             tool,
             sessionUserId: user.getId().toString(),

@@ -5,7 +5,7 @@ import { SessionUser } from "@/modules/auth/session-user";
 import { User } from "@/modules/identity/user/user.entity";
 import { mapRolesToLtiSystemRoles } from "@/modules/lti/mappers/convert-roles";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiLaunchServices } from "$/core/services/launch.services";
+import { LtiLaunchServices } from "$/core/services/launch";
 import { AppService } from "./app.service";
 import { IrrecoverableError } from "./core/errors/irrecoverable-error";
 import { ResourceNotFoundError } from "./core/errors/resource-not-found.error";

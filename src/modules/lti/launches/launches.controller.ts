@@ -20,7 +20,7 @@ import { MalformedRequestError } from "$/core/errors/malformed-request.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { MessageRequests } from "$/core/messages";
 import { Platform } from "$/core/platform";
-import { LtiLaunchServices } from "$/core/services/launch.services";
+import { LtiLaunchServices } from "$/core/services/launch";
 import { FindToolByIdService } from "../tools/services/find-tool-by-id.service";
 import { InitiateLaunchDto } from "./dtos/initiate-launch.dto";
 import { LaunchLoginDto } from "./dtos/launch-login.dto";
@@ -122,7 +122,6 @@ export class LtiLaunchesController {
           te.mapLeft((error) => ({ error, redirectUri }) as IErrorContext<typeof error>),
         ),
       ),
-      te.mapLeft((e) => e),
       te.match(
         (errorContext) => {
           const isInvalidRedirectUriError = !("redirectUri" in errorContext);
@@ -136,12 +135,13 @@ export class LtiLaunchesController {
             return res.redirect(error.intoUrl().toString());
           }
 
-          const isLtiRepositoryExternalError =
-            error instanceof LtiRepositoryError && error.type === "ExternalError";
+          if (error instanceof LtiRepositoryError) {
+            assert(
+              error.type === "ExternalError" && error.cause instanceof IrrecoverableError,
+              "Unhandled `NotFound` `LtiRepositoryError`",
+            );
 
-          if (isLtiRepositoryExternalError) {
-            const { cause } = error;
-            return handleIrrecoverableError(cause, body, redirectUri, res);
+            return handleIrrecoverableError(error.cause, body, redirectUri, res);
           }
 
           if (error instanceof IrrecoverableError)

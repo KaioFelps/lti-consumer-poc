@@ -6,7 +6,7 @@ import { OIDCModule } from "@/modules/oidc/oidc.module";
 import { Platform } from "$/core/platform";
 import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
-import { LtiLaunchServices } from "$/core/services/launch.services";
+import { LtiLaunchServices } from "$/core/services/launch";
 import { LtiResourceLinkServices } from "$/core/services/resource-link.services";
 import { LtiDeploymentsController } from "./deployments/deployments.controller";
 import { DeployToolService } from "./deployments/services/deploy-tool.service";
@@ -49,6 +49,7 @@ import { LtiToolsController } from "./tools/tools.controller";
           ltiToolsRepository,
           launchRepository,
           platform,
+          undefined,
         ),
       inject: [LtiResourceLinksRepository, LtiToolsRepository, LtiLaunchesRepository, Platform],
     },
