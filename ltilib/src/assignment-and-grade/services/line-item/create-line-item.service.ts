@@ -17,7 +17,7 @@ import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deploymen
 import { ToolRecord } from "$/registration/tool-record";
 import { CannotAttachResourceLinkError } from "../../errors/cannot-attach-resource-link.error";
 import { InvalidLineItemArgumentError } from "../../errors/invalid-line-item-argument.error";
-import { MissingPlatformAgsConfiguration } from "../../errors/missing-platform-ags-configuration.error";
+import { MissingPlatformAgsConfigurationError } from "../../errors/missing-platform-ags-configuration.error";
 import { ToolIsNotDeployedInContextError } from "../../errors/tool-is-not-deployed-in-context.error";
 import { ILtiLineItem, LtiLineItem } from "../../line-item";
 import { PresentedLtiLineItem, presentLtiLineItem } from "../../presenters/line-item.presenter";
@@ -73,7 +73,7 @@ export class CreateService {
       HttpResponseWrapper<LtiLineItem, PresentedLtiLineItem>
     >
   > {
-    if (!this.platform.agsConfiguration) return e.left(new MissingPlatformAgsConfiguration());
+    if (!this.platform.agsConfiguration) return e.left(new MissingPlatformAgsConfigurationError());
     const { agsConfiguration } = this.platform;
 
     args.tag = args.tag?.trim() || undefined;

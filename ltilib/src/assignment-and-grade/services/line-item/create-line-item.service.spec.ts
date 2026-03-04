@@ -22,7 +22,7 @@ import { InvalidMediaTypeError } from "$/advantage/errors/invalid-media-type.err
 import { MissingScopeError } from "$/advantage/errors/missing-scope.error";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { CannotAttachResourceLinkError } from "$/assignment-and-grade/errors/cannot-attach-resource-link.error";
-import { MissingPlatformAgsConfiguration } from "$/assignment-and-grade/errors/missing-platform-ags-configuration.error";
+import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors/missing-platform-ags-configuration.error";
 import { ToolIsNotDeployedInContextError } from "$/assignment-and-grade/errors/tool-is-not-deployed-in-context.error";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
@@ -602,7 +602,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
     assert(e.isLeft(response));
     expect(response.left.httpStatusCode).toBe(500);
-    expect(response.left).toBeInstanceOf(MissingPlatformAgsConfiguration);
+    expect(response.left).toBeInstanceOf(MissingPlatformAgsConfigurationError);
   });
 
   describe("[3.1.2] Extensions", () => {

@@ -4,7 +4,7 @@ import { Either } from "fp-ts/lib/Either";
 import { Context } from "$/core/context";
 import { MisconfiguredPlatformError } from "$/core/errors/misconfigured-platform.error";
 import { Platform } from "$/core/platform";
-import { MissingPlatformAgsConfiguration } from "../errors/missing-platform-ags-configuration.error";
+import { MissingPlatformAgsConfigurationError } from "../errors/missing-platform-ags-configuration.error";
 import { LtiLineItem } from "../line-item";
 
 export type PresentedLtiLineItem = {
@@ -27,7 +27,7 @@ export function presentLtiLineItem<
   platform: Platform,
 ): Either<MisconfiguredPlatformError, PresentedLtiLineItem & CustomParameters> {
   if (!platform.agsConfiguration) {
-    return either.left(new MissingPlatformAgsConfiguration());
+    return either.left(new MissingPlatformAgsConfigurationError());
   }
 
   const resolvedStartDateTime = platform.agsConfiguration.deadlinesEnabled.start
