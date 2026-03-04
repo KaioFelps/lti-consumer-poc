@@ -128,18 +128,4 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
     const claims = launchRequest.right.intoLtiClaim();
     expect(claims).not.toHaveProperty(REQUIRED_CLAIM);
   });
-
-  it.skip("should allow custom parameters to be added to the AGS claim", () => {
-    const VALID_CUSTOM_PARAMETER_AS_PER_EXAMPLE = {
-      "https://www.toolexample.com/lti/score": {
-        originality: 94,
-        submissionUrl: "https://www.toolexample.com/lti/score/54/5893/essay.pdf",
-      },
-    };
-    assert(false);
-  });
-
-  it.skip("should require custom parameters'keys to be fully qualified URLs", () => {
-    assert(false);
-  });
 });
