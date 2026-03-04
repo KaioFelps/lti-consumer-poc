@@ -19,21 +19,3 @@ export function eitherPromiseToTaskEither<E, V>(
     taskEither.flatten,
   );
 }
-
-/**
- * Maps the value of a `TaskEither` into a transformation promise and flats the transformation
- * into another `TaskEither`
- *
- * @param promise The transformation promise to be applied to the right value from `TaskEither`
- * @returns a `TaskEither` of the new value and flatten errors.
- */
-export function mapTaskEitherEitherAndFlatten<E1, V, E2, V2>(
-  promise: (value: V) => Promise<Either<E2, V2>>,
-) {
-  return (te: TaskEither<E1, V>) =>
-    pipe(
-      te,
-      taskEither.map((value) => eitherPromiseToTaskEither(() => promise(value))),
-      taskEither.flattenW,
-    );
-}

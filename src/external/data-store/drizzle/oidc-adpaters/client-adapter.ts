@@ -3,13 +3,13 @@
  * when managing OIDC Clients and LTI Tools.
  */
 
-import { either, option, taskEither } from "fp-ts";
+import { either, option, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { Adapter, AdapterPayload, errors } from "oidc-provider";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ValidationErrors } from "@/core/validation/validation-errors";
 import { OIDCServerErrorException } from "@/lib/exceptions/oidc/exception";
-import { eitherPromiseToTaskEither, mapTaskEitherEitherAndFlatten } from "@/lib/fp-ts";
+import { eitherPromiseToTaskEither } from "@/lib/fp-ts";
 import { LtiToolIdPrefix } from "@/modules/lti";
 import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity";
 import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository";
@@ -37,9 +37,9 @@ export class DrizzleOIDCClientAdapter implements Adapter {
     if (isLtiTool) {
       await pipe(
         LtiTool.tryCreateFromClientMetadata(payload),
-        taskEither.fromEither,
-        mapTaskEitherEitherAndFlatten((tool) => this.toolsRepository.upsertTool(tool)),
-        taskEither.mapError(handleUpsertErrors),
+        te.fromEither,
+        te.chainW((tool) => () => this.toolsRepository.upsertTool(tool)),
+        te.mapError(handleUpsertErrors),
       )();
 
       return;
@@ -47,9 +47,9 @@ export class DrizzleOIDCClientAdapter implements Adapter {
 
     await pipe(
       OIDCClient.tryCreateFromMetadata(payload),
-      taskEither.fromEither,
-      mapTaskEitherEitherAndFlatten((metadata) => this.clientRepository.upsertClient(metadata)),
-      taskEither.mapError(handleUpsertErrors),
+      te.fromEither,
+      te.chainW((metadata) => () => this.clientRepository.upsertClient(metadata)),
+      te.mapError(handleUpsertErrors),
     )();
   }
 
@@ -57,14 +57,14 @@ export class DrizzleOIDCClientAdapter implements Adapter {
     if (id.startsWith(LtiToolIdPrefix)) {
       return await pipe(
         eitherPromiseToTaskEither(() => this.toolsRepository.findToolById(id)),
-        taskEither.match(
+        te.match(
           (err) => {
             if (err instanceof IrrecoverableError) return either.left(err);
             return either.right(option.none);
           },
           (tool) => either.right(option.some(tool)),
         ),
-        taskEither.map((tool) =>
+        te.map((tool) =>
           pipe(
             tool,
             option.match(
@@ -73,7 +73,7 @@ export class DrizzleOIDCClientAdapter implements Adapter {
             ),
           ),
         ),
-        taskEither.match(
+        te.match(
           (err) => {
             console.error(err);
             throw new OIDCServerErrorException();
