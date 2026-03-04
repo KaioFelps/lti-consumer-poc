@@ -3,7 +3,6 @@ import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import * as jose from "jose";
 import { errors as jerr } from "jose";
-import { mapTaskEitherIntoEitherAndFlatten as mapAndFlatten } from "@/lib/fp-ts";
 import { Platform } from "$/core/platform";
 import { JoseJwtClaimValidationFailureReason } from "$/lib/jose";
 
@@ -126,10 +125,10 @@ export async function validateMessageToolJwt<T extends jose.JWTPayload>(
       return [payload, allowedClaims] as const;
     }),
     te.map(([payload, allowedClaims]) => discardUnknownClaims<T>(payload, allowedClaims)),
-    mapAndFlatten((claims) => validateAudienceAndAzp(claims, platform.issuer)),
-    mapAndFlatten((claims) => validateNonce(claims, options.nonceIsFresh)),
-    mapAndFlatten(validateMessageSpecificClaims),
-    mapAndFlatten((claims) =>
+    te.chainEitherKW((claims) => validateAudienceAndAzp(claims, platform.issuer)),
+    te.chainEitherKW((claims) => validateNonce(claims, options.nonceIsFresh)),
+    te.chainEitherKW(validateMessageSpecificClaims),
+    te.chainEitherKW((claims) =>
       performVendorValidations<T>(claims, options.vendorPrefix, options.vendorClaimsValidator),
     ),
   )();
