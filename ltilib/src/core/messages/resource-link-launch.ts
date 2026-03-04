@@ -106,7 +106,7 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
       const description =
         "Given resource link " +
         (resourceLink.title ? `"${resourceLink.title}"` : `of id "${resourceLink.id}"`) +
-        `does not belong to any deployment from tool "${tool.name}".`;
+        ` does not belong to any deployment from tool "${tool.name}".`;
       const error = new InvalidResourceLinkLaunchError({ code: "invalid_deployment", description });
       return e.left(error);
     }
@@ -176,12 +176,23 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
     this.vendorClaims = claims;
   }
 
-  public setContext(context: Context<CustomContextType>) {
+  public setContext(
+    context: Context<CustomContextType>,
+  ): Either<InvalidResourceLinkLaunchError, void> {
     if (context.id !== this.resourceLink.contextId) {
-      // TODO: return some error
+      const description =
+        "The resource link " +
+        (this.resourceLink.title
+          ? `"${this.resourceLink.title}"`
+          : `of id "${this.resourceLink.id}"`) +
+        " does not belong to the given context.";
+
+      const error = new InvalidResourceLinkLaunchError({ code: "invalid_context", description });
+      return e.left(error);
     }
 
     this.context = context;
+    return e.right(undefined);
   }
 
   public setPresentation(

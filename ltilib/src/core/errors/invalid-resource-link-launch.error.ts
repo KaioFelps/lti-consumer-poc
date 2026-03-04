@@ -1,6 +1,6 @@
 import { IOAuthError, OAuthError } from "./bases/oauth.error";
 
-type ErrorCode = "invalid_deployment" | "insufficient_roles";
+type ErrorCode = "invalid_deployment" | "insufficient_roles" | "invalid_context";
 
 type Args = Omit<IOAuthError<ErrorCode>, "httpStatusCode">;
 
@@ -16,11 +16,12 @@ export class InvalidResourceLinkLaunchError extends OAuthError<ErrorCode> {
     });
   }
 
-  public static resolveHttpStatusCode(errorCode: ErrorCode) {
+  private static resolveHttpStatusCode(errorCode: ErrorCode) {
     switch (errorCode) {
       case "insufficient_roles":
         return 403;
       case "invalid_deployment":
+      case "invalid_context":
         return 401;
     }
   }
