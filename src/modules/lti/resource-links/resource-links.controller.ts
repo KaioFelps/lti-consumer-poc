@@ -6,7 +6,6 @@ import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { LtiToolDeploymentPresenter } from "@/external/presenters/entities/lti-tool-deployment.presenter";
 import { ConfigCoreValidation } from "@/lib/core-validation";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { eitherPromiseToTaskEither as teFromPromise } from "@/lib/fp-ts";
 import { Mvc, Rest } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
@@ -86,16 +85,15 @@ export class LtiResourceLinksController {
       te.fromEither,
       te.chain((resourceLink) =>
         pipe(
-          teFromPromise(() =>
+          () =>
             this.findDeploymentService.exec({
               deploymentId: deploymentId.toString(),
             }),
-          ),
           te.map((deployment) => ({ resourceLink, deployment })),
         ),
       ),
       te.map((params) => ({ ...params, description, title, customParameters })),
-      te.chain((params) => teFromPromise(() => this.createResourceLinkService.exec(params))),
+      te.chain((params) => () => this.createResourceLinkService.exec(params)),
       te.map((link) => presentLtiResourceLink(link, this.platform)),
       te.getOrElse((error) => {
         throw ExceptionsFactory.fromError(error);

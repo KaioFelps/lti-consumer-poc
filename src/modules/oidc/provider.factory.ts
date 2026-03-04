@@ -4,7 +4,6 @@ import { pipe } from "fp-ts/lib/function";
 import Provider, { type Configuration, errors } from "oidc-provider";
 import { EnvironmentVars } from "@/config/environment-vars";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { eitherPromiseToTaskEither } from "@/lib/fp-ts";
 import { AuthJwkSet } from "@/modules/auth/encryption/jwks-set";
 import { LtiToolIdPrefix } from "@/modules/lti";
 import { ltiToolConfigurationSchema } from "@/modules/lti/tools/lti-tool-config-schemas";
@@ -145,11 +144,11 @@ export class OIDCProviderFactory {
 
   private async getClientsAndLtiTools() {
     return await pipe(
-      eitherPromiseToTaskEither(() => this.ltiToolsRepository.findManyTools()),
+      () => this.ltiToolsRepository.findManyTools(),
       taskEither.map((tools) => tools.map((tool) => tool.asClientMetadata())),
       taskEither.map((tools) => {
         return pipe(
-          eitherPromiseToTaskEither(() => this.clientsRepository.getClients()),
+          () => this.clientsRepository.getClients(),
           taskEither.map((clients) => clients.map((client) => client.asClientMetadata())),
           taskEither.map((clients) => [...tools, ...clients]),
         );

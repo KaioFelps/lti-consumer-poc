@@ -4,7 +4,6 @@
 import { Injectable } from "@nestjs/common";
 import { option as opt, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
-import { eitherPromiseToTaskEither as teFromPromise } from "@/lib/fp-ts";
 import { FindPersonByIdService } from "@/modules/identity/person/services/find-person-by-id.service";
 import { User } from "@/modules/identity/user/user.entity";
 import mappers from "@/modules/lti/mappers";
@@ -37,7 +36,7 @@ export class LaunchLoginService {
           opt.fromNullable,
           opt.traverse(te.ApplicativePar)((user) =>
             pipe(
-              teFromPromise(() => this.findPersonByIdService.exec({ id: user.getId() })),
+              () => this.findPersonByIdService.exec({ id: user.getId() }),
               te.map(mappers.mapPersonToUserIdentity),
             ),
           ),
@@ -45,8 +44,8 @@ export class LaunchLoginService {
           te.map((userIdentity) => userIdentity),
         ),
       ),
-      te.chainW((userIdentity) =>
-        teFromPromise(() =>
+      te.chainW(
+        (userIdentity) => () =>
           this.launchServices.authenticateLaunch({
             tool,
             redirectUri,
@@ -59,7 +58,6 @@ export class LaunchLoginService {
             errorDescriptionsRoutes: undefined,
             context: undefined,
           }),
-        ),
       ),
     )();
   }

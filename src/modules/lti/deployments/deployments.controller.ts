@@ -3,7 +3,6 @@ import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { HttpResponse, RequestSession } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { eitherPromiseToTaskEither as teFromPromise } from "@/lib/fp-ts";
 import { Mvc, Rest } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { FindToolByIdService } from "../tools/services/find-tool-by-id.service";
@@ -29,10 +28,8 @@ export class LtiDeploymentsController {
     @Res() response: HttpResponse,
   ) {
     const deployment = await pipe(
-      teFromPromise(() => this.findToolByIdService.exec({ id: toolId })),
-      te.chainW((tool) =>
-        teFromPromise(() => this.deployToolService.exec({ tool, label: dto.label })),
-      ),
+      () => this.findToolByIdService.exec({ id: toolId }),
+      te.chainW((tool) => () => this.deployToolService.exec({ tool, label: dto.label })),
       (a) => a,
       te.getOrElse((error) => {
         throw ExceptionsFactory.fromError(error);
@@ -52,7 +49,7 @@ export class LtiDeploymentsController {
   @Delete(":deploymentId/delete")
   public async removeDeployment(@Param("deploymentId") deploymentId: string) {
     await pipe(
-      teFromPromise(() => this.removeDeploymentService.exec({ deploymentId })),
+      () => this.removeDeploymentService.exec({ deploymentId }),
       te.getOrElse((error) => {
         throw ExceptionsFactory.fromError(error);
       }),

@@ -9,7 +9,6 @@ import { Adapter, AdapterPayload, errors } from "oidc-provider";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ValidationErrors } from "@/core/validation/validation-errors";
 import { OIDCServerErrorException } from "@/lib/exceptions/oidc/exception";
-import { eitherPromiseToTaskEither } from "@/lib/fp-ts";
 import { LtiToolIdPrefix } from "@/modules/lti";
 import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity";
 import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository";
@@ -56,7 +55,7 @@ export class DrizzleOIDCClientAdapter implements Adapter {
   public async find(id: string): Promise<AdapterPayload | undefined> {
     if (id.startsWith(LtiToolIdPrefix)) {
       return await pipe(
-        eitherPromiseToTaskEither(() => this.toolsRepository.findToolById(id)),
+        () => this.toolsRepository.findToolById(id),
         te.match(
           (err) => {
             if (err instanceof IrrecoverableError) return either.left(err);
