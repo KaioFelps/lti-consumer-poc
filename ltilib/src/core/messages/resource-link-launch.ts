@@ -9,7 +9,8 @@
  */
 
 import ejs from "ejs";
-import { either } from "fp-ts";
+import { either as e } from "fp-ts";
+import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import {
   AvailableLtiVersion,
@@ -25,6 +26,7 @@ import { UserIdentity, UserRoles } from "$/core/user-identity";
 import { ToolRecord } from "$/registration/tool-record";
 import { LtiSubmittableMessage } from "$/security/lti-message";
 import { PrepareIdTokenError, prepareIdToken } from "$/security/prepare-id-token";
+import { InvalidResourceLinkLaunchError } from "../errors/invalid-resource-link-launch.error";
 import { Platform } from "../platform";
 import { MessageRequests } from ".";
 
@@ -96,9 +98,17 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
     userRoles: _userRoles,
     context,
     agsClaim,
-  }: CreateFromLtiRecordArgs<CustomRoles>) {
+  }: CreateFromLtiRecordArgs<CustomRoles>): Either<
+    InvalidResourceLinkLaunchError,
+    LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>
+  > {
     if (!tool.ltiConfiguration.deploymentsIds.includes(resourceLink.deploymentId)) {
-      // TODO: return some error
+      const description =
+        "Given resource link " +
+        (resourceLink.title ? `"${resourceLink.title}"` : `of id "${resourceLink.id}"`) +
+        `does not belong to any deployment from tool "${tool.name}".`;
+      const error = new InvalidResourceLinkLaunchError({ code: "invalid_deployment", description });
+      return e.left(error);
     }
 
     const resourceLinkMessage = tool.ltiConfiguration.messages.find(
@@ -114,7 +124,9 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
       );
 
     if (!userIsAllowedToLaunchMessage) {
-      // TODO: return some error
+      const description = "User does not have any of the required roles to launch this resource.";
+      const error = new InvalidResourceLinkLaunchError({ code: "insufficient_roles", description });
+      return e.left(error);
     }
 
     const targetLink = new URL(
@@ -131,7 +143,7 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
       ...(relatedToolMessage?.customParameters ?? {}),
     } satisfies Record<string, string>;
 
-    return new LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>(
+    const message = new LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>(
       state,
       nonce,
       resourceLink,
@@ -147,6 +159,8 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
       undefined,
       agsClaim,
     );
+
+    return e.right(message);
   }
 
   /**
@@ -210,7 +224,7 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
         nonce: this.nonce,
         targetTool: this.tool,
       }),
-      either.map((idToken) => {
+      e.map((idToken) => {
         const data = {
           idToken: idToken,
           state: this.state,

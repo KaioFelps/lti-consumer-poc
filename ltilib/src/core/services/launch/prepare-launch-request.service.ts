@@ -4,6 +4,7 @@ import { pipe } from "fp-ts/lib/function";
 import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim";
 import { Context } from "$/core/context";
 import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
+import { InvalidResourceLinkLaunchError } from "$/core/errors/invalid-resource-link-launch.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LTIResourceLinkLaunchRequest } from "$/core/messages/resource-link-launch";
 import { Platform } from "$/core/platform";
@@ -63,7 +64,7 @@ export class PrepareLaunchRequestService<CustomRoles = never, CustomContextType 
     transformLaunchRequest,
   }: AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType>): Promise<
     Either<
-      AuthenticationRedirectionError | LtiRepositoryError,
+      AuthenticationRedirectionError | LtiRepositoryError | InvalidResourceLinkLaunchError,
       LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>
     >
   > {
@@ -150,18 +151,21 @@ export class PrepareLaunchRequestService<CustomRoles = never, CustomContextType 
 
     return await pipe(
       this.prepareAgsClaimIfEnabled(tool, context, resourceLink),
-      te.map((agsClaim) =>
-        LTIResourceLinkLaunchRequest.create<CustomRoles, CustomContextType>({
-          tool,
-          nonce,
-          platform: this.platform,
-          resourceLink,
-          state,
-          userIdentity,
-          context,
-          userRoles: fallbackUserRoles,
-          agsClaim,
-        }),
+      te.chainW((agsClaim) =>
+        pipe(
+          LTIResourceLinkLaunchRequest.create<CustomRoles, CustomContextType>({
+            tool,
+            nonce,
+            platform: this.platform,
+            resourceLink,
+            state,
+            userIdentity,
+            context,
+            userRoles: fallbackUserRoles,
+            agsClaim,
+          }),
+          te.fromEither,
+        ),
       ),
       te.map((launchRequest) => {
         if (launch.presentation) launchRequest.setPresentation(launch.presentation);

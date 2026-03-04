@@ -15,6 +15,7 @@ import type { User } from "@/modules/identity/user/user.entity";
 import { Routes } from "@/routes";
 import { assertNever } from "@/utils/assert-never";
 import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
+import { OAuthError } from "$/core/errors/bases/oauth.error";
 import type { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
 import { MalformedRequestError } from "$/core/errors/malformed-request.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
@@ -150,6 +151,10 @@ export class LtiLaunchesController {
           if (error instanceof PersonNotFoundError)
             return handlePersonNotFoundError(error, body, redirectUri, res);
 
+          if (error instanceof OAuthError) {
+            return handleOAuthLikeError(error, res);
+          }
+
           assertNever(error);
         },
         (link) =>
@@ -246,4 +251,9 @@ function handleJoseNotSupportedError(error: JOSENotSupported) {
   );
 
   throw ExceptionsFactory.fromError(renderable);
+}
+
+function handleOAuthLikeError<T extends string>(error: OAuthError<T>, res: HttpResponse) {
+  Object.entries(error.headers).forEach(([header, value]) => res.setHeader(header, value));
+  res.status(error.httpStatusCode).send(error.present());
 }
