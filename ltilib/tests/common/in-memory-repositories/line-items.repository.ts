@@ -47,4 +47,16 @@ export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
 
     return e.right(lineitems);
   }
+
+  public async findById(
+    lineItemId: LtiLineItem["id"],
+  ): Promise<Either<LtiRepositoryError, LtiLineItem>> {
+    const lineItem = this.lineItems.find((lineItem) => lineItem.id === lineItemId);
+
+    if (lineItem) return e.right(lineItem);
+
+    return e.left(
+      new LtiRepositoryError({ type: "NotFound", subject: LtiLineItem.name, cause: undefined }),
+    );
+  }
 }

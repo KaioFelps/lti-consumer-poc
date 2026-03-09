@@ -15,4 +15,8 @@ export abstract class LtiLineItemsRepository {
     resourceLinkId: LtiResourceLink["id"],
     limit: number,
   ): Promise<Either<LtiRepositoryError, LtiLineItem[]>>;
+
+  public abstract findById(
+    lineItemId: LtiLineItem["id"],
+  ): Promise<Either<LtiRepositoryError, LtiLineItem>>;
 }
