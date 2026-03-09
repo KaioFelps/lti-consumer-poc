@@ -107,9 +107,12 @@ export class CreateService {
       ),
       te.map(
         ({ lineitem, presentedLineItem }) =>
-          new HttpResponseWrapper(presentedLineItem, 201, lineitem, {
-            "Content-Type": LtiAdvantageMediaType.LineItem,
-          }),
+          new HttpResponseWrapper<LtiLineItem, PresentedLtiLineItem>(
+            presentedLineItem,
+            201,
+            lineitem,
+            { "Content-Type": LtiAdvantageMediaType.LineItem },
+          ),
       ),
     )();
   }
