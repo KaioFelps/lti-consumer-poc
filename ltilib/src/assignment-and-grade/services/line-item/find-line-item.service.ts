@@ -3,7 +3,7 @@ import { pipe } from "fp-ts/lib/function";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { ensureAcceptHeaderIsValid } from "$/advantage/utils/ensure-accept-header-is-valid";
 import { ensureHasAnyScope } from "$/advantage/utils/ensure-has-any-scope";
-import { InaccessibleLineItemError } from "$/assignment-and-grade/errors/Inaccessible-line-item.error";
+import { InaccessibleLineItemError } from "$/assignment-and-grade/errors/inaccessible-line-item.error";
 import { LtiLineItem } from "$/assignment-and-grade/line-item";
 import { presentLtiLineItem } from "$/assignment-and-grade/presenters/line-item.presenter";
 import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";

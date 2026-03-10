@@ -19,7 +19,7 @@ import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memor
 import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
 import { InvalidMediaTypeError } from "$/advantage/errors/invalid-media-type.error";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import { InaccessibleLineItemError } from "$/assignment-and-grade/errors/Inaccessible-line-item.error";
+import { InaccessibleLineItemError } from "$/assignment-and-grade/errors/inaccessible-line-item.error";
 import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors/missing-platform-ags-configuration.error";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
