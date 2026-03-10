@@ -2,8 +2,8 @@ import type * as schema from "drizzle/schema";
 import type { BuildQueryResult, DBQueryConfig, ExtractTablesWithRelations } from "drizzle-orm";
 import { AnyLtiRole } from "$/claims/enums/roles";
 import { MessageType } from "$/claims/serialization";
+import { MessagePlacement } from "$/core/tool/message-placement";
 import { Contact, GrantType } from "$/registration/dynamic/tool-configuration";
-import { MessagePlacement } from "$/registration/enums/message-placement";
 import { ToolRecord } from "$/registration/tool-record";
 import { ToolSupportedMessage } from "$/registration/tool-supported-message";
 

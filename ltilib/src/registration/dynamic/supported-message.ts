@@ -1,6 +1,6 @@
 import { AnyLtiRole } from "$/claims/enums/roles";
 import { MessageType } from "$/claims/serialization";
-import { MessagePlacement } from "../enums/message-placement";
+import { MessagePlacement } from "../../core/tool/message-placement";
 
 export type ToolConfigurationSupportedMessage = {
   type: MessageType;

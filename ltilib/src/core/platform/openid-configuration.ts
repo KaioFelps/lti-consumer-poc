@@ -1,6 +1,6 @@
 import { ClassProperties } from "common/src/types/class-properties";
 import { MessageType } from "$/claims/serialization";
-import { MessagePlacement } from "$/registration/enums/message-placement";
+import { MessagePlacement } from "$/core/tool/message-placement";
 
 export interface IOpenIdConfiguration {
   /**

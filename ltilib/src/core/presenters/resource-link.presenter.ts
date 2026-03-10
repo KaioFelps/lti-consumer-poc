@@ -1,4 +1,4 @@
-import { MessagePlacement } from "$/registration/enums/message-placement";
+import { MessagePlacement } from "$/core/tool/message-placement";
 import { ToolSupportedMessage } from "$/registration/tool-supported-message";
 import { Platform } from "../platform";
 import { LtiResourceLink } from "../resource-link";
