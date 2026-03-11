@@ -3,7 +3,7 @@ import { LtiTool } from "$/core/tool";
 
 export interface IExternalLtiResource {
   /**
-   * The platform which the resource belongs to.
+   * The tool to which the resource belongs.
    */
   tool: LtiTool;
   /**
