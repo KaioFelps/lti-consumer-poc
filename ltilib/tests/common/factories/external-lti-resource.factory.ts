@@ -11,8 +11,8 @@ export function createExternalLtiResource({
   localResourceId = generateUUID(),
   tool = createTool(),
 }: CreateExternalLtiResourceConstructorArgs = {}) {
-  if (tool.ltiConfiguration.deploymentsIds.length <= 0) {
-    tool.ltiConfiguration.deploymentsIds.push(generateUUID());
+  if (tool.deploymentsIds.length <= 0) {
+    tool.deploymentsIds.push(generateUUID());
   }
 
   return ExternalLtiResource.create({

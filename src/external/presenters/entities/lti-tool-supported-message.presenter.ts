@@ -1,4 +1,4 @@
-import { ToolSupportedMessage } from "$/registration/tool-supported-message";
+import type { LtiTool } from "$/core/tool";
 
 export type PresentedLtiToolSupportedMessage = {
   type: string;
@@ -11,7 +11,7 @@ export type PresentedLtiToolSupportedMessage = {
 };
 
 export class LtiToolSupportedMessagePresenter {
-  public static present(entity: ToolSupportedMessage): PresentedLtiToolSupportedMessage {
+  public static present(entity: LtiTool.SupportedMessage): PresentedLtiToolSupportedMessage {
     return {
       type: entity.type.toString(),
       targetLinkUri: entity.targetLinkUri,

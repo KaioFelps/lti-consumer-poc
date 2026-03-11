@@ -1,7 +1,7 @@
 import { Either } from "fp-ts/lib/Either";
-import { ToolRecord } from "$/registration/tool-record";
 import { Context } from "../context";
 import { LtiRepositoryError } from "../errors/repository.error";
+import { LtiTool } from "../tool";
 import { LtiToolDeployment } from "../tool-deployment";
 
 export abstract class LtiToolDeploymentsRepository {
@@ -15,7 +15,7 @@ export abstract class LtiToolDeploymentsRepository {
    * @param contextId  the identifier of the specific context to which the LTI tool should belong.
    */
   public abstract findDeploymentInContextOrGlobal(
-    toolId: ToolRecord["id"],
+    toolId: LtiTool["id"],
     contextId: Context["id"],
   ): Promise<Either<LtiRepositoryError, LtiToolDeployment>>;
 }

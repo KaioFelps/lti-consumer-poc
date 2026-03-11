@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { either } from "fp-ts";
 import { ILtiLineItem, LtiLineItem } from "$/assignment-and-grade/line-item";
 import { Context } from "$/core/context";
-import { ToolRecord } from "$/registration/tool-record";
+import { LtiTool } from "$/core/tool";
 import { createContext } from "./context.factory";
 import { createExternalLtiResource } from "./external-lti-resource.factory";
 import { createResourceLink } from "./resource-link.factory";
@@ -12,7 +12,7 @@ type CreateResourceLinkConstructorArgs = Partial<ILtiLineItem>;
 
 type CreateFullLineItemExtraArgs = {
   context?: Context;
-  tool?: ToolRecord;
+  tool?: LtiTool;
 };
 
 export function createFullLineItem(

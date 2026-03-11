@@ -11,12 +11,12 @@ import { Platform } from "$/core/platform";
 import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiResourceLink } from "$/core/resource-link";
+import { LtiTool } from "$/core/tool";
 import { UserIdentity, UserRoles } from "$/core/user-identity";
-import { ToolRecord } from "$/registration/tool-record";
 
 export type AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType> = {
   nonce: string;
-  tool: ToolRecord;
+  tool: LtiTool;
   redirectUri: URL;
   state: string;
   loginHint: string;
@@ -176,7 +176,7 @@ export class PrepareLaunchRequestService<CustomRoles = never, CustomContextType 
   }
 
   private prepareAgsClaimIfEnabled(
-    tool: ToolRecord,
+    tool: LtiTool,
     context: Context | undefined,
     resourceLink: LtiResourceLink,
   ) {

@@ -1,8 +1,8 @@
 import z from "zod";
 import { AnyLtiRole, InstitutionRole, MembershipRole, SystemRole } from "$/claims/enums/roles";
 import { MessageType } from "$/claims/serialization";
+import { MessagePlacement } from "$/core/tool/message-placement";
 import { GrantType, LTI_TOOL_CONFIGURATION_KEY } from "$/registration/dynamic/tool-configuration";
-import { MessagePlacement } from "$/registration/enums/message-placement";
 
 /**
  * Describes the values and its constraints specified by [LTI Dynamic Registration] specifications.

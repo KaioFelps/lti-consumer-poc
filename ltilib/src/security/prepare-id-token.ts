@@ -3,11 +3,11 @@ import { pipe } from "fp-ts/lib/function";
 import * as jose from "jose";
 import { JOSENotSupported } from "jose/dist/types/util/errors";
 import { Platform } from "$/core/platform";
-import { ToolRecord } from "$/registration/tool-record";
+import { LtiTool } from "$/core/tool";
 
 type PrepareIdTokenArgs = {
   platform: Platform;
-  targetTool: ToolRecord;
+  targetTool: LtiTool;
   nonce: string;
   /**
    * A LTI Claims object (with already resolved keys, i.e., return of some `message.intoLtiClaim()`).

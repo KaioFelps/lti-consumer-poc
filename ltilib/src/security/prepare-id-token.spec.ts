@@ -3,7 +3,7 @@ import { pipe } from "fp-ts/lib/function";
 import { decodeJwt } from "jose";
 import { createMockKeySet } from "ltilib/tests/utils/create-jwks";
 import { Platform } from "$/core/platform";
-import { ToolRecord } from "$/registration/tool-record";
+import { LtiTool } from "$/core/tool";
 import { prepareIdToken } from "./prepare-id-token";
 
 describe("prepareIdToken", async () => {
@@ -34,26 +34,22 @@ describe("prepareIdToken", async () => {
   const claims = { sub: "24400320" };
 
   const targetTool = pipe(
-    ToolRecord.create({
+    LtiTool.create({
       id: toolId,
       applicationType: "web",
-      grantTypes: [],
+      grantTypes: ["client_credentials", "implicit"],
       name: "Foo",
-      scope: "openid",
+      scopes: ["openid"],
       responseTypes: ["id_token"],
       tokenEndpointAuthMethod: "private_key_jwt",
-      uris: {
-        initiate: "https://foo.com/initiate",
-        jwks: "https://foo.com/jwks",
-        redirect: ["https://foo.com/launch"],
-      },
-      ltiConfiguration: {
-        claims: [],
-        deploymentsIds: ["deployment-1"],
-        domain: "foo.com",
-        targetLinkUri: "https://foo.com/callback",
-        messages: [],
-      },
+      initiateUrl: new URL("https://foo.com/initiate"),
+      jwksUrl: new URL("https://foo.com/jwks"),
+      redirectUrls: ["https://foo.com/launch"],
+      claims: [],
+      deploymentsIds: ["deployment-1"],
+      domain: "foo.com",
+      targetLinkUri: new URL("https://foo.com/callback"),
+      messages: [],
     }),
     either.match(
       (error) => {

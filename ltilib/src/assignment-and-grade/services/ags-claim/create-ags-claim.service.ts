@@ -9,10 +9,10 @@ import { Context } from "$/core/context";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { Platform } from "$/core/platform";
 import { LtiResourceLink } from "$/core/resource-link";
-import { ToolRecord } from "$/registration/tool-record";
+import { LtiTool } from "$/core/tool";
 
 export type CreateClaimParams = {
-  tool: ToolRecord;
+  tool: LtiTool;
   context?: Context;
   resourceLink: LtiResourceLink;
 };
@@ -64,12 +64,10 @@ export class CreateService {
 
   private async resolveScopes(
     agsConfig: Platform.LtiAssignmentAndGradeServicesConfig,
-    tool: ToolRecord,
+    tool: LtiTool,
     context: Context,
     resourceLink: LtiResourceLink,
   ) {
-    const toolScopes = tool.scope.split(" ");
-
     return await pipe(
       () =>
         agsConfig.pickAllowedScopes({
@@ -77,7 +75,7 @@ export class CreateService {
           context,
           deploymentId: resourceLink.deploymentId,
         }),
-      t.map((scopes) => scopes.filter((scope) => toolScopes.includes(scope))),
+      t.map((scopes) => scopes.filter((scope) => tool.scopes.includes(scope))),
     )();
   }
 

@@ -7,7 +7,7 @@ import { InitiateLaunchRequest } from "$/core/messages/initiate-launch";
 import { Platform } from "$/core/platform";
 import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
 import { LtiResourceLink } from "$/core/resource-link";
-import { ToolRecord } from "$/registration/tool-record";
+import { LtiTool } from "$/core/tool";
 
 export type InitiateLaunchParams = {
   /**
@@ -16,7 +16,7 @@ export type InitiateLaunchParams = {
    */
   sessionUserId: string;
   resourceLink: LtiResourceLink;
-  tool: ToolRecord;
+  tool: LtiTool;
   /**
    * Indicates how to present this resource link launch.
    */

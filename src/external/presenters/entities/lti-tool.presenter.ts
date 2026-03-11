@@ -25,19 +25,17 @@ export class LtiToolPresenter {
     const presentedObject = {
       id: record.id,
       name: record.name,
-      description: record.ltiConfiguration.description,
-      homePageUri: record.uris.homePage,
-      logoUri: record.uris.logo,
+      description: record.description,
+      homePageUri: record.homePageUrl?.toString(),
+      logoUri: record.logoUrl?.toString(),
       grantTypes: record.grantTypes,
-      initiateUri: record.uris.initiate,
-      requiredClaims: record.ltiConfiguration.claims,
+      initiateUri: record.initiateUrl.toString(),
+      requiredClaims: record.claims,
       contacts: record.contacts,
-      policyUri: record.uris.policy,
-      registeredMessages: record.ltiConfiguration.messages.map(
-        LtiToolSupportedMessagePresenter.present,
-      ),
-      termsOfServiceUri: record.uris.tos,
-      redirectUris: record.uris.redirect,
+      policyUri: record.policyUrl?.toString(),
+      registeredMessages: record.messages.map(LtiToolSupportedMessagePresenter.present),
+      termsOfServiceUri: record.termsOfServiceUrl?.toString(),
+      redirectUris: record.redirectUrls,
     };
 
     const nonUndefinedTuples = Object.entries(presentedObject).filter(

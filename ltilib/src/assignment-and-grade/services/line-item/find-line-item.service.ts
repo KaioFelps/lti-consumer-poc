@@ -3,7 +3,7 @@ import { pipe } from "fp-ts/lib/function";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { ensureAcceptHeaderIsValid } from "$/advantage/utils/ensure-accept-header-is-valid";
 import { ensureHasAnyScope } from "$/advantage/utils/ensure-has-any-scope";
-import { InaccessibleLineItemError } from "$/assignment-and-grade/errors/Inaccessible-line-item.error";
+import { InaccessibleLineItemError } from "$/assignment-and-grade/errors/inaccessible-line-item.error";
 import { LtiLineItem } from "$/assignment-and-grade/line-item";
 import { presentLtiLineItem } from "$/assignment-and-grade/presenters/line-item.presenter";
 import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
@@ -12,12 +12,12 @@ import { Context } from "$/core/context";
 import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
 import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
-import { ToolRecord } from "$/registration/tool-record";
+import { LtiTool } from "$/core/tool";
 
 export type FindLineItemParams = {
   lineItemId: LtiLineItem["id"];
   acceptHeader: string | undefined;
-  tool: ToolRecord;
+  tool: LtiTool;
   context: Context;
 };
 
@@ -69,7 +69,7 @@ export class FindService {
     );
   }
 
-  private ensureToolCanSeeLineItemDueToResourceLink(lineItem: LtiLineItem, tool: ToolRecord) {
+  private ensureToolCanSeeLineItemDueToResourceLink(lineItem: LtiLineItem, tool: LtiTool) {
     if (!lineItem.resourceLink || lineItem.resourceLink.toolId === tool.id) {
       return te.right(lineItem);
     }
@@ -77,7 +77,7 @@ export class FindService {
     return te.left(new InaccessibleLineItemError(lineItem.id));
   }
 
-  private ensureToolCanSeeLineItemDueToResource(lineItem: LtiLineItem, tool: ToolRecord) {
+  private ensureToolCanSeeLineItemDueToResource(lineItem: LtiLineItem, tool: LtiTool) {
     if (!lineItem.externalResource || lineItem.externalResource.tool.id === tool.id) {
       return te.right(lineItem);
     }
@@ -86,7 +86,7 @@ export class FindService {
   }
 
   private ensureToolCanSearchThisLineitem(
-    tool: ToolRecord,
+    tool: LtiTool,
     context: Context,
     lineItemId: LtiLineItem["id"],
   ) {

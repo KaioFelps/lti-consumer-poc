@@ -6,7 +6,7 @@ import { AvailableScopes } from "@/modules/oidc/consts";
 import { Routes } from "@/routes";
 import { MessageType } from "$/claims/serialization";
 import { Platform } from "$/core/platform";
-import { MessagePlacement } from "$/registration/enums/message-placement";
+import { MessagePlacement } from "$/core/tool/message-placement";
 
 @Injectable({ scope: Scope.DEFAULT })
 export class PlatformFactory {

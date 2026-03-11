@@ -1,7 +1,15 @@
 import { AnyLtiRole } from "$/claims/enums/roles";
 import { MessageType } from "$/claims/serialization";
-import { MessagePlacement } from "../enums/message-placement";
+import { MessagePlacement } from "../../core/tool/message-placement";
 
+/**
+ * An interface of the raw payload of a tool supported message
+ * from an incoming request of LTI tool registration. I.e.,
+ * each object from the `["https://purl.imsglobal.org/spec/lti-tool-configuration"].messages`
+ * property from the [2.2.5 non normative example of LTI Dynamic Registration specification].
+ *
+ * [2.2.5 non normative example of LTI Dynamic Registration specification]: https://www.imsglobal.org/spec/lti-dr/v1p0#non-normative-example-0
+ */
 export type ToolConfigurationSupportedMessage = {
   type: MessageType;
   target_link_uri?: string;

@@ -2,17 +2,45 @@ import { faker } from "@faker-js/faker";
 import { generateUUID } from "common/src/types/uuid";
 import { either, option as o } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
-import { type IToolRecord, ToolRecord } from "$/registration/tool-record";
+import { resolveFactoryOptional } from "ltilib/tests/utils/resolve-nullified-optional";
+import { type ILtiTool, LtiTool } from "$/core/tool";
+import { NullifyUndefined } from "../types/nullify";
 
-type ToolUrisConstructorArgs = Partial<IToolRecord["uris"]>;
+type ToolURIs = {
+  targetLinkUri: URL;
+  initiateUrl: URL;
+  jwksUrl: URL;
+  redirectUrls: string[];
+  homePageUrl?: URL;
+  logoUrl?: URL;
+  termsOfServiceUrl?: URL;
+  policyUrl?: URL;
+};
+
+type ToolUrisConstructorArgs = Partial<NullifyUndefined<ToolURIs>>;
 
 export function createToolUris(
-  { homePage, initiate, jwks, logo, policy, redirect, tos }: ToolUrisConstructorArgs = {},
+  {
+    homePageUrl,
+    initiateUrl,
+    jwksUrl,
+    logoUrl,
+    policyUrl,
+    redirectUrls,
+    termsOfServiceUrl,
+    targetLinkUri,
+  }: ToolUrisConstructorArgs = {},
   baseUrl?: URL,
-): IToolRecord["uris"] {
+): ToolURIs {
   const getBaseUrl = () => {
     const firstGivenUrl = pipe(
-      homePage || initiate || jwks || logo || policy || tos || redirect?.[0],
+      homePageUrl ||
+        initiateUrl ||
+        jwksUrl ||
+        logoUrl ||
+        policyUrl ||
+        termsOfServiceUrl ||
+        redirectUrls?.[0],
       o.fromNullable,
       o.getOrElse(() => faker.internet.url({ protocol: "https" })),
       (url) => new URL(url),
@@ -21,24 +49,30 @@ export function createToolUris(
     return firstGivenUrl;
   };
 
+  targetLinkUri ??= new URL("/launch", baseUrl);
   baseUrl ??= getBaseUrl();
-  homePage ??= new URL("/", baseUrl).toString();
-  initiate ??= new URL("/initiate", baseUrl).toString();
-  jwks ??= new URL("/keys", baseUrl).toString();
-  redirect ??= [new URL("/launch", baseUrl).toString()];
+  homePageUrl ??= new URL("/", baseUrl);
+  initiateUrl ??= new URL("/initiate", baseUrl);
+  jwksUrl ??= new URL("/keys", baseUrl);
+  redirectUrls ??= [new URL("/launch", baseUrl).toString()];
+  logoUrl = resolveFactoryOptional(logoUrl, new URL("/logo.png", baseUrl));
+  policyUrl = resolveFactoryOptional(policyUrl, new URL("/policy", baseUrl));
+  termsOfServiceUrl = resolveFactoryOptional(
+    termsOfServiceUrl,
+    new URL("/terms-of-service", baseUrl),
+  );
 
   return {
-    initiate,
-    jwks,
-    redirect,
-    homePage,
-    logo,
-    policy,
-    tos,
+    initiateUrl,
+    jwksUrl,
+    redirectUrls,
+    homePageUrl,
+    logoUrl,
+    policyUrl,
+    termsOfServiceUrl,
+    targetLinkUri,
   };
 }
-
-type ToolLtiConfigurationConstructorArgs = Partial<IToolRecord["ltiConfiguration"]>;
 
 export const DEFAULT_MOCK_CLAIMS = [
   "iss",
@@ -50,65 +84,53 @@ export const DEFAULT_MOCK_CLAIMS = [
   "picture",
 ] as const;
 
-export function createToolLtiConfiguration({
-  claims = [...DEFAULT_MOCK_CLAIMS],
-  customParameters = {},
-  deploymentsIds = [],
-  description = faker.company.buzzPhrase(),
-  domain = faker.internet.domainName(),
-  messages = [],
-  targetLinkUri,
-}: ToolLtiConfigurationConstructorArgs = {}): IToolRecord["ltiConfiguration"] {
-  targetLinkUri ??= new URL("/launch", `https://${domain}`).toString();
-  return {
-    claims,
-    customParameters,
-    deploymentsIds,
-    domain,
-    messages,
-    targetLinkUri,
-    description,
-  };
-}
-
-type ToolRecordConstructorArgs = Partial<
+type LtiToolConstructorArgs = Partial<
   Omit<
-    IToolRecord,
+    ILtiTool,
     "applicationType" | "tokenEndpointAuthMethod" | "grantTypes" | "responseTypes" | "scope"
   > & { scopes: string[] }
 >;
 
 /**
- * Creates a mocked `ToolRecord` with fake data or throw if it fails.
+ * Creates a mocked `LtiTool` with fake data or throw if it fails.
  * Intended for testing purposes only.
  */
 export function createTool({
   clientSecret,
   contacts = [],
   id = generateUUID(),
-  ltiConfiguration,
+  claims = [...DEFAULT_MOCK_CLAIMS],
+  customParameters = {},
+  deploymentsIds = [],
+  description = faker.company.buzzPhrase(),
+  domain = faker.internet.domainName(),
+  messages = [],
   name = faker.company.name(),
-  uris,
   scopes = [],
-}: Partial<ToolRecordConstructorArgs> = {}) {
+  ...uris
+}: Partial<LtiToolConstructorArgs> = {}) {
   const platformFakeUrl = new URL(faker.internet.url({ protocol: "https", appendSlash: false }));
 
-  ltiConfiguration ??= createToolLtiConfiguration({ domain: platformFakeUrl.hostname });
-  uris ??= createToolUris({}, platformFakeUrl);
+  const resolvedURIs = createToolUris(uris, platformFakeUrl);
 
   return pipe(
-    ToolRecord.create({
+    LtiTool.create({
       applicationType: "web",
       grantTypes: ["client_credentials", "implicit"],
       id,
       name,
-      scope: Array.from(new Set([...scopes, "openid"])).join(" "),
+      scopes: Array.from(new Set([...scopes, "openid"])),
       responseTypes: ["id_token"],
       contacts,
       clientSecret,
-      ltiConfiguration,
       tokenEndpointAuthMethod: "private_key_jwt",
-      uris,
+      claims,
+      deploymentsIds,
+      domain,
+      messages,
+      customParameters,
+      description,
+      ...resolvedURIs,
     }),
     either.fold(
       (err) => {
@@ -121,7 +143,6 @@ export function createTool({
 
 export default {
   createTool,
-  createLtiConfiguration: createToolLtiConfiguration,
   createUris: createToolUris,
   DEFAULT_MOCK_CLAIMS,
 };
