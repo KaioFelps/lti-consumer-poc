@@ -2,10 +2,9 @@ import type * as schema from "drizzle/schema";
 import type { BuildQueryResult, DBQueryConfig, ExtractTablesWithRelations } from "drizzle-orm";
 import { AnyLtiRole } from "$/claims/enums/roles";
 import { MessageType } from "$/claims/serialization";
+import { LtiTool } from "$/core/tool";
 import { MessagePlacement } from "$/core/tool/message-placement";
 import { Contact, GrantType } from "$/registration/dynamic/tool-configuration";
-import { ToolRecord } from "$/registration/tool-record";
-import { ToolSupportedMessage } from "$/registration/tool-supported-message";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 
@@ -23,85 +22,81 @@ const requiredQueryConfig = {
   },
 } as const satisfies LtiToolsQueryConfig;
 
-function fromRow(row: LtiToolRow): ToolRecord {
-  return ToolRecord.createUnchecked({
+function fromRow(row: LtiToolRow): LtiTool {
+  return LtiTool.createUnchecked({
     applicationType: row.oauthClient.applicationType as "web",
     contacts: row.oauthClient.contacts.map((contact) => contact.email as Contact),
     grantTypes: row.grantTypes.split(" ") as GrantType[],
     id: row.id,
-    ltiConfiguration: {
-      claims: row.claims.split(" "),
-      deploymentsIds: row.deployments.map((deployment) => deployment.id),
-      domain: row.domain,
-      messages: row.supportedMessages.map(
-        (message) =>
-          ({
-            type: message.type as MessageType,
-            customParameters: message.customParameters as Record<string, string>,
-            iconUri: message.iconUri ?? undefined,
-            label: message.label ?? undefined,
-            placements:
-              message.placements?.split(" ").map((placement) => placement as MessagePlacement) ??
-              undefined,
-            roles:
-              message.roles?.length === 0
-                ? undefined
-                : message.roles.map((role) => role.role as AnyLtiRole),
-            targetLinkUri: message.targetLinkUri ?? undefined,
-          }) satisfies ToolSupportedMessage,
-      ),
-      targetLinkUri: row.targetLinkUri,
-      customParameters: row.customParameters as Record<string, string>,
-      description: row.description ?? undefined,
-    },
+    claims: row.claims.split(" "),
+    deploymentsIds: row.deployments.map((deployment) => deployment.id),
+    domain: row.domain,
+    messages: row.supportedMessages.map(
+      (message) =>
+        ({
+          type: message.type as MessageType,
+          customParameters: message.customParameters as Record<string, string>,
+          iconUri: message.iconUri ?? undefined,
+          label: message.label ?? undefined,
+          placements:
+            message.placements?.split(" ").map((placement) => placement as MessagePlacement) ??
+            undefined,
+          roles:
+            message.roles?.length === 0
+              ? undefined
+              : message.roles.map((role) => role.role as AnyLtiRole),
+          targetLinkUri: message.targetLinkUri ?? undefined,
+        }) satisfies LtiTool.SupportedMessage,
+    ),
+    targetLinkUri: new URL(row.targetLinkUri),
+    customParameters: row.customParameters as Record<string, string>,
+    description: row.description ?? undefined,
     name: row.oauthClient.name,
     responseTypes: row.responseTypes.split(" ") as "id_token"[],
-    scope: row.oauthClient.scopes,
+    scopes: row.oauthClient.scopes.split(" "),
     tokenEndpointAuthMethod: "private_key_jwt",
-    uris: {
-      initiate: row.initiateUri,
-      jwks: row.oauthClient.jwksUri,
-      redirect: row.oauthClient.redirectUris.map(({ uri }) => uri),
-      homePage: row.homePageUri ?? undefined,
-      logo: row.logoUri ?? undefined,
-      policy: row.policyUri ?? undefined,
-      tos: row.tosUri ?? undefined,
-    },
+    initiateUrl: new URL(row.initiateUri),
+    jwksUrl: new URL(row.oauthClient.jwksUri),
+    redirectUrls: row.oauthClient.redirectUris.map(({ uri }) => uri),
+    homePageUrl: row.homePageUri ? new URL(row.homePageUri) : undefined,
+    logoUrl: row.logoUri ? new URL(row.logoUri) : undefined,
+    policyUrl: row.policyUri ? new URL(row.policyUri) : undefined,
+    termsOfServiceUrl: row.tosUri ? new URL(row.tosUri) : undefined,
     clientSecret: row.oauthClient.clientSecret ?? undefined,
   });
 }
 
-function intoRow(tool: ToolRecord): LtiToolRowWithoutDeployments {
+function intoRow(tool: LtiTool): LtiToolRowWithoutDeployments {
   return {
     id: tool.id,
-    claims: tool.ltiConfiguration.claims.join(" "),
-    customParameters: tool.ltiConfiguration.customParameters ?? {},
-    domain: tool.ltiConfiguration.domain,
+    claims: tool.claims.join(" "),
+    customParameters: tool.customParameters ?? {},
+    domain: tool.domain,
     grantTypes: tool.grantTypes.join(" "),
-    initiateUri: tool.uris.initiate,
+    initiateUri: tool.initiateUrl.toString(),
     responseTypes: tool.responseTypes.join(" "),
-    targetLinkUri: tool.ltiConfiguration.targetLinkUri,
-    description: tool.ltiConfiguration.description ?? null,
-    homePageUri: tool.uris.homePage ?? null,
-    logoUri: tool.uris.logo ?? null,
-    policyUri: tool.uris.policy ?? null,
-    tosUri: tool.uris.tos ?? null,
+    targetLinkUri: tool.targetLinkUri.toString(),
+    description: tool.description ?? null,
+    homePageUri: tool.homePageUrl?.toString() ?? null,
+    logoUri: tool.logoUrl?.toString() ?? null,
+    policyUri: tool.policyUrl?.toString() ?? null,
+    tosUri: tool.termsOfServiceUrl?.toString() ?? null,
 
     oauthClient: {
       id: tool.id,
       applicationType: tool.applicationType,
-      jwksUri: tool.uris.jwks,
+      jwksUri: tool.jwksUrl.toString(),
       name: tool.name,
-      scopes: tool.scope,
+      scopes: tool.scopes.join(" "),
       clientSecret: tool.clientSecret ?? null,
-      redirectUris: tool.uris.redirect.map((uri) => ({
+      redirectUris: tool.redirectUrls.map((uri) => ({
         uri,
         clientId: tool.id,
       })),
       contacts: tool.contacts?.map((email) => ({ clientId: tool.id, email })) ?? [],
     },
 
-    supportedMessages: tool.ltiConfiguration.messages.map((message) => ({
+    supportedMessages: tool.messages.map((message) => ({
       clientId: tool.id,
       type: message.type,
       customParameters: message.customParameters ?? null,

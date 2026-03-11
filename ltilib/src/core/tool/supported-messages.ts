@@ -3,9 +3,9 @@ import { AnyLtiRole } from "$/claims/enums/roles";
 import { MessageType } from "$/claims/serialization";
 import { MessagePlacement } from "$/core/tool/message-placement";
 
-export type IToolSupportedMessage = ClassProperties<ToolSupportedMessage>;
+export type ILtiToolSupportedMessage = ClassProperties<LtiToolSupportedMessage>;
 
-export class ToolSupportedMessage {
+export class LtiToolSupportedMessage {
   public type: MessageType;
   public targetLinkUri?: string;
   public label?: string;
@@ -14,7 +14,7 @@ export class ToolSupportedMessage {
   public roles?: AnyLtiRole[];
   public customParameters?: Record<string, string>;
 
-  public constructor(args: IToolSupportedMessage) {
+  public constructor(args: ILtiToolSupportedMessage) {
     Object.assign(this, args);
   }
 }

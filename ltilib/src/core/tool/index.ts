@@ -11,7 +11,7 @@ import {
 import { InvalidToolConfigurationError } from "$/registration/errors/invalid-tool-configuration.error";
 import * as toolNamespace from "./namespace";
 
-interface ILtiTool {
+export interface ILtiTool {
   readonly id?: string;
   // the two properties below will never be assigned from the input upon instantiation,
   // however, asking them to be input allow us to ensure they have these values strictly,
@@ -192,9 +192,9 @@ export class LtiTool implements ILtiTool, IntoLtiClaim {
 }
 
 export namespace LtiTool {
-  export const { MessagePlacement, ToolSupportedMessage } = toolNamespace;
+  export const { MessagePlacement, LtiToolSupportedMessage: SupportedMessage } = toolNamespace;
 
-  export type ISupportedMessage = toolNamespace.IToolSupportedMessage;
-  export type SupportedMessage = toolNamespace.ToolSupportedMessage;
+  export type ISupportedMessage = toolNamespace.ILtiToolSupportedMessage;
+  export type SupportedMessage = toolNamespace.LtiToolSupportedMessage;
   export type MessagePlacement = toolNamespace.MessagePlacement;
 }

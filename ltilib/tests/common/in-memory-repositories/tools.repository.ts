@@ -3,11 +3,11 @@ import { Either } from "fp-ts/lib/Either";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiToolsRepository } from "$/core/repositories/tools.repository";
 import { LtiResourceLink } from "$/core/resource-link";
-import { ToolRecord } from "$/registration/tool-record";
+import { LtiTool } from "$/core/tool";
 import { InMemoryLtiResourceLinksRepository } from "./resource-links.repository";
 
 export class InMemoryToolsRepository implements LtiToolsRepository {
-  public tools: ToolRecord[] = [];
+  public tools: LtiTool[] = [];
 
   public constructor(
     public resourceLinksRepo: InMemoryLtiResourceLinksRepository = new InMemoryLtiResourceLinksRepository(),
@@ -15,7 +15,7 @@ export class InMemoryToolsRepository implements LtiToolsRepository {
 
   public async findToolsOwningResourceLinks(
     resourceLinksIds: LtiResourceLink["id"][],
-  ): Promise<Either<LtiRepositoryError, ToolRecord[]>> {
+  ): Promise<Either<LtiRepositoryError, LtiTool[]>> {
     const resourceLinks = this.resourceLinksRepo.resourceLinks.filter((link) =>
       resourceLinksIds.includes(link.id),
     );
@@ -27,14 +27,14 @@ export class InMemoryToolsRepository implements LtiToolsRepository {
     return e.right(tools);
   }
 
-  public async findToolById(id: string): Promise<Either<LtiRepositoryError, ToolRecord>> {
+  public async findToolById(id: string): Promise<Either<LtiRepositoryError, LtiTool>> {
     const tool = this.tools.find((tool) => tool.id === id);
 
     if (tool) return e.right(tool);
 
     const error = new LtiRepositoryError({
       type: "NotFound",
-      subject: ToolRecord.name,
+      subject: LtiTool.name,
       cause: undefined,
     });
 

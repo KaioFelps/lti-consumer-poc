@@ -3,14 +3,14 @@ import { Either } from "fp-ts/lib/Either";
 import { Context } from "$/core/context";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
+import { LtiTool } from "$/core/tool";
 import { LtiToolDeployment } from "$/core/tool-deployment";
-import { ToolRecord } from "$/registration/tool-record";
 
 export class InMemoryLtiToolDeploymentsRepository implements LtiToolDeploymentsRepository {
   public deployments: LtiToolDeployment[] = [];
 
   public async findDeploymentInContextOrGlobal(
-    toolId: ToolRecord["id"],
+    toolId: LtiTool["id"],
     contextId: Context["id"],
   ): Promise<Either<LtiRepositoryError, LtiToolDeployment>> {
     const deployment = this.deployments.find((deployment) => {

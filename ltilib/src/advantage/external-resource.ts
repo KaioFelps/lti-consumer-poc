@@ -1,11 +1,11 @@
 import { Context } from "$/core/context";
-import { ToolRecord } from "$/registration/tool-record";
+import { LtiTool } from "$/core/tool";
 
 export interface IExternalLtiResource {
   /**
    * The platform which the resource belongs to.
    */
-  tool: ToolRecord;
+  tool: LtiTool;
   /**
    * The platform's context in which the resources are placed.
    */
@@ -25,7 +25,7 @@ export interface IExternalLtiResource {
  * will represent it.
  */
 export class ExternalLtiResource implements IExternalLtiResource {
-  public tool: ToolRecord;
+  public tool: LtiTool;
   public context?: Context<never> | undefined;
   public readonly externalToolResourceId: string;
   public readonly localResourceId: string;

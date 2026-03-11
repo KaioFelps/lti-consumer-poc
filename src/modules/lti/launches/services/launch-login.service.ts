@@ -8,14 +8,14 @@ import { FindPersonByIdService } from "@/modules/identity/person/services/find-p
 import { User } from "@/modules/identity/user/user.entity";
 import mappers from "@/modules/lti/mappers";
 import { LtiLaunchServices } from "$/core/services/launch";
-import { ToolRecord } from "$/registration/tool-record";
+import { LtiTool } from "$/core/tool";
 import { validateAuthenticationRequest } from "$/security/validate-authentication-request";
 import { LaunchLoginDto } from "../../launches/dtos/launch-login.dto";
 
 type Params = {
   body: LaunchLoginDto;
   redirectUri: URL;
-  tool: ToolRecord;
+  tool: LtiTool;
   user?: User;
 };
 

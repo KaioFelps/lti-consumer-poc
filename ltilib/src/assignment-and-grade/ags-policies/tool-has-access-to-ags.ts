@@ -2,11 +2,11 @@ import { either as e } from "fp-ts";
 import { ensureHasAnyScope } from "$/advantage/utils/ensure-has-any-scope";
 import { Context } from "$/core/context";
 import { Platform } from "$/core/platform";
-import { ToolRecord } from "$/registration/tool-record";
+import { LtiTool } from "$/core/tool";
 import { ASSIGNMENT_AND_GRADE_SERVICES_SCOPES, AssignmentAndGradeServiceScopes } from "../scopes";
 
 export async function toolHasAccessToAgs(
-  tool: ToolRecord,
+  tool: LtiTool,
   platform: Platform,
   context: Context<unknown> | undefined,
   toolAuthorizedAgsScopes: AssignmentAndGradeServiceScopes[],

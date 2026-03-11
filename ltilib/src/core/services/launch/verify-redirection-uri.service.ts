@@ -2,11 +2,11 @@ import { either as e } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
-import { ToolRecord } from "$/registration/tool-record";
+import { LtiTool } from "$/core/tool";
 
 export type VerifyRedirectUriParams = {
   redirectUri: string;
-  tool: ToolRecord;
+  tool: LtiTool;
 };
 
 export class VerifyRedirectionUriService {
@@ -19,7 +19,7 @@ export class VerifyRedirectionUriService {
     redirectUri,
     tool,
   }: VerifyRedirectUriParams): Promise<Either<InvalidRedirectUriError, URL>> {
-    if (!tool.uris.redirect.includes(redirectUri)) {
+    if (!tool.redirectUrls.includes(redirectUri)) {
       return e.left(
         new InvalidRedirectUriError("Given redirect URI is not registered.", redirectUri),
       );

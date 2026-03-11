@@ -1,11 +1,11 @@
 import { either as e } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
-import { ToolRecord } from "$/registration/tool-record";
+import { LtiTool } from "$/core/tool";
 import { MissingAnyScopeError, MissingScopeError } from "../errors/missing-scope.error";
 
 type Params = {
   requiredScopes: string | readonly string[];
-  tool: ToolRecord;
+  tool: LtiTool;
 };
 
 export function ensureHasAnyScope({
@@ -15,8 +15,7 @@ export function ensureHasAnyScope({
   const scopes = Array.isArray(requiredScopes) ? requiredScopes : [requiredScopes];
 
   const hasAnyScope = scopes.some((scope) => {
-    const toolScopes = tool.scope.split(" ");
-    return toolScopes.includes(scope);
+    return tool.scopes.includes(scope);
   });
 
   return hasAnyScope ? e.right(undefined) : e.left(new MissingAnyScopeError(requiredScopes));

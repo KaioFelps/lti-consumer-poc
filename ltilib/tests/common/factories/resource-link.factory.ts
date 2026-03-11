@@ -1,11 +1,11 @@
 import { faker } from "@faker-js/faker";
 import { generateUUID } from "common/src/types/uuid";
 import { ILtiResourceLink, LtiResourceLink } from "$/core/resource-link";
-import { ToolRecord } from "$/registration/tool-record";
+import { LtiTool } from "$/core/tool";
 import { createTool } from "./tool.factory";
 
 type CreateResourceLinkConstructorArgs = Omit<Partial<ILtiResourceLink>, "toolId"> & {
-  tool?: ToolRecord;
+  tool?: LtiTool;
 };
 
 export function createResourceLink({
@@ -18,8 +18,8 @@ export function createResourceLink({
   id,
   title = faker.book.title(),
 }: CreateResourceLinkConstructorArgs = {}): LtiResourceLink {
-  if (!tool.ltiConfiguration.deploymentsIds.includes(deploymentId)) {
-    tool.ltiConfiguration.deploymentsIds.push(deploymentId);
+  if (!tool.deploymentsIds.includes(deploymentId)) {
+    tool.deploymentsIds.push(deploymentId);
   }
 
   return LtiResourceLink.create({

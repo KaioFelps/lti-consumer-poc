@@ -16,14 +16,9 @@ import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity";
 import { LtiToolPreview } from "@/modules/lti/tools/entities/lti-tool-preview.entity";
 import { ToolNotFoundError } from "@/modules/lti/tools/errors/tool-not-found.error";
 import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository";
-import { AnyLtiRole } from "$/claims/enums/roles";
-import { MessageType } from "$/claims/serialization";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiResourceLink } from "$/core/resource-link";
-import { MessagePlacement } from "$/core/tool/message-placement";
-import { Contact, GrantType } from "$/registration/dynamic/tool-configuration";
-import { ToolRecord } from "$/registration/tool-record";
-import { ToolSupportedMessage } from "$/registration/tool-supported-message";
+import { LtiTool as BaseLtiTool } from "$/core/tool";
 import { DrizzleClient } from "../client";
 import ltiToolPreviewsMapper from "../mappers/lti-tool-previews.mapper";
 import ltiToolsMapper from "../mappers/lti-tools.mapper";
@@ -39,68 +34,17 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
         () => this.drizzle.getClient().query.ltiTools.findMany(ltiToolsMapper.requiredQueryConfig),
         (error: Error) => {
           return new IrrecoverableError(
-            `An error occurred in ${DrizzleLtiToolsRepository.name} on ` + "finding many tools.",
+            `An error occurred in ${DrizzleLtiToolsRepository.name} on finding many tools.`,
             error,
           );
         },
       ),
-      taskEither.map((rows) => {
-        return rows.map((row) => {
-          const ltiRecord = ToolRecord.createUnchecked({
-            applicationType: row.oauthClient.applicationType as "web",
-            contacts: row.oauthClient.contacts.map((contact) => contact.email as Contact),
-            grantTypes: row.grantTypes.split(" ") as GrantType[],
-            id: row.id,
-            ltiConfiguration: {
-              claims: row.claims.split(" "),
-              deploymentsIds: row.deployments.map((deployment) => deployment.id),
-              domain: row.domain,
-              messages: row.supportedMessages.map(
-                (message) =>
-                  ({
-                    type: message.type as MessageType,
-                    customParameters: message.customParameters as Record<string, string>,
-                    iconUri: message.iconUri ?? undefined,
-                    label: message.label ?? undefined,
-                    placements:
-                      message.placements
-                        ?.split(" ")
-                        .map((placement) => placement as MessagePlacement) ?? undefined,
-                    roles:
-                      message.roles?.length === 0
-                        ? undefined
-                        : message.roles.map((role) => role.role as AnyLtiRole),
-                    targetLinkUri: message.targetLinkUri ?? undefined,
-                  }) satisfies ToolSupportedMessage,
-              ),
-              targetLinkUri: row.targetLinkUri,
-              customParameters: row.customParameters as Record<string, string>,
-              description: row.description ?? undefined,
-            },
-            name: row.oauthClient.name,
-            responseTypes: row.responseTypes.split(" ") as "id_token"[],
-            scope: row.oauthClient.scopes,
-            tokenEndpointAuthMethod: "private_key_jwt",
-            uris: {
-              initiate: row.initiateUri,
-              jwks: row.oauthClient.jwksUri,
-              redirect: row.oauthClient.redirectUris.map(({ uri }) => uri),
-              homePage: row.homePageUri ?? undefined,
-              logo: row.logoUri ?? undefined,
-              policy: row.policyUri ?? undefined,
-              tos: row.tosUri ?? undefined,
-            },
-            clientSecret: row.oauthClient.clientSecret ?? undefined,
-          });
-
-          return ltiRecord;
-        });
-      }),
+      taskEither.map((rows) => rows.map(ltiToolsMapper.fromRow)),
       taskEither.map((ltiRecords) => ltiRecords.map((record) => new LtiTool(record))),
     )();
   }
 
-  public async findToolById(id: string): Promise<Either<LtiRepositoryError, ToolRecord>> {
+  public async findToolById(id: string): Promise<Either<LtiRepositoryError, BaseLtiTool>> {
     return await pipe(
       taskEither.tryCatch(
         () =>
@@ -131,7 +75,7 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
             new LtiRepositoryError({
               type: "NotFound",
               cause: new ToolNotFoundError(id),
-              subject: ToolRecord.name,
+              subject: BaseLtiTool.name,
             }),
         ),
       ),
@@ -234,7 +178,7 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
 
   public async findToolsOwningResourceLinks(
     resourceLinksIds: LtiResourceLink["id"][],
-  ): Promise<Either<LtiRepositoryError, ToolRecord[]>> {
+  ): Promise<Either<LtiRepositoryError, BaseLtiTool[]>> {
     return await pipe(
       taskEither.tryCatch(
         () =>

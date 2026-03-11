@@ -64,8 +64,8 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
 
     const tool = toolFactory.createTool({
       scopes,
-      ltiConfiguration: toolFactory.createLtiConfiguration({ domain: toolIssuer.host }),
-      uris: toolFactory.createUris({ redirect: [toolRedirectUri.toString()] }, toolIssuer),
+      domain: toolIssuer.host,
+      redirectUrls: [toolRedirectUri.toString()],
     });
 
     const deployment = createToolDeployment({ context, tool });

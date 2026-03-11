@@ -14,7 +14,7 @@ import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
-import { ToolRecord } from "$/registration/tool-record";
+import { LtiTool } from "$/core/tool";
 import { CannotAttachResourceLinkError } from "../../errors/cannot-attach-resource-link.error";
 import { InvalidLineItemArgumentError } from "../../errors/invalid-line-item-argument.error";
 import { MissingPlatformAgsConfigurationError } from "../../errors/missing-platform-ags-configuration.error";
@@ -42,7 +42,7 @@ export type CreateLineItemServiceParams = {
   /**
    * The LTI tool which is trying to create this line item.
    */
-  tool: ToolRecord;
+  tool: LtiTool;
   context: Context;
 } & RawLineItemsPayload;
 
@@ -137,7 +137,7 @@ export class CreateService {
 
   private createNewLineItem(
     context: Context,
-    tool: ToolRecord,
+    tool: LtiTool,
     agsConfig: Platform.LtiAssignmentAndGradeServicesConfig,
     { resourceId, resourceLinkId, ...args }: RawLineItemsPayload,
   ) {
@@ -179,7 +179,7 @@ export class CreateService {
     );
   }
 
-  private ensureToolIsDeployedInContext(tool: ToolRecord, context: Context) {
+  private ensureToolIsDeployedInContext(tool: LtiTool, context: Context) {
     return pipe(
       () => this.deploymentsRepo.findDeploymentInContextOrGlobal(tool.id, context.id),
       te.map((_) => {}),
@@ -206,7 +206,7 @@ export class CreateService {
 
   private maybeGetAndValidateResourceLink(
     context: Context,
-    tool: ToolRecord,
+    tool: LtiTool,
     resourceLinkId: string | undefined,
   ) {
     return pipe(

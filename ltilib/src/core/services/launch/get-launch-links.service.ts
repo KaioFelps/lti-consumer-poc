@@ -11,8 +11,7 @@ import {
 } from "$/core/presenters/resource-link.presenter";
 import { LtiToolsRepository } from "$/core/repositories/tools.repository";
 import { LtiResourceLink } from "$/core/resource-link";
-import { ToolRecord } from "$/registration/tool-record";
-import { ToolSupportedMessage } from "$/registration/tool-supported-message";
+import { LtiTool } from "$/core/tool";
 
 export type GetLaunchLinksParams = {
   userRoles: AnyLtiRole[];
@@ -24,7 +23,7 @@ export type GetLaunchLinksFromResourceLinksParams = GetLaunchLinksParams & {
 
 type PresentLaunchLinksParams = {
   resourceLinks: LtiResourceLink[];
-  toolsResourceLinkMessages: Map<string, ToolSupportedMessage>;
+  toolsResourceLinkMessages: Map<string, LtiTool.SupportedMessage>;
 };
 
 export class GetLaunchLinksService {
@@ -48,7 +47,7 @@ export class GetLaunchLinksService {
       await this.ltiToolsRepository.findToolsOwningResourceLinks(linksIds),
       e.map((tools) =>
         tools.reduce((acc, tool) => {
-          const toolMessages = tool.ltiConfiguration.messages;
+          const toolMessages = tool.messages;
           const resourceLinkMessage = toolMessages.find(
             (msg) => msg.type === MessageType.resourceLink,
           );
@@ -56,7 +55,7 @@ export class GetLaunchLinksService {
           if (resourceLinkMessage) acc?.set(tool.id, resourceLinkMessage);
 
           return acc;
-        }, new Map<ToolRecord["id"], ToolSupportedMessage>()),
+        }, new Map<LtiTool["id"], LtiTool.SupportedMessage>()),
       ),
     );
 

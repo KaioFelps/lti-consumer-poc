@@ -1,9 +1,9 @@
-import { ToolRecord } from "$/registration/tool-record";
+import { LtiTool } from "$/core/tool";
 import { Platform } from "../../core/platform";
 import { LtiInitiationMessage } from "../lti-message";
 
 export type CreateInitiateThirdPartyLoginRequestArgs = {
-  tool: Readonly<ToolRecord>;
+  tool: Readonly<LtiTool>;
   platform: Readonly<Platform>;
   loginHint: string;
   targetLink: URL;
@@ -11,7 +11,7 @@ export type CreateInitiateThirdPartyLoginRequestArgs = {
 
 export class LtiInitiateThirdPartyLoginRequest implements LtiInitiationMessage {
   protected constructor(
-    private tool: Readonly<ToolRecord>,
+    private tool: Readonly<LtiTool>,
     private platform: Readonly<Platform>,
     private loginHint: string,
     private targetLink: URL,
@@ -27,7 +27,7 @@ export class LtiInitiateThirdPartyLoginRequest implements LtiInitiationMessage {
   }
 
   public intoUrl(): URL {
-    const url = new URL(this.tool.uris.initiate);
+    const url = new URL(this.tool.initiateUrl);
     url.searchParams.set("iss", this.platform.issuer);
     url.searchParams.set("login_hint", this.loginHint);
     url.searchParams.set("target_link_uri", this.targetLink.toString());

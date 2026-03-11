@@ -23,15 +23,15 @@ import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim";
 import { Context } from "$/core/context";
 import { LtiResourceLink } from "$/core/resource-link";
 import { UserIdentity, UserRoles } from "$/core/user-identity";
-import { ToolRecord } from "$/registration/tool-record";
 import { LtiSubmittableMessage } from "$/security/lti-message";
 import { PrepareIdTokenError, prepareIdToken } from "$/security/prepare-id-token";
 import { InvalidResourceLinkLaunchError } from "../errors/invalid-resource-link-launch.error";
 import { Platform } from "../platform";
+import { LtiTool } from "../tool";
 import { MessageRequests } from ".";
 
 type CreateFromLtiRecordArgs<CR = never> = {
-  tool: ToolRecord;
+  tool: LtiTool;
   platform: Platform;
   /**
    * This identifies the user that started the LTI Launch. **Unless it is an anonymous launch,
@@ -68,7 +68,7 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
     private nonce: string,
     private resourceLink: Readonly<LtiResourceLink>,
     private platform: Readonly<Platform>,
-    private tool: Readonly<ToolRecord>,
+    private tool: Readonly<LtiTool>,
     private resolvedTargetLink: URL,
     private resolvedUserRoles: Readonly<UserRoles<CustomRoles>>,
     private userIdentity: Readonly<UserIdentity<CustomRoles>> | undefined,
@@ -102,7 +102,7 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
     InvalidResourceLinkLaunchError,
     LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>
   > {
-    if (!tool.ltiConfiguration.deploymentsIds.includes(resourceLink.deploymentId)) {
+    if (!tool.deploymentsIds.includes(resourceLink.deploymentId)) {
       const description =
         "Given resource link " +
         (resourceLink.title ? `"${resourceLink.title}"` : `of id "${resourceLink.id}"`) +
@@ -111,7 +111,7 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
       return e.left(error);
     }
 
-    const resourceLinkMessage = tool.ltiConfiguration.messages.find(
+    const resourceLinkMessage = tool.messages.find(
       (message) => message.type === MessageType.resourceLink,
     );
 
@@ -129,16 +129,12 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
       return e.left(error);
     }
 
-    const targetLink = new URL(
-      resourceLinkMessage?.targetLinkUri ?? tool.ltiConfiguration.targetLinkUri,
-    );
+    const targetLink = new URL(resourceLinkMessage?.targetLinkUri ?? tool.targetLinkUri);
 
-    const relatedToolMessage = tool.ltiConfiguration.messages.find(
-      (msg) => msg.type === MessageType.resourceLink,
-    );
+    const relatedToolMessage = tool.messages.find((msg) => msg.type === MessageType.resourceLink);
 
     const resolvedCustomClaims = {
-      ...(tool.ltiConfiguration.customParameters ?? {}),
+      ...(tool.customParameters ?? {}),
       ...resourceLink.customParameters,
       ...(relatedToolMessage?.customParameters ?? {}),
     } satisfies Record<string, string>;

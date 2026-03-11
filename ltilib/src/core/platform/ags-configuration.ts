@@ -3,8 +3,8 @@ import {
   ASSIGNMENT_AND_GRADE_SERVICES_SCOPES,
   AssignmentAndGradeServiceScopes,
 } from "$/assignment-and-grade/scopes";
-import { ToolRecord } from "$/registration/tool-record";
 import { Context } from "../context";
+import { LtiTool } from "../tool";
 import { LtiToolDeployment } from "../tool-deployment";
 
 interface ILtiAssignmentAndGradeServicesConfig {
@@ -48,7 +48,7 @@ interface ILtiAssignmentAndGradeServicesConfig {
    */
   authorizeServicesClaim?: (ctx: {
     context: Context<unknown>;
-    tool: ToolRecord;
+    tool: LtiTool;
     toolAgsScopes: AssignmentAndGradeServiceScopes[];
   }) => Promise<boolean>;
   /**
@@ -70,7 +70,7 @@ interface ILtiAssignmentAndGradeServicesConfig {
    * ```
    */
   pickAllowedScopes?: (ctx: {
-    tool: ToolRecord;
+    tool: LtiTool;
     context: Context<unknown>;
     deploymentId: LtiToolDeployment["id"];
   }) => Promise<AssignmentAndGradeServiceScopes[]>;
@@ -97,11 +97,9 @@ export class LtiAssignmentAndGradeServicesConfig implements ILtiAssignmentAndGra
     ILtiAssignmentAndGradeServicesConfig["pickAllowedScopes"],
     undefined
   > = async ({ tool }) => {
-    return tool.scope
-      .split(" ")
-      .filter((scope) =>
-        ASSIGNMENT_AND_GRADE_SERVICES_SCOPES.includes(scope as AssignmentAndGradeServiceScopes),
-      ) as AssignmentAndGradeServiceScopes[];
+    return tool.scopes.filter((scope) =>
+      ASSIGNMENT_AND_GRADE_SERVICES_SCOPES.includes(scope as AssignmentAndGradeServiceScopes),
+    ) as AssignmentAndGradeServiceScopes[];
   };
 
   private constructor(args: ILtiAssignmentAndGradeServicesConfig) {
