@@ -52,6 +52,10 @@ type CreateFromLtiRecordArgs<CR = never> = {
    * to provide an instance of {@link AssignmentAndGradeServiceClaim}.
    */
   agsClaim?: AssignmentAndGradeServiceClaim;
+  /**
+   * The resolved 'target_link_uri' value.
+   */
+  resolvedTargetLinkUrl: URL;
 };
 
 /**
@@ -98,6 +102,7 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
     userRoles: _userRoles,
     context,
     agsClaim,
+    resolvedTargetLinkUrl,
   }: CreateFromLtiRecordArgs<CustomRoles>): Either<
     InvalidResourceLinkLaunchError,
     LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>
@@ -129,8 +134,6 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
       return e.left(error);
     }
 
-    const targetLink = new URL(resourceLinkMessage?.targetLinkUri ?? tool.targetLinkUri);
-
     const relatedToolMessage = tool.messages.find((msg) => msg.type === MessageType.resourceLink);
 
     const resolvedCustomClaims = {
@@ -145,7 +148,7 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
       resourceLink,
       platform,
       tool,
-      targetLink,
+      resolvedTargetLinkUrl,
       userRoles,
       userIdentity,
       context,

@@ -10,10 +10,17 @@ export class LtiLaunchData {
     public readonly id: UUID,
     public readonly resourceLinkId: UUID,
     public readonly userId: string,
+    public readonly targetLinkUrl: URL,
     public readonly presentation?: MessageRequests.Presentation,
   ) {}
 
-  public static create({ resourceLinkId, userId, presentation, id = generateUUID() }: Args) {
-    return new LtiLaunchData(id, resourceLinkId, userId, presentation);
+  public static create({
+    resourceLinkId,
+    userId,
+    presentation,
+    targetLinkUrl,
+    id = generateUUID(),
+  }: Args) {
+    return new LtiLaunchData(id, resourceLinkId, userId, targetLinkUrl, presentation);
   }
 }

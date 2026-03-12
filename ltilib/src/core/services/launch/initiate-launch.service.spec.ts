@@ -159,6 +159,27 @@ describe("[Core] Initiate Launch Service", async () => {
     ).toBeTruthy();
   });
 
+  it("should store the resolved target link URI in the launch data for the next launch step", async () => {
+    const { resourceLink, tool, sessionUserId } = getValidLaunchInitiationData();
+
+    const result = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
+
+    assert(e.isRight(result));
+
+    const message = result.right.intoUrl();
+    const launchId = message.searchParams.get(URL_ID_PARAM);
+    const targetLinkUrl = message.searchParams.get("target_link_uri");
+    const storedLaunchData = launchesRepo.launches.find((launch) => launch.data.id === launchId);
+
+    assert(targetLinkUrl);
+    assert(storedLaunchData);
+
+    expect(
+      storedLaunchData.data.targetLinkUrl.toString(),
+      "the resolved target link URI should've been persisted within the launch data",
+    ).toEqual(targetLinkUrl);
+  });
+
   it("should store resource link identifier for the next launch step", async () => {
     const { resourceLink, tool, sessionUserId } = getValidLaunchInitiationData();
 

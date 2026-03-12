@@ -163,6 +163,7 @@ export class PrepareLaunchRequestService<CustomRoles = never, CustomContextType 
             context,
             userRoles: fallbackUserRoles,
             agsClaim,
+            resolvedTargetLinkUrl: launch.targetLinkUrl,
           }),
           te.fromEither,
         ),

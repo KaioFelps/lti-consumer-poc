@@ -51,10 +51,13 @@ export class InitiateLaunchService {
       return e.left(new InvalidLaunchInitiationError("resource_link_is_not_in_tools_deployments"));
     }
 
+    const resolvedTargetLinkUrl = this.resolveTargetLinkUrl(tool, resourceLink);
+
     const launch = LtiLaunchData.create({
       resourceLinkId: resourceLink.id,
       userId: sessionUserId,
       presentation,
+      targetLinkUrl: resolvedTargetLinkUrl,
     });
 
     const TEN_MINUTES = 600;
@@ -68,7 +71,7 @@ export class InitiateLaunchService {
       platform: this.platform,
       tool,
       deploymentId: resourceLink.deploymentId,
-      targetLink: this.resolveTargetLinkUrl(tool, resourceLink),
+      targetLink: resolvedTargetLinkUrl,
       loginHint: launch.id.toString(),
       ltiMessageHint: launch.id.toString(),
     });
