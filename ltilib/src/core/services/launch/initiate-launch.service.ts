@@ -40,7 +40,6 @@ export class InitiateLaunchService {
     tool,
     sessionUserId,
     presentation,
-    targetLinkUri,
   }: InitiateLaunchParams): Promise<
     Either<LtiRepositoryError<ExternalError> | InvalidLaunchInitiationError, InitiateLaunchRequest>
   > {
@@ -69,11 +68,21 @@ export class InitiateLaunchService {
       platform: this.platform,
       tool,
       deploymentId: resourceLink.deploymentId,
-      targetLink: targetLinkUri ?? resourceLink.resource,
+      targetLink: this.resolveTargetLinkUrl(tool, resourceLink),
       loginHint: launch.id.toString(),
       ltiMessageHint: launch.id.toString(),
     });
 
     return e.right(launchInitiationRequest);
+  }
+
+  private resolveTargetLinkUrl(tool: LtiTool, resourceLink: LtiResourceLink) {
+    const resourceLinkMessageSchema = tool.messages.find(
+      (msg) => msg.type === MessageType.resourceLink,
+    );
+
+    return (
+      resourceLink.resourceUrl ?? resourceLinkMessageSchema?.targetLinkUri ?? tool.targetLinkUri
+    );
   }
 }
