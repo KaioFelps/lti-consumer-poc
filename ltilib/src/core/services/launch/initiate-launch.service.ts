@@ -1,5 +1,7 @@
 import { either as e } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
+import { MessageType } from "$/claims/serialization";
+import { InvalidLaunchInitiationError } from "$/core/errors/invalid-launch-initiation.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiLaunchData } from "$/core/launch-data";
 import { MessageRequests } from "$/core/messages";
@@ -40,8 +42,16 @@ export class InitiateLaunchService {
     presentation,
     targetLinkUri,
   }: InitiateLaunchParams): Promise<
-    Either<LtiRepositoryError<ExternalError>, InitiateLaunchRequest>
+    Either<LtiRepositoryError<ExternalError> | InvalidLaunchInitiationError, InitiateLaunchRequest>
   > {
+    if (resourceLink.toolId !== tool.id) {
+      return e.left(new InvalidLaunchInitiationError("resource_link_does_not_belong_to_tool"));
+    }
+
+    if (!tool.deploymentsIds.includes(resourceLink.deploymentId)) {
+      return e.left(new InvalidLaunchInitiationError("resource_link_is_not_in_tools_deployments"));
+    }
+
     const launch = LtiLaunchData.create({
       resourceLinkId: resourceLink.id,
       userId: sessionUserId,
