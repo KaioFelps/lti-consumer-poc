@@ -8,7 +8,7 @@ import { LtiResourceLink } from "$/core/resource-link";
 import { LtiResourceLinksRepository } from "../resource-links.repository";
 
 type Params = {
-  resourceUrl: URL;
+  resourceUrl?: URL;
   context?: Context;
   deployment: LtiToolDeployment;
   title?: string;

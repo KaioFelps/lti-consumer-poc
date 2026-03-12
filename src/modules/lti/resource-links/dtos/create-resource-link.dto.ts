@@ -12,9 +12,11 @@ export class CreateResourceLinkDto implements DTO {
     deploymentId: z.uuid({
       error: "lti:create-resource-link:deployment-id-is-required-and-valid",
     }),
-    resourceLink: z.url({
-      error: "lti:create-resource-link:resource-link-is-valid-url",
-    }),
+    resourceLink: z
+      .url({
+        error: "lti:create-resource-link:resource-link-is-valid-url",
+      })
+      .optional(),
     title: z
       .string({ error: "lti:create-resource-link:title-must-be-string" })
       .nonempty({ error: "lti:create-resource-link:title-must-not-be-empty" })
@@ -44,7 +46,7 @@ export class CreateResourceLinkDto implements DTO {
   deploymentId: UUID;
 
   @Expose()
-  resourceLink: string;
+  resourceLink: string | undefined;
 
   @Expose()
   title?: string;

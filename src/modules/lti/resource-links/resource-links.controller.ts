@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Query, Render } from "@nestjs/common";
-import { either as e, taskEither as te } from "fp-ts";
+import { either as e, option as o, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
@@ -68,20 +68,24 @@ export class LtiResourceLinksController {
   public async create(
     @Body() {
       deploymentId,
-      resourceLink: resourceUrl,
+      resourceLink,
       description,
       title,
       customParameters,
     }: CreateResourceLinkDto,
   ) {
     const ltiResourceLink = await pipe(
-      e.tryCatch(
-        () => new URL(resourceUrl),
-        (_) =>
-          new InvalidArgumentError({
-            errorMessageIdentifier: "lti:create-resource-link:resource-link-is-valid-url",
-          }),
+      o.fromNullable(resourceLink),
+      o.traverse(e.Applicative)((resourceUrl) =>
+        e.tryCatch(
+          () => new URL(resourceUrl),
+          (_) =>
+            new InvalidArgumentError({
+              errorMessageIdentifier: "lti:create-resource-link:resource-link-is-valid-url",
+            }),
+        ),
       ),
+      e.map(o.toUndefined),
       te.fromEither,
       te.chain((resourceUrl) =>
         pipe(
