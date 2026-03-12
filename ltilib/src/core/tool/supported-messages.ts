@@ -7,7 +7,7 @@ export type ILtiToolSupportedMessage = ClassProperties<LtiToolSupportedMessage>;
 
 export class LtiToolSupportedMessage {
   public type: MessageType;
-  public targetLinkUri?: string;
+  public targetLinkUri?: URL;
   public label?: string;
   public iconUri?: string;
   public placements?: MessagePlacement[];
