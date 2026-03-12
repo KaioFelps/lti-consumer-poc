@@ -6,6 +6,7 @@ import { User } from "@/modules/identity/user/user.entity";
 import { findResourceLinkByIdService } from "@/modules/lti/resource-links/services/find-resource-link-by-id.service";
 import { FindToolByIdService } from "@/modules/lti/tools/services/find-tool-by-id.service";
 import { MessageRequests } from "$/core/messages";
+import { LtiResourceLink } from "$/core/resource-link";
 import { LtiLaunchServices } from "$/core/services/launch";
 
 type Params = {
@@ -23,24 +24,28 @@ export class InitiateLaunchService {
   ) {}
 
   public async exec({ resourceLinkId, presentation, user }: Params) {
+    const sessionUserId = user.getId().toString();
+
     return await pipe(
-      () => this.findResourceLinkByIdService.exec({ resourceLinkId }),
-      te.chainW((resourceLink) =>
-        pipe(
-          () => this.findToolByIdService.exec({ id: resourceLink.toolId }),
-          te.map((tool) => ({ tool: tool.record, resourceLink })),
-        ),
-      ),
-      te.chainW(
-        ({ tool, resourceLink }) =>
-          () =>
-            this.launchServices.initiateLaunch<IrrecoverableError>({
-              resourceLink,
-              tool,
-              sessionUserId: user.getId().toString(),
-              presentation,
-            }),
-      ),
+      te.Do,
+      te.apS("resourceLink", () => this.findResourceLinkByIdService.exec({ resourceLinkId })),
+      te.bindW("tool", (args) => this.getLtilibTool(args)),
+      (a) => a,
+      te.chainW(({ tool, resourceLink }) => () => {
+        return this.launchServices.initiateLaunch<IrrecoverableError>({
+          resourceLink,
+          sessionUserId,
+          presentation,
+          tool,
+        });
+      }),
     )();
+  }
+
+  private getLtilibTool({ resourceLink }: { resourceLink: LtiResourceLink }) {
+    return pipe(
+      () => this.findToolByIdService.exec({ id: resourceLink.toolId }),
+      te.map((tool) => tool.record),
+    );
   }
 }

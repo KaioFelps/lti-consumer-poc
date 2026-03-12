@@ -1,0 +1,36 @@
+<main class="main">
+   <h1><%= title %></h1>
+    <br>
+    <div class="error-alert">
+        <span><%= message %></span>
+        <hr style="border: none; border-top: 1px solid #a5000030; margin-block: 12px;">
+        <p style="font-size: 12px;">
+            <span style="font-weight: bold;">
+                <%= await t.translate("lti:lti-launch-initiation-error:original-message-label") %>: 
+            </span>
+            <%= originalMessage %>
+        </p>
+        <p style="font-size: 12px;">
+            <span style="font-weight: bold;">
+                <%= await t.translate("lti:lti-launch-initiation-error:original-code-label") %>: 
+            </span>
+            <%= originalReason %>
+        </p>
+    </div>
+
+    <div id="close-popup-container" style="display: hidden;"">
+        <button onclick="goBack()"><%= await t.translate("buttons:back") %></button>
+    </div>
+</main>
+
+<script>
+    window.addEventListener("load", () => {
+        const closePopupContainer = document.getElementById("close-popup-container");
+        const isInPopup = Boolean(window.opener);
+        if (isInPopup) closePopupContainer.style.display = null;
+    });
+
+    function goBack() {
+        window.close();
+    }
+</script>

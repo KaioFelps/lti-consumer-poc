@@ -1,8 +1,10 @@
 import { Controller, Get, HttpStatus, Param, Query, Render, Res } from "@nestjs/common";
-import { either as e, taskEither as te } from "fp-ts";
+import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { type JOSENotSupported } from "jose/dist/types/util/errors";
+import { ErrorBase } from "@/core/errors/error-base";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
+import { RenderableLtiInvalidLaunchInitiationError } from "@/core/errors/renderable/lti-invalid-launch-initiation.error";
 import { RenderableError } from "@/core/errors/renderable/renderable-error";
 import { HttpResponse } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
@@ -16,6 +18,7 @@ import { Routes } from "@/routes";
 import { assertNever } from "@/utils/assert-never";
 import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
 import { OAuthError } from "$/core/errors/bases/oauth.error";
+import { InvalidLaunchInitiationError } from "$/core/errors/invalid-launch-initiation.error";
 import type { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
 import { MalformedRequestError } from "$/core/errors/malformed-request.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
@@ -73,27 +76,31 @@ export class LtiLaunchesController {
     @SessionUser() user: User,
     @Res() response: HttpResponse,
   ) {
+    const presentation = MessageRequests.Presentation.create({
+      documentTarget: MessageRequests.DocumentTarget.Window,
+      width,
+      height,
+      locale: this.t.getLocale(),
+      returnUrl: new URL(Routes.lti.launch.return(), this.platform.issuer),
+    });
+
     return pipe(
-      await this.initiateLaunchService.exec({
-        resourceLinkId,
-        user,
-        presentation: MessageRequests.Presentation.create({
-          documentTarget: MessageRequests.DocumentTarget.Window,
-          width,
-          height,
-          locale: this.t.getLocale(),
-          returnUrl: new URL(Routes.lti.launch.return(), this.platform.issuer),
-        }),
-      }),
-      e.match(
-        (_error) => {
-          const error = _error instanceof LtiRepositoryError ? _error.cause : _error;
+      () => this.initiateLaunchService.exec({ resourceLinkId, user, presentation }),
+      te.match(
+        async (_error) => {
+          let error: ErrorBase | RenderableError;
+
+          if (_error instanceof InvalidLaunchInitiationError)
+            error = await RenderableLtiInvalidLaunchInitiationError.create(_error, this.t);
+          else if (_error instanceof LtiRepositoryError) error = _error.cause;
+          else error = _error;
 
           throw ExceptionsFactory.fromError(error);
         },
-        (initiateLaunchRequest) => response.redirect(initiateLaunchRequest.intoUrl().toString()),
+        async (initiateLaunchRequest) =>
+          response.redirect(initiateLaunchRequest.intoUrl().toString()),
       ),
-    );
+    )();
   }
 
   @Public()

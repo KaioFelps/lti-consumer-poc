@@ -42,7 +42,7 @@ label.checkbox-item > span {
 
 .error-alert {
     padding: 8px 16px;
-    background: color-mix(in oklab, red 25%, transparent);
+    background: color-mix(in oklab, red 10%, transparent);
     color: red;
     margin-bottom: 12px;
 }

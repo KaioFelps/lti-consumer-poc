@@ -138,6 +138,18 @@ ptBR["lti:resource-links:find-by-id:resource-not-found"] = ({ resourceLinkId }) 
 ptBR["lti:initiate-launch:width-must-be-number"] = "A largura precisa ser um valor numérico.";
 ptBR["lti:initiate-launch:height-must-be-number"] = "A altura precisa ser um valor numérico.";
 
+ptBR["lti:initiate-launch:invalid-launch-error:title"] =
+  "Não foi possível realizar o lançamento LTI";
+
+ptBR["lti:lti-launch-initiation-error:original-code-label"] = "Código-razão do erro";
+ptBR["lti:lti-launch-initiation-error:original-message-label"] = "Mensagem original do erro";
+ptBR["lti:initiate-launch:invalid-launch-error:resource_link_does_not_belong_to_tool"] =
+  "Este recurso pertence a uma ferramenta LTI diferente. Contate um instrutor para " +
+  "que ele corrija as configurações desta atividade.";
+ptBR["lti:initiate-launch:invalid-launch-error:resource_link_is_not_in_tools_deployments"] =
+  "Este recurso pertence a uma instalação diferente desta ferramenta LTI. Contate um instrutor para que " +
+  "ele corrija as configurações desta atividade.";
+
 ptBR["lti:launch-login:scopes-must-contain-openid"] =
   "O campo 'scope' precisa incluir o escopo 'openid'.";
 ptBR["lti:launch-login:response-type-must-be-id-token"] =
