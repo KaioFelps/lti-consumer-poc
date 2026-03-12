@@ -14,7 +14,7 @@ export class LtiToolSupportedMessagePresenter {
   public static present(entity: LtiTool.SupportedMessage): PresentedLtiToolSupportedMessage {
     return {
       type: entity.type.toString(),
-      targetLinkUri: entity.targetLinkUri,
+      targetLinkUri: entity.targetLinkUri?.toString(),
       label: entity.label,
       iconUri: entity.iconUri,
       placements: entity.placements?.map(toString),

@@ -45,7 +45,7 @@ function fromRow(row: LtiToolRow): LtiTool {
             message.roles?.length === 0
               ? undefined
               : message.roles.map((role) => role.role as AnyLtiRole),
-          targetLinkUri: message.targetLinkUri ?? undefined,
+          targetLinkUri: message.targetLinkUri ? new URL(message.targetLinkUri) : undefined,
         }) satisfies LtiTool.SupportedMessage,
     ),
     targetLinkUri: new URL(row.targetLinkUri),
@@ -103,7 +103,7 @@ function intoRow(tool: LtiTool): LtiToolRowWithoutDeployments {
       iconUri: message.iconUri ?? null,
       label: message.label ?? null,
       placements: message.placements?.join(" ") ?? null,
-      targetLinkUri: message.targetLinkUri ?? null,
+      targetLinkUri: message.targetLinkUri?.toString() ?? null,
       roles:
         message.roles?.map((role) => ({
           clientId: tool.id,

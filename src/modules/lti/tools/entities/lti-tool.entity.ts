@@ -48,7 +48,9 @@ export class LtiTool {
                 label: message.label,
                 placements: message.placements,
                 roles: message.roles,
-                targetLinkUri: message.target_link_uri,
+                targetLinkUri: message.target_link_uri
+                  ? new URL(message.target_link_uri)
+                  : undefined,
               }),
           ),
           targetLinkUri: new URL(ltiConfig.target_link_uri),

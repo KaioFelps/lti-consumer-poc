@@ -68,7 +68,7 @@ export class LtiResourceLinksController {
   public async create(
     @Body() {
       deploymentId,
-      resourceLink,
+      resourceLink: resourceUrl,
       description,
       title,
       customParameters,
@@ -76,20 +76,20 @@ export class LtiResourceLinksController {
   ) {
     const ltiResourceLink = await pipe(
       e.tryCatch(
-        () => new URL(resourceLink),
+        () => new URL(resourceUrl),
         (_) =>
           new InvalidArgumentError({
             errorMessageIdentifier: "lti:create-resource-link:resource-link-is-valid-url",
           }),
       ),
       te.fromEither,
-      te.chain((resourceLink) =>
+      te.chain((resourceUrl) =>
         pipe(
           () =>
             this.findDeploymentService.exec({
               deploymentId: deploymentId.toString(),
             }),
-          te.map((deployment) => ({ resourceLink, deployment })),
+          te.map((deployment) => ({ resourceUrl, deployment })),
         ),
       ),
       te.map((params) => ({ ...params, description, title, customParameters })),

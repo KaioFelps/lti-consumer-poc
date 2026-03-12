@@ -1,0 +1,1 @@
+ALTER TABLE "lti_resource_link" ALTER COLUMN "resource_url" DROP NOT NULL;

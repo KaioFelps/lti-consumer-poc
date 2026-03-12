@@ -25,7 +25,7 @@ function intoRow(link: LtiResourceLink): LtiResourceLinkPlainRow {
   return {
     deploymentId: link.deploymentId,
     id: link.id,
-    resourceUrl: link.resource.toString(),
+    resourceUrl: link.resourceUrl?.toString() ?? null,
     contextId: link.contextId ?? null,
     description: link.description ?? null,
     title: link.title ?? null,
@@ -37,7 +37,7 @@ function fromRow(row: LtiResourceLinkRow): LtiResourceLink {
   return LtiResourceLink.create({
     id: row.id,
     deploymentId: row.deployment.id,
-    resource: new URL(row.resourceUrl),
+    resourceUrl: row.resourceUrl ? new URL(row.resourceUrl) : undefined,
     toolId: row.deployment.tool.id,
     contextId: row.context?.id,
     description: row.description ?? undefined,

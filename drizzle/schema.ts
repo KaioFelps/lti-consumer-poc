@@ -146,7 +146,7 @@ export const ltiResourceLinks = pgTable("lti_resource_link", {
     .notNull()
     .references(() => ltiToolDeployments.id, { onDelete: "cascade" }),
   contextId: uuid("context_id").references(() => ltiContexts.id),
-  resourceUrl: varchar("resource_url").notNull(),
+  resourceUrl: varchar("resource_url"),
   title: varchar(), // nullable
   description: varchar(), // nullable
   customParameters: jsonb("custom_parameters").$type<Record<string, string>>(),

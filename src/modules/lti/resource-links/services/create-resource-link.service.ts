@@ -8,7 +8,7 @@ import { LtiResourceLink } from "$/core/resource-link";
 import { LtiResourceLinksRepository } from "../resource-links.repository";
 
 type Params = {
-  resourceLink: URL;
+  resourceUrl: URL;
   context?: Context;
   deployment: LtiToolDeployment;
   title?: string;
@@ -21,7 +21,7 @@ export class CreateResourceLinkService {
   public constructor(private resourceLinksRepo: LtiResourceLinksRepository) {}
 
   public async exec({
-    resourceLink: resource,
+    resourceUrl,
     context,
     deployment,
     description,
@@ -30,7 +30,7 @@ export class CreateResourceLinkService {
   }: Params) {
     const resourceLink = LtiResourceLink.create({
       id: generateUUID(),
-      resource,
+      resourceUrl,
       toolId: deployment.getToolId(),
       contextId: context?.id,
       description,

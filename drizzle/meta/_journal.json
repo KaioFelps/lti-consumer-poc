@@ -64,6 +64,13 @@
       "when": 1769748749269,
       "tag": "0008_remove_resource_links_on_tool_removal",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1773289335807,
+      "tag": "0009_make_lti_resource_link_resource_url_nullable",
+      "breakpoints": true
     }
   ]
 }
