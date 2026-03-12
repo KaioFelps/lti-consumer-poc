@@ -16,9 +16,10 @@ export interface ILtiResourceLink {
    */
   contextId?: string;
   /**
-   * The URL to the resource this link points to.
+   * The URL to the resource this link points to. If present, overrides both tool's
+   * `target_link_uri` and its resource `LtiResourceLinkRequest` message schema's `target_link_uri`.
    */
-  resource: URL;
+  resourceUrl?: URL;
   /**
    * The title from the resource this link points to (e.g., "Marília de Dirceu Quiz").
    */
@@ -50,7 +51,7 @@ export class LtiResourceLink implements ILtiResourceLink, IntoLtiClaim {
   public readonly id: string;
   public deploymentId: string;
   public contextId?: string;
-  public resource: URL;
+  public resourceUrl?: URL;
   public title?: string;
   public description?: string;
   public toolId: string;

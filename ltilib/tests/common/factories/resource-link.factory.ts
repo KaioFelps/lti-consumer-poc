@@ -11,7 +11,7 @@ type CreateResourceLinkConstructorArgs = Omit<Partial<ILtiResourceLink>, "toolId
 export function createResourceLink({
   deploymentId = generateUUID(),
   tool = createTool(),
-  resource = new URL(faker.internet.url({ protocol: "https" })),
+  resourceUrl,
   contextId,
   customParameters,
   description,
@@ -24,7 +24,7 @@ export function createResourceLink({
 
   return LtiResourceLink.create({
     deploymentId,
-    resource,
+    resourceUrl,
     toolId: tool.id,
     contextId,
     customParameters,
