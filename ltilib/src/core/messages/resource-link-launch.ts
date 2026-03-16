@@ -206,6 +206,10 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
   }
 
   intoLtiClaim(): object {
+    const onlyDefined = ([_, value]) => typeof value !== "undefined";
+    const hasCustomClaims = Object.entries(this.customClaims).filter(onlyDefined).length > 0;
+    const resolvedCustomClaims = hasCustomClaims ? this.customClaims : undefined;
+
     const claims = {
       ...this.userIdentity?.intoLtiClaim(),
       [resolveClaimKey(LTIClaimKey.messageType)]: this.messageType.toString(),
@@ -218,7 +222,7 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
       [resolveClaimKey(LTIClaimKey.platformInstanceData)]: this.platform.instance?.intoLtiClaim(),
       [resolveClaimKey(LTIClaimKey.mentoredUsers)]: this.mentorScope,
       [resolveClaimKey(LTIClaimKey.launchPresentation)]: this.presentation?.intoLtiClaim(),
-      [resolveClaimKey(LTIClaimKey.customs)]: this.customClaims,
+      [resolveClaimKey(LTIClaimKey.customs)]: resolvedCustomClaims,
       ...this.vendorClaims?.intoLtiClaim(),
       ...(this.agsClaim?.intoLtiClaim() ?? {}),
     };
