@@ -60,7 +60,7 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
   const getValidEntities = ({ scopes }: { scopes: string[] }) => {
     const userId = generateUUID();
     const toolIssuer = new URL(faker.internet.url({ appendSlash: false, protocol: "https" }));
-    const toolRedirectUri = new URL("/launch", toolIssuer);
+    const toolRedirectUri = new URL("/launch", toolIssuer).toString();
 
     const tool = toolFactory.createTool({
       scopes,
@@ -74,7 +74,11 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
       contextId: context.id,
       deploymentId: deployment.id,
     });
-    const launch = LtiLaunchData.create({ resourceLinkId: resourceLink.id, userId });
+    const launch = LtiLaunchData.create({
+      resourceLinkId: resourceLink.id,
+      userId,
+      targetLinkUrl: tool.targetLinkUri,
+    });
 
     deploymentsRepo.deployments.push(deployment);
     toolsRepo.tools.push(tool);
