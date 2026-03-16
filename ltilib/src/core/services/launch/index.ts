@@ -15,10 +15,6 @@ import {
   AuthenticateLaunchLoginRequestParams,
   PrepareLaunchRequestService,
 } from "./prepare-launch-request.service";
-import {
-  VerifyRedirectionUriService,
-  VerifyRedirectUriParams,
-} from "./verify-redirection-uri.service";
 
 type GetLaunchLinksFromContext = GetLaunchLinksParams & {
   contextId: string;
@@ -28,7 +24,6 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
   private prepareLaunchRequestService: PrepareLaunchRequestService<CustomRoles, CustomContextType>;
   private initiateLaunchService: InitiateLaunchService;
   private getLaunchLinksService: GetLaunchLinksService;
-  private verifyRedirectionUriService: VerifyRedirectionUriService;
 
   public constructor(
     private resourceLinksRepository: LtiResourceLinksRepository,
@@ -47,8 +42,6 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
     this.initiateLaunchService = new InitiateLaunchService(platform, launchesRepository);
 
     this.getLaunchLinksService = new GetLaunchLinksService(platform, ltiToolsRepository);
-
-    this.verifyRedirectionUriService = new VerifyRedirectionUriService();
   }
 
   /**
@@ -58,10 +51,6 @@ export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
     args: AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType>,
   ) {
     return await this.prepareLaunchRequestService.execute(args);
-  }
-
-  public async verifyRedirectUri(args: VerifyRedirectUriParams) {
-    return await this.verifyRedirectionUriService.execute(args);
   }
 
   public async initiateLaunch<ExternalError = unknown>(args: InitiateLaunchParams) {

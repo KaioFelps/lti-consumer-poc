@@ -4,6 +4,7 @@ import { pipe } from "fp-ts/lib/function";
 import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim";
 import { Context } from "$/core/context";
 import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
+import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
 import { InvalidResourceLinkLaunchError } from "$/core/errors/invalid-resource-link-launch.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LTIResourceLinkLaunchRequest } from "$/core/messages/resource-link-launch";
@@ -17,7 +18,7 @@ import { UserIdentity, UserRoles } from "$/core/user-identity";
 export type AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType> = {
   nonce: string;
   tool: LtiTool;
-  redirectUri: URL;
+  redirectUri: string;
   state: string;
   loginHint: string;
   messageHint: string;
@@ -54,7 +55,7 @@ export class PrepareLaunchRequestService<CustomRoles = never, CustomContextType 
     loginHint,
     messageHint,
     nonce,
-    redirectUri,
+    redirectUri: _redirectUri,
     state,
     userIdentity,
     context,
@@ -64,10 +65,17 @@ export class PrepareLaunchRequestService<CustomRoles = never, CustomContextType 
     transformLaunchRequest,
   }: AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType>): Promise<
     Either<
-      AuthenticationRedirectionError | LtiRepositoryError | InvalidResourceLinkLaunchError,
+      | AuthenticationRedirectionError
+      | LtiRepositoryError
+      | InvalidResourceLinkLaunchError
+      | InvalidRedirectUriError,
       LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>
     >
   > {
+    const redirectUriIsValid = this.verifyRedirectUri(_redirectUri, tool);
+    if (e.isLeft(redirectUriIsValid)) return redirectUriIsValid;
+    const redirectUri = redirectUriIsValid.right;
+
     if (loginHint !== messageHint) {
       const invalidRequestError = new AuthenticationRedirectionError({
         code: "invalid_request",
@@ -186,6 +194,26 @@ export class PrepareLaunchRequestService<CustomRoles = never, CustomContextType 
         ? () => this.agsClaimServices!.create({ tool, context, resourceLink })
         : te.right(o.none),
       te.map(o.toUndefined),
+    );
+  }
+
+  /**
+   * Ensures the `redirectUri` is safe to redirect the current user to.
+   * It **must** be the first verification to be made during an authentication flow,
+   * since further errors are redirections to `redirectUri`.
+   */
+  private verifyRedirectUri(redirectUri: string, tool: LtiTool) {
+    if (!tool.redirectUrls.includes(redirectUri)) {
+      return e.left(
+        new InvalidRedirectUriError("Given redirect URI is not registered.", redirectUri),
+      );
+    }
+
+    return pipe(
+      e.tryCatch(
+        () => new URL(redirectUri),
+        (_error) => new InvalidRedirectUriError("Given redirect URI is not valid.", redirectUri),
+      ),
     );
   }
 }
