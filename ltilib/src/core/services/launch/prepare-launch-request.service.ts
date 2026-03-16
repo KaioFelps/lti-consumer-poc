@@ -43,7 +43,10 @@ export type AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType>
   >;
 };
 
-export class PrepareLaunchRequestService<CustomRoles = never, CustomContextType = never> {
+export class PrepareLaunchRequestService<
+  CustomRoles extends string = never,
+  CustomContextType = never,
+> {
   public constructor(
     private platform: Platform,
     private resourceLinksRepository: LtiResourceLinksRepository,

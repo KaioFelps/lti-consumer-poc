@@ -9,7 +9,7 @@
  */
 
 import ejs from "ejs";
-import { either as e } from "fp-ts";
+import { either as e, option as o } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import {
@@ -20,6 +20,7 @@ import {
   resolveClaimKey,
 } from "ltilib/src/claims/serialization";
 import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim";
+import { RolesHelper } from "$/claims/enums/roles";
 import { Context } from "$/core/context";
 import { LtiResourceLink } from "$/core/resource-link";
 import { UserIdentity, UserRoles } from "$/core/user-identity";
@@ -61,8 +62,10 @@ type CreateFromLtiRecordArgs<CR = never> = {
 /**
  * @see {@link https://www.imsglobal.org/spec/lti/v1p3/#resource-link-launch-request-message Resource Link Launch Request Message}
  */
-export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType = never>
-  implements IntoLtiClaim, LtiSubmittableMessage<PrepareIdTokenError>
+export class LTIResourceLinkLaunchRequest<
+  CustomRoles extends string = never,
+  CustomContextType = never,
+> implements IntoLtiClaim, LtiSubmittableMessage<PrepareIdTokenError>
 {
   private readonly version = AvailableLtiVersion["1p3"];
   private readonly messageType = MessageType.resourceLink;
@@ -92,7 +95,7 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
     private agsClaim: AssignmentAndGradeServiceClaim | undefined,
   ) {}
 
-  public static create<CustomRoles = never, CustomContextType = never>({
+  public static create<CustomRoles extends string = never, CustomContextType = never>({
     tool,
     nonce,
     platform,
@@ -120,7 +123,24 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
       (message) => message.type === MessageType.resourceLink,
     );
 
-    const userRoles = userIdentity?.roles ?? _userRoles ?? [];
+    const userRolesWithPossibleDuplicates = [
+      ...(_userRoles ?? []),
+      ...(userIdentity?.roles ?? []),
+    ] as UserRoles<CustomRoles>;
+
+    const userRoles = Array.from(new Set(userRolesWithPossibleDuplicates));
+
+    const userRolesContainsAtLeastOneLtiRoleIfNotEmpty =
+      userRoles.length === 0 ||
+      userRoles.some((role) => o.isSome(RolesHelper.tryParseFromRoleURL(role.toString())));
+
+    if (!userRolesContainsAtLeastOneLtiRoleIfNotEmpty) {
+      // see: https://www.imsglobal.org/spec/lti/v1p3/#roles-claim
+      const description =
+        "When user has roles, at least one of them must be from LTI's role vocabulary.";
+      const error = new InvalidResourceLinkLaunchError({ code: "insufficient_roles", description });
+      return e.left(error);
+    }
 
     const userIsAllowedToLaunchMessage =
       !resourceLinkMessage?.roles ||
@@ -149,7 +169,7 @@ export class LTIResourceLinkLaunchRequest<CustomRoles = never, CustomContextType
       platform,
       tool,
       resolvedTargetLinkUrl,
-      userRoles,
+      userRoles as UserRoles<CustomRoles>,
       userIdentity,
       context,
       undefined,
