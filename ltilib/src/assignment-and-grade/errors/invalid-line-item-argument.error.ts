@@ -1,4 +1,4 @@
-import { InvalidArgumentError } from "$/core/errors/invalid-argument.error";
+import { InvalidArgumentError } from "$/core/errors/bases/invalid-argument.error";
 
 type Fields = "label" | "scoreMaximum" | "customParameters";
 

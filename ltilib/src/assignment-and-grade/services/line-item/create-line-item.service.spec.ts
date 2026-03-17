@@ -26,7 +26,7 @@ import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/err
 import { ToolIsNotDeployedInContextError } from "$/assignment-and-grade/errors/tool-is-not-deployed-in-context.error";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
-import { InvalidArgumentError } from "$/core/errors/invalid-argument.error";
+import { InvalidArgumentError } from "$/core/errors/bases/invalid-argument.error";
 import { Platform } from "$/core/platform";
 
 describe("[AGS] Create Line Item Service", async () => {
