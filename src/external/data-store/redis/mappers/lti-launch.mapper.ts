@@ -6,6 +6,7 @@ type Payload = {
   launchId: string;
   resourceLinkId: string;
   userId: string;
+  targetLinkUrl: string;
   presentation?: {
     documentTarget?: string;
     width?: number;
@@ -22,6 +23,7 @@ function intoPayload(launch: LtiLaunchData): Payload {
     launchId: launch.id.toString(),
     resourceLinkId: launch.resourceLinkId.toString(),
     userId: launch.userId,
+    targetLinkUrl: launch.targetLinkUrl.toString(),
     presentation: {
       documentTarget: documentTarget?.toString(),
       height,
@@ -52,6 +54,7 @@ function fromPayload(payload: Payload): LtiLaunchData {
     userId: payload.userId,
     id: payload.launchId,
     presentation,
+    targetLinkUrl: new URL(payload.targetLinkUrl),
   });
 }
 
