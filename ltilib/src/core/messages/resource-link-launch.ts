@@ -276,6 +276,7 @@ const launchForm = `<form id="ltiLaunchForm" name="ltiLaunchForm" action="<%= ta
     <input type="hidden" name="state" value="<%= state %>">
 </form>
 <script type="text/javascript">
-    document.ltiLaunchForm.submit();
+    const form = document.getElementById("ltiLaunchForm");
+    form.submit();
 </script>
 `;
