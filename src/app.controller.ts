@@ -7,7 +7,6 @@ import { mapRolesToLtiSystemRoles } from "@/modules/lti/mappers/convert-roles";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiLaunchServices } from "$/core/services/launch";
 import { AppService } from "./app.service";
-import { IrrecoverableError } from "./core/errors/irrecoverable-error";
 import { ResourceNotFoundError } from "./core/errors/resource-not-found.error";
 import { Mvc } from "./lib/mvc-routes";
 import { TranslatorService } from "./message-string/translator.service";
@@ -17,7 +16,7 @@ export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly t: TranslatorService,
-    private readonly ltiLaunchServices: LtiLaunchServices<IrrecoverableError>,
+    private readonly ltiLaunchServices: LtiLaunchServices,
   ) {}
 
   @Get("users")
