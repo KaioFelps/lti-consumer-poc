@@ -14,7 +14,6 @@ import { LaunchLoginDto } from "../../launches/dtos/launch-login.dto";
 
 type Params = {
   body: LaunchLoginDto;
-  redirectUri: URL;
   tool: LtiTool;
   user?: User;
 };
@@ -26,7 +25,7 @@ export class LaunchLoginService {
     private findPersonByIdService: FindPersonByIdService,
   ) {}
 
-  public async exec({ body, user, redirectUri, tool }: Params) {
+  public async exec({ body, user, tool }: Params) {
     return await pipe(
       validateAuthenticationRequest(body),
       te.fromEither,
@@ -48,7 +47,7 @@ export class LaunchLoginService {
         (userIdentity) => () =>
           this.launchServices.authenticateLaunch({
             tool,
-            redirectUri,
+            redirectUri: body.redirect_uri,
             userIdentity,
             loginHint: body.login_hint,
             messageHint: body.lti_message_hint,
