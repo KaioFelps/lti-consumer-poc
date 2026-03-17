@@ -158,8 +158,8 @@ export class LTIResourceLinkLaunchRequest<
 
     const resolvedCustomClaims = {
       ...(tool.customParameters ?? {}),
-      ...resourceLink.customParameters,
       ...(relatedToolMessage?.customParameters ?? {}),
+      ...resourceLink.customParameters,
     } satisfies Record<string, string>;
 
     const message = new LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>(
