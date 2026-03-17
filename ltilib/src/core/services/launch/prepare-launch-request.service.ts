@@ -15,7 +15,16 @@ import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
 import { UserIdentity, UserRoles } from "$/core/user-identity";
 
-export type AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType> = {
+type ErrorKey =
+  | "invalidRequest"
+  | "linkNotFound"
+  | "malformedLaunch"
+  | "loginRequired"
+  | "serverError";
+
+export type LaunchAuthErrorDescriptionsRoutes = { [key in ErrorKey]?: URL };
+
+export type AuthenticateLaunchLoginRequestParams<CustomRoles extends string, CustomContextType> = {
   nonce: string;
   tool: LtiTool;
   redirectUri: string;
@@ -33,14 +42,7 @@ export type AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType>
    *
    * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#AuthError}
    */
-  errorDescriptionsRoutes?: Record<
-    | "invalidRequest"
-    | "linkNotFound"
-    | "malformedLaunch"
-    | "unauthorizedRedirectUri"
-    | "serverError",
-    URL
-  >;
+  errorDescriptionsRoutes?: LaunchAuthErrorDescriptionsRoutes;
 };
 
 export class PrepareLaunchRequestService<
@@ -151,7 +153,7 @@ export class PrepareLaunchRequestService<
     if (loginRequiredError) {
       const loginRequiredRedirection = new AuthenticationRedirectionError({
         code: "login_required",
-        errorPageUri: errorDescriptionsRoutes?.unauthorizedRedirectUri,
+        errorPageUri: errorDescriptionsRoutes?.loginRequired,
         description: loginRequiredError,
         redirectUri,
         state,
