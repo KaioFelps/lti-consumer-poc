@@ -67,7 +67,8 @@ export async function createPlatform({
   initiateLaunchEndpoint ??= (resourceLinkId) =>
     new URL(issuer, `/initiate/${resourceLinkId}`).toString();
 
-  jsonWebKey ??= await createMockKeySet();
+  const mockJws = await createMockKeySet();
+  jsonWebKey ??= mockJws.jwk;
   openIdConfiguration ??= await createPlatformOpenIdConfiguration({ issuer });
 
   return Platform.create({
