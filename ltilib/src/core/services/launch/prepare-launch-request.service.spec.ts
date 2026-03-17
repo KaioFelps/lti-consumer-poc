@@ -7,22 +7,33 @@ import { faker } from "@faker-js/faker";
 import { generateUUID } from "common/src/types/uuid";
 import { either as e } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
+import { createContext } from "ltilib/tests/common/factories/context.factory";
 import { createPlatform } from "ltilib/tests/common/factories/platform.factory";
 import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
 import { createTool } from "ltilib/tests/common/factories/tool.factory";
 import { InMemoryLaunchesRepository } from "ltilib/tests/common/in-memory-repositories/launches.repository";
 import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
 import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
+import { InstitutionRole, MembershipRole } from "$/claims/enums/roles";
+import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
 import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
+import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiLaunchData } from "$/core/launch-data";
+import { MessageRequests } from "$/core/messages";
 import { InitiateLaunchRequest } from "$/core/messages/initiate-launch";
 import { Platform } from "$/core/platform";
+import { FindManyParams } from "$/core/repositories/resource-links.repository";
+import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
-import { UserIdentity } from "$/core/user-identity";
+import { UserIdentity, UserRoles } from "$/core/user-identity";
 import { LtiLaunchServices } from ".";
+import { LaunchAuthErrorDescriptionsRoutes } from "./prepare-launch-request.service";
 
 describe("[Core] Prepare Launch Request Service", async () => {
   const TARGET_LINK_URI_CLAIM = "https://purl.imsglobal.org/spec/lti/claim/target_link_uri";
+  const PRESENTATION_CLAIM = "https://purl.imsglobal.org/spec/lti/claim/launch_presentation";
+  const CONTEXT_CLAIM = "https://purl.imsglobal.org/spec/lti/claim/context";
+  const ROLES_CLAIM = "https://purl.imsglobal.org/spec/lti/claim/roles";
 
   let resourceLinksRepo: InMemoryLtiResourceLinksRepository;
   let toolsRepo: InMemoryToolsRepository;
@@ -186,24 +197,471 @@ describe("[Core] Prepare Launch Request Service", async () => {
     expect(launch.left).toBeInstanceOf(InvalidRedirectUriError);
   });
 
-  // This means that the `redirect_uri` check must be the first check to be made within the launch service.
-  it.skip("should never return any redirection error response when `redirect_uri` is not trusted", async () => {});
+  /**
+   * Recreates the service under testing (sut) with poisoned versions of relevant repositories.
+   * These repositories will fail upon any method call with `LtiRepositoryError` of type "ExternalError".
+   */
+  const recreateSutWithPoisonedRepositories = () => {
+    class FailingResourceLinksRepo extends InMemoryLtiResourceLinksRepository {
+      public override async findMany(
+        _params?: FindManyParams,
+      ): Promise<Either<LtiRepositoryError, LtiResourceLink[]>> {
+        const error = new LtiRepositoryError({
+          type: "ExternalError",
+          cause: "mocked error on finding many",
+        });
+        return e.left(error);
+      }
+      public override async findById(
+        _resourceLinkId: string,
+      ): Promise<Either<LtiRepositoryError, LtiResourceLink>> {
+        const error = new LtiRepositoryError({
+          type: "ExternalError",
+          cause: "mocked error on finding by id",
+        });
+        return e.left(error);
+      }
+    }
 
-  it.skip("should require login hint to be the same value as message hint since this is how ltilib mounts the launch initiation", async () => {});
+    class FailingLaunchesRepo extends InMemoryLaunchesRepository {
+      public override async save(
+        _launch: LtiLaunchData,
+        _timeToLiveSeconds: number,
+      ): Promise<Either<LtiRepositoryError, void>> {
+        const error = new LtiRepositoryError({
+          type: "ExternalError",
+          cause: "mocked error on saving",
+        });
+        return e.left(error);
+      }
+      public override async findById(
+        _launchId: string,
+      ): Promise<Either<LtiRepositoryError, LtiLaunchData>> {
+        const error = new LtiRepositoryError({
+          type: "ExternalError",
+          cause: "mocked error on finding by id",
+        });
+        return e.left(error);
+      }
+    }
 
-  it.skip("should refuse to perform the launch if there is no launch data stored and identified by login/message hint", async () => {});
+    const failingResourceLinksRepo = new FailingResourceLinksRepo();
+    const failingLaunchesRepo = new FailingLaunchesRepo();
+    sut = new LtiLaunchServices(
+      failingResourceLinksRepo,
+      toolsRepo,
+      failingLaunchesRepo,
+      platform,
+      undefined,
+    );
+  };
 
-  it.skip("should refuse to perform the launch if resource link does not exist", async () => {});
+  const reverseString = (str: string) => {
+    return str.split("").reverse().join("");
+  };
 
-  it.skip("should treat server internal errors with a valid Open ID auth error", async () => {});
+  // This means that the `redirect_uri` check must be the first check to be made within the launch service,
+  // having precedence over errors that might redirect the user to `redirect_uri`.
+  it.each([
+    { when: "login hint differs message hint", overrides: { loginHint: generateUUID() } },
+    {
+      when: "launch could not be found",
+      overrides: {
+        loginHint: "fake-and-unexisting-launch-id",
+        messageHint: "fake-and-unexisting-launch-id",
+      },
+    },
+    {
+      when: "there is some external error raised by repositories",
+      overrides: {},
+      cb: recreateSutWithPoisonedRepositories,
+    },
+    {
+      when: "launch data's session user ID differs from service's session user parameter",
+      overrides: { userIdentity: UserIdentity.create<never>({ id: "fake-unexisting-user-id" }) },
+    },
+    { when: "no user identity was provided", overrides: { userIdentity: undefined } },
+  ])(
+    "should not return redirection error response when $when if `redirect_uri` is not trusted",
+    async ({ overrides, cb }) => {
+      const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
+      const initiation = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
 
-  it.skip("should refuse to perform the launch when there is no valid session user", async () => {});
+      const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+      const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
 
-  it.skip("should refuse to perform the launch when session user has changed during launch initiation and performance", async () => {});
+      // use an unregistered redirect url
+      const UNREGISTERED_REDIRECT_URL = faker.internet.url({ protocol: "https" });
+      tool.redirectUrls = tool.redirectUrls.filter((uri) => uri !== UNREGISTERED_REDIRECT_URL);
 
-  it.skip("should include presentation specified in the launch data as a LTI claim", async () => {});
+      cb?.();
 
-  it.skip("should allow platforms to perform some transformation over launch request", async () => {});
+      const launch = await sut.authenticateLaunch({
+        ...parameters,
+        ...overrides,
+        redirectUri: UNREGISTERED_REDIRECT_URL,
+      });
 
-  it.skip("should include context claim if context is given", async () => {});
+      assert(e.isLeft(launch));
+      expect(launch.left).not.toBeInstanceOf(AuthenticationRedirectionError);
+    },
+  );
+
+  it("should require login hint to be the same value as message hint since this is how ltilib mounts the launch initiation", async () => {
+    const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
+    const initiation = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+
+    const launch = await sut.authenticateLaunch({
+      ...parameters,
+      loginHint: reverseString(loginHint),
+    });
+
+    assert(e.isLeft(launch));
+    expect(launch.left).toBeInstanceOf(AuthenticationRedirectionError);
+
+    if (launch.left instanceof AuthenticationRedirectionError) {
+      expect(launch.left.code).toBe("invalid_request");
+    }
+  });
+
+  it("should refuse to perform the launch if there is no launch data stored and identified by login/message hint", async () => {
+    const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
+    const initiation = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+
+    const unknownLaunchId = "fake-invalid-and-unexisting-launch-id";
+
+    const launch = await sut.authenticateLaunch({
+      ...parameters,
+      loginHint: unknownLaunchId,
+      messageHint: unknownLaunchId,
+    });
+
+    assert(e.isLeft(launch));
+    expect(launch.left).toBeInstanceOf(AuthenticationRedirectionError);
+
+    if (launch.left instanceof AuthenticationRedirectionError) {
+      expect(launch.left.code).toBe("invalid_request");
+    }
+  });
+
+  it("should refuse to perform the launch if resource link does not exist", async () => {
+    const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
+    const initiation = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+
+    // removes `resourceLink` from storage
+    resourceLinksRepo.resourceLinks = resourceLinksRepo.resourceLinks.filter(
+      (link) => link.id !== resourceLink.id,
+    );
+
+    const launch = await sut.authenticateLaunch(parameters);
+
+    assert(e.isLeft(launch));
+    expect(launch.left).toBeInstanceOf(AuthenticationRedirectionError);
+
+    if (launch.left instanceof AuthenticationRedirectionError) {
+      expect(launch.left.code).toBe("invalid_request");
+    }
+  });
+
+  it("should treat server internal errors with a valid Open ID auth error", async () => {
+    const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
+    const initiation = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+
+    recreateSutWithPoisonedRepositories();
+
+    const launch = await sut.authenticateLaunch(parameters);
+
+    assert(e.isLeft(launch));
+    expect(launch.left).toBeInstanceOf(AuthenticationRedirectionError);
+
+    if (launch.left instanceof AuthenticationRedirectionError) {
+      expect(launch.left.code).toBe("server_error");
+    }
+  });
+
+  it("should refuse to perform the launch when there is no valid session user", async () => {
+    const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
+    const initiation = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+
+    const launch = await sut.authenticateLaunch({
+      ...parameters,
+      userIdentity: undefined,
+    });
+
+    assert(e.isLeft(launch));
+    expect(launch.left).toBeInstanceOf(AuthenticationRedirectionError);
+
+    if (launch.left instanceof AuthenticationRedirectionError) {
+      expect(launch.left.code).toBe("login_required");
+    }
+  });
+
+  it("should refuse to perform the launch when session user has changed during launch initiation and performance", async () => {
+    const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
+    const initiation = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+
+    const launch = await sut.authenticateLaunch({
+      ...parameters,
+      userIdentity: UserIdentity.create({ id: "different-unknown-user-id" }),
+    });
+
+    assert(e.isLeft(launch));
+    expect(launch.left).toBeInstanceOf(AuthenticationRedirectionError);
+
+    if (launch.left instanceof AuthenticationRedirectionError) {
+      expect(launch.left.code).toBe("login_required");
+    }
+  });
+
+  it("should include presentation specified in the launch data as a LTI claim", async () => {
+    const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
+
+    const presentation = MessageRequests.Presentation.create({
+      width: 100,
+      height: 200,
+      documentTarget: MessageRequests.DocumentTarget.Frame,
+      locale: "pt-BR",
+      returnUrl: new URL(faker.internet.url()),
+    });
+
+    const initiation = await sut.initiateLaunch({
+      resourceLink,
+      sessionUserId,
+      tool,
+      presentation,
+    });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+
+    const launch = await sut.authenticateLaunch(parameters);
+
+    assert(e.isRight(launch));
+    expect(launch.right.intoLtiClaim()).toHaveProperty(PRESENTATION_CLAIM);
+    expect(launch.right.intoLtiClaim()[PRESENTATION_CLAIM]).toMatchObject(
+      presentation.intoLtiClaim(),
+    );
+  });
+
+  it("should not include presentation claim if no presentation has been specified", async () => {
+    const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
+    const initiation = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+
+    const launch = await sut.authenticateLaunch(parameters);
+
+    assert(e.isRight(launch));
+    expect(launch.right.intoLtiClaim()[PRESENTATION_CLAIM]).not.toBeDefined();
+  });
+
+  it("should include context claim if context is given and it contains the resource link", async () => {
+    const customContext = createContext();
+
+    const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
+
+    resourceLink.contextId = customContext.id;
+
+    const initiation = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+
+    const launch = await sut.authenticateLaunch(parameters);
+
+    assert(e.isRight(launch));
+    assert(e.isRight(launch.right.setContext(customContext)));
+
+    const claims = launch.right.intoLtiClaim();
+    expect(claims[CONTEXT_CLAIM]).toBeDefined();
+    expect(claims[CONTEXT_CLAIM]).toMatchObject({
+      id: customContext.id,
+      label: customContext.label,
+      title: customContext.title,
+      type: customContext.type,
+    });
+  });
+
+  it("should not set a context if the resource link being launched does not belong to it", async () => {
+    const customContext = createContext();
+
+    // ensure resource link is attached to no context at all
+    const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
+    resourceLink.contextId = undefined;
+    const initiation = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+
+    const launch = await sut.authenticateLaunch(parameters);
+
+    assert(e.isRight(launch));
+    assert(
+      e.isLeft(launch.right.setContext(customContext)),
+      "it should not include context since the resource link does not belong to it",
+    );
+  });
+
+  it("should allow platforms to perform some transformation over launch request", async () => {
+    const customContext = createContext();
+    const customMsg = "value assigned from within transformation";
+
+    const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
+
+    resourceLink.contextId = customContext.id;
+
+    const initiation = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+
+    const launch = await sut.authenticateLaunch({
+      ...parameters,
+
+      transformLaunchRequest: (request) => {
+        request.customClaims["foo"] = customMsg;
+        request.setContext(customContext);
+      },
+    });
+
+    assert(e.isRight(launch));
+    expect(launch.right.customClaims["foo"]).toBe(customMsg);
+
+    const claims = launch.right.intoLtiClaim();
+    expect(claims[CONTEXT_CLAIM]).toBeDefined();
+    expect(claims[CONTEXT_CLAIM]).toMatchObject({
+      id: customContext.id,
+      label: customContext.label,
+      title: customContext.title,
+      type: customContext.type,
+    });
+  });
+
+  it.each([
+    {
+      errorDescriptionKey: "malformedLaunch",
+      error: "malformed request redirection",
+      overrides: { loginHint: generateUUID() },
+    },
+    {
+      errorDescriptionKey: "linkNotFound",
+      error: "link not found",
+      overrides: {},
+      overrideLaunchResourceLinkId: "fake-and-unexisting-resource-link-id",
+    },
+    {
+      errorDescriptionKey: "serverError",
+      error: "server error redirection",
+      overrides: {},
+      cb: recreateSutWithPoisonedRepositories,
+    },
+    {
+      errorDescriptionKey: "loginRequired",
+      error: "login required redirection",
+      overrides: { userIdentity: UserIdentity.create<never>({ id: "fake-unexisting-user-id" }) },
+    },
+  ])(
+    "should correctly include routes defined in `errorDescriptionsRoutes` in the error responses upon $error error",
+    async ({ overrides, overrideLaunchResourceLinkId, errorDescriptionKey, cb }) => {
+      const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
+      const initiation = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
+
+      const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+      const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+
+      cb?.();
+
+      if (overrideLaunchResourceLinkId) {
+        const launch = launchesRepo.launches.find((launch) => launch.data.id === messageHint)!;
+
+        const newLaunch = LtiLaunchData.create({
+          ...launch.data,
+          resourceLinkId: overrideLaunchResourceLinkId,
+        });
+
+        launchesRepo.launches = launchesRepo.launches.filter(
+          (persistedLaunch) => persistedLaunch.data.id !== launch.data.id,
+        );
+
+        launchesRepo.launches.push({ data: newLaunch, savedAt: launch.savedAt, ttl: launch.ttl });
+      }
+
+      const errorDescriptionsRoutes = {
+        invalidRequest: new URL("/invalid-lti-request", platform.issuer),
+        linkNotFound: new URL("/lti-link-not-found", platform.issuer),
+        malformedLaunch: new URL("/malformed-lti-launch", platform.issuer),
+        serverError: new URL("/platform-server-error", platform.issuer),
+        loginRequired: new URL("/login", platform.issuer),
+      } satisfies LaunchAuthErrorDescriptionsRoutes;
+
+      const launch = await sut.authenticateLaunch({
+        ...parameters,
+        ...overrides,
+        errorDescriptionsRoutes,
+      });
+
+      const ERR_PAGE_URI_PROP = "errorPageUri";
+
+      assert(e.isLeft(launch));
+      expect(launch.left).toHaveProperty(ERR_PAGE_URI_PROP);
+      expect(launch.left[ERR_PAGE_URI_PROP]).toBeDefined();
+
+      const error = launch.left;
+
+      expect(error[ERR_PAGE_URI_PROP]).toBe(errorDescriptionsRoutes[errorDescriptionKey]);
+    },
+  );
+
+  it("should fallback to `fallbackUserRoles` when there are no roles in given `userIdentity`", async () => {
+    const userIdentityWithoutRoles = UserIdentity.create<never>({ id: generateUUID(), roles: [] });
+    const fallbackUserRoles = [MembershipRole.Learner, InstitutionRole.Learner] satisfies UserRoles;
+
+    const { resourceLink, tool } = getValidDataForInitiation();
+    const initiation = await sut.initiateLaunch({
+      resourceLink,
+      sessionUserId: userIdentityWithoutRoles.id,
+      tool,
+    });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({
+      loginHint,
+      messageHint,
+      sessionUserId: userIdentityWithoutRoles.id,
+      tool,
+    });
+
+    const launch = await sut.authenticateLaunch({
+      ...parameters,
+      userIdentity: userIdentityWithoutRoles,
+      fallbackUserRoles,
+    });
+
+    assert(e.isRight(launch));
+
+    const claims = launch.right.intoLtiClaim();
+    expect(
+      claims[ROLES_CLAIM],
+      "it should have (only) the fallback user's roles set as value of the LTI roles claim",
+    ).toEqual(expect.arrayContaining(fallbackUserRoles));
+  });
 });
