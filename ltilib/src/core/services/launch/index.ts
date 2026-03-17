@@ -20,7 +20,7 @@ type GetLaunchLinksFromContext = GetLaunchLinksParams & {
   contextId: string;
 };
 
-export class LtiLaunchServices<CustomRoles = never, CustomContextType = never> {
+export class LtiLaunchServices<CustomRoles extends string = never, CustomContextType = never> {
   private prepareLaunchRequestService: PrepareLaunchRequestService<CustomRoles, CustomContextType>;
   private initiateLaunchService: InitiateLaunchService;
   private getLaunchLinksService: GetLaunchLinksService;
