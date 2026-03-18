@@ -15,7 +15,6 @@ import { FindDeploymentByIdService } from "./deployments/services/find-deploymen
 import { RemoveToolDeploymentService } from "./deployments/services/remove-tool-deployment.service";
 import { LtiLaunchesController } from "./launches/launches.controller";
 import { InitiateLaunchService } from "./launches/services/initiate-launch.service";
-import { LaunchLoginService } from "./launches/services/launch-login.service";
 import { LtiController } from "./lti.controller";
 import { PlatformFactory } from "./platform.factory";
 import { LtiResourceLinksController } from "./resource-links/resource-links.controller";
@@ -77,7 +76,6 @@ import { LtiToolsController } from "./tools/tools.controller";
     CreateResourceLinkService,
     DeleteResourceLinkService,
     findResourceLinkByIdService,
-    LaunchLoginService,
     InitiateLaunchService,
   ],
   exports: [LtiLaunchServices, Platform],
