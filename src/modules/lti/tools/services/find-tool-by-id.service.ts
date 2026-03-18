@@ -4,16 +4,16 @@ import { either } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { PersonNotFoundError } from "@/modules/identity/errors/person-not-found.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiTool } from "../entities/lti-tool.entity";
+import { ToolNotFoundError } from "../errors/tool-not-found.error";
 import { LtiToolsRepository } from "../lti-tools.repository";
 
 type Params = {
   id: UUID;
 };
 
-type PossibleErrors = IrrecoverableError | PersonNotFoundError;
+type PossibleErrors = IrrecoverableError | ToolNotFoundError;
 
 @Injectable()
 export class FindToolByIdService {
