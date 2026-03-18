@@ -59,7 +59,7 @@ export class UserIdentity<CustomRoles = never> implements IntoLtiClaim {
     Object.assign(this, args);
   }
 
-  public static create<CustomRoles>(args: Args<CustomRoles>) {
+  public static create<CustomRoles = never>(args: Args<CustomRoles>) {
     return new UserIdentity(args);
   }
 
