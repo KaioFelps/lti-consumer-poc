@@ -9,7 +9,6 @@ import { AuthenticationRedirectionError } from "$/core/errors/authentication-red
 import { CouldNotFindToolDueToExternalRepositoryError } from "$/core/errors/could-not-find-tool-due-to-external-error";
 import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
 import { InvalidResourceLinkLaunchError } from "$/core/errors/invalid-resource-link-launch.error";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiLaunchData } from "$/core/launch-data";
 import { LTIResourceLinkLaunchRequest } from "$/core/messages/resource-link-launch";
 import { Platform } from "$/core/platform";
@@ -20,6 +19,12 @@ import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identitie
 import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
 import { UserIdentity, UserRoles } from "$/core/user-identity";
+
+type RedirectionErrorFactory = (
+  code: AuthenticationRedirectionError["code"],
+  description: string,
+  page: ErrorKey,
+) => AuthenticationRedirectionError;
 
 type ErrorKey =
   | "invalidRequest"
@@ -85,7 +90,6 @@ export class PrepareLaunchRequestService<
   }: AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType>): Promise<
     Either<
       | AuthenticationRedirectionError
-      | LtiRepositoryError
       | InvalidResourceLinkLaunchError
       | InvalidRedirectUriError
       | CouldNotFindToolDueToExternalRepositoryError,
@@ -166,21 +170,31 @@ export class PrepareLaunchRequestService<
       }),
     )();
 
+    const serverErrorFactory: RedirectionErrorFactory = (
+      code: AuthenticationRedirectionError["code"],
+      description: string,
+      page: ErrorKey,
+    ) =>
+      new AuthenticationRedirectionError({
+        code,
+        description,
+        errorPageUri: errorDescriptionsRoutes?.[page],
+        redirectUri,
+        state,
+      });
+
     if (e.isLeft(launchAndLink)) return launchAndLink;
 
     const { launch, resourceLink } = launchAndLink.right;
 
-    const a = await pipe(
+    return await pipe(
       te.Do,
-      te.apSW("agsClaim", this.prepareAgsClaimIfEnabled(tool, context, resourceLink)),
+      te.apSW(
+        "agsClaim",
+        this.prepareAgsClaimIfEnabled(tool, context, resourceLink, serverErrorFactory),
+      ),
       te.apSW("userIdentity", () =>
-        this.resolveUserIdentity({
-          launch,
-          redirectUri,
-          state,
-          userIdentity,
-          errorDescriptionsRoutes,
-        }),
+        this.resolveUserIdentity(launch, userIdentity, serverErrorFactory),
       ),
       te.chainW(({ agsClaim, userIdentity }) =>
         pipe(
@@ -205,20 +219,26 @@ export class PrepareLaunchRequestService<
         return launchRequest;
       }),
     )();
-
-    return a;
   }
 
   private prepareAgsClaimIfEnabled(
     tool: LtiTool,
     context: Context | undefined,
     resourceLink: LtiResourceLink,
-  ): TaskEither<LtiRepositoryError<unknown>, AssignmentAndGradeServiceClaim | undefined> {
+    errFactory: RedirectionErrorFactory,
+  ): TaskEither<AuthenticationRedirectionError, AssignmentAndGradeServiceClaim | undefined> {
     return pipe(
       this.agsClaimServices
         ? () => this.agsClaimServices!.create({ tool, context, resourceLink })
         : te.right(o.none),
       te.map(o.toUndefined),
+      te.mapLeft((_externalRepositoryError) =>
+        errFactory(
+          "server_error",
+          "Something went wrong while mounting LTI AGS claim",
+          "serverError",
+        ),
+      ),
     );
   }
 
@@ -242,27 +262,17 @@ export class PrepareLaunchRequestService<
     );
   }
 
-  private async resolveUserIdentity({
-    launch,
-    redirectUri,
-    state,
-    userIdentity,
-    errorDescriptionsRoutes,
-  }: {
-    userIdentity: UserIdentity | undefined;
-    launch: LtiLaunchData;
-    redirectUri: URL;
-    state: string;
-    errorDescriptionsRoutes?: LaunchAuthErrorDescriptionsRoutes;
-  }): Promise<Either<AuthenticationRedirectionError, UserIdentity>> {
+  private async resolveUserIdentity(
+    launch: LtiLaunchData,
+    userIdentity: UserIdentity | undefined,
+    errFactory: RedirectionErrorFactory,
+  ): Promise<Either<AuthenticationRedirectionError, UserIdentity>> {
     if (userIdentity && launch.userId !== userIdentity.id) {
-      const loginRequiredRedirection = new AuthenticationRedirectionError({
-        code: "login_required",
-        errorPageUri: errorDescriptionsRoutes?.loginRequired,
-        description: "The user who started the launch is not the current user.",
-        redirectUri,
-        state,
-      });
+      const loginRequiredRedirection = errFactory(
+        "login_required",
+        "The user who started the launch is not the current user.",
+        "loginRequired",
+      );
 
       return e.left(loginRequiredRedirection);
     } else if (userIdentity) return e.right(userIdentity);
@@ -274,24 +284,21 @@ export class PrepareLaunchRequestService<
     if (e.isRight(userIdentityResult)) return userIdentityResult;
 
     if (userIdentityResult.left.type === "NotFound") {
-      const loginRequiredRedirection = new AuthenticationRedirectionError({
-        code: "login_required",
-        errorPageUri: errorDescriptionsRoutes?.loginRequired,
-        description: "There's no authenticated user attached to this launch.",
-        redirectUri,
-        state,
-      });
+      const loginRequiredRedirection = errFactory(
+        "login_required",
+        "There's no authenticated user attached to this launch.",
+        "loginRequired",
+      );
 
       return e.left(loginRequiredRedirection);
     }
 
-    const error = new AuthenticationRedirectionError({
-      code: "server_error",
-      description: "Something went wrong while retrieving user identity.",
-      errorPageUri: errorDescriptionsRoutes?.serverError,
-      redirectUri,
-      state,
-    });
+    const error = errFactory(
+      "server_error",
+      "Something went wrong while retrieving user identity.",
+      "serverError",
+    );
+
     return e.left(error);
   }
 }
