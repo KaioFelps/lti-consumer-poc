@@ -1,16 +1,22 @@
 import { either as e, option as o, taskEither as te } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
+import { TaskEither } from "fp-ts/lib/TaskEither";
+import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim";
 import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim";
 import { Context } from "$/core/context";
 import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
+import { CouldNotFindToolDueToExternalRepositoryError } from "$/core/errors/could-not-find-tool-due-to-external-error";
 import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
 import { InvalidResourceLinkLaunchError } from "$/core/errors/invalid-resource-link-launch.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
+import { LtiLaunchData } from "$/core/launch-data";
 import { LTIResourceLinkLaunchRequest } from "$/core/messages/resource-link-launch";
 import { Platform } from "$/core/platform";
 import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
+import { LtiToolsRepository } from "$/core/repositories/tools.repository";
+import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identities.repository";
 import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
 import { UserIdentity, UserRoles } from "$/core/user-identity";
@@ -26,11 +32,17 @@ export type LaunchAuthErrorDescriptionsRoutes = { [key in ErrorKey]?: URL };
 
 export type AuthenticateLaunchLoginRequestParams<CustomRoles extends string, CustomContextType> = {
   nonce: string;
-  tool: LtiTool;
+  toolId: LtiTool["id"];
   redirectUri: string;
   state: string;
   loginHint: string;
   messageHint: string;
+  /**
+   * If an instance of `UserIdentity` of the same user who initiated the launch is already available,
+   * it can be used to authenticate the tool and prepare the launch request.
+   *
+   * If none is provided, the identity of the user who initiated the launch will be fetched and used.
+   */
   userIdentity?: UserIdentity;
   context?: Context;
   fallbackUserRoles?: UserRoles<CustomRoles>;
@@ -54,6 +66,8 @@ export class PrepareLaunchRequestService<
     private resourceLinksRepository: LtiResourceLinksRepository,
     private launchesRepository: LtiLaunchesRepository,
     private agsClaimServices: LtiAgsClaimServices | undefined,
+    private userIdentitiesRepository: LtiUserIdentitiesRespository,
+    private toolsRepository: LtiToolsRepository,
   ) {}
 
   public async execute({
@@ -66,17 +80,33 @@ export class PrepareLaunchRequestService<
     context,
     fallbackUserRoles,
     errorDescriptionsRoutes,
-    tool,
+    toolId,
     transformLaunchRequest,
   }: AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType>): Promise<
     Either<
       | AuthenticationRedirectionError
       | LtiRepositoryError
       | InvalidResourceLinkLaunchError
-      | InvalidRedirectUriError,
+      | InvalidRedirectUriError
+      | CouldNotFindToolDueToExternalRepositoryError,
       LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>
     >
   > {
+    const toolResult = await this.toolsRepository.findToolById(toolId);
+    if (e.isLeft(toolResult)) {
+      if (toolResult.left.type === "ExternalError") {
+        return e.left(new CouldNotFindToolDueToExternalRepositoryError(toolResult.left));
+      }
+
+      const error = new InvalidRedirectUriError(
+        "Tool is not registered and thus given redirect URI is not reliable.",
+        _redirectUri,
+      );
+      return e.left(error);
+    }
+
+    const tool = toolResult.right;
+
     const redirectUriIsValid = this.verifyRedirectUri(_redirectUri, tool);
     if (e.isLeft(redirectUriIsValid)) return redirectUriIsValid;
     const redirectUri = redirectUriIsValid.right;
@@ -140,31 +170,19 @@ export class PrepareLaunchRequestService<
 
     const { launch, resourceLink } = launchAndLink.right;
 
-    let loginRequiredError: string | undefined;
-
-    if (!userIdentity) {
-      loginRequiredError = "There's no authenticated user attached to this launch.";
-    }
-
-    if (launch.userId !== userIdentity?.id) {
-      loginRequiredError = "The user who started the launch is not the current user.";
-    }
-
-    if (loginRequiredError) {
-      const loginRequiredRedirection = new AuthenticationRedirectionError({
-        code: "login_required",
-        errorPageUri: errorDescriptionsRoutes?.loginRequired,
-        description: loginRequiredError,
-        redirectUri,
-        state,
-      });
-
-      return e.left(loginRequiredRedirection);
-    }
-
-    return await pipe(
-      this.prepareAgsClaimIfEnabled(tool, context, resourceLink),
-      te.chainW((agsClaim) =>
+    const a = await pipe(
+      te.Do,
+      te.apSW("agsClaim", this.prepareAgsClaimIfEnabled(tool, context, resourceLink)),
+      te.apSW("userIdentity", () =>
+        this.resolveUserIdentity({
+          launch,
+          redirectUri,
+          state,
+          userIdentity,
+          errorDescriptionsRoutes,
+        }),
+      ),
+      te.chainW(({ agsClaim, userIdentity }) =>
         pipe(
           LTIResourceLinkLaunchRequest.create<CustomRoles, CustomContextType>({
             tool,
@@ -187,13 +205,15 @@ export class PrepareLaunchRequestService<
         return launchRequest;
       }),
     )();
+
+    return a;
   }
 
   private prepareAgsClaimIfEnabled(
     tool: LtiTool,
     context: Context | undefined,
     resourceLink: LtiResourceLink,
-  ) {
+  ): TaskEither<LtiRepositoryError<unknown>, AssignmentAndGradeServiceClaim | undefined> {
     return pipe(
       this.agsClaimServices
         ? () => this.agsClaimServices!.create({ tool, context, resourceLink })
@@ -220,5 +240,58 @@ export class PrepareLaunchRequestService<
         (_error) => new InvalidRedirectUriError("Given redirect URI is not valid.", redirectUri),
       ),
     );
+  }
+
+  private async resolveUserIdentity({
+    launch,
+    redirectUri,
+    state,
+    userIdentity,
+    errorDescriptionsRoutes,
+  }: {
+    userIdentity: UserIdentity | undefined;
+    launch: LtiLaunchData;
+    redirectUri: URL;
+    state: string;
+    errorDescriptionsRoutes?: LaunchAuthErrorDescriptionsRoutes;
+  }): Promise<Either<AuthenticationRedirectionError, UserIdentity>> {
+    if (userIdentity && launch.userId !== userIdentity.id) {
+      const loginRequiredRedirection = new AuthenticationRedirectionError({
+        code: "login_required",
+        errorPageUri: errorDescriptionsRoutes?.loginRequired,
+        description: "The user who started the launch is not the current user.",
+        redirectUri,
+        state,
+      });
+
+      return e.left(loginRequiredRedirection);
+    } else if (userIdentity) return e.right(userIdentity);
+
+    const userIdentityResult = await this.userIdentitiesRepository.findUserIdentityById(
+      launch.userId,
+    );
+
+    if (e.isRight(userIdentityResult)) return userIdentityResult;
+
+    if (userIdentityResult.left.type === "NotFound") {
+      const loginRequiredRedirection = new AuthenticationRedirectionError({
+        code: "login_required",
+        errorPageUri: errorDescriptionsRoutes?.loginRequired,
+        description: "There's no authenticated user attached to this launch.",
+        redirectUri,
+        state,
+      });
+
+      return e.left(loginRequiredRedirection);
+    }
+
+    const error = new AuthenticationRedirectionError({
+      code: "server_error",
+      description: "Something went wrong while retrieving user identity.",
+      errorPageUri: errorDescriptionsRoutes?.serverError,
+      redirectUri,
+      state,
+    });
+    return e.left(error);
   }
 }

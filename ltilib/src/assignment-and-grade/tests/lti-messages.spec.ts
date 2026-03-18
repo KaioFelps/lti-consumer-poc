@@ -16,6 +16,7 @@ import { InMemoryLtiLineItemsRepository } from "ltilib/tests/common/in-memory-re
 import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
 import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
 import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
+import { InMemoryUserIdentitiesRepository } from "ltilib/tests/common/in-memory-repositories/user-identities.repository";
 import { ASSIGNMENT_AND_GRADE_SERVICES_SCOPES } from "$/assignment-and-grade/scopes";
 import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim";
 import { LtiLaunchData } from "$/core/launch-data";
@@ -33,6 +34,7 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
   let toolsRepo: InMemoryToolsRepository;
   let resourceLinksRepo: InMemoryLtiResourceLinksRepository;
   let launchesRepo: InMemoryLaunchesRepository;
+  let userIdentitiesRepo: InMemoryUserIdentitiesRepository;
 
   let agsClaimServices: LtiAgsClaimServices;
   let launchServices: LtiLaunchServices;
@@ -42,6 +44,7 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
     launchesRepo = new InMemoryLaunchesRepository();
     deploymentsRepo = new InMemoryLtiToolDeploymentsRepository();
     resourceLinksRepo = new InMemoryLtiResourceLinksRepository();
+    userIdentitiesRepo = new InMemoryUserIdentitiesRepository();
     toolsRepo = new InMemoryToolsRepository(
       resourceLinksRepo as InMemoryLtiResourceLinksRepository,
     );
@@ -52,6 +55,7 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
       resourceLinksRepo,
       toolsRepo,
       launchesRepo,
+      userIdentitiesRepo,
       platform,
       agsClaimServices,
     );
@@ -84,6 +88,7 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
     toolsRepo.tools.push(tool);
     resourceLinksRepo.resourceLinks.push(resourceLink);
     launchesRepo.save(launch, 15 * 60);
+    userIdentitiesRepo.users.push(UserIdentity.create({ id: userId }));
 
     return { tool, userId, deployment, resourceLink, launch, toolRedirectUri };
   };
@@ -91,7 +96,7 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
   test.each(ASSIGNMENT_AND_GRADE_SERVICES_SCOPES)(
     "AGS-enabled LTI messages to tools with access to any AGS should contain the service's claim",
     async (scope) => {
-      const { launch, toolRedirectUri, userId, tool } = getValidEntities({ scopes: [scope] });
+      const { launch, toolRedirectUri, tool } = getValidEntities({ scopes: [scope] });
 
       const launchRequest = await launchServices.authenticateLaunch({
         loginHint: launch.id.toString(),
@@ -99,9 +104,8 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
         nonce: randomBytes(1024).toString("base64"),
         redirectUri: toolRedirectUri,
         state: randomBytes(512).toString("base64"),
-        tool,
+        toolId: tool.id,
         context,
-        userIdentity: UserIdentity.create({ id: userId }),
       });
 
       assert(e.isRight(launchRequest), "it should be a valid launch request");
@@ -114,7 +118,7 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
   );
 
   it("should not contain the service's claim if the tool does not have access to any of them", async () => {
-    const { tool, toolRedirectUri, userId, launch } = getValidEntities({ scopes: [] });
+    const { tool, toolRedirectUri, launch } = getValidEntities({ scopes: [] });
 
     const launchRequest = await launchServices.authenticateLaunch({
       loginHint: launch.id.toString(),
@@ -122,9 +126,8 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
       nonce: randomBytes(1024).toString("base64"),
       redirectUri: toolRedirectUri,
       state: randomBytes(512).toString("base64"),
-      tool,
+      toolId: tool.id,
       context,
-      userIdentity: UserIdentity.create({ id: userId }),
     });
 
     assert(e.isRight(launchRequest), "it should be a valid launch request");

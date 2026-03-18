@@ -14,8 +14,10 @@ import { createTool } from "ltilib/tests/common/factories/tool.factory";
 import { InMemoryLaunchesRepository } from "ltilib/tests/common/in-memory-repositories/launches.repository";
 import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
 import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
+import { InMemoryUserIdentitiesRepository } from "ltilib/tests/common/in-memory-repositories/user-identities.repository";
 import { InstitutionRole, MembershipRole } from "$/claims/enums/roles";
 import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
+import { CouldNotFindToolDueToExternalRepositoryError } from "$/core/errors/could-not-find-tool-due-to-external-error";
 import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiLaunchData } from "$/core/launch-data";
@@ -23,6 +25,7 @@ import { MessageRequests } from "$/core/messages";
 import { InitiateLaunchRequest } from "$/core/messages/initiate-launch";
 import { Platform } from "$/core/platform";
 import { FindManyParams } from "$/core/repositories/resource-links.repository";
+import { LtiToolsRepository } from "$/core/repositories/tools.repository";
 import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
 import { UserIdentity, UserRoles } from "$/core/user-identity";
@@ -38,6 +41,7 @@ describe("[Core] Prepare Launch Request Service", async () => {
   let resourceLinksRepo: InMemoryLtiResourceLinksRepository;
   let toolsRepo: InMemoryToolsRepository;
   let launchesRepo: InMemoryLaunchesRepository;
+  let userIdentitiesRepo: InMemoryUserIdentitiesRepository;
 
   let platform: Platform;
   let sut: LtiLaunchServices;
@@ -45,22 +49,32 @@ describe("[Core] Prepare Launch Request Service", async () => {
   beforeEach(async () => {
     resourceLinksRepo = new InMemoryLtiResourceLinksRepository();
     toolsRepo = new InMemoryToolsRepository();
+    userIdentitiesRepo = new InMemoryUserIdentitiesRepository();
     launchesRepo = new InMemoryLaunchesRepository();
 
     platform = await createPlatform();
 
-    sut = new LtiLaunchServices(resourceLinksRepo, toolsRepo, launchesRepo, platform, undefined);
+    sut = new LtiLaunchServices(
+      resourceLinksRepo,
+      toolsRepo,
+      launchesRepo,
+      userIdentitiesRepo,
+      platform,
+      undefined,
+    );
   });
 
   function getValidDataForInitiation() {
     const tool = createTool();
     const resourceLink = createResourceLink({ tool });
     const sessionUserId = generateUUID();
+    const userIdentity = UserIdentity.create({ id: sessionUserId });
 
     toolsRepo.tools.push(tool);
     resourceLinksRepo.resourceLinks.push(resourceLink);
+    userIdentitiesRepo.users.push(userIdentity);
 
-    return { tool, resourceLink, sessionUserId };
+    return { tool, resourceLink, sessionUserId, userIdentity };
   }
 
   /**
@@ -95,7 +109,6 @@ describe("[Core] Prepare Launch Request Service", async () => {
   function getValidDataForLaunch({
     loginHint,
     messageHint,
-    sessionUserId,
     tool,
   }: {
     loginHint: string;
@@ -106,8 +119,7 @@ describe("[Core] Prepare Launch Request Service", async () => {
     return {
       loginHint,
       messageHint,
-      tool,
-      userIdentity: UserIdentity.create<never>({ id: sessionUserId }),
+      toolId: tool.id,
       nonce: randomBytes(64).toString(),
       state: randomBytes(64).toString(),
       redirectUri: tool.redirectUrls[0],
@@ -130,12 +142,54 @@ describe("[Core] Prepare Launch Request Service", async () => {
     });
   }
 
+  it(
+    `should specifically return a ${CouldNotFindToolDueToExternalRepositoryError.name} when tool ` +
+      "could not be found due to external repository error and thus `resource_uri` could not be checked",
+    async () => {
+      class PoisonedToolsRepo implements LtiToolsRepository {
+        public async findToolsOwningResourceLinks(
+          _resourceLinksIds: LtiResourceLink["id"][],
+        ): Promise<Either<LtiRepositoryError, LtiTool[]>> {
+          return e.left(new LtiRepositoryError({ type: "ExternalError", cause: undefined }));
+        }
+        public async findToolById(_id: string): Promise<Either<LtiRepositoryError, LtiTool>> {
+          return e.left(new LtiRepositoryError({ type: "ExternalError", cause: undefined }));
+        }
+      }
+
+      const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
+      const initiation = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
+      const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+
+      sut = new LtiLaunchServices(
+        resourceLinksRepo,
+        new PoisonedToolsRepo(),
+        launchesRepo,
+        userIdentitiesRepo,
+        platform,
+        undefined,
+      );
+
+      const launch = await sut.authenticateLaunch(
+        getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool }),
+      );
+
+      assert(
+        e.isLeft(launch),
+        "it should not be a successful launch since tools repository is poisoned",
+      );
+
+      expect(launch.left).toBeInstanceOf(CouldNotFindToolDueToExternalRepositoryError);
+    },
+  );
+
   it("should not turn `redirect_uri` into a `URL` instance until registry verification has been done", async () => {
     const urlWithoutTrailingSlash = faker.internet.url({ protocol: "https", appendSlash: false });
     const tool = createTool({ redirectUrls: [urlWithoutTrailingSlash] });
     const resourceLink = createResourceLink({ tool });
     const sessionUserId = generateUUID();
 
+    userIdentitiesRepo.users.push(UserIdentity.create({ id: sessionUserId }));
     resourceLinksRepo.resourceLinks.push(resourceLink);
     toolsRepo.tools.push(tool);
 
@@ -251,6 +305,7 @@ describe("[Core] Prepare Launch Request Service", async () => {
       failingResourceLinksRepo,
       toolsRepo,
       failingLaunchesRepo,
+      userIdentitiesRepo,
       platform,
       undefined,
     );
@@ -398,9 +453,11 @@ describe("[Core] Prepare Launch Request Service", async () => {
     const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
     const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
 
+    // removes user
+    userIdentitiesRepo.users = [];
+
     const launch = await sut.authenticateLaunch({
       ...parameters,
-      userIdentity: undefined,
     });
 
     assert(e.isLeft(launch));
@@ -409,6 +466,48 @@ describe("[Core] Prepare Launch Request Service", async () => {
     if (launch.left instanceof AuthenticationRedirectionError) {
       expect(launch.left.code).toBe("login_required");
     }
+  });
+
+  it("should fetch user identity when none is already provided", async () => {
+    const repoCall = vi.spyOn(userIdentitiesRepo, "findUserIdentityById");
+
+    const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
+    const initiation = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+
+    const launch = await sut.authenticateLaunch({
+      ...parameters,
+      userIdentity: undefined,
+    });
+
+    assert(e.isRight(launch));
+    expect(
+      repoCall,
+      "it should have tried to fetch user identity since none had been provided",
+    ).toHaveBeenCalled();
+  });
+
+  it("should avoid to find user identity if the correct one has already been provided", async () => {
+    const repoCall = vi.spyOn(userIdentitiesRepo, "findUserIdentityById");
+
+    const { resourceLink, sessionUserId, tool, userIdentity } = getValidDataForInitiation();
+    const initiation = await sut.initiateLaunch({ resourceLink, sessionUserId, tool });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+
+    const launch = await sut.authenticateLaunch({
+      ...parameters,
+      userIdentity,
+    });
+
+    assert(e.isRight(launch));
+    expect(
+      repoCall,
+      "it should not have tried to fetch user identity since it had already been provided",
+    ).not.toHaveBeenCalled();
   });
 
   it("should refuse to perform the launch when session user has changed during launch initiation and performance", async () => {
@@ -577,7 +676,7 @@ describe("[Core] Prepare Launch Request Service", async () => {
     {
       errorDescriptionKey: "loginRequired",
       error: "login required redirection",
-      overrides: { userIdentity: UserIdentity.create<never>({ id: "fake-unexisting-user-id" }) },
+      overrides: { userIdentity: UserIdentity.create({ id: "fake-unexisting-user-id" }) },
     },
   ])(
     "should correctly include routes defined in `errorDescriptionsRoutes` in the error responses upon $error error",
@@ -634,6 +733,8 @@ describe("[Core] Prepare Launch Request Service", async () => {
   it("should fallback to `fallbackUserRoles` when there are no roles in given `userIdentity`", async () => {
     const userIdentityWithoutRoles = UserIdentity.create<never>({ id: generateUUID(), roles: [] });
     const fallbackUserRoles = [MembershipRole.Learner, InstitutionRole.Learner] satisfies UserRoles;
+
+    userIdentitiesRepo.users.push(userIdentityWithoutRoles);
 
     const { resourceLink, tool } = getValidDataForInitiation();
     const initiation = await sut.initiateLaunch({

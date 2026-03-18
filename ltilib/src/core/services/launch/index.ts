@@ -5,6 +5,7 @@ import { Platform } from "$/core/platform";
 import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiToolsRepository } from "$/core/repositories/tools.repository";
+import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identities.repository";
 import {
   GetLaunchLinksFromResourceLinksParams,
   GetLaunchLinksParams,
@@ -29,6 +30,7 @@ export class LtiLaunchServices<CustomRoles extends string = never, CustomContext
     private resourceLinksRepository: LtiResourceLinksRepository,
     ltiToolsRepository: LtiToolsRepository,
     launchesRepository: LtiLaunchesRepository,
+    userIdentitiesRepository: LtiUserIdentitiesRespository,
     platform: Platform,
     agsClaimServices: LtiAgsClaimServices | undefined,
   ) {
@@ -37,6 +39,8 @@ export class LtiLaunchServices<CustomRoles extends string = never, CustomContext
       resourceLinksRepository,
       launchesRepository,
       agsClaimServices,
+      userIdentitiesRepository,
+      ltiToolsRepository,
     );
 
     this.initiateLaunchService = new InitiateLaunchService(platform, launchesRepository);

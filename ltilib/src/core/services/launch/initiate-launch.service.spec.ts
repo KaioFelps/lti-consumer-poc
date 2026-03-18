@@ -6,6 +6,7 @@ import { createTool } from "ltilib/tests/common/factories/tool.factory";
 import { InMemoryLaunchesRepository } from "ltilib/tests/common/in-memory-repositories/launches.repository";
 import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
 import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
+import { InMemoryUserIdentitiesRepository } from "ltilib/tests/common/in-memory-repositories/user-identities.repository";
 import { MessageType } from "$/claims/serialization";
 import { InvalidLaunchInitiationError } from "$/core/errors/invalid-launch-initiation.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
@@ -21,6 +22,7 @@ describe("[Core] Initiate Launch Service", async () => {
   let resourceLinksRepo: InMemoryLtiResourceLinksRepository;
   let toolsRepo: InMemoryToolsRepository;
   let launchesRepo: InMemoryLaunchesRepository;
+  let userIdentitiesRepo: InMemoryUserIdentitiesRepository;
 
   let platform: Platform;
   let sut: LtiLaunchServices;
@@ -29,10 +31,18 @@ describe("[Core] Initiate Launch Service", async () => {
     resourceLinksRepo = new InMemoryLtiResourceLinksRepository();
     toolsRepo = new InMemoryToolsRepository();
     launchesRepo = new InMemoryLaunchesRepository();
+    userIdentitiesRepo = new InMemoryUserIdentitiesRepository();
 
     platform = await createPlatform();
 
-    sut = new LtiLaunchServices(resourceLinksRepo, toolsRepo, launchesRepo, platform, undefined);
+    sut = new LtiLaunchServices(
+      resourceLinksRepo,
+      toolsRepo,
+      launchesRepo,
+      userIdentitiesRepo,
+      platform,
+      undefined,
+    );
   });
 
   const getValidLaunchInitiationData = () => {
