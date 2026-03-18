@@ -1,8 +1,9 @@
 import { either as e } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
+import { pipe } from "fp-ts/lib/function";
 import { MalformedRequestError } from "$/core/errors/malformed-request.error";
 
-type ValidateAuthenticationRequestArgs = {
+export type ValidateAuthenticationRequestArgs = {
   response_mode: unknown;
   response_type: unknown;
   prompt: unknown;
@@ -17,47 +18,60 @@ type ValidateAuthenticationRequestArgs = {
 export function validateAuthenticationRequest(
   args: ValidateAuthenticationRequestArgs | unknown,
 ): Either<MalformedRequestError, void> {
-  if (!args || typeof args !== "object") {
-    const error = new MalformedRequestError(
-      "It is not a valid LTI authentication request.",
-      "body",
-    );
+  return pipe(
+    validateArgs(args),
+    e.chain(ensureOpenIdScopeIsPresent),
+    e.chain(ensureFormPostResponseMode),
+    e.chain(ensureIdTokenResponseType),
+    e.chain(ensurePromptIsNone),
+    e.map(() => {}),
+  );
+}
 
-    return e.left(error);
-  }
+function validateArgs(args: unknown) {
+  const argsIsObject = !args || typeof args === "object";
+  if (argsIsObject) return e.right(args as ValidateAuthenticationRequestArgs);
 
-  const { response_mode, response_type, prompt, scope } = args as ValidateAuthenticationRequestArgs;
+  const error = new MalformedRequestError("It is not a valid LTI authentication request.", "body");
+  return e.left(error);
+}
 
-  const hasOpenIdScope = typeof scope === "string" && scope.includes("openid");
-  if (!hasOpenIdScope) {
-    const error = new MalformedRequestError(
-      "Request's OAuth scopes should include 'openid'.",
-      "scope",
-    );
+function ensureOpenIdScopeIsPresent(args: ValidateAuthenticationRequestArgs) {
+  const hasOpenIdScope = typeof args.scope === "string" && args.scope.includes("openid");
+  if (hasOpenIdScope) return e.right(args);
 
-    return e.left(error);
-  }
+  const error = new MalformedRequestError(
+    "Request's OAuth scopes should include 'openid'.",
+    "scope",
+  );
 
-  if (response_mode !== "form_post") {
-    const error = new MalformedRequestError(
-      "'response_mode' parameter must be 'form_post'.",
-      "response_mode",
-    );
+  return e.left(error);
+}
 
-    return e.left(error);
-  }
+function ensureFormPostResponseMode(args: ValidateAuthenticationRequestArgs) {
+  const responseModeIsFormPost = args.response_mode === "form_post";
+  if (responseModeIsFormPost) return e.right(args);
 
-  if (response_type !== "id_token") {
-    const error = new MalformedRequestError("'response_type' must be 'id_token'.", "response_type");
+  const error = new MalformedRequestError(
+    "'response_mode' parameter must be 'form_post'.",
+    "response_mode",
+  );
 
-    return e.left(error);
-  }
+  return e.left(error);
+}
 
-  if (prompt !== "none") {
-    const error = new MalformedRequestError("'prompt' must be 'none'.", "prompt");
+function ensureIdTokenResponseType(args: ValidateAuthenticationRequestArgs) {
+  const responseTypeIsIdToken = args.response_type === "id_token";
+  if (responseTypeIsIdToken) return e.right(args);
 
-    return e.left(error);
-  }
+  const error = new MalformedRequestError("'response_type' must be 'id_token'.", "response_type");
+  return e.left(error);
+}
 
-  return e.right(undefined);
+function ensurePromptIsNone(args: ValidateAuthenticationRequestArgs) {
+  const promptIsNone = args.prompt === "none";
+  if (promptIsNone) return e.right(args);
+
+  const error = new MalformedRequestError("'prompt' must be 'none'.", "prompt");
+  return e.left(error);
 }
