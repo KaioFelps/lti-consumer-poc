@@ -7,6 +7,7 @@ import { Context } from "$/core/context";
 import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
 import { CouldNotFindToolDueToExternalRepositoryError } from "$/core/errors/could-not-find-tool-due-to-external-error";
 import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
+import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { LtiLaunchData } from "$/core/launch-data";
 import { LTIResourceLinkLaunchRequest } from "$/core/messages/resource-link-launch";
 import { Platform } from "$/core/platform";
@@ -125,10 +126,24 @@ export class PrepareLaunchRequestService<
           fallbackUserRoles,
         ),
       ),
-      te.map(({ launchMessage, launch }) => {
+      te.chainFirstIOK(({ launchMessage, launch }) => () => {
         if (launch.presentation) launchMessage.setPresentation(launch.presentation);
         transformLaunchRequest?.(launchMessage);
-        return launchMessage;
+      }),
+      te.bindW(
+        "form",
+        ({ launchMessage }) =>
+          () =>
+            launchMessage.intoForm(),
+      ),
+      te.map(({ form, launchMessage }) => {
+        const headers = { "Content-Type": "text/html" };
+        return new HttpResponseWrapper<typeof launchMessage, string>(
+          form,
+          200,
+          launchMessage,
+          headers,
+        );
       }),
     )();
   }

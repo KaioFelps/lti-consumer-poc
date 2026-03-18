@@ -115,7 +115,7 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
       assert(e.isRight(launchRequest), "it should be a valid launch request");
 
       const message = launchRequest.right;
-      const claims = message.intoLtiClaim();
+      const claims = message.rawContent.intoLtiClaim();
 
       expect(claims).toHaveProperty(REQUIRED_CLAIM);
     },
@@ -140,7 +140,7 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
 
     assert(e.isRight(launchRequest), "it should be a valid launch request");
 
-    const claims = launchRequest.right.intoLtiClaim();
+    const claims = launchRequest.right.rawContent.intoLtiClaim();
     expect(claims).not.toHaveProperty(REQUIRED_CLAIM);
   });
 });

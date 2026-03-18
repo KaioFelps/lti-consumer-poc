@@ -7,6 +7,7 @@ import { faker } from "@faker-js/faker";
 import { generateUUID } from "common/src/types/uuid";
 import { either as e } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
+import { JSDOM, VirtualConsole } from "jsdom";
 import { createContext } from "ltilib/tests/common/factories/context.factory";
 import { createPlatform } from "ltilib/tests/common/factories/platform.factory";
 import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
@@ -23,6 +24,7 @@ import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiLaunchData } from "$/core/launch-data";
 import { MessageRequests } from "$/core/messages";
 import { InitiateLaunchRequest } from "$/core/messages/initiate-launch";
+import { LTIResourceLinkLaunchRequest } from "$/core/messages/resource-link-launch";
 import { Platform } from "$/core/platform";
 import { FindManyParams } from "$/core/repositories/resource-links.repository";
 import { LtiToolsRepository } from "$/core/repositories/tools.repository";
@@ -235,7 +237,7 @@ describe("[Core] Prepare Launch Request Service", async () => {
     );
 
     assert(e.isRight(launchMessage), "it should've been a successful launch");
-    const claims = launchMessage.right.intoLtiClaim();
+    const claims = launchMessage.right.rawContent.intoLtiClaim();
 
     expect(claims).toHaveProperty(TARGET_LINK_URI_CLAIM);
     expect(claims[TARGET_LINK_URI_CLAIM]).toBe(FAKE_TARGET_LINK.toString());
@@ -562,8 +564,8 @@ describe("[Core] Prepare Launch Request Service", async () => {
     const launch = await sut.authenticateLaunch(parameters);
 
     assert(e.isRight(launch));
-    expect(launch.right.intoLtiClaim()).toHaveProperty(PRESENTATION_CLAIM);
-    expect(launch.right.intoLtiClaim()[PRESENTATION_CLAIM]).toMatchObject(
+    expect(launch.right.rawContent.intoLtiClaim()).toHaveProperty(PRESENTATION_CLAIM);
+    expect(launch.right.rawContent.intoLtiClaim()[PRESENTATION_CLAIM]).toMatchObject(
       presentation.intoLtiClaim(),
     );
   });
@@ -578,7 +580,7 @@ describe("[Core] Prepare Launch Request Service", async () => {
     const launch = await sut.authenticateLaunch(parameters);
 
     assert(e.isRight(launch));
-    expect(launch.right.intoLtiClaim()[PRESENTATION_CLAIM]).not.toBeDefined();
+    expect(launch.right.rawContent.intoLtiClaim()[PRESENTATION_CLAIM]).not.toBeDefined();
   });
 
   it("should include context claim if context is given and it contains the resource link", async () => {
@@ -596,9 +598,9 @@ describe("[Core] Prepare Launch Request Service", async () => {
     const launch = await sut.authenticateLaunch(parameters);
 
     assert(e.isRight(launch));
-    assert(e.isRight(launch.right.setContext(customContext)));
+    assert(e.isRight(launch.right.rawContent.setContext(customContext)));
 
-    const claims = launch.right.intoLtiClaim();
+    const claims = launch.right.rawContent.intoLtiClaim();
     expect(claims[CONTEXT_CLAIM]).toBeDefined();
     expect(claims[CONTEXT_CLAIM]).toMatchObject({
       id: customContext.id,
@@ -623,7 +625,7 @@ describe("[Core] Prepare Launch Request Service", async () => {
 
     assert(e.isRight(launch));
     assert(
-      e.isLeft(launch.right.setContext(customContext)),
+      e.isLeft(launch.right.rawContent.setContext(customContext)),
       "it should not include context since the resource link does not belong to it",
     );
   });
@@ -651,9 +653,9 @@ describe("[Core] Prepare Launch Request Service", async () => {
     });
 
     assert(e.isRight(launch));
-    expect(launch.right.customClaims["foo"]).toBe(customMsg);
+    expect(launch.right.rawContent.customClaims["foo"]).toBe(customMsg);
 
-    const claims = launch.right.intoLtiClaim();
+    const claims = launch.right.rawContent.intoLtiClaim();
     expect(claims[CONTEXT_CLAIM]).toBeDefined();
     expect(claims[CONTEXT_CLAIM]).toMatchObject({
       id: customContext.id,
@@ -767,7 +769,7 @@ describe("[Core] Prepare Launch Request Service", async () => {
 
     assert(e.isRight(launch));
 
-    const claims = launch.right.intoLtiClaim();
+    const claims = launch.right.rawContent.intoLtiClaim();
     expect(
       claims[ROLES_CLAIM],
       "it should have (only) the fallback user's roles set as value of the LTI roles claim",
@@ -793,5 +795,38 @@ describe("[Core] Prepare Launch Request Service", async () => {
       validatePolicySpy,
       "it should have validated the launch request as per LTI Security Framework specs",
     ).toHaveBeenCalledOnce();
+  });
+
+  it("should return a http response wrapper with the auto-submission form ready-to-go", async () => {
+    const { resourceLink, tool, sessionUserId } = getValidDataForInitiation();
+    const initiation = await sut.initiateLaunch({
+      resourceLink,
+      sessionUserId,
+      tool,
+    });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+    const launch = await sut.authenticateLaunch(parameters);
+
+    assert(e.isRight(launch));
+
+    expect(launch.right.httpStatusCode, "it should suggest 200 OK HTTP status code").toBe(200);
+    expect(
+      launch.right.headers.get("content-type"),
+      "it should suggest 'text/html' content-type",
+    ).toBe("text/html");
+    expect(
+      launch.right.rawContent,
+      "it should provide the original resource link launch message",
+    ).toBeInstanceOf(LTIResourceLinkLaunchRequest);
+
+    const formHtml = launch.right.content;
+    const getDomWithForm = () => new JSDOM(formHtml, { virtualConsole: new VirtualConsole() });
+
+    expect(getDomWithForm).not.toThrow();
+    const dom = getDomWithForm();
+    const form = dom.window.document.querySelector("form");
+    expect(form, "the response content should be the auto-submission form HTML").not.toBeNull();
   });
 });
