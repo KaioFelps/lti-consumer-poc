@@ -5,7 +5,7 @@ export interface IOAuthError<ErrorCode> extends Omit<ILtilibError, "message"> {
   description?: string;
   errorPageUri?: URL;
   httpStatusCode: number;
-  headers?: Record<string, string>;
+  headers?: Record<string, string> | Headers;
 }
 
 /**
@@ -23,7 +23,7 @@ export abstract class OAuthError<ErrorCode extends string>
   /**
    * Headers that must be set to the HTTP response from the framework under usage.
    */
-  public readonly headers: Record<string, string>;
+  public readonly headers: Headers;
 
   public constructor(args: IOAuthError<ErrorCode>, errorOptions?: ErrorOptions) {
     const { httpStatusCode, code, description, errorPageUri, headers } = args;
@@ -33,7 +33,7 @@ export abstract class OAuthError<ErrorCode extends string>
     this.code = code;
     this.description = description;
     this.errorPageUri = errorPageUri;
-    this.headers = headers ?? {};
+    this.headers = new Headers(headers ?? {});
   }
 
   protected _present() {
