@@ -5,5 +5,6 @@ export class MalformedRequestError extends LtilibError {
 
   public constructor(message: string, cause: MalformedRequestError["cause"]) {
     super(400, message, { cause });
+    this.cause = cause;
   }
 }
