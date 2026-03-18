@@ -1,7 +1,6 @@
 import { taskEither } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import * as jose from "jose";
-import { JOSENotSupported } from "jose/dist/types/util/errors";
 import { Platform } from "$/core/platform";
 import { LtiTool } from "$/core/tool";
 
@@ -15,7 +14,7 @@ type PrepareIdTokenArgs = {
   claims: object;
 };
 
-export type PrepareIdTokenError = JOSENotSupported;
+export type PrepareIdTokenError = jose.errors.JOSENotSupported;
 
 /**
  * Prepares the Id Token and its JWS, as specified by [LTI Security Framework 1.0].

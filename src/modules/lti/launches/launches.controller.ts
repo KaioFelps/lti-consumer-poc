@@ -1,7 +1,7 @@
 import { Controller, Get, HttpStatus, Param, Query, Render, Res } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
-import { JOSENotSupported } from "jose/dist/types/util/errors";
+import { errors as joseErrors } from "jose";
 import { RenderableLtiInvalidLaunchInitiationError } from "@/core/errors/renderable/lti-invalid-launch-initiation.error";
 import { RenderableError } from "@/core/errors/renderable/renderable-error";
 import { HttpResponse } from "@/lib";
@@ -124,7 +124,8 @@ export class LtiLaunchesController {
             return await handleToolRetrievalExternalError(error, this.t);
           }
 
-          if (error instanceof JOSENotSupported) return handleJoseNotSupportedError(error);
+          if (error instanceof joseErrors.JOSENotSupported)
+            return handleJoseNotSupportedError(error);
 
           assertNever(error);
         },
@@ -168,7 +169,7 @@ function handleMalformedRequestError(error: MalformedRequestError) {
   throw ExceptionsFactory.fromError(renderable);
 }
 
-function handleJoseNotSupportedError(error: JOSENotSupported) {
+function handleJoseNotSupportedError(error: joseErrors.JOSENotSupported) {
   const renderable = new RenderableError(
     {
       view: "errors/lti-server-error",
