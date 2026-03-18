@@ -110,7 +110,6 @@ export class LtiLaunchesController {
       // passing just the method's reference (i.e., `() => launchMessage.intoForm`) causes loss of context,
       // this means the launch won't work since it will lose access to `this` (thus can't access stuff like
       // `this.platform`)
-      te.chainW((launchMessage) => () => launchMessage.intoForm()),
       te.matchW(
         async (error) => {
           if (error instanceof InvalidRedirectUriError) return handleInvalidRedurectUriError(error);
@@ -132,7 +131,11 @@ export class LtiLaunchesController {
 
           assertNever(error);
         },
-        (form) => res.type("html").status(HttpStatus.OK).send(form),
+        (response) => {
+          res.setHeaders(response.headers);
+          res.status(response.httpStatusCode);
+          res.send(response.content);
+        },
       ),
     )();
   }
@@ -190,8 +193,7 @@ function handleJoseNotSupportedError(error: joseErrors.JOSENotSupported) {
 }
 
 function handleOAuthLikeError<T extends string>(error: OAuthError<T>, res: HttpResponse) {
-  Object.entries(error.headers).forEach(([header, value]) => res.setHeader(header, value));
-  res.status(error.httpStatusCode).send(error.present());
+  res.setHeaders(error.headers).status(error.httpStatusCode).send(error.present());
 }
 
 async function handleToolRetrievalExternalError(
