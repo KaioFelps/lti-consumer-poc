@@ -106,6 +106,10 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
         state: randomBytes(512).toString("base64"),
         toolId: tool.id,
         context,
+        prompt: "none",
+        response_mode: "form_post",
+        response_type: "id_token",
+        scope: "openid",
       });
 
       assert(e.isRight(launchRequest), "it should be a valid launch request");
@@ -128,6 +132,10 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
       state: randomBytes(512).toString("base64"),
       toolId: tool.id,
       context,
+      prompt: "none",
+      response_mode: "form_post",
+      response_type: "id_token",
+      scope: "openid",
     });
 
     assert(e.isRight(launchRequest), "it should be a valid launch request");

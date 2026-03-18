@@ -9,6 +9,7 @@ import { AuthenticationRedirectionError } from "$/core/errors/authentication-red
 import { CouldNotFindToolDueToExternalRepositoryError } from "$/core/errors/could-not-find-tool-due-to-external-error";
 import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
 import { InvalidResourceLinkLaunchError } from "$/core/errors/invalid-resource-link-launch.error";
+import { MalformedRequestError } from "$/core/errors/malformed-request.error";
 import { LtiLaunchData } from "$/core/launch-data";
 import { LTIResourceLinkLaunchRequest } from "$/core/messages/resource-link-launch";
 import { Platform } from "$/core/platform";
@@ -19,6 +20,10 @@ import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identitie
 import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
 import { UserIdentity, UserRoles } from "$/core/user-identity";
+import {
+  ValidateAuthenticationRequestArgs,
+  validateAuthenticationRequest,
+} from "$/security/validate-authentication-request";
 
 type RedirectionErrorFactory = (
   code: AuthenticationRedirectionError["code"],
@@ -60,7 +65,7 @@ export type AuthenticateLaunchLoginRequestParams<CustomRoles extends string, Cus
    * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#AuthError}
    */
   errorDescriptionsRoutes?: LaunchAuthErrorDescriptionsRoutes;
-};
+} & ValidateAuthenticationRequestArgs;
 
 export class PrepareLaunchRequestService<
   CustomRoles extends string = never,
@@ -87,16 +92,22 @@ export class PrepareLaunchRequestService<
     errorDescriptionsRoutes,
     toolId,
     transformLaunchRequest,
+    ...otherParametersToValidate
   }: AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType>): Promise<
     Either<
       | AuthenticationRedirectionError
       | InvalidResourceLinkLaunchError
       | InvalidRedirectUriError
-      | CouldNotFindToolDueToExternalRepositoryError,
+      | CouldNotFindToolDueToExternalRepositoryError
+      | MalformedRequestError,
       LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>
     >
   > {
+    const requestIsValid = validateAuthenticationRequest(otherParametersToValidate);
+    if (e.isLeft(requestIsValid)) return requestIsValid;
+
     const toolResult = await this.toolsRepository.findToolById(toolId);
+
     if (e.isLeft(toolResult)) {
       if (toolResult.left.type === "ExternalError") {
         return e.left(new CouldNotFindToolDueToExternalRepositoryError(toolResult.left));

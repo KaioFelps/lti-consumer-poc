@@ -30,7 +30,10 @@ import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
 import { UserIdentity, UserRoles } from "$/core/user-identity";
 import { LtiLaunchServices } from ".";
-import { LaunchAuthErrorDescriptionsRoutes } from "./prepare-launch-request.service";
+import {
+  AuthenticateLaunchLoginRequestParams,
+  LaunchAuthErrorDescriptionsRoutes,
+} from "./prepare-launch-request.service";
 
 describe("[Core] Prepare Launch Request Service", async () => {
   const TARGET_LINK_URI_CLAIM = "https://purl.imsglobal.org/spec/lti/claim/target_link_uri";
@@ -123,7 +126,11 @@ describe("[Core] Prepare Launch Request Service", async () => {
       nonce: randomBytes(64).toString(),
       state: randomBytes(64).toString(),
       redirectUri: tool.redirectUrls[0],
-    } as const;
+      prompt: "none",
+      response_mode: "form_post",
+      response_type: "id_token",
+      scope: "openid",
+    } satisfies AuthenticateLaunchLoginRequestParams<never, never>;
   }
 
   function replaceLaunches(
