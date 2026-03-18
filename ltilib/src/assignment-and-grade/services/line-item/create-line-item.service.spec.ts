@@ -163,7 +163,7 @@ describe("[AGS] Create Line Item Service", async () => {
       });
 
       assert(e.isRight(response));
-      expect(response.right.headers["Content-Type"]).toBe(LtiAdvantageMediaType.LineItem);
+      expect(response.right.headers.get("Content-Type")).toBe(LtiAdvantageMediaType.LineItem);
     });
 
     it("should contain the newly created line item's ID", async () => {

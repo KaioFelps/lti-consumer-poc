@@ -248,8 +248,7 @@ describe("[AGS] Create Line Item Service", async () => {
     });
 
     assert(e.isRight(result));
-    expect(result.right.headers).toHaveProperty("Content-Type");
-    expect(result.right.headers["Content-Type"]).toEqual(LtiAdvantageMediaType.LineItem);
+    expect(result.right.headers.get("content-type")).toEqual(LtiAdvantageMediaType.LineItem);
   });
 
   it("should suggest a 404 NOT FOUND HTTP response when line item does not exist", async () => {
