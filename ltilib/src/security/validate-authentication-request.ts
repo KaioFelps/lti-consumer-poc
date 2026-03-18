@@ -29,7 +29,7 @@ export function validateAuthenticationRequest(
 }
 
 function validateArgs(args: unknown) {
-  const argsIsObject = !args || typeof args === "object";
+  const argsIsObject = typeof args === "object" && !Array.isArray(args);
   if (argsIsObject) return e.right(args as ValidateAuthenticationRequestArgs);
 
   const error = new MalformedRequestError("It is not a valid LTI authentication request.", "body");
@@ -37,15 +37,19 @@ function validateArgs(args: unknown) {
 }
 
 function ensureOpenIdScopeIsPresent(args: ValidateAuthenticationRequestArgs) {
-  const hasOpenIdScope = typeof args.scope === "string" && args.scope.includes("openid");
-  if (hasOpenIdScope) return e.right(args);
-
   const error = new MalformedRequestError(
-    "Request's OAuth scopes should include 'openid'.",
+    "Request's OAuth scopes should be a space-separated list and should include 'openid'.",
     "scope",
   );
 
-  return e.left(error);
+  if (typeof args.scope !== "string") return e.left(error);
+
+  const scopes = args.scope.split(" ");
+  const hasOpenIdScope = scopes.includes("openid");
+
+  if (!hasOpenIdScope) return e.left(error);
+
+  return e.right(args);
 }
 
 function ensureFormPostResponseMode(args: ValidateAuthenticationRequestArgs) {
