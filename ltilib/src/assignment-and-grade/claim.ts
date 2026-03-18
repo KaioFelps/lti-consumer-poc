@@ -9,7 +9,7 @@ const AGS_CLAIM_KEY = "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint";
 
 interface AgsClaimConstructorArgs {
   specificLineItem: LtiLineItem | undefined;
-  context: Context;
+  context: Context<unknown>;
   agsConfig: Platform.LtiAssignmentAndGradeServicesConfig;
   scopes: AssignmentAndGradeServiceScopes[];
 }
@@ -19,7 +19,7 @@ export class AssignmentAndGradeServiceClaim implements IntoLtiClaim {
 
   private constructor(
     private specificLineItem: LtiLineItem | undefined,
-    private context: Context,
+    private context: Context<unknown>,
     private agsConfig: Platform.LtiAssignmentAndGradeServicesConfig,
     private scopes: AssignmentAndGradeServiceScopes[],
   ) {}

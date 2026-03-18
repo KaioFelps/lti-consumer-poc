@@ -31,7 +31,7 @@ import { Platform } from "../platform";
 import { LtiTool } from "../tool";
 import { MessageRequests } from ".";
 
-type CreateFromLtiRecordArgs<CR = never> = {
+type CreateFromLtiRecordArgs<CR = never, CC = never> = {
   tool: LtiTool;
   platform: Platform;
   /**
@@ -47,7 +47,7 @@ type CreateFromLtiRecordArgs<CR = never> = {
   resourceLink: LtiResourceLink;
   nonce: string;
   state: string;
-  context?: Context;
+  context?: Context<CC>;
   /**
    * If and only if `tool` has access to any Assignment and Grade service, be sure
    * to provide an instance of {@link AssignmentAndGradeServiceClaim}.

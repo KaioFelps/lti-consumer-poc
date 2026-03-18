@@ -11,13 +11,13 @@ import { Platform } from "$/core/platform";
 import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
 
-export type CreateClaimParams = {
+export type CreateClaimParams<CustomContextType = never> = {
   tool: LtiTool;
-  context?: Context;
+  context?: Context<CustomContextType>;
   resourceLink: LtiResourceLink;
 };
 
-export class CreateService {
+export class CreateService<CustomContextType = never> {
   public constructor(
     private readonly platform: Platform,
     private readonly lineItemsRepo: LtiLineItemsRepository,
@@ -27,7 +27,7 @@ export class CreateService {
     tool,
     context,
     resourceLink,
-  }: CreateClaimParams): Promise<
+  }: CreateClaimParams<CustomContextType>): Promise<
     Either<LtiRepositoryError, Option<AssignmentAndGradeServiceClaim>>
   > {
     if (!this.platform.agsConfiguration) return e.right(o.none);
@@ -65,7 +65,7 @@ export class CreateService {
   private async resolveScopes(
     agsConfig: Platform.LtiAssignmentAndGradeServicesConfig,
     tool: LtiTool,
-    context: Context,
+    context: Context<CustomContextType>,
     resourceLink: LtiResourceLink,
   ) {
     return await pipe(
