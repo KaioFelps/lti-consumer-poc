@@ -43,7 +43,7 @@ type CreateFromLtiRecordArgs<CR = never, CC = never> = {
    * If not provided, it'll fallback to an empty array.
    */
   userIdentity?: UserIdentity<CR>;
-  userRoles?: UserRoles<CR>;
+  fallbackUserRoles?: UserRoles<CR>;
   resourceLink: LtiResourceLink;
   nonce: string;
   state: string;
@@ -102,11 +102,11 @@ export class LTIResourceLinkLaunchRequest<
     state,
     userIdentity,
     resourceLink,
-    userRoles: _userRoles,
+    fallbackUserRoles,
     context,
     agsClaim,
     resolvedTargetLinkUrl,
-  }: CreateFromLtiRecordArgs<CustomRoles>): Either<
+  }: CreateFromLtiRecordArgs<CustomRoles, CustomContextType>): Either<
     InvalidResourceLinkLaunchError,
     LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>
   > {
@@ -124,7 +124,7 @@ export class LTIResourceLinkLaunchRequest<
     );
 
     const userRolesWithPossibleDuplicates = [
-      ...(_userRoles ?? []),
+      ...(fallbackUserRoles ?? []),
       ...(userIdentity?.roles ?? []),
     ] as UserRoles<CustomRoles>;
 

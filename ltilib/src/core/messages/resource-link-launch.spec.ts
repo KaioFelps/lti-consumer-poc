@@ -46,7 +46,7 @@ describe("[Core] Resource link Launch Request", async () => {
       agsClaim: undefined,
       context: createContext(),
       userIdentity: UserIdentity.create<never>({ id: generateUUID() }),
-      userRoles: undefined,
+      fallbackUserRoles: undefined,
     };
   }
 

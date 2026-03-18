@@ -1,5 +1,4 @@
 import { either as e, option as o, taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { TaskEither } from "fp-ts/lib/TaskEither";
 import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim";
@@ -8,8 +7,6 @@ import { Context } from "$/core/context";
 import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
 import { CouldNotFindToolDueToExternalRepositoryError } from "$/core/errors/could-not-find-tool-due-to-external-error";
 import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
-import { InvalidResourceLinkLaunchError } from "$/core/errors/invalid-resource-link-launch.error";
-import { MalformedRequestError } from "$/core/errors/malformed-request.error";
 import { LtiLaunchData } from "$/core/launch-data";
 import { LTIResourceLinkLaunchRequest } from "$/core/messages/resource-link-launch";
 import { Platform } from "$/core/platform";
@@ -54,7 +51,7 @@ export type AuthenticateLaunchLoginRequestParams<CustomRoles extends string, Cus
    * If none is provided, the identity of the user who initiated the launch will be fetched and used.
    */
   userIdentity?: UserIdentity;
-  context?: Context;
+  context?: Context<CustomContextType>;
   fallbackUserRoles?: UserRoles<CustomRoles>;
   transformLaunchRequest?: (
     request: LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>,
@@ -75,8 +72,8 @@ export class PrepareLaunchRequestService<
     private platform: Platform,
     private resourceLinksRepository: LtiResourceLinksRepository,
     private launchesRepository: LtiLaunchesRepository,
-    private agsClaimServices: LtiAgsClaimServices | undefined,
-    private userIdentitiesRepository: LtiUserIdentitiesRespository,
+    private agsClaimServices: LtiAgsClaimServices<CustomContextType> | undefined,
+    private userIdentitiesRepository: LtiUserIdentitiesRespository<CustomRoles>,
     private toolsRepository: LtiToolsRepository,
   ) {}
 
@@ -84,157 +81,61 @@ export class PrepareLaunchRequestService<
     loginHint,
     messageHint,
     nonce,
-    redirectUri: _redirectUri,
+    redirectUri: unsafeRedirectUri,
     state,
-    userIdentity,
+    userIdentity: incominguseridentity,
     context,
     fallbackUserRoles,
     errorDescriptionsRoutes,
     toolId,
     transformLaunchRequest,
     ...otherParametersToValidate
-  }: AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType>): Promise<
-    Either<
-      | AuthenticationRedirectionError
-      | InvalidResourceLinkLaunchError
-      | InvalidRedirectUriError
-      | CouldNotFindToolDueToExternalRepositoryError
-      | MalformedRequestError,
-      LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>
-    >
-  > {
-    const requestIsValid = validateAuthenticationRequest(otherParametersToValidate);
-    if (e.isLeft(requestIsValid)) return requestIsValid;
-
-    const toolResult = await this.toolsRepository.findToolById(toolId);
-
-    if (e.isLeft(toolResult)) {
-      if (toolResult.left.type === "ExternalError") {
-        return e.left(new CouldNotFindToolDueToExternalRepositoryError(toolResult.left));
-      }
-
-      const error = new InvalidRedirectUriError(
-        "Tool is not registered and thus given redirect URI is not reliable.",
-        _redirectUri,
-      );
-      return e.left(error);
-    }
-
-    const tool = toolResult.right;
-
-    const redirectUriIsValid = this.verifyRedirectUri(_redirectUri, tool);
-    if (e.isLeft(redirectUriIsValid)) return redirectUriIsValid;
-    const redirectUri = redirectUriIsValid.right;
-
-    if (loginHint !== messageHint) {
-      const invalidRequestError = new AuthenticationRedirectionError({
-        code: "invalid_request",
-        description: "Initiated launch is malformed.",
-        errorPageUri: errorDescriptionsRoutes?.malformedLaunch,
-        redirectUri,
-        state,
-      });
-
-      return e.left(invalidRequestError);
-    }
-
-    const launchAndLink = await pipe(
-      () => this.launchesRepository.findById(messageHint),
-      te.mapLeft((error) => {
-        if (error.type === "ExternalError") return error;
-        return new AuthenticationRedirectionError({
-          code: "invalid_request",
-          description: "Launch is invalid or might be expired.",
-          errorPageUri: errorDescriptionsRoutes?.invalidRequest,
-          redirectUri,
-          state,
-        });
-      }),
-      te.chainW((launch) =>
-        pipe(
-          () => {
-            const linkId = launch.resourceLinkId.toString();
-            return this.resourceLinksRepository.findById(linkId);
-          },
-          te.mapLeft((error) => {
-            if (error.type === "ExternalError") return error;
-            return new AuthenticationRedirectionError({
-              code: "invalid_request",
-              description: "The resource does not exist or could not be found.",
-              errorPageUri: errorDescriptionsRoutes?.linkNotFound,
-              redirectUri,
-              state,
-            });
-          }),
-          te.map((resourceLink) => ({ launch, resourceLink })),
-        ),
-      ),
-      te.mapLeft((error) => {
-        if (error instanceof AuthenticationRedirectionError) return error;
-        return new AuthenticationRedirectionError({
-          code: "server_error",
-          description: "Something went wrong while retrieving the launch data.",
-          errorPageUri: errorDescriptionsRoutes?.serverError,
-          redirectUri,
-          state,
-        });
-      }),
-    )();
-
-    const serverErrorFactory: RedirectionErrorFactory = (
-      code: AuthenticationRedirectionError["code"],
-      description: string,
-      page: ErrorKey,
-    ) =>
-      new AuthenticationRedirectionError({
-        code,
-        description,
-        errorPageUri: errorDescriptionsRoutes?.[page],
-        redirectUri,
-        state,
-      });
-
-    if (e.isLeft(launchAndLink)) return launchAndLink;
-
-    const { launch, resourceLink } = launchAndLink.right;
-
+  }: AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType>) {
     return await pipe(
       te.Do,
-      te.apSW(
-        "agsClaim",
-        this.prepareAgsClaimIfEnabled(tool, context, resourceLink, serverErrorFactory),
+      te.chainFirstEitherKW(() => validateAuthenticationRequest(otherParametersToValidate)),
+      te.bindW("tool", () => this.findTool(toolId, unsafeRedirectUri)),
+      te.bindW("redirectUri", ({ tool }) => this.verifyRedirectUri(tool, unsafeRedirectUri)),
+      te.bindW("failRedirect", ({ redirectUri }) =>
+        this.generateRedirectErrorFactory(errorDescriptionsRoutes, redirectUri, state),
       ),
-      te.apSW("userIdentity", () =>
-        this.resolveUserIdentity(launch, userIdentity, serverErrorFactory),
+      te.chainFirstW(({ failRedirect }) =>
+        this.ensureLtilibLaunch(loginHint, messageHint, failRedirect),
       ),
-      te.chainW(({ agsClaim, userIdentity }) =>
-        pipe(
-          LTIResourceLinkLaunchRequest.create<CustomRoles, CustomContextType>({
-            tool,
-            nonce,
-            platform: this.platform,
-            resourceLink,
-            state,
-            userIdentity,
-            context,
-            userRoles: fallbackUserRoles,
-            agsClaim,
-            resolvedTargetLinkUrl: launch.targetLinkUrl,
-          }),
-          te.fromEither,
+      te.bindW("launch", ({ failRedirect }) => this.findLaunchData(messageHint, failRedirect)),
+      te.bindW("resourceLink", ({ launch, failRedirect }) =>
+        this.findResourceLink(launch, failRedirect),
+      ),
+      te.bindW("userIdentity", ({ launch, failRedirect }) =>
+        this.resolveUserIdentity(launch, incominguseridentity, failRedirect),
+      ),
+      te.bindW("agsClaim", ({ tool, resourceLink, failRedirect }) =>
+        this.prepareAgsClaimIfEnabled(tool, context, resourceLink, failRedirect),
+      ),
+      te.bindW("launchMessage", ({ tool, resourceLink, agsClaim, launch, userIdentity }) =>
+        this.prepareMessage(
+          tool,
+          resourceLink,
+          launch,
+          agsClaim,
+          nonce,
+          state,
+          userIdentity,
+          context,
+          fallbackUserRoles,
         ),
       ),
-      te.map((launchRequest) => {
-        if (launch.presentation) launchRequest.setPresentation(launch.presentation);
-        transformLaunchRequest?.(launchRequest);
-        return launchRequest;
+      te.map(({ launchMessage, launch }) => {
+        if (launch.presentation) launchMessage.setPresentation(launch.presentation);
+        transformLaunchRequest?.(launchMessage);
+        return launchMessage;
       }),
     )();
   }
 
   private prepareAgsClaimIfEnabled(
     tool: LtiTool,
-    context: Context | undefined,
+    context: Context<CustomContextType> | undefined,
     resourceLink: LtiResourceLink,
     errFactory: RedirectionErrorFactory,
   ): TaskEither<AuthenticationRedirectionError, AssignmentAndGradeServiceClaim | undefined> {
@@ -258,58 +159,185 @@ export class PrepareLaunchRequestService<
    * It **must** be the first verification to be made during an authentication flow,
    * since further errors are redirections to `redirectUri`.
    */
-  private verifyRedirectUri(redirectUri: string, tool: LtiTool) {
-    if (!tool.redirectUrls.includes(redirectUri)) {
-      return e.left(
-        new InvalidRedirectUriError("Given redirect URI is not registered.", redirectUri),
+  private verifyRedirectUri(tool: LtiTool, unsafeRedirectUri: string) {
+    if (!tool.redirectUrls.includes(unsafeRedirectUri)) {
+      return te.left(
+        new InvalidRedirectUriError("Given redirect URI is not registered.", unsafeRedirectUri),
       );
     }
 
     return pipe(
       e.tryCatch(
-        () => new URL(redirectUri),
-        (_error) => new InvalidRedirectUriError("Given redirect URI is not valid.", redirectUri),
+        () => new URL(unsafeRedirectUri),
+        (_error) =>
+          new InvalidRedirectUriError("Given redirect URI is not valid.", unsafeRedirectUri),
       ),
+      te.fromEither,
     );
   }
 
-  private async resolveUserIdentity(
+  private resolveUserIdentity(
     launch: LtiLaunchData,
-    userIdentity: UserIdentity | undefined,
+    userIdentity: UserIdentity<CustomRoles> | undefined,
     errFactory: RedirectionErrorFactory,
-  ): Promise<Either<AuthenticationRedirectionError, UserIdentity>> {
-    if (userIdentity && launch.userId !== userIdentity.id) {
+  ): TaskEither<AuthenticationRedirectionError, UserIdentity<CustomRoles>> {
+    const userIdentityExistsButIsInconsistent = !!userIdentity && launch.userId !== userIdentity.id;
+
+    if (userIdentityExistsButIsInconsistent) {
       const loginRequiredRedirection = errFactory(
         "login_required",
         "The user who started the launch is not the current user.",
         "loginRequired",
       );
 
-      return e.left(loginRequiredRedirection);
-    } else if (userIdentity) return e.right(userIdentity);
-
-    const userIdentityResult = await this.userIdentitiesRepository.findUserIdentityById(
-      launch.userId,
-    );
-
-    if (e.isRight(userIdentityResult)) return userIdentityResult;
-
-    if (userIdentityResult.left.type === "NotFound") {
-      const loginRequiredRedirection = errFactory(
-        "login_required",
-        "There's no authenticated user attached to this launch.",
-        "loginRequired",
-      );
-
-      return e.left(loginRequiredRedirection);
+      return te.left(loginRequiredRedirection);
     }
 
-    const error = errFactory(
-      "server_error",
-      "Something went wrong while retrieving user identity.",
-      "serverError",
-    );
+    if (userIdentity) return te.right(userIdentity);
 
-    return e.left(error);
+    return pipe(
+      () => this.userIdentitiesRepository.findUserIdentityById(launch.userId),
+      te.mapLeft((error) => {
+        if (error.type === "NotFound") {
+          return errFactory(
+            "login_required",
+            "There's no authenticated user attached to this launch.",
+            "loginRequired",
+          );
+        }
+
+        return errFactory(
+          "server_error",
+          "Something went wrong while retrieving user identity.",
+          "serverError",
+        );
+      }),
+    );
+  }
+
+  private findTool(toolId: string, unsafeRedirectUri: string) {
+    return pipe(
+      () => this.toolsRepository.findToolById(toolId),
+      te.mapLeft((error) => {
+        if (error.type === "ExternalError") {
+          return new CouldNotFindToolDueToExternalRepositoryError(error);
+        }
+
+        return new InvalidRedirectUriError(
+          "Tool is not registered and thus given redirect URI is not reliable.",
+          unsafeRedirectUri,
+        );
+      }),
+    );
+  }
+
+  private ensureLtilibLaunch(
+    loginHint: string,
+    messageHint: string,
+    errFactory: RedirectionErrorFactory,
+  ) {
+    if (loginHint !== messageHint) {
+      const invalidRequestError = errFactory(
+        "invalid_request",
+        "Initiated launch is malformed.",
+        "malformedLaunch",
+      );
+
+      return te.left(invalidRequestError);
+    }
+
+    return te.right(undefined);
+  }
+
+  private generateRedirectErrorFactory(
+    errorDescriptionsRoutes: LaunchAuthErrorDescriptionsRoutes | undefined,
+    safeRedirectUri: URL,
+    state: string,
+  ) {
+    const factory: RedirectionErrorFactory = (
+      code: AuthenticationRedirectionError["code"],
+      description: string,
+      page: ErrorKey,
+    ) =>
+      new AuthenticationRedirectionError({
+        code,
+        description,
+        errorPageUri: errorDescriptionsRoutes?.[page],
+        redirectUri: safeRedirectUri,
+        state,
+      });
+
+    return te.right(factory);
+  }
+
+  private findLaunchData(launchId: string, redirectionErrFactory: RedirectionErrorFactory) {
+    return pipe(
+      () => this.launchesRepository.findById(launchId),
+      te.mapLeft((error) => {
+        if (error.type === "ExternalError") {
+          return redirectionErrFactory(
+            "server_error",
+            "Something went wrong while retrieving the launch data.",
+            "serverError",
+          );
+        }
+
+        return redirectionErrFactory(
+          "invalid_request",
+          "Launch is invalid or might be expired.",
+          "invalidRequest",
+        );
+      }),
+    );
+  }
+
+  private findResourceLink(launch: LtiLaunchData, failRedirect: RedirectionErrorFactory) {
+    const linkId = launch.resourceLinkId.toString();
+    return pipe(
+      () => this.resourceLinksRepository.findById(linkId),
+      te.mapLeft((error) => {
+        if (error.type === "ExternalError") {
+          return failRedirect(
+            "server_error",
+            "Something went wrong while retrieving the resource link being launched.",
+            "serverError",
+          );
+        }
+
+        return failRedirect(
+          "invalid_request",
+          "The resource does not exist or could not be found.",
+          "linkNotFound",
+        );
+      }),
+    );
+  }
+
+  private prepareMessage(
+    tool: LtiTool,
+    resourceLink: LtiResourceLink,
+    launch: LtiLaunchData,
+    agsClaim: AssignmentAndGradeServiceClaim | undefined,
+    nonce: string,
+    state: string,
+    userIdentity: UserIdentity<CustomRoles>,
+    context: Context<CustomContextType> | undefined,
+    fallbackUserRoles: UserRoles<CustomRoles> | undefined,
+  ) {
+    return pipe(
+      LTIResourceLinkLaunchRequest.create<CustomRoles, CustomContextType>({
+        tool,
+        nonce,
+        platform: this.platform,
+        resourceLink,
+        state,
+        userIdentity,
+        context,
+        fallbackUserRoles,
+        agsClaim,
+        resolvedTargetLinkUrl: launch.targetLinkUrl,
+      }),
+      te.fromEither,
+    );
   }
 }

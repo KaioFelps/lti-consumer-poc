@@ -29,6 +29,7 @@ import { LtiToolsRepository } from "$/core/repositories/tools.repository";
 import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
 import { UserIdentity, UserRoles } from "$/core/user-identity";
+import * as validateRequestFn from "$/security/validate-authentication-request";
 import { LtiLaunchServices } from ".";
 import {
   AuthenticateLaunchLoginRequestParams,
@@ -771,5 +772,26 @@ describe("[Core] Prepare Launch Request Service", async () => {
       claims[ROLES_CLAIM],
       "it should have (only) the fallback user's roles set as value of the LTI roles claim",
     ).toEqual(expect.arrayContaining(fallbackUserRoles));
+  });
+
+  it("should use `validateAuthenticationRequest` policy", async () => {
+    const validatePolicySpy = vi.spyOn(validateRequestFn, "validateAuthenticationRequest");
+
+    const { resourceLink, tool, sessionUserId } = getValidDataForInitiation();
+    const initiation = await sut.initiateLaunch({
+      resourceLink,
+      sessionUserId,
+      tool,
+    });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+    const launch = await sut.authenticateLaunch(parameters);
+
+    assert(e.isRight(launch));
+    expect(
+      validatePolicySpy,
+      "it should have validated the launch request as per LTI Security Framework specs",
+    ).toHaveBeenCalledOnce();
   });
 });
