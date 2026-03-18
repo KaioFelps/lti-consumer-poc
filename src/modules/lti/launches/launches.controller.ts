@@ -107,7 +107,10 @@ export class LtiLaunchesController {
           errorDescriptionsRoutes: undefined,
           context: undefined,
         }),
-      te.chainW((launchMessage) => launchMessage.intoForm),
+      // passing just the method's reference (i.e., `() => launchMessage.intoForm`) causes loss of context,
+      // this means the launch won't work since it will lose access to `this` (thus can't access stuff like
+      // `this.platform`)
+      te.chainW((launchMessage) => () => launchMessage.intoForm()),
       te.matchW(
         async (error) => {
           if (error instanceof InvalidRedirectUriError) return handleInvalidRedurectUriError(error);
