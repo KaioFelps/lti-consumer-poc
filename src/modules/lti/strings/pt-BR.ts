@@ -177,6 +177,11 @@ ptBR["lti:launch:repository:launch-not-found"] = ({ launchId }) =>
 ptBR["lti:launch:no-valid-launch-found-error"] = ({ launchId }) =>
   `Não foi possível encontrar um registro de lançamento LTI válido com o id "${launchId}".`;
 
+ptBR["lti:launch:tool-retrieval-ext-err:title"] =
+  "Falha ao iniciar ferramenta de aprendizagem externa";
+ptBR["lti:launch:tool-retrieval-ext-err:message"] =
+  "Não foi possível iniciar de forma segura a ferramenta externa. Tente novamente mais tarde ou contate o suporte.";
+
 ptBR["lti:post-launch:success-title"] = "Lançamento concluído com sucesso";
 ptBR["lti:post-launch:error-title"] = "Lançamento mal-sucedido";
 ptBR["lti:post-launch:default-title"] = "Lançamento concluído";

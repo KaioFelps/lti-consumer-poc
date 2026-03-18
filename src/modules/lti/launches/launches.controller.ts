@@ -1,9 +1,7 @@
 import { Controller, Get, HttpStatus, Param, Query, Render, Res } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
-import { type JOSENotSupported } from "jose/dist/types/util/errors";
-import { ErrorBase } from "@/core/errors/error-base";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
+import { JOSENotSupported } from "jose/dist/types/util/errors";
 import { RenderableLtiInvalidLaunchInitiationError } from "@/core/errors/renderable/lti-invalid-launch-initiation.error";
 import { RenderableError } from "@/core/errors/renderable/renderable-error";
 import { HttpResponse } from "@/lib";
@@ -12,41 +10,30 @@ import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { Public } from "@/modules/auth/public-routes";
 import { SessionUser } from "@/modules/auth/session-user";
-import { PersonNotFoundError } from "@/modules/identity/errors/person-not-found.error";
 import type { User } from "@/modules/identity/user/user.entity";
 import { Routes } from "@/routes";
 import { assertNever } from "@/utils/assert-never";
 import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
 import { OAuthError } from "$/core/errors/bases/oauth.error";
+import { CouldNotFindToolDueToExternalRepositoryError } from "$/core/errors/could-not-find-tool-due-to-external-error";
 import { InvalidLaunchInitiationError } from "$/core/errors/invalid-launch-initiation.error";
-import type { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
+import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
 import { MalformedRequestError } from "$/core/errors/malformed-request.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { MessageRequests } from "$/core/messages";
 import { Platform } from "$/core/platform";
 import { LtiLaunchServices } from "$/core/services/launch";
-import { FindToolByIdService } from "../tools/services/find-tool-by-id.service";
 import { InitiateLaunchDto } from "./dtos/initiate-launch.dto";
 import { LaunchLoginDto } from "./dtos/launch-login.dto";
 import { PostLaunchDto } from "./dtos/post-launch.dto";
 import { InitiateLaunchService } from "./services/initiate-launch.service";
-import { LaunchLoginService } from "./services/launch-login.service";
-
-type IErrorContext<E> = E extends InvalidRedirectUriError
-  ? { error: E }
-  : {
-      error: E;
-      redirectUri: URL;
-    };
 
 @Mvc()
 @Controller("/lti/launches")
 export class LtiLaunchesController {
   public constructor(
     private launchServices: LtiLaunchServices,
-    private launchLoginService: LaunchLoginService,
     private initiateLaunchService: InitiateLaunchService,
-    private findToolByIdService: FindToolByIdService,
     private platform: Platform,
     private t: TranslatorService,
   ) {}
@@ -88,13 +75,12 @@ export class LtiLaunchesController {
       () => this.initiateLaunchService.exec({ resourceLinkId, user, presentation }),
       te.match(
         async (_error) => {
-          let error: ErrorBase | RenderableError;
+          if (_error instanceof InvalidLaunchInitiationError) {
+            const error = await RenderableLtiInvalidLaunchInitiationError.create(_error, this.t);
+            throw ExceptionsFactory.fromError(error);
+          }
 
-          if (_error instanceof InvalidLaunchInitiationError)
-            error = await RenderableLtiInvalidLaunchInitiationError.create(_error, this.t);
-          else if (_error instanceof LtiRepositoryError) error = _error.cause;
-          else error = _error;
-
+          const error = _error instanceof LtiRepositoryError ? _error.cause : _error;
           throw ExceptionsFactory.fromError(error);
         },
         async (initiateLaunchRequest) =>
@@ -108,34 +94,23 @@ export class LtiLaunchesController {
   public async launchLogin(
     @Query() body: LaunchLoginDto,
     @Res() res: HttpResponse,
-    @SessionUser() user?: User,
   ): Promise<HttpResponse | void> {
     return await pipe(
-      () => this.findToolByIdService.exec({ id: body.client_id }),
-      te.map((tool) => tool.record),
-      te.chainW((tool) =>
-        pipe(
-          () =>
-            this.launchServices.verifyRedirectUri({
-              tool,
-              redirectUri: body.redirect_uri,
-            }),
-          te.map((redirectUri) => ({ redirectUri, tool })),
-        ),
-      ),
-      te.mapLeft((error) => ({ error }) as IErrorContext<typeof error>),
-      te.chainW(({ redirectUri, tool }) =>
-        pipe(
-          () => this.launchLoginService.exec({ body, redirectUri, tool, user }),
-          te.mapLeft((error) => ({ error, redirectUri }) as IErrorContext<typeof error>),
-        ),
-      ),
-      te.match(
-        (errorContext) => {
-          const isInvalidRedirectUriError = !("redirectUri" in errorContext);
-          if (isInvalidRedirectUriError) return handleInvalidRedurectUriError(errorContext.error);
-
-          const { error, redirectUri } = errorContext;
+      () =>
+        this.launchServices.authenticateLaunch({
+          ...body,
+          toolId: body.client_id,
+          redirectUri: body.redirect_uri,
+          loginHint: body.login_hint,
+          messageHint: body.lti_message_hint,
+          fallbackUserRoles: undefined,
+          errorDescriptionsRoutes: undefined,
+          context: undefined,
+        }),
+      te.chainW((launchMessage) => launchMessage.intoForm),
+      te.matchW(
+        async (error) => {
+          if (error instanceof InvalidRedirectUriError) return handleInvalidRedurectUriError(error);
 
           if (error instanceof MalformedRequestError) return handleMalformedRequestError(error);
 
@@ -143,35 +118,17 @@ export class LtiLaunchesController {
             return res.redirect(error.intoUrl().toString());
           }
 
-          if (error instanceof LtiRepositoryError) {
-            assert(
-              error.type === "ExternalError" && error.cause instanceof IrrecoverableError,
-              "Unhandled `NotFound` `LtiRepositoryError`",
-            );
+          if (error instanceof OAuthError) return handleOAuthLikeError(error, res);
 
-            return handleIrrecoverableError(error.cause, body, redirectUri, res);
+          if (error instanceof CouldNotFindToolDueToExternalRepositoryError) {
+            return await handleToolRetrievalExternalError(error, this.t);
           }
 
-          if (error instanceof IrrecoverableError)
-            return handleIrrecoverableError(error, body, redirectUri, res);
-
-          if (error instanceof PersonNotFoundError)
-            return handlePersonNotFoundError(error, body, redirectUri, res);
-
-          if (error instanceof OAuthError) {
-            return handleOAuthLikeError(error, res);
-          }
+          if (error instanceof JOSENotSupported) return handleJoseNotSupportedError(error);
 
           assertNever(error);
         },
-        (link) =>
-          pipe(
-            () => link.intoForm(),
-            te.match(
-              (error) => handleJoseNotSupportedError(error),
-              (form) => res.type("html").status(HttpStatus.OK).send(form),
-            ),
-          )(),
+        (form) => res.type("html").status(HttpStatus.OK).send(form),
       ),
     )();
   }
@@ -211,38 +168,6 @@ function handleMalformedRequestError(error: MalformedRequestError) {
   throw ExceptionsFactory.fromError(renderable);
 }
 
-function handleIrrecoverableError(
-  _error: IrrecoverableError,
-  body: LaunchLoginDto,
-  redirectUri: URL,
-  response: HttpResponse,
-) {
-  const redirectionError = new AuthenticationRedirectionError({
-    code: "server_error",
-    description: "Something went wrong in the server. Try again later.",
-    redirectUri,
-    state: body.state,
-  });
-
-  return response.redirect(redirectionError.intoUrl().toString());
-}
-
-function handlePersonNotFoundError(
-  _error: PersonNotFoundError,
-  body: LaunchLoginDto,
-  redirectUri: URL,
-  response: HttpResponse,
-) {
-  const redirectionError = new AuthenticationRedirectionError({
-    code: "login_required",
-    description: "User could not be found.",
-    redirectUri,
-    state: body.state,
-  });
-
-  return response.redirect(redirectionError.intoUrl().toString());
-}
-
 function handleJoseNotSupportedError(error: JOSENotSupported) {
   const renderable = new RenderableError(
     {
@@ -263,4 +188,24 @@ function handleJoseNotSupportedError(error: JOSENotSupported) {
 function handleOAuthLikeError<T extends string>(error: OAuthError<T>, res: HttpResponse) {
   Object.entries(error.headers).forEach(([header, value]) => res.setHeader(header, value));
   res.status(error.httpStatusCode).send(error.present());
+}
+
+async function handleToolRetrievalExternalError(
+  error: CouldNotFindToolDueToExternalRepositoryError,
+  t: TranslatorService,
+) {
+  const renderable = new RenderableError(
+    {
+      view: "errors/lti-server-error",
+      viewProperties: {
+        title: await t.translate("lti:launch:tool-retrieval-ext-err:title"),
+        message: await t.translate("lti:launch:tool-retrieval-ext-err:message"),
+        code: "COULD_NOT_RETRIEVE_TOOL_RECORD",
+      },
+      status: error.httpStatusCode,
+    },
+    error.constructor.name,
+  );
+
+  throw ExceptionsFactory.fromError(renderable);
 }
