@@ -23,7 +23,6 @@ import { ILtiLineItem, LtiLineItem } from "../../line-item";
 import { PresentedLtiLineItem, presentLtiLineItem } from "../../presenters/line-item.presenter";
 import { LtiLineItemsRepository } from "../../repositories/line-items.repository";
 import { AssignmentAndGradeServiceScopes } from "../../scopes";
-import { DiscoverService } from "./discover-line-item.service";
 
 type RawLineItemsPayload = {
   resourceId?: string;
@@ -53,7 +52,6 @@ export class CreateService {
     private readonly externalResourcesRepo: ExternalLtiResourcesRepository,
     private readonly lineItemsRepo: LtiLineItemsRepository,
     private readonly deploymentsRepo: LtiToolDeploymentsRepository,
-    private readonly discoverService: DiscoverService,
   ) {}
 
   public async execute({
@@ -123,7 +121,7 @@ export class CreateService {
   ) {
     return pipe(
       o.fromNullable(resourceId),
-      o.map((resourceId) => () => this.discoverService.execute({ resourceId, tag })),
+      o.map((resourceId) => () => this.lineItemsRepo.findByExternalResourceAndTag(resourceId, tag)),
       o.sequence(te.ApplicativePar),
       te.match(
         (error) => {
