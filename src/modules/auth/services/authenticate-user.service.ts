@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { either } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
+import { taskEither as te } from "fp-ts";
+import { pipe } from "fp-ts/lib/function";
 import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
 import { UnauthorizedError } from "@/core/errors/unauthorized.error";
 import { User } from "@/modules/identity/user/user.entity";
@@ -13,8 +12,6 @@ type AuthenticateUserParams = {
   password: string;
 };
 
-type PossibleErrors = IrrecoverableError | UnauthorizedError;
-
 @Injectable()
 export class AuthenticateUserService {
   public constructor(
@@ -22,33 +19,27 @@ export class AuthenticateUserService {
     private usersRepository: UsersRepository,
   ) {}
 
-  public async execute({
-    username,
-    password,
-  }: AuthenticateUserParams): Promise<Either<PossibleErrors, User>> {
+  public async execute({ username, password }: AuthenticateUserParams) {
     const errorMessageIdentifier = "auth:authenticate-user:invalid-credentials";
-    const userFromDatastore = await this.usersRepository.findUserByUsername(username);
+    return await pipe(
+      te.Do,
+      te.bindW("user", () => () => this.usersRepository.findUserByUsername(username)),
+      te.bindW("passwordsMatch", ({ user }) => this.checkPasswords(password, user)),
+      te.chainW(({ passwordsMatch, user }) => {
+        if (passwordsMatch) return te.right(user);
+        return te.left(new UnauthorizedError({ errorMessageIdentifier }));
+      }),
+      te.mapLeft((error) => {
+        if (!(error instanceof ResourceNotFoundError)) return error;
+        return new UnauthorizedError({ errorMessageIdentifier });
+      }),
+    )();
+  }
 
-    if (either.isLeft(userFromDatastore)) {
-      const error = userFromDatastore.left;
-      if (error instanceof ResourceNotFoundError) {
-        return either.left(new UnauthorizedError({ errorMessageIdentifier }));
-      }
-
-      return either.left(error);
-    }
-
-    const user = userFromDatastore.right;
-
-    const passwordsMatch = await this.passwordComparator.compare(password, user.getPasswordHash());
-
-    if (!passwordsMatch)
-      return either.left(
-        new UnauthorizedError({
-          errorMessageIdentifier,
-        }),
-      );
-
-    return either.right(user);
+  private checkPasswords(password: string, user: User) {
+    return pipe(
+      () => this.passwordComparator.compare(password, user.getPasswordHash()),
+      te.fromTask,
+    );
   }
 }
