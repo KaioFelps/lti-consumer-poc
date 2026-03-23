@@ -132,9 +132,7 @@ export class LtiLaunchesController {
           assertNever(error);
         },
         (response) => {
-          res.setHeaders(response.headers);
-          res.status(response.httpStatusCode);
-          res.send(response.content);
+          res.setHeaders(response.headers).status(response.httpStatusCode).send(response.content);
         },
       ),
     )();

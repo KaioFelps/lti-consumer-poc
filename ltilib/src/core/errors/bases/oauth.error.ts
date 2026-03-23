@@ -1,7 +1,7 @@
 import { ILtilibError, LtilibError } from "./ltilib.error";
 
 export interface IOAuthError<ErrorCode> extends Omit<ILtilibError, "message"> {
-  code: ErrorCode;
+  reason: ErrorCode;
   description?: string;
   errorPageUri?: URL;
   httpStatusCode: number;
@@ -17,7 +17,7 @@ export abstract class OAuthError<ErrorCode extends string>
   extends LtilibError
   implements IOAuthError<ErrorCode>
 {
-  public readonly code: ErrorCode;
+  public readonly reason: ErrorCode;
   public readonly description?: string;
   public readonly errorPageUri?: URL;
   /**
@@ -26,11 +26,11 @@ export abstract class OAuthError<ErrorCode extends string>
   public readonly headers: Headers;
 
   public constructor(args: IOAuthError<ErrorCode>, errorOptions?: ErrorOptions) {
-    const { httpStatusCode, code, description, errorPageUri, headers } = args;
+    const { httpStatusCode, reason, description, errorPageUri, headers } = args;
 
-    super(httpStatusCode, description || code, errorOptions);
+    super(httpStatusCode, description || reason, errorOptions);
 
-    this.code = code;
+    this.reason = reason;
     this.description = description;
     this.errorPageUri = errorPageUri;
     this.headers = new Headers(headers ?? {});
@@ -38,7 +38,7 @@ export abstract class OAuthError<ErrorCode extends string>
 
   protected _present() {
     return {
-      error: this.code,
+      error: this.reason,
       error_description: this.description,
       error_uri: this.errorPageUri?.toString(),
     };

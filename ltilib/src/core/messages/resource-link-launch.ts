@@ -115,7 +115,10 @@ export class LTIResourceLinkLaunchRequest<
         "Given resource link " +
         (resourceLink.title ? `"${resourceLink.title}"` : `of id "${resourceLink.id}"`) +
         ` does not belong to any deployment from tool "${tool.name}".`;
-      const error = new InvalidResourceLinkLaunchError({ code: "invalid_deployment", description });
+      const error = new InvalidResourceLinkLaunchError({
+        reason: "invalid_deployment",
+        description,
+      });
       return e.left(error);
     }
 
@@ -138,7 +141,10 @@ export class LTIResourceLinkLaunchRequest<
       // see: https://www.imsglobal.org/spec/lti/v1p3/#roles-claim
       const description =
         "When user has roles, at least one of them must be from LTI's role vocabulary.";
-      const error = new InvalidResourceLinkLaunchError({ code: "insufficient_roles", description });
+      const error = new InvalidResourceLinkLaunchError({
+        reason: "insufficient_roles",
+        description,
+      });
       return e.left(error);
     }
 
@@ -150,7 +156,10 @@ export class LTIResourceLinkLaunchRequest<
 
     if (!userIsAllowedToLaunchMessage) {
       const description = "User does not have any of the required roles to launch this resource.";
-      const error = new InvalidResourceLinkLaunchError({ code: "insufficient_roles", description });
+      const error = new InvalidResourceLinkLaunchError({
+        reason: "insufficient_roles",
+        description,
+      });
       return e.left(error);
     }
 
@@ -206,7 +215,7 @@ export class LTIResourceLinkLaunchRequest<
           : `of id "${this.resourceLink.id}"`) +
         " does not belong to the given context.";
 
-      const error = new InvalidResourceLinkLaunchError({ code: "invalid_context", description });
+      const error = new InvalidResourceLinkLaunchError({ reason: "invalid_context", description });
       return e.left(error);
     }
 

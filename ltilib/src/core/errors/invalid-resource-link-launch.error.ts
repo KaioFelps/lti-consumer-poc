@@ -16,7 +16,7 @@ export class InvalidResourceLinkLaunchError extends OAuthError<ErrorCode> {
   public constructor(args: Args) {
     super({
       ...args,
-      httpStatusCode: InvalidResourceLinkLaunchError.resolveHttpStatusCode(args.code),
+      httpStatusCode: InvalidResourceLinkLaunchError.resolveHttpStatusCode(args.reason),
     });
   }
 

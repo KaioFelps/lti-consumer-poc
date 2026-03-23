@@ -41,7 +41,7 @@ export class OAuthBearerError extends OAuthError<OAuthBearerError.Code> {
     const authenticateHeader = new OAuthBearerError.WWWAuthenticate(authenticateParams);
 
     super({
-      code: error,
+      reason: error,
       httpStatusCode: OAuthBearerError.resolveStatusCode(error),
       description: errorDescription,
       errorPageUri: errorUri,
@@ -50,7 +50,7 @@ export class OAuthBearerError extends OAuthError<OAuthBearerError.Code> {
   }
 
   public present(): object | undefined {
-    if (this.code === "authentication_unaware") return;
+    if (this.reason === "authentication_unaware") return;
     return super._present();
   }
 }
