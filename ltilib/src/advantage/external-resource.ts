@@ -11,7 +11,7 @@ export interface IExternalLtiResource {
    */
   context?: Context;
   /**
-   * The internal ID of the tool's resource attached to this platform's resource.
+   * This external resource's ID within the tool to which it belongs.
    */
   externalToolResourceId: string;
   /**
