@@ -1,14 +1,8 @@
 import { either as e, option as o, taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
-import { InvalidMediaTypeError } from "$/advantage/errors/invalid-media-type.error";
-import { MissingScopeError } from "$/advantage/errors/missing-scope.error";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
-import { ensureAcceptHeaderIsValid } from "$/advantage/utils/ensure-accept-header-is-valid";
-import { ensureHasAnyScope } from "$/advantage/utils/ensure-has-any-scope";
 import { Context } from "$/core/context";
-import { MisconfiguredPlatformError } from "$/core/errors/misconfigured-platform.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
@@ -16,13 +10,13 @@ import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.r
 import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
 import { LtiTool } from "$/core/tool";
 import { CannotAttachResourceLinkError } from "../../errors/cannot-attach-resource-link.error";
-import { InvalidLineItemArgumentError } from "../../errors/invalid-line-item-argument.error";
 import { MissingPlatformAgsConfigurationError } from "../../errors/missing-platform-ags-configuration.error";
 import { ToolIsNotDeployedInContextError } from "../../errors/tool-is-not-deployed-in-context.error";
 import { ILtiLineItem, LtiLineItem } from "../../line-item";
 import { PresentedLtiLineItem, presentLtiLineItem } from "../../presenters/line-item.presenter";
 import { LtiLineItemsRepository } from "../../repositories/line-items.repository";
 import { AssignmentAndGradeServiceScopes } from "../../scopes";
+import { ILineItemService, type LtiLineItemServices } from ".";
 
 type RawLineItemsPayload = {
   resourceId?: string;
@@ -37,7 +31,6 @@ type RawLineItemsPayload = {
 };
 
 export type CreateLineItemServiceParams = {
-  acceptHeader: string | undefined;
   /**
    * The LTI tool which is trying to create this line item.
    */
@@ -45,7 +38,15 @@ export type CreateLineItemServiceParams = {
   context: Context;
 } & RawLineItemsPayload;
 
-export class CreateService {
+const REQUIRED_SCOPES = [AssignmentAndGradeServiceScopes.Lineitem] as const;
+
+/**
+ * Do not use this service. It lacks important checks. Use
+ * {@link LtiLineItemServices.create `LtiLineItemServices.create`} instead.
+ *
+ * @internal
+ */
+export class CreateService implements ILineItemService {
   public constructor(
     private readonly platform: Platform,
     private readonly resourceLinksRepo: LtiResourceLinksRepository,
@@ -54,79 +55,59 @@ export class CreateService {
     private readonly deploymentsRepo: LtiToolDeploymentsRepository,
   ) {}
 
-  public async execute({
-    tool,
-    context,
-    resourceId,
-    acceptHeader,
-    ...args
-  }: CreateLineItemServiceParams): Promise<
-    Either<
-      | MissingScopeError
-      | InvalidMediaTypeError
-      | InvalidLineItemArgumentError
-      | CannotAttachResourceLinkError
-      | MisconfiguredPlatformError
-      | LtiRepositoryError<unknown>,
-      HttpResponseWrapper<LtiLineItem, PresentedLtiLineItem>
-    >
-  > {
+  getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined {
+    return REQUIRED_SCOPES;
+  }
+
+  getRequiredAcceptHeader(): Readonly<LtiAdvantageMediaType> | undefined {
+    return undefined;
+  }
+  getRequiredContentType(): Readonly<LtiAdvantageMediaType> | undefined {
+    return LtiAdvantageMediaType.LineItem;
+  }
+
+  public async execute({ tool, context, ...args }: CreateLineItemServiceParams) {
     if (!this.platform.agsConfiguration) return e.left(new MissingPlatformAgsConfigurationError());
     const { agsConfiguration } = this.platform;
 
     args.tag = args.tag?.trim() || undefined;
-    resourceId = resourceId?.trim() || undefined;
+    args.resourceId = args.resourceId?.trim() || undefined;
     args.resourceLinkId = args.resourceLinkId?.trim() || undefined;
 
     return await pipe(
-      ensureHasAnyScope({ tool, requiredScopes: AssignmentAndGradeServiceScopes.Lineitem }),
-      e.chainW(() =>
-        ensureAcceptHeaderIsValid({
-          acceptHeader,
-          requiredMediaType: LtiAdvantageMediaType.LineItem,
-        }),
-      ),
-      te.fromEither,
-      te.chainW(() => this.ensureToolIsDeployedInContext(tool, context)),
-      te.chainW(() =>
-        pipe(
-          this.findExistingLineItemFromResourceAndTag(resourceId, args.tag),
-          te.chainW((existingLineitem) => {
-            if (existingLineitem) return te.right(existingLineitem);
-            return this.createNewLineItem(context, tool, agsConfiguration, { resourceId, ...args });
-          }),
-        ),
-      ),
-      te.chainW((lineitem) =>
-        pipe(
-          async () => presentLtiLineItem(lineitem, context, this.platform),
-          te.map((presentedLineItem) => ({ lineitem, presentedLineItem })),
-        ),
-      ),
+      te.Do,
+      te.chainFirstW(() => this.ensureToolIsDeployedInContext(tool, context)),
+      te.bindW("existingLineItem", () => this.findExistingLineItem(args.resourceId, args.tag)),
+      te.bindW("lineItem", ({ existingLineItem }) => {
+        if (existingLineItem) return te.right(existingLineItem);
+        return this.createNewLineItem(context, tool, agsConfiguration, args);
+      }),
+      te.bindW("presentedLineItem", ({ lineItem }) => this.presentLineItem(lineItem, context)),
       te.map(
-        ({ lineitem, presentedLineItem }) =>
+        ({ lineItem, presentedLineItem }) =>
           new HttpResponseWrapper<LtiLineItem, PresentedLtiLineItem>(
             presentedLineItem,
             201,
-            lineitem,
+            lineItem,
             { "Content-Type": LtiAdvantageMediaType.LineItem },
           ),
       ),
     )();
   }
 
-  private findExistingLineItemFromResourceAndTag(
-    resourceId: string | undefined,
-    tag: RawLineItemsPayload["tag"],
-  ) {
+  private presentLineItem(lineItem: LtiLineItem, context: Context) {
+    return pipe(presentLtiLineItem(lineItem, context, this.platform), te.fromEither);
+  }
+
+  private findExistingLineItem(resourceId: string | undefined, tag: RawLineItemsPayload["tag"]) {
     return pipe(
       o.fromNullable(resourceId),
       o.map((resourceId) => () => this.lineItemsRepo.findByExternalResourceAndTag(resourceId, tag)),
       o.sequence(te.ApplicativePar),
       te.match(
         (error) => {
-          if (error.type === "ExternalError") return e.left(error);
-          return e.right(undefined);
+          if (error.type === "NotFound") return e.right(undefined);
+          return e.left(error);
         },
         (lineitem) => e.right(o.toUndefined(lineitem)),
       ),

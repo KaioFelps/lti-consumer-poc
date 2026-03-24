@@ -17,7 +17,7 @@ import { InMemoryExternalLtiResourcesRepository } from "ltilib/tests/common/in-m
 import { InMemoryLtiLineItemsRepository } from "ltilib/tests/common/in-memory-repositories/line-items.repository";
 import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
 import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
-import { InvalidMediaTypeError } from "$/advantage/errors/invalid-media-type.error";
+import { NotAcceptableMediaTypeError } from "$/advantage/errors/not-acceptable-media-type.error";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { InaccessibleLineItemError } from "$/assignment-and-grade/errors/inaccessible-line-item.error";
 import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors/missing-platform-ags-configuration.error";
@@ -82,6 +82,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
     const result = await sut.find({
       acceptHeader: LtiAdvantageMediaType.LineItem,
+      contentTypeHeader: undefined,
       lineItemId: lineItem.id,
       context,
       tool,
@@ -91,19 +92,20 @@ describe("[AGS] Create Line Item Service", async () => {
     expect(result.left).toBeInstanceOf(MissingPlatformAgsConfigurationError);
   });
 
-  it("should require LTI lineitem media type", async () => {
+  it("should require LTI lineitem media type accept header", async () => {
     const { tool, lineItem, context } = getValidCompleteLineItemCreationArgs();
 
     const result = await sut.find({
       acceptHeader: "anyInvalidMediaType",
+      contentTypeHeader: undefined,
       tool,
       lineItemId: lineItem.id,
       context,
     });
 
     assert(e.isLeft(result));
-    expect(result.left).toBeInstanceOf(InvalidMediaTypeError);
-    expect(result.left.httpStatusCode).toBe(415);
+    expect(result.left).toBeInstanceOf(NotAcceptableMediaTypeError);
+    expect(result.left.httpStatusCode).toBe(406);
   });
 
   it.each([
@@ -135,6 +137,7 @@ describe("[AGS] Create Line Item Service", async () => {
       const result = await sut.find({
         tool,
         acceptHeader: LtiAdvantageMediaType.LineItem,
+        contentTypeHeader: undefined,
         lineItemId: lineItem.id,
         context,
       });
@@ -158,6 +161,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
     const result = await sut.find({
       acceptHeader: LtiAdvantageMediaType.LineItem,
+      contentTypeHeader: undefined,
       context,
       lineItemId: lineItem.id,
       tool: toolNotFromSameContext,
@@ -175,6 +179,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
     const result = await sut.find({
       acceptHeader: LtiAdvantageMediaType.LineItem,
+      contentTypeHeader: undefined,
       tool: globallyDeployedTool,
       lineItemId: lineItem.id,
       context,
@@ -211,6 +216,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
       const result = await sut.find({
         acceptHeader: LtiAdvantageMediaType.LineItem,
+        contentTypeHeader: undefined,
         lineItemId: lineItem.id,
         tool: otherTool,
         context,
@@ -227,6 +233,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
     const result = await sut.find({
       acceptHeader: LtiAdvantageMediaType.LineItem,
+      contentTypeHeader: undefined,
       lineItemId: lineItem.id,
       context,
       tool,
@@ -242,6 +249,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
     const result = await sut.find({
       acceptHeader: LtiAdvantageMediaType.LineItem,
+      contentTypeHeader: undefined,
       lineItemId: lineItem.id,
       context,
       tool,
@@ -259,6 +267,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
     const result = await sut.find({
       acceptHeader: LtiAdvantageMediaType.LineItem,
+      contentTypeHeader: undefined,
       lineItemId: lineItem.id,
       context,
       tool,

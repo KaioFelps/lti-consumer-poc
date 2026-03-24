@@ -1,10 +1,30 @@
+import { either as e, taskEither as te } from "fp-ts";
+import { Either } from "fp-ts/lib/Either";
+import { pipe } from "fp-ts/lib/function";
+import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
+import utils from "$/advantage/utils";
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { Platform } from "$/core/platform";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
+import { LtiTool } from "$/core/tool";
 import { LtiLineItemsRepository } from "../../repositories/line-items.repository";
 import { CreateLineItemServiceParams, CreateService } from "./create-line-item.service";
 import { FindLineItemParams, FindService } from "./find-line-item.service";
+
+type BasicRequestValidationParams = {
+  tool: LtiTool;
+  acceptHeader: string | undefined;
+  contentTypeHeader: string | undefined;
+};
+
+export interface ILineItemService<Params = unknown, ReturnType = unknown, ErrorsType = unknown> {
+  execute(params: Params): Promise<Either<ErrorsType, ReturnType>>;
+  getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined;
+  getRequiredAcceptHeader(): Readonly<LtiAdvantageMediaType> | undefined;
+  getRequiredContentType(): Readonly<LtiAdvantageMediaType> | undefined;
+}
 
 export class LtiLineItemServices {
   private readonly createService: CreateService;
@@ -28,11 +48,58 @@ export class LtiLineItemServices {
     );
   }
 
-  public async create(params: CreateLineItemServiceParams) {
-    return await this.createService.execute(params);
+  public async create({
+    acceptHeader,
+    contentTypeHeader,
+    ...params
+  }: CreateLineItemServiceParams & BasicRequestValidationParams) {
+    const executorParams = { acceptHeader, contentTypeHeader, tool: params.tool };
+    return await this.executeService(executorParams, this.createService, params);
   }
 
-  public async find(params: FindLineItemParams) {
-    return await this.findService.execute(params);
+  public async find({
+    acceptHeader,
+    contentTypeHeader,
+    ...params
+  }: FindLineItemParams & BasicRequestValidationParams) {
+    const executorParams = { acceptHeader, contentTypeHeader, tool: params.tool };
+    return await this.executeService(executorParams, this.findService, params);
+  }
+
+  protected async executeService<
+    S extends ILineItemService,
+    Params = S extends ILineItemService<infer TParams, unknown, unknown> ? TParams : never,
+    ReturnType = S extends ILineItemService<unknown, infer TReturn, unknown> ? TReturn : never,
+    ErrorType = S extends ILineItemService<unknown, unknown, infer TErrors> ? TErrors : never,
+  >(
+    { acceptHeader, contentTypeHeader, tool }: BasicRequestValidationParams,
+    service: ILineItemService<Params, ReturnType, ErrorType>,
+    params: Params,
+  ) {
+    return await pipe(
+      this.checkScopes(tool, service),
+      e.chainW(() => this.checkAcceptHeader(acceptHeader, service)),
+      e.chainW(() => this.checkContentTypeHeader(contentTypeHeader, service)),
+      te.fromEither,
+      te.chainW(() => () => service.execute(params)),
+    )();
+  }
+
+  private checkScopes(tool: LtiTool, service: ILineItemService) {
+    const scopes = service.getRequiredScopes();
+    if (!scopes || scopes.length === 0) return e.right(undefined);
+    return utils.ensureHasAnyScope({ tool, requiredScopes: scopes });
+  }
+
+  private checkAcceptHeader(acceptHeader: string | undefined, service: ILineItemService) {
+    const requiredMediaType = service.getRequiredAcceptHeader();
+    if (!requiredMediaType) return e.right(undefined);
+    return utils.ensureMediaTypeIsAccepted(acceptHeader, requiredMediaType);
+  }
+
+  private checkContentTypeHeader(contentTypeHeader: string | undefined, service: ILineItemService) {
+    const requiredContentType = service.getRequiredContentType();
+    if (!requiredContentType) return e.right(undefined);
+    return utils.ensureContentTypeIsValid(contentTypeHeader, requiredContentType);
   }
 }

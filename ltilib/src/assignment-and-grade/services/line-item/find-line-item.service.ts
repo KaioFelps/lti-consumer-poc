@@ -1,8 +1,6 @@
-import { either as e, taskEither as te } from "fp-ts";
+import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import { ensureAcceptHeaderIsValid } from "$/advantage/utils/ensure-accept-header-is-valid";
-import { ensureHasAnyScope } from "$/advantage/utils/ensure-has-any-scope";
 import { InaccessibleLineItemError } from "$/assignment-and-grade/errors/inaccessible-line-item.error";
 import { LtiLineItem } from "$/assignment-and-grade/line-item";
 import { presentLtiLineItem } from "$/assignment-and-grade/presenters/line-item.presenter";
@@ -13,6 +11,7 @@ import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
 import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
 import { LtiTool } from "$/core/tool";
+import { ILineItemService, type LtiLineItemServices } from ".";
 
 export type FindLineItemParams = {
   lineItemId: LtiLineItem["id"];
@@ -21,25 +20,39 @@ export type FindLineItemParams = {
   context: Context;
 };
 
-export class FindService {
+const REQUIRED_SCOPES = [
+  AssignmentAndGradeServiceScopes.Lineitem,
+  AssignmentAndGradeServiceScopes.LineitemReadonly,
+] as const;
+
+/**
+ * Do not use this service. It lacks important checks. Use
+ * {@link LtiLineItemServices.find `LtiLineItemServices.find`} instead.
+ *
+ * @internal
+ */
+export class FindService implements ILineItemService {
   public constructor(
     private readonly platform: Platform,
     private readonly lineItemsRepo: LtiLineItemsRepository,
     private readonly deploymentsRepo: LtiToolDeploymentsRepository,
   ) {}
 
-  public async execute({ lineItemId, acceptHeader, tool, context }: FindLineItemParams) {
-    const requiredMediaType = LtiAdvantageMediaType.LineItem;
-    const requiredScopes = [
-      AssignmentAndGradeServiceScopes.Lineitem,
-      AssignmentAndGradeServiceScopes.LineitemReadonly,
-    ];
+  getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined {
+    return REQUIRED_SCOPES;
+  }
 
+  getRequiredAcceptHeader(): Readonly<LtiAdvantageMediaType> | undefined {
+    return LtiAdvantageMediaType.LineItem;
+  }
+
+  getRequiredContentType(): Readonly<LtiAdvantageMediaType> | undefined {
+    return undefined;
+  }
+
+  public async execute({ lineItemId, tool, context }: FindLineItemParams) {
     return await pipe(
-      ensureAcceptHeaderIsValid({ acceptHeader, requiredMediaType }),
-      e.chainW(() => ensureHasAnyScope({ tool, requiredScopes })),
-      te.fromEither,
-      te.chainW(() => this.ensureToolCanSearchThisLineitem(tool, context, lineItemId)),
+      this.ensureToolCanSearchThisLineitem(tool, context, lineItemId),
       te.chainW(() => this.findLineItem(lineItemId)),
       te.chainW((lineItem) => this.ensureToolCanSeeLineItemDueToResource(lineItem, tool)),
       te.chainW((lineItem) => this.ensureToolCanSeeLineItemDueToResourceLink(lineItem, tool)),
