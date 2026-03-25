@@ -611,7 +611,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
     const context = createContext();
     const tool = createTool({ scopes: [AssignmentAndGradeServiceScopes.Lineitem] });
-    const deployment = createToolDeployment({ tool });
+    const deployment = createToolDeployment({ tool, context });
     toolDeploymentsRepo.deployments.push(deployment);
 
     const response = await sut.create({

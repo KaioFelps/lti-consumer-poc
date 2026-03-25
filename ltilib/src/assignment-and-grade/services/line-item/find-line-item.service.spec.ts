@@ -21,6 +21,7 @@ import { NotAcceptableMediaTypeError } from "$/advantage/errors/not-acceptable-m
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { InaccessibleLineItemError } from "$/assignment-and-grade/errors/inaccessible-line-item.error";
 import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors/missing-platform-ags-configuration.error";
+import { ToolIsNotDeployedInContextError } from "$/assignment-and-grade/errors/tool-is-not-deployed-in-context.error";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
 import { Platform } from "$/core/platform";
@@ -168,7 +169,8 @@ describe("[AGS] Create Line Item Service", async () => {
     });
 
     assert(e.isLeft(result));
-    expect(result.left.httpStatusCode).toBe(404);
+    expect(result.left.httpStatusCode).toBe(403);
+    expect(result.left).toBeInstanceOf(ToolIsNotDeployedInContextError);
   });
 
   it("should allow tools with global deployment to search for a lineitem not attached to a specific tool by resource nor resource link", async () => {

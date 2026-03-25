@@ -7,11 +7,9 @@ import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
-import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
 import { LtiTool } from "$/core/tool";
 import { CannotAttachResourceLinkError } from "../../errors/cannot-attach-resource-link.error";
 import { MissingPlatformAgsConfigurationError } from "../../errors/missing-platform-ags-configuration.error";
-import { ToolIsNotDeployedInContextError } from "../../errors/tool-is-not-deployed-in-context.error";
 import { ILtiLineItem, LtiLineItem } from "../../line-item";
 import { PresentedLtiLineItem, presentLtiLineItem } from "../../presenters/line-item.presenter";
 import { LtiLineItemsRepository } from "../../repositories/line-items.repository";
@@ -52,7 +50,6 @@ export class CreateService implements ILineItemService {
     private readonly resourceLinksRepo: LtiResourceLinksRepository,
     private readonly externalResourcesRepo: ExternalLtiResourcesRepository,
     private readonly lineItemsRepo: LtiLineItemsRepository,
-    private readonly deploymentsRepo: LtiToolDeploymentsRepository,
   ) {}
 
   getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined {
@@ -76,7 +73,6 @@ export class CreateService implements ILineItemService {
 
     return await pipe(
       te.Do,
-      te.chainFirstW(() => this.ensureToolIsDeployedInContext(tool, context)),
       te.bindW("existingLineItem", () => this.findExistingLineItem(args.resourceId, args.tag)),
       te.bindW("lineItem", ({ existingLineItem }) => {
         if (existingLineItem) return te.right(existingLineItem);
@@ -155,17 +151,6 @@ export class CreateService implements ILineItemService {
           te.map(() => lineitem),
         ),
       ),
-    );
-  }
-
-  private ensureToolIsDeployedInContext(tool: LtiTool, context: Context) {
-    return pipe(
-      () => this.deploymentsRepo.findDeploymentInContextOrGlobal(tool.id, context.id),
-      te.map((_) => {}),
-      te.mapLeft((err) => {
-        if (err.type === "NotFound") return new ToolIsNotDeployedInContextError(tool, context);
-        return err;
-      }),
     );
   }
 

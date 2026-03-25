@@ -5,6 +5,7 @@ import guards from "$/advantage/guards";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
+import { Context } from "$/core/context";
 import { Platform } from "$/core/platform";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
@@ -15,6 +16,7 @@ import { FindLineItemParams, FindService } from "./find-line-item.service";
 
 type BasicRequestValidationParams = {
   tool: LtiTool;
+  context: Context | undefined;
   acceptHeader: string | undefined;
   contentTypeHeader: string | undefined;
 };
@@ -35,7 +37,7 @@ export class LtiLineItemServices {
     resourceLinksRepo: LtiResourceLinksRepository,
     externalResourcesRepo: ExternalLtiResourcesRepository,
     lineItemsRepo: LtiLineItemsRepository,
-    deploymentsRepo: LtiToolDeploymentsRepository,
+    private readonly deploymentsRepo: LtiToolDeploymentsRepository,
   ) {
     this.findService = new FindService(platform, lineItemsRepo, deploymentsRepo);
 
@@ -44,26 +46,15 @@ export class LtiLineItemServices {
       resourceLinksRepo,
       externalResourcesRepo,
       lineItemsRepo,
-      deploymentsRepo,
     );
   }
 
-  public async create({
-    acceptHeader,
-    contentTypeHeader,
-    ...params
-  }: CreateLineItemServiceParams & BasicRequestValidationParams) {
-    const executorParams = { acceptHeader, contentTypeHeader, tool: params.tool };
-    return await this.executeService(executorParams, this.createService, params);
+  public async create(params: CreateLineItemServiceParams & BasicRequestValidationParams) {
+    return await this.executeService(this.createService, params);
   }
 
-  public async find({
-    acceptHeader,
-    contentTypeHeader,
-    ...params
-  }: FindLineItemParams & BasicRequestValidationParams) {
-    const executorParams = { acceptHeader, contentTypeHeader, tool: params.tool };
-    return await this.executeService(executorParams, this.findService, params);
+  public async find(params: FindLineItemParams & BasicRequestValidationParams) {
+    return await this.executeService(this.findService, params);
   }
 
   protected async executeService<
@@ -72,14 +63,16 @@ export class LtiLineItemServices {
     ReturnType = S extends ILineItemService<unknown, infer TReturn, unknown> ? TReturn : never,
     ErrorType = S extends ILineItemService<unknown, unknown, infer TErrors> ? TErrors : never,
   >(
-    { acceptHeader, contentTypeHeader, tool }: BasicRequestValidationParams,
     service: ILineItemService<Params, ReturnType, ErrorType>,
-    params: Params,
+    params: Params & BasicRequestValidationParams,
   ) {
     return await pipe(
       this.checkScopes(params.tool, service),
       te.chainW(() => this.checkAcceptHeader(params.acceptHeader, service)),
       te.chainW(() => this.checkContentTypeHeader(params.contentTypeHeader, service)),
+      te.chainW(() =>
+        guards.ensureToolIsDeployedInContext(params.tool, params.context, this.deploymentsRepo),
+      ),
       te.chainW(() => () => service.execute(params)),
     )();
   }
