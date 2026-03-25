@@ -1,9 +1,9 @@
-import { either as e, taskEither as te } from "fp-ts";
+import { taskEither as te } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
+import guards from "$/advantage/guards";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
-import utils from "$/advantage/utils";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { Platform } from "$/core/platform";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
@@ -77,29 +77,28 @@ export class LtiLineItemServices {
     params: Params,
   ) {
     return await pipe(
-      this.checkScopes(tool, service),
-      e.chainW(() => this.checkAcceptHeader(acceptHeader, service)),
-      e.chainW(() => this.checkContentTypeHeader(contentTypeHeader, service)),
-      te.fromEither,
+      this.checkScopes(params.tool, service),
+      te.chainW(() => this.checkAcceptHeader(params.acceptHeader, service)),
+      te.chainW(() => this.checkContentTypeHeader(params.contentTypeHeader, service)),
       te.chainW(() => () => service.execute(params)),
     )();
   }
 
   private checkScopes(tool: LtiTool, service: ILineItemService) {
     const scopes = service.getRequiredScopes();
-    if (!scopes || scopes.length === 0) return e.right(undefined);
-    return utils.ensureHasAnyScope({ tool, requiredScopes: scopes });
+    if (!scopes || scopes.length === 0) return te.right(undefined);
+    return guards.ensureHasAnyScope({ tool, requiredScopes: scopes });
   }
 
   private checkAcceptHeader(acceptHeader: string | undefined, service: ILineItemService) {
     const requiredMediaType = service.getRequiredAcceptHeader();
-    if (!requiredMediaType) return e.right(undefined);
-    return utils.ensureMediaTypeIsAccepted(acceptHeader, requiredMediaType);
+    if (!requiredMediaType) return te.right(undefined);
+    return guards.ensureMediaTypeIsAccepted(acceptHeader, requiredMediaType);
   }
 
   private checkContentTypeHeader(contentTypeHeader: string | undefined, service: ILineItemService) {
     const requiredContentType = service.getRequiredContentType();
-    if (!requiredContentType) return e.right(undefined);
-    return utils.ensureContentTypeIsValid(contentTypeHeader, requiredContentType);
+    if (!requiredContentType) return te.right(undefined);
+    return guards.ensureContentTypeIsValid(contentTypeHeader, requiredContentType);
   }
 }

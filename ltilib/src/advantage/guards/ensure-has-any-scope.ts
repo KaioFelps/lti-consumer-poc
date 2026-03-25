@@ -1,5 +1,5 @@
-import { either as e } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
+import { taskEither as te } from "fp-ts";
+import { TaskEither } from "fp-ts/lib/TaskEither";
 import { LtiTool } from "$/core/tool";
 import { MissingAnyScopeError, MissingScopeError } from "../errors/missing-scope.error";
 
@@ -11,12 +11,12 @@ type Params = {
 export function ensureHasAnyScope({
   tool,
   requiredScopes,
-}: Params): Either<MissingScopeError, void> {
+}: Params): TaskEither<MissingScopeError, void> {
   const scopes = Array.isArray(requiredScopes) ? requiredScopes : [requiredScopes];
 
   const hasAnyScope = scopes.some((scope) => {
     return tool.scopes.includes(scope);
   });
 
-  return hasAnyScope ? e.right(undefined) : e.left(new MissingAnyScopeError(requiredScopes));
+  return hasAnyScope ? te.right(undefined) : te.left(new MissingAnyScopeError(requiredScopes));
 }

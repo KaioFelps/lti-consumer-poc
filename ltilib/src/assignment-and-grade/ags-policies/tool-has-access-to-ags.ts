@@ -1,5 +1,5 @@
 import { either as e } from "fp-ts";
-import { ensureHasAnyScope } from "$/advantage/utils/ensure-has-any-scope";
+import { ensureHasAnyScope } from "$/advantage/guards/ensure-has-any-scope";
 import { Context } from "$/core/context";
 import { Platform } from "$/core/platform";
 import { LtiTool } from "$/core/tool";
@@ -15,7 +15,7 @@ export async function toolHasAccessToAgs(
   if (!context) return false;
 
   const requiredScopes = ASSIGNMENT_AND_GRADE_SERVICES_SCOPES;
-  const toolHasAgsScopes = ensureHasAnyScope({ tool, requiredScopes });
+  const toolHasAgsScopes = await ensureHasAnyScope({ tool, requiredScopes })();
 
   if (e.isLeft(toolHasAgsScopes)) return false;
 
