@@ -2,13 +2,13 @@ import { either as e, option as o, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
+import { CannotAttachResourceLinkError } from "$/assignment-and-grade/errors/cannot-attach-resource-link.error";
 import { Context } from "$/core/context";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiTool } from "$/core/tool";
-import { CannotAttachResourceLinkError } from "../../errors/cannot-attach-resource-link.error";
 import { MissingPlatformAgsConfigurationError } from "../../errors/missing-platform-ags-configuration.error";
 import { ILtiLineItem, LtiLineItem } from "../../line-item";
 import { PresentedLtiLineItem, presentLtiLineItem } from "../../presenters/line-item.presenter";
@@ -123,7 +123,7 @@ export class CreateService implements ILineItemService {
         pipe(
           o.fromNullable(resourceId),
           o.map((id) => () => this.externalResourcesRepo.findById(id, tool.id)),
-          o.sequence(te.ApplicativePar),
+          o.sequence(te.ApplicativeSeq),
           te.map(o.toUndefined),
         ),
       ),
@@ -142,6 +142,7 @@ export class CreateService implements ILineItemService {
             resourceLink,
             startDateTime: resolvedStartDate,
             endDateTime: resolvedEndDate,
+            context,
           }),
         );
       }),
@@ -185,13 +186,11 @@ export class CreateService implements ILineItemService {
             const doesntBelongToLineItemContext = resourceLink.contextId !== context.id;
 
             if (doesntBelongToTool) {
-              return te.left(new CannotAttachResourceLinkError("doesnt_belong_to_tool"));
+              return te.left(new CannotAttachResourceLinkError("must_belong_to_tool"));
             }
 
             if (doesntBelongToLineItemContext) {
-              return te.left(
-                new CannotAttachResourceLinkError("doesnt_belong_to_lineitem_context"),
-              );
+              return te.left(new CannotAttachResourceLinkError("must_belong_to_lineitem_context"));
             }
 
             return te.right(o.some(resourceLink));
@@ -200,7 +199,7 @@ export class CreateService implements ILineItemService {
       ),
       te.mapError((error) => {
         const isNotFoundError = error instanceof LtiRepositoryError && error.type === "NotFound";
-        return isNotFoundError ? new CannotAttachResourceLinkError("doesnt_belong_to_tool") : error;
+        return isNotFoundError ? new CannotAttachResourceLinkError("must_belong_to_tool") : error;
       }),
       te.map(o.toUndefined),
     );

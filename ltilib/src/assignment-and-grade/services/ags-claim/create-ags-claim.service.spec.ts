@@ -74,7 +74,7 @@ describe("[AGS] Create Ags Claim Service", async () => {
   });
 
   it("should include a `lineitem` property if and only if there is a lineitem with one-to-one relationship with a resource link", async () => {
-    const existingLineItem = createFullLineItem(undefined, { resourceLink });
+    const existingLineItem = createFullLineItem({ context }, { resourceLink });
     lineItemsRepo.lineItems.push(existingLineItem);
 
     const result = await sut.execute({ tool, context, resourceLink });

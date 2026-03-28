@@ -20,14 +20,19 @@ import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memor
 import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
 import { InvalidContentTypeError } from "$/advantage/errors/invalid-content-type.error";
 import { MissingScopeError } from "$/advantage/errors/missing-scope.error";
+import { ExternalLtiResource } from "$/advantage/external-resource";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { CannotAttachResourceLinkError } from "$/assignment-and-grade/errors/cannot-attach-resource-link.error";
 import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors/missing-platform-ags-configuration.error";
 import { ToolIsNotDeployedInContextError } from "$/assignment-and-grade/errors/tool-is-not-deployed-in-context.error";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
+import { Context } from "$/core/context";
 import { InvalidArgumentError } from "$/core/errors/bases/invalid-argument.error";
+import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { Platform } from "$/core/platform";
+import { LtiResourceLink } from "$/core/resource-link";
+import { LtiTool } from "$/core/tool";
 
 describe("[AGS] Create Line Item Service", async () => {
   let platform: Platform;
@@ -74,6 +79,29 @@ describe("[AGS] Create Line Item Service", async () => {
     ltiResourceLinksRepo.resourceLinks.push(resourceLink);
 
     return { tool, context, resourceLink, resource, deployment };
+  };
+
+  const getCreateLineItemParams = ({
+    context,
+    tool,
+    resource,
+    resourceLink,
+  }: {
+    tool: LtiTool;
+    context: Context;
+    resourceLink?: LtiResourceLink;
+    resource?: ExternalLtiResource;
+  }) => {
+    return {
+      tool,
+      context,
+      acceptHeader: undefined,
+      contentTypeHeader: LtiAdvantageMediaType.LineItem,
+      label: faker.lorem.sentence(),
+      scoreMaximum: 60,
+      resourceId: resource?.externalToolResourceId,
+      resourceLinkId: resourceLink?.id,
+    } satisfies Parameters<typeof sut.create>[0];
   };
 
   describe("Successful Creation's Result", () => {
@@ -431,6 +459,7 @@ describe("[AGS] Create Line Item Service", async () => {
 
       assert(e.isLeft(response));
       expect(response.left).toBeInstanceOf(CannotAttachResourceLinkError);
+      expect(response.left["field"]).toBe("resourceLinkId");
     });
 
     describe("Requests to create line items should be responded with not found error when resource link to be bound", () => {
@@ -513,6 +542,27 @@ describe("[AGS] Create Line Item Service", async () => {
 
       assert(e.isRight(response));
       expect(lineItemsRepo.lineItems[0].resourceLink).toBeUndefined();
+    });
+
+    it("should require external resource to belong to the tool trying to create the line item", async () => {
+      const { context, tool, resource } = getValidCompleteLineItemCreationArgs();
+
+      // ensure the resource belongs to another tool
+      resource.tool = createTool();
+
+      externalLtiResourcesRepo.externalLtiResources.push(resource);
+      toolDeploymentsRepo.deployments.push(createToolDeployment({ context, tool: resource.tool }));
+
+      const response = await sut.create(getCreateLineItemParams({ context, tool, resource }));
+
+      assert(
+        e.isLeft(response),
+        "response should be an error since resource belongs to a different tool " +
+          "than the one trying to create a line item associated with it",
+      );
+
+      expect(response.left).toBeInstanceOf(LtiRepositoryError);
+      expect(response.left["subject"]).toBe(ExternalLtiResource.name);
     });
   });
 
