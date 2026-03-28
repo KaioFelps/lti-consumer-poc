@@ -187,6 +187,10 @@ export class LtiLineItem implements ILtiLineItem {
     return toolOwnsByResourceLink && toolOwnsByResource;
   }
 
+  public belongsToContext(context: Context) {
+    return this.context.id === context.id;
+  }
+
   public get resourceLink() {
     return this._resourceLink;
   }
