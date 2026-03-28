@@ -1,16 +1,24 @@
 import { either as e, option as o } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
+import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters";
 import { LtiLineItem } from "$/assignment-and-grade/line-item";
 import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
+import { Context } from "$/core/context";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
+import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
 import { LtiResourceLink } from "$/core/resource-link";
+import { LtiTool } from "$/core/tool";
 
 export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
   public lineItems: LtiLineItem[] = [];
 
   public async save(lineItem: LtiLineItem): Promise<Either<LtiRepositoryError, void>> {
-    this.lineItems.push(lineItem);
+    const index = this.lineItems.findIndex((li) => li.id === lineItem.id);
+
+    if (index !== -1) this.lineItems[index] = lineItem;
+    else this.lineItems.push(lineItem);
+
     return e.right(undefined);
   }
   public async findByExternalResourceAndTag(
@@ -23,16 +31,13 @@ export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
           lineItem.externalResource?.externalToolResourceId === resourceId && lineItem.tag === tag,
       ),
       o.fromNullable,
-      o.match(
+      e.fromOption(
         () =>
-          e.left(
-            new LtiRepositoryError({
-              type: "NotFound",
-              cause: undefined,
-              subject: LtiLineItem.name,
-            }),
-          ),
-        (lineitem) => e.right(lineitem),
+          new LtiRepositoryError({
+            type: "NotFound",
+            subject: LtiLineItem.name,
+            cause: undefined,
+          }),
       ),
     );
   }
@@ -58,5 +63,36 @@ export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
     return e.left(
       new LtiRepositoryError({ type: "NotFound", subject: LtiLineItem.name, cause: undefined }),
     );
+  }
+
+  public async fetchWithContainerFilters(
+    context: Context,
+    tool: LtiTool,
+    limit: number,
+    page: number,
+    { tag, resourceId, resourceLinkId }: Omit<LineItemsContainerFilters, "limit" | "page">,
+  ): Promise<Either<LtiRepositoryError, LtiRepositoryPaginatedResponse<LtiLineItem>>> {
+    const filters = (lineItem: LtiLineItem) => {
+      const matchesResourceLinkId = !resourceLinkId || lineItem.resourceLink?.id === resourceLinkId;
+      const matchesTag = !tag || lineItem.tag === tag;
+      const matchesResourceId =
+        !resourceId || lineItem.externalResource?.externalToolResourceId === resourceId;
+
+      return (
+        matchesResourceId &&
+        matchesResourceLinkId &&
+        matchesTag &&
+        lineItem.isAccessibleToTool(tool) &&
+        lineItem.belongsToContext(context)
+      );
+    };
+
+    const filteredLineItems = this.lineItems.filter(filters);
+    const count = filteredLineItems.length;
+
+    const offset = (page - 1) * limit;
+    const lineItemsSlice = filteredLineItems.slice(offset, offset + limit);
+
+    return e.right({ count, values: lineItemsSlice });
   }
 }
