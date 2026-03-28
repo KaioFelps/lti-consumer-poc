@@ -6,6 +6,7 @@ import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { Context } from "$/core/context";
 import { LtiResourceLink } from "$/core/resource-link";
+import { LtiTool } from "$/core/tool";
 import { ExternalLtiResource } from "../advantage/external-resource";
 import { CannotAttachResourceLinkError } from "./errors/cannot-attach-resource-link.error";
 import { InvalidLineItemArgumentError } from "./errors/invalid-line-item-argument.error";
@@ -178,6 +179,12 @@ export class LtiLineItem implements ILtiLineItem {
 
   public removeCustomParameter(key: string) {
     delete this._customParameters[key];
+  }
+
+  public isAccessibleToTool(tool: LtiTool) {
+    const toolOwnsByResourceLink = !this._resourceLink || this._resourceLink.belongsToTool(tool);
+    const toolOwnsByResource = !this.externalResource || this.externalResource.belongsToTool(tool);
+    return toolOwnsByResourceLink && toolOwnsByResource;
   }
 
   public setResourceLink(resourceLink: LtiResourceLink | undefined) {

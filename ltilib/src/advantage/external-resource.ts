@@ -40,4 +40,8 @@ export class ExternalLtiResource implements IExternalLtiResource {
   public static create(args: IExternalLtiResource) {
     return new ExternalLtiResource(args);
   }
+
+  public belongsToTool(tool: LtiTool) {
+    return this.tool.id === tool.id;
+  }
 }
