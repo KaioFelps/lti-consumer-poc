@@ -7,6 +7,7 @@ import { pipe } from "fp-ts/lib/function";
 import { Context } from "$/core/context";
 import { LtiResourceLink } from "$/core/resource-link";
 import { ExternalLtiResource } from "../advantage/external-resource";
+import { CannotAttachResourceLinkError } from "./errors/cannot-attach-resource-link.error";
 import { InvalidLineItemArgumentError } from "./errors/invalid-line-item-argument.error";
 
 type CustomParameters = Record<string, JsonValue>;
@@ -68,7 +69,6 @@ export interface ILtiLineItem {
    * @see {@link https://www.imsglobal.org/spec/lti-ags/v2p0 LTI AGS specification}
    */
   startDateTime?: Date;
-
   /**
    * The ISO 8601 date and time after which no more submissions will be accepted for this line item.
    * Represents the formal deadline for the activity.
@@ -78,7 +78,6 @@ export interface ILtiLineItem {
    * @see {@link https://www.imsglobal.org/spec/lti-ags/v2p0 LTI AGS specification}
    */
   endDateTime?: Date;
-
   /**
    * Whether the tool expects the grades to be visible to the students in the platform's gradebook already.
    *
@@ -111,7 +110,7 @@ export class LtiLineItem implements ILtiLineItem {
     public label: string,
     public scoreMaximum: number,
     public readonly context: Context,
-    public resourceLink?: LtiResourceLink | undefined,
+    private _resourceLink?: LtiResourceLink | undefined,
     public readonly externalResource?: ExternalLtiResource | undefined,
     public readonly tag?: string,
     public gradesReleased?: boolean | undefined,
@@ -143,7 +142,7 @@ export class LtiLineItem implements ILtiLineItem {
       label,
       args.scoreMaximum,
       args.context,
-      args.resourceLink,
+      undefined,
       args.externalResource,
       args.tag,
       args.gradesReleased,
@@ -154,7 +153,10 @@ export class LtiLineItem implements ILtiLineItem {
     // silently ignore invalid keys
     Object.entries(customParameters).map(([key, value]) => lineitem.addCustomParameter(key, value));
 
-    return e.right(lineitem);
+    return pipe(
+      lineitem.setResourceLink(args.resourceLink),
+      e.map(() => lineitem),
+    );
   }
 
   public get customParameters(): Readonly<CustomParameters> {
@@ -176,5 +178,18 @@ export class LtiLineItem implements ILtiLineItem {
 
   public removeCustomParameter(key: string) {
     delete this._customParameters[key];
+  }
+
+  public setResourceLink(resourceLink: LtiResourceLink | undefined) {
+    if (!this.canAttachResourceLink(resourceLink)) {
+      return e.left(new CannotAttachResourceLinkError("must_belong_to_lineitem_context"));
+    }
+
+    this._resourceLink = resourceLink;
+    return e.right(undefined);
+  }
+
+  private canAttachResourceLink(resourceLink: LtiResourceLink | undefined) {
+    return !resourceLink || resourceLink.belongsToContext(this.context);
   }
 }

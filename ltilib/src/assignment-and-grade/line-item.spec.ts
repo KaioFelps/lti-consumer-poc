@@ -12,6 +12,8 @@
 import { faker } from "@faker-js/faker";
 import { either as e } from "fp-ts";
 import { createContext } from "ltilib/tests/common/factories/context.factory";
+import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
+import { CannotAttachResourceLinkError } from "./errors/cannot-attach-resource-link.error";
 import { InvalidLineItemArgumentError } from "./errors/invalid-line-item-argument.error";
 import { LtiLineItem } from "./line-item";
 
@@ -103,5 +105,38 @@ describe("[AGS] Line Item properties' domain rules", () => {
 
     const { invalidKey: _, ...validCustomParameters } = customParameters;
     expect(lineitem.right.customParameters).toMatchObject(validCustomParameters);
+  });
+
+  test("[3.2.9] resource link should exist in the same context as the line item to be attached", () => {
+    const resourceLinkFromAnotherContext = createResourceLink();
+    const validResourceLink = createResourceLink({ contextId: VALID_PAYLOAD.context.id });
+
+    let lineitem = LtiLineItem.create({
+      ...VALID_PAYLOAD,
+      resourceLink: resourceLinkFromAnotherContext,
+    });
+
+    assert(e.isLeft(lineitem));
+    expect(lineitem.left).toBeInstanceOf(CannotAttachResourceLinkError);
+
+    lineitem = LtiLineItem.create({ ...VALID_PAYLOAD, resourceLink: validResourceLink });
+    assert(e.isRight(lineitem));
+    expect(lineitem.right.resourceLink).toEqual(validResourceLink);
+
+    // creates a line item without resource links to assert setter also ensures resource link be valid
+    lineitem = LtiLineItem.create(VALID_PAYLOAD);
+    assert(e.isRight(lineitem));
+    expect(lineitem.right.resourceLink).toBeUndefined();
+
+    assert(e.isLeft(lineitem.right.setResourceLink(resourceLinkFromAnotherContext)));
+    expect(
+      lineitem.right.resourceLink,
+      "it should not set an invalid resource link",
+    ).toBeUndefined();
+
+    assert(e.isRight(lineitem.right.setResourceLink(validResourceLink)));
+    expect(lineitem.right.resourceLink, "it should set the resource link when it's valid").toEqual(
+      validResourceLink,
+    );
   });
 });
