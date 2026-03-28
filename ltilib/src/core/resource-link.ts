@@ -1,5 +1,7 @@
 import { generateUUID } from "common/src/types/uuid";
 import { IntoLtiClaim } from "$/claims/serialization";
+import { Context } from "./context";
+import { LtiTool } from "./tool";
 
 export interface ILtiResourceLink {
   /**
@@ -71,5 +73,13 @@ export class LtiResourceLink implements ILtiResourceLink, IntoLtiClaim {
       description: this.description,
       title: this.title,
     };
+  }
+
+  public belongsToTool(tool: LtiTool) {
+    return this.toolId === tool.id;
+  }
+
+  public belongsToContext(context: Context) {
+    return this.contextId === context.id;
   }
 }
