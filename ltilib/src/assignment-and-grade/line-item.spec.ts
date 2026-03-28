@@ -11,13 +11,17 @@
 
 import { faker } from "@faker-js/faker";
 import { either as e } from "fp-ts";
+import { createContext } from "ltilib/tests/common/factories/context.factory";
 import { InvalidLineItemArgumentError } from "./errors/invalid-line-item-argument.error";
 import { LtiLineItem } from "./line-item";
 
 describe("[AGS] Line Item properties' domain rules", () => {
+  const context = createContext();
+
   const VALID_PAYLOAD = {
     label: faker.lorem.sentence(),
     scoreMaximum: 60,
+    context,
   } satisfies Parameters<typeof LtiLineItem.create>[0];
 
   describe("[3.2.7] `label`", () => {

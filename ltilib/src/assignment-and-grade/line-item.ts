@@ -4,6 +4,7 @@ import { generateUUID, UUID } from "common/src/types/uuid";
 import { either as e } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
+import { Context } from "$/core/context";
 import { LtiResourceLink } from "$/core/resource-link";
 import { ExternalLtiResource } from "../advantage/external-resource";
 import { InvalidLineItemArgumentError } from "./errors/invalid-line-item-argument.error";
@@ -48,6 +49,10 @@ export interface ILtiLineItem {
    * @see {@link https://www.imsglobal.org/spec/lti-ags/v2p0 LTI AGS specification}
    */
   externalResource?: ExternalLtiResource;
+  /**
+   * The LTI {@link Context `Context`} to which this line item belongs.
+   */
+  context: Context;
   /**
    * A tag the LTI tool may set to this line item.
    *
@@ -105,6 +110,7 @@ export class LtiLineItem implements ILtiLineItem {
     public readonly id: number | UUID | string,
     public label: string,
     public scoreMaximum: number,
+    public readonly context: Context,
     public resourceLink?: LtiResourceLink | undefined,
     public readonly externalResource?: ExternalLtiResource | undefined,
     public readonly tag?: string,
@@ -136,6 +142,7 @@ export class LtiLineItem implements ILtiLineItem {
       id,
       label,
       args.scoreMaximum,
+      args.context,
       args.resourceLink,
       args.externalResource,
       args.tag,

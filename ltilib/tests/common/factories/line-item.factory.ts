@@ -22,12 +22,24 @@ export function createFullLineItem(
     endDateTime = faker.datatype.boolean()
       ? faker.date.soon({ days: 10, refDate: startDateTime })
       : undefined,
-    resourceLink = createResourceLink({ contextId: context.id, tool }),
-    externalResource = createExternalLtiResource({ context, tool }),
+    resourceLink,
+    externalResource,
     tag = faker.lorem.word(),
     gradesReleased = faker.datatype.boolean(),
-  }: CreateResourceLinkConstructorArgs = {},
+  }: Omit<CreateResourceLinkConstructorArgs, "context"> = {},
 ): LtiLineItem {
+  const resolvedContext = externalResource?.context ?? context;
+
+  resourceLink ??= createResourceLink({ contextId: resolvedContext.id, tool });
+  externalResource ??= createExternalLtiResource({ context: resolvedContext, tool });
+
+  if (resourceLink.contextId !== resolvedContext.id) {
+    throw new Error(
+      `Called \`createFullLineItem\` with an instance of ${LtiLineItem.name}` +
+        " that belongs to a different context than the one passed to the factory.",
+    );
+  }
+
   return createMinimalLineItem({
     startDateTime,
     endDateTime,
@@ -35,6 +47,7 @@ export function createFullLineItem(
     externalResource,
     tag,
     gradesReleased,
+    context: resolvedContext,
   });
 }
 
@@ -49,6 +62,7 @@ export function createMinimalLineItem({
   scoreMaximum = faker.number.int({ min: 1, max: 100 }),
   startDateTime,
   tag,
+  context = createContext(),
 }: CreateResourceLinkConstructorArgs = {}): LtiLineItem {
   const lineitem = LtiLineItem.create({
     label,
@@ -61,6 +75,7 @@ export function createMinimalLineItem({
     resourceLink,
     startDateTime,
     tag,
+    context,
   });
 
   assert(
