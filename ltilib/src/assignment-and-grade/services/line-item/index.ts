@@ -12,6 +12,10 @@ import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deploymen
 import { LtiTool } from "$/core/tool";
 import { LtiLineItemsRepository } from "../../repositories/line-items.repository";
 import { CreateLineItemServiceParams, CreateService } from "./create-line-item.service";
+import {
+  FetchFromContainerService,
+  FetchLineItemsFromContainerParams,
+} from "./fetch-line-items-from-container.service";
 import { FindLineItemParams, FindService } from "./find-line-item.service";
 
 type BasicRequestValidationParams = {
@@ -31,6 +35,7 @@ export interface ILineItemService<Params = unknown, ReturnType = unknown, Errors
 export class LtiLineItemServices {
   private readonly createService: CreateService;
   private readonly findService: FindService;
+  private readonly containerService: FetchFromContainerService;
 
   public constructor(
     platform: Platform,
@@ -40,6 +45,7 @@ export class LtiLineItemServices {
     private readonly deploymentsRepo: LtiToolDeploymentsRepository,
   ) {
     this.findService = new FindService(platform, lineItemsRepo);
+    this.containerService = new FetchFromContainerService(lineItemsRepo, platform);
     this.createService = new CreateService(
       platform,
       resourceLinksRepo,
@@ -54,6 +60,12 @@ export class LtiLineItemServices {
 
   public async find(params: FindLineItemParams & BasicRequestValidationParams) {
     return await this.executeService(this.findService, params);
+  }
+
+  public async fetchFromContainer(
+    params: FetchLineItemsFromContainerParams & BasicRequestValidationParams,
+  ) {
+    return await this.executeService(this.containerService, params);
   }
 
   protected async executeService<
