@@ -6,6 +6,12 @@ import { Context } from "$/core/context";
 import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
 import { LtiTool } from "$/core/tool";
 
+/**
+ * Checks whether the tool is deployed in the given LTI context.
+ * This check passes only when:
+ * 1. there is a context
+ * 2. there is at least one deployment of the tool in the given tool OR the tool has a global deployment
+ */
 export function ensureToolIsDeployedInContext(
   tool: LtiTool,
   context: Context | undefined,

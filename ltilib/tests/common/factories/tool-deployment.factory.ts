@@ -11,6 +11,18 @@ type CreateToolDeploymentParams = Partial<
   NullifyUndefined<{ id: LtiToolDeployment["id"]; context?: Context; tool: LtiTool }>
 >;
 
+export function createToolGlobalDeployment({
+  id = generateUUID(),
+  tool = createTool(),
+}: Omit<CreateToolDeploymentParams, "context">) {
+  tool.deploymentsIds.push(id.toString());
+
+  return LtiToolDeployment.create({
+    id,
+    toolId: tool.id,
+  });
+}
+
 export function createToolDeployment({
   id = generateUUID(),
   context,
@@ -26,5 +38,6 @@ export function createToolDeployment({
 }
 
 export default {
-  createToolDeployment,
+  createDeployment: createToolDeployment,
+  createGlobalDeployment: createToolGlobalDeployment,
 };
