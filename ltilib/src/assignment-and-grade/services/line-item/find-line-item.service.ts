@@ -9,7 +9,6 @@ import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { Context } from "$/core/context";
 import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
-import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
 import { LtiTool } from "$/core/tool";
 import { ILineItemService, type LtiLineItemServices } from ".";
 
@@ -35,7 +34,6 @@ export class FindService implements ILineItemService {
   public constructor(
     private readonly platform: Platform,
     private readonly lineItemsRepo: LtiLineItemsRepository,
-    private readonly deploymentsRepo: LtiToolDeploymentsRepository,
   ) {}
 
   getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined {
@@ -52,8 +50,7 @@ export class FindService implements ILineItemService {
 
   public async execute({ lineItemId, tool, context }: FindLineItemParams) {
     return await pipe(
-      this.ensureToolCanSearchThisLineitem(tool, context, lineItemId),
-      te.chainW(() => this.findLineItem(lineItemId)),
+      this.findLineItem(lineItemId),
       te.chainW((lineItem) => this.ensureToolCanAccessLineItem(lineItem, tool)),
       te.chainW((lineItem) => this.presentLineItem(lineItem, context)),
     )();
@@ -84,20 +81,5 @@ export class FindService implements ILineItemService {
   private ensureToolCanAccessLineItem(lineItem: LtiLineItem, tool: LtiTool) {
     if (lineItem.isAccessibleToTool(tool)) return te.right(lineItem);
     return te.left(new InaccessibleLineItemError(lineItem.id));
-  }
-
-  private ensureToolCanSearchThisLineitem(
-    tool: LtiTool,
-    context: Context,
-    lineItemId: LtiLineItem["id"],
-  ) {
-    return pipe(
-      () => this.deploymentsRepo.findDeploymentInContextOrGlobal(tool.id, context.id),
-      te.map(() => {}),
-      te.mapLeft((error) => {
-        if (error.type === "NotFound") return new InaccessibleLineItemError(lineItemId);
-        return error;
-      }),
-    );
   }
 }

@@ -39,8 +39,7 @@ export class LtiLineItemServices {
     lineItemsRepo: LtiLineItemsRepository,
     private readonly deploymentsRepo: LtiToolDeploymentsRepository,
   ) {
-    this.findService = new FindService(platform, lineItemsRepo, deploymentsRepo);
-
+    this.findService = new FindService(platform, lineItemsRepo);
     this.createService = new CreateService(
       platform,
       resourceLinksRepo,
