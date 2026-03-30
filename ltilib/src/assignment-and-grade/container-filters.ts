@@ -15,11 +15,11 @@ export type LineItemsContainerFilters = {
   /**
    * Limits the line items returned to only those marked with the given `tag`.
    */
-  tag: string;
+  tag?: string;
   /**
    * Restricts the number of line items returned to `limit`.
    */
-  limit: number | undefined;
+  limit?: number;
   /**
    * The current (1-based indexing) page of the container line items with given `filters`.
    */
