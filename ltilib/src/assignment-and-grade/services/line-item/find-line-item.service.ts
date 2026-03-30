@@ -54,8 +54,7 @@ export class FindService implements ILineItemService {
     return await pipe(
       this.ensureToolCanSearchThisLineitem(tool, context, lineItemId),
       te.chainW(() => this.findLineItem(lineItemId)),
-      te.chainW((lineItem) => this.ensureToolCanSeeLineItemDueToResource(lineItem, tool)),
-      te.chainW((lineItem) => this.ensureToolCanSeeLineItemDueToResourceLink(lineItem, tool)),
+      te.chainW((lineItem) => this.ensureToolCanAccessLineItem(lineItem, tool)),
       te.chainW((lineItem) => this.presentLineItem(lineItem, context)),
     )();
   }
@@ -82,19 +81,8 @@ export class FindService implements ILineItemService {
     );
   }
 
-  private ensureToolCanSeeLineItemDueToResourceLink(lineItem: LtiLineItem, tool: LtiTool) {
-    if (!lineItem.resourceLink || lineItem.resourceLink.toolId === tool.id) {
-      return te.right(lineItem);
-    }
-
-    return te.left(new InaccessibleLineItemError(lineItem.id));
-  }
-
-  private ensureToolCanSeeLineItemDueToResource(lineItem: LtiLineItem, tool: LtiTool) {
-    if (!lineItem.externalResource || lineItem.externalResource.tool.id === tool.id) {
-      return te.right(lineItem);
-    }
-
+  private ensureToolCanAccessLineItem(lineItem: LtiLineItem, tool: LtiTool) {
+    if (lineItem.isAccessibleToTool(tool)) return te.right(lineItem);
     return te.left(new InaccessibleLineItemError(lineItem.id));
   }
 
