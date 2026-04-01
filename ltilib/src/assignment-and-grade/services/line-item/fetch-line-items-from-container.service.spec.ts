@@ -76,12 +76,12 @@ describe("[AGS] Fetch Line Items From Container Service", async () => {
     page = 1,
     filters,
     defaultLimit = 12,
-  }: {
-    context: Context;
-    tool: LtiTool;
+    ...props
+  }: Omit<Partial<Parameters<typeof sut.fetchFromContainer>[0]>, "filters"> & {
     page?: number;
+    tool: LtiTool;
+    context: Context;
     filters?: Partial<LineItemsContainerFilters>;
-    defaultLimit?: number;
   }) => {
     const resolvedFilters = { page, ...(filters ?? {}) };
     return {
@@ -91,6 +91,7 @@ describe("[AGS] Fetch Line Items From Container Service", async () => {
       defaultLimit,
       tool,
       filters: resolvedFilters,
+      ...props,
     };
   };
 
@@ -595,5 +596,27 @@ describe("[AGS] Fetch Line Items From Container Service", async () => {
     result.right.rawContent.forEach((lineItem) => {
       expect(lineItem.belongsToContext(context)).toBeTruthy();
     });
+  });
+
+  it("should respect the `maxLimit` over container request filter's `limit` parameter", async () => {
+    const { context, tool } = getValidEntities();
+
+    const TOTAL_LINE_ITEMS = 200;
+    const MAX_LIMIT = 100;
+
+    generateLineItems({ context, count: TOTAL_LINE_ITEMS });
+
+    const result = await sut.fetchFromContainer(
+      getSutValidParams({
+        context,
+        tool,
+        filters: { limit: 1000 },
+        defaultLimit: 1500,
+        maxLimit: MAX_LIMIT,
+      }),
+    );
+
+    assert(e.isRight(result));
+    expect(result.right.content.length).toBe(MAX_LIMIT);
   });
 });

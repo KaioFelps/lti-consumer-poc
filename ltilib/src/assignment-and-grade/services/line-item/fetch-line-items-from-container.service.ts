@@ -12,6 +12,7 @@ import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
 import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
 import { LtiTool } from "$/core/tool";
+import type { LtiLineItemServices } from ".";
 import { ILineItemService } from ".";
 
 export type FetchLineItemsFromContainerParams = {
@@ -22,6 +23,7 @@ export type FetchLineItemsFromContainerParams = {
    */
   filters: LineItemsContainerFilters;
   defaultLimit: number;
+  maxLimit?: number;
   context: Context;
   tool: LtiTool;
 };
@@ -60,8 +62,9 @@ export class FetchFromContainerService implements ILineItemService {
     context,
     tool,
     defaultLimit,
+    maxLimit,
   }: FetchLineItemsFromContainerParams) {
-    const resolvedLimit = filters.limit ?? defaultLimit;
+    const resolvedLimit = this.resolveLimit(defaultLimit, maxLimit, filters?.limit);
 
     // forces the page to be 1-based indexed
     filters.page = Math.max(1, filters.page);
@@ -87,6 +90,14 @@ export class FetchFromContainerService implements ILineItemService {
       ),
       te.map(({ response }) => response),
     )();
+  }
+
+  private resolveLimit(defaultLimit: number, maxLimit?: number, filterLimit?: number) {
+    let resolvedLimit = filterLimit ?? defaultLimit;
+
+    if (maxLimit) resolvedLimit = Math.min(resolvedLimit, maxLimit);
+
+    return resolvedLimit;
   }
 
   private getLineItems(
