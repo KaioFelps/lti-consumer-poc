@@ -540,7 +540,7 @@ describe("[Core] Prepare Launch Request Service", async () => {
     }
   });
 
-  it("should include presentation specified in the launch data as a LTI claim", async () => {
+  it("should include presentation specified in the launch data as an LTI claim", async () => {
     const { resourceLink, sessionUserId, tool } = getValidDataForInitiation();
 
     const presentation = MessageRequests.Presentation.create({

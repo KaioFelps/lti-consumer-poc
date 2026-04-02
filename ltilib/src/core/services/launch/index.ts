@@ -49,7 +49,7 @@ export class LtiLaunchServices<CustomRoles extends string = never, CustomContext
   }
 
   /**
-   * Authenticates a LTI launch login request and prepare the launch message.
+   * Authenticates an LTI launch login request and prepare the launch message.
    */
   public async authenticateLaunch(
     args: AuthenticateLaunchLoginRequestParams<CustomRoles, CustomContextType>,

@@ -152,7 +152,7 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
         () => transaction,
         (err: Error) => {
           return new IrrecoverableError(
-            `An error occurred in ${DrizzleLtiToolsRepository.name} when trying to upsert a LTI tool.`,
+            `An error occurred in ${DrizzleLtiToolsRepository.name} when trying to upsert an LTI tool.`,
             err,
           );
         },

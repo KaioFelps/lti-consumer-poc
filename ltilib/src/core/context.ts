@@ -34,7 +34,7 @@ export interface IContext<CustomContextType = never> {
 }
 
 /**
- * A LTI context represents a group of related LTI items. I.e., when a collection of resources
+ * An LTI context represents a group of related LTI items. I.e., when a collection of resources
  * are related to a specific course, this course is a context.
  */
 export class Context<CustomContextType = never>

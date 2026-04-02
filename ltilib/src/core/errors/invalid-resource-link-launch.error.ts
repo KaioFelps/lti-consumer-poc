@@ -9,7 +9,7 @@ type ErrorCode =
 type Args = Omit<IOAuthError<ErrorCode>, "httpStatusCode">;
 
 /**
- * A non-normative error that can be returned when a LTI Launch is not
+ * A non-normative error that can be returned when an LTI Launch is not
  * valid and thus cannot be successfuly formed.
  */
 export class InvalidResourceLinkLaunchError extends OAuthError<ErrorCode> {

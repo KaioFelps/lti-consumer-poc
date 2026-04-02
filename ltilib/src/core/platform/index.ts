@@ -31,7 +31,7 @@ export interface IPlatform {
 }
 
 /**
- * Represents a LTI Platform.
+ * Represents an LTI Platform.
  */
 export class Platform implements IPlatform {
   /**

@@ -14,7 +14,7 @@ export interface ILtiToolDeployment {
 }
 
 /**
- * Represents a deployment of a LTI tool (`ToolRecord`) within some context.
+ * Represents a deployment of an LTI tool (`ToolRecord`) within some context.
  */
 export class LtiToolDeployment implements ILtiToolDeployment {
   public readonly id: string;

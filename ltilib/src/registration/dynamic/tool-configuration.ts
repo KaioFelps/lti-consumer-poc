@@ -54,7 +54,7 @@ export type DraftLtiDynamicToolConfiguration = {
 
 /**
  * Represents a stored configuration from some registered LTI tool. Platforms
- * must return this type after registering a LTI tool and everytime a tool requests
+ * must return this type after registering an LTI tool and everytime a tool requests
  * its configuration within the platform.
  */
 export type LtiDynamicToolConfiguration = DraftLtiDynamicToolConfiguration & {

@@ -9,7 +9,7 @@ type PrepareIdTokenArgs = {
   targetTool: LtiTool;
   nonce: string;
   /**
-   * A LTI Claims object (with already resolved keys, i.e., return of some `message.intoLtiClaim()`).
+   * An LTI Claims object (with already resolved keys, i.e., return of some `message.intoLtiClaim()`).
    */
   claims: object;
 };
