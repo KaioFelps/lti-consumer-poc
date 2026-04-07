@@ -20,7 +20,7 @@ export function ensureToolIsDeployedInContext(
   if (!context) return te.left(new MissingLtiContextError());
 
   return pipe(
-    () => deploymentsRepo.findDeploymentInContextOrGlobal(tool.id, context.id),
+    () => deploymentsRepo.findDeploymentInContextTreeOrGlobal(tool.id, context),
     te.map((_) => {}),
     te.mapLeft((error) => {
       if (error.type === "NotFound") return new ToolIsNotDeployedInContextError(tool, context);

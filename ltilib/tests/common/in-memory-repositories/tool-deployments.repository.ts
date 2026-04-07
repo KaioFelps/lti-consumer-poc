@@ -9,13 +9,13 @@ import { LtiToolDeployment } from "$/core/tool-deployment";
 export class InMemoryLtiToolDeploymentsRepository implements LtiToolDeploymentsRepository {
   public deployments: LtiToolDeployment[] = [];
 
-  public async findDeploymentInContextOrGlobal(
+  public async findDeploymentInContextTreeOrGlobal(
     toolId: LtiTool["id"],
-    contextId: Context["id"],
+    context: Context,
   ): Promise<Either<LtiRepositoryError, LtiToolDeployment>> {
     const deployment = this.deployments.find((deployment) => {
       const belongsToTool = deployment.toolId === toolId;
-      const isGlobalOrInContext = !deployment.contextId || deployment.contextId === contextId;
+      const isGlobalOrInContext = !deployment.contextId || deployment.contextId === context.id;
       return belongsToTool && isGlobalOrInContext;
     });
 
