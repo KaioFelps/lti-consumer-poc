@@ -1,14 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { type UUID } from "common/src/types/uuid";
-import { either as e, taskEither as te } from "fp-ts";
+import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
-import { Course } from "@/modules/courses-and-enrollments/entities/course.entity";
 import { PersonNotFoundError } from "@/modules/identity/errors/person-not-found.error";
 import { PeopleRepository } from "@/modules/identity/person/people.repository";
-import { Person } from "@/modules/identity/person/person.entity";
-import { CourseInstructorMismatch } from "../errors/course-instructor-mismatch.error";
 import { InstructorNotFoundError } from "../errors/instructor-not-found.error";
 import { StudentNotFoundError } from "../errors/student-not-found.error";
+import policies from "../policies";
 import { AssignmentsRepository } from "../repositories/assignments.repository";
 import { CoursesRepository } from "../repositories/courses.repository";
 
@@ -41,16 +39,11 @@ export class GradeAnAssignmentService {
             this.coursesRepository.findById(assignment.getCourseId()),
       ),
       te.chainFirstEitherKW(({ instructor, course }) =>
-        this.ensureInstructorIsAuthorized(instructor, course),
+        policies.instructorIsAuthorized(instructor, course),
       ),
       te.chainEitherKW(({ assignment, student }) => assignment.grade(student, score, release)),
       te.chainW((grade) => () => this.assignmentsRepository.saveGrade(grade)),
     )();
-  }
-
-  private ensureInstructorIsAuthorized(instructor: Person, course: Course) {
-    if (course.isTaughtBy(instructor)) return e.right(undefined);
-    return e.left(new CourseInstructorMismatch(course, instructor));
   }
 
   private findInstructor(instructorId: UUID) {

@@ -1,10 +1,11 @@
 import { type UUID } from "common/src/types/uuid";
-import { either } from "fp-ts";
+import { either as e } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { EntityBase } from "@/core/entity-base";
 import { Course } from "@/modules/courses-and-enrollments/entities/course.entity";
 import { Person } from "@/modules/identity/person/person.entity";
 import { GradeOfAssignment } from "../aggregates/grade-of-assignment.aggregate";
+import { InvalidAssignmentError } from "../errors/invalid-assignment.error";
 import { Grade } from "./grade.entity";
 
 type Props = {
@@ -19,7 +20,19 @@ type Props = {
 
 export class Assignment extends EntityBase<Props> {
   public static create(props: Omit<Props, "id" | "createdAt">) {
-    return new Assignment({ ...props, id: EntityBase.generateId(), createdAt: new Date() });
+    const now = new Date();
+    if (props.deadline && props.deadline <= now) {
+      return e.left(
+        new InvalidAssignmentError({
+          argumentName: "deadline",
+          errorMessageIdentifier: "assignments:errors:deadline-cannot-be-past",
+        }),
+      );
+    }
+
+    if (props.releasedAt && props.releasedAt < now) props.releasedAt = now;
+
+    return e.right(new Assignment({ ...props, id: EntityBase.generateId(), createdAt: now }));
   }
 
   public static createUnchecked(props: Props) {
@@ -35,7 +48,7 @@ export class Assignment extends EntityBase<Props> {
         maxScore: this.props.maxScore,
         released: isReleased,
       }),
-      either.map((grade) => new GradeOfAssignment({ assignment: this, grade })),
+      e.map((grade) => new GradeOfAssignment({ assignment: this, grade })),
     );
   }
 

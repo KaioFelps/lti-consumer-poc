@@ -25,4 +25,8 @@ export abstract class AssignmentsRepository {
   ): Promise<
     Either<IrrecoverableError | AssignmentNotFoundError | GradeNotFoundError, GradeOfAssignment>
   >;
+
+  public abstract createAssignment(
+    assignment: Assignment,
+  ): Promise<Either<IrrecoverableError, Assignment>>;
 }
