@@ -1,7 +1,10 @@
 import { ClassProperties } from "common/src/types/class-properties";
+import { OptionalizeUndefined } from "common/src/types/optional";
 import { MessageStringFormatterArg } from "@/message-string/internal";
 
-export type ErrorClassProperties<Class> = Omit<ClassProperties<Class>, "errorType">;
+export type ErrorClassProperties<Class> = OptionalizeUndefined<
+  Omit<ClassProperties<Class>, "errorType">
+>;
 
 export interface IErrorBase {
   /**
