@@ -10,7 +10,7 @@ export class OIDCAdapterBridge implements Adapter {
     OIDCAdapterBridge.internalAdapterFactory = internalAdapterFactory;
   }
 
-  public constructor(modelName: ModelName) {
+  public constructor(modelName: ModelName | string) {
     if (!OIDCAdapterBridge.internalAdapterFactory) {
       throw new IrrecoverableError(
         "Tried to instantiate a OIDCRedisAdapterBridge without " +
@@ -18,7 +18,9 @@ export class OIDCAdapterBridge implements Adapter {
       );
     }
 
-    this.internalAdapter = OIDCAdapterBridge.internalAdapterFactory.getAdapter(modelName);
+    this.internalAdapter = OIDCAdapterBridge.internalAdapterFactory.getAdapter(
+      modelName as ModelName,
+    );
   }
 
   public async upsert(id: string, payload: AdapterPayload, expiresIn: number): Promise<undefined> {

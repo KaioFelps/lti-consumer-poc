@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { DrizzleOIDCClientAdapter } from "@/external/data-store/drizzle/oidc-adpaters/client-adapter";
 import { Redis } from "@/external/data-store/redis/client";
 import { OIDCRedisAdapter } from "@/external/data-store/redis/oidc-adapter";
@@ -23,14 +23,11 @@ export type ModelName =
 
 @Injectable()
 export class OIDCAdapterFactory {
-  @Inject()
-  private readonly redis: Redis;
-
-  @Inject()
-  private readonly clientsRepository: OIDCClientsRepository;
-
-  @Inject()
-  private readonly ltiToolsRepository: LtiToolsRepository;
+  public constructor(
+    private readonly redis: Redis,
+    private readonly clientsRepository: OIDCClientsRepository,
+    private readonly ltiToolsRepository: LtiToolsRepository,
+  ) {}
 
   public getAdapter(modelName: ModelName) {
     if (modelName === "Client") {
