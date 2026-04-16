@@ -1,11 +1,11 @@
 import { EntityBase } from "@/core/entity-base";
 import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity";
-import { Person } from "@/modules/identity/person/person.entity";
 import { Course } from "../entities/course.entity";
+import { Instructor } from "../entities/instructor.entity";
 
 type Props = {
   course: Course;
-  instructor: Person;
+  instructor: Instructor;
 };
 
 export class CourseWithInstructor extends EntityBase<Props> {

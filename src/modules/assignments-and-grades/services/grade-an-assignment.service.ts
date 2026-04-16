@@ -2,9 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { type UUID } from "common/src/types/uuid";
 import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
+import { InstructorsRepository } from "@/modules/courses-and-enrollments/repositories/instructors.repository";
 import { PersonNotFoundError } from "@/modules/identity/errors/person-not-found.error";
 import { PeopleRepository } from "@/modules/identity/person/people.repository";
-import { InstructorNotFoundError } from "../errors/instructor-not-found.error";
 import { StudentNotFoundError } from "../errors/student-not-found.error";
 import policies from "../policies";
 import { AssignmentsRepository } from "../repositories/assignments.repository";
@@ -22,6 +22,7 @@ type Params = {
 export class GradeAnAssignmentService {
   public constructor(
     private readonly peopleRepository: PeopleRepository,
+    private readonly instructorsRepository: InstructorsRepository,
     private readonly assignmentsRepository: AssignmentsRepository,
     private readonly coursesRepository: CoursesRepository,
   ) {}
@@ -29,7 +30,7 @@ export class GradeAnAssignmentService {
   public async execute({ studentId, assignmentId, instructorId, release, score }: Params) {
     return await pipe(
       te.Do,
-      te.apS("instructor", this.findInstructor(instructorId)),
+      te.apS("instructor", () => this.instructorsRepository.findInstructorById(instructorId)),
       te.apS("student", this.findStudent(studentId)),
       te.apS("assignment", () => this.assignmentsRepository.findById(assignmentId)),
       te.bindW(
@@ -44,15 +45,6 @@ export class GradeAnAssignmentService {
       te.chainEitherKW(({ assignment, student }) => assignment.grade(student, score, release)),
       te.chainW((grade) => () => this.assignmentsRepository.saveGrade(grade)),
     )();
-  }
-
-  private findInstructor(instructorId: UUID) {
-    return pipe(
-      () => this.peopleRepository.findById(instructorId.toString()),
-      te.mapError((error) =>
-        error instanceof PersonNotFoundError ? new InstructorNotFoundError(instructorId) : error,
-      ),
-    );
   }
 
   private findStudent(studentId: UUID) {

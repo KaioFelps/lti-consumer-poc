@@ -2,6 +2,7 @@ import { UUID } from "common/src/types/uuid";
 import { EntityBase } from "@/core/entity-base";
 import { Person } from "@/modules/identity/person/person.entity";
 import { type User } from "@/modules/identity/user/user.entity";
+import { Instructor } from "./instructor.entity";
 
 type Props = {
   id: UUID;
@@ -10,7 +11,7 @@ type Props = {
 };
 
 export class Course extends EntityBase<Props> {
-  public static create(props: Omit<Props, "id">) {
+  public static create(props: Course.ConstructorProps) {
     return new Course({ ...props, id: Course.generateId() });
   }
 
@@ -30,8 +31,8 @@ export class Course extends EntityBase<Props> {
     this.props.title = value;
   }
 
-  public isTaughtBy(instructor: Person) {
-    return instructor.getUser().getId() === this.props.instructorId;
+  public isTaughtBy(instructor: Instructor) {
+    return instructor.getId() === this.props.instructorId;
   }
 
   public getInstructorId() {
@@ -41,4 +42,8 @@ export class Course extends EntityBase<Props> {
   public setInstructor(instructor: Person) {
     this.props.instructorId = instructor.getUser().getId();
   }
+}
+
+export namespace Course {
+  export type ConstructorProps = Omit<Props, "id">;
 }
