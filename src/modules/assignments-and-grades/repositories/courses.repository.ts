@@ -8,4 +8,6 @@ export abstract class CoursesRepository {
   public abstract findById(
     courseId: UUID,
   ): Promise<Either<IrrecoverableError | CourseNotFoundError, Course>>;
+
+  public abstract save(course: Course): Promise<Either<IrrecoverableError, Course>>;
 }
