@@ -11,17 +11,17 @@ export interface IErrorBase {
    * A domain-namespaced error code that may be used by a client to find and display a
    * message string that explains this error.
    */
-  errorMessageIdentifier: string;
+  readonly errorMessageIdentifier: string;
   /**
    * Optional parameters that the message-strings module may use when formatting
    * the message identified by `errorMessageIdentifier`.
    */
-  messageParams?: MessageStringFormatterArg;
+  readonly messageParams?: MessageStringFormatterArg;
   /**
    * A code that indicates the type of this error. May be used by
    * a client to determine the appropriate way to handle this error.
    */
-  errorType: string;
+  readonly errorType: string;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { ErrorBase } from "./error-base";
+import { type IErrorBase } from "./error-base";
 
 /**
  * Indicates an programmin-level error that is not recoverable. The message describes
@@ -7,7 +7,7 @@ import { ErrorBase } from "./error-base";
  * This is the only error a developer should `throw` instead of returning as an `Either`
  * variant.
  */
-export class IrrecoverableError extends Error implements ErrorBase {
+export class IrrecoverableError extends Error implements IErrorBase {
   public constructor(
     public message: string,
     cause?: Error,

@@ -2,7 +2,7 @@ import { option } from "fp-ts";
 import { Option } from "fp-ts/lib/Option";
 import { InvalidArgumentError } from "../errors/invalid-argument.error";
 
-export type ValidationError = InvalidArgumentError;
+export type ValidationError = InvalidArgumentError & { argumentName: string };
 
 export type ValidationErrorsMap = Record<
   string,
@@ -52,7 +52,7 @@ export class ValidationErrors {
     this.recursivelyInsertError(error, path);
   }
 
-  private recursivelyInsertError(error: Required<ValidationError>, path: string[]) {
+  private recursivelyInsertError(error: ValidationError, path: string[]) {
     let errorsWindow = this.errors;
     const lastSegment = path[path.length - 1];
     path = path.slice(0, path.length - 1);
@@ -75,9 +75,7 @@ export class ValidationErrors {
     this.errors = { ...this.errors, ...valiationErrors.errors };
   }
 
-  private ensureErrorRequiredFields(
-    error: InvalidArgumentError,
-  ): error is Required<InvalidArgumentError> {
+  private ensureErrorRequiredFields(error: InvalidArgumentError): error is ValidationError {
     if (typeof error.argumentName === "undefined")
       throw new Error(
         "Every validation error's `InvalidArgumentError` instance needs to have a defined `argumentName` value.",
