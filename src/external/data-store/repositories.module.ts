@@ -1,4 +1,7 @@
 import { Global, Module } from "@nestjs/common";
+import { AssignmentsRepository } from "@/modules/assignments-and-grades/repositories/assignments.repository";
+import { CoursesRepository } from "@/modules/assignments-and-grades/repositories/courses.repository";
+import { InstructorsRepository } from "@/modules/courses-and-enrollments/repositories/instructors.repository";
 import { PeopleRepository } from "@/modules/identity/person/people.repository";
 import { UsersRepository } from "@/modules/identity/user/users.repository";
 import { LtiResourceLinksRepository } from "@/modules/lti/resource-links/resource-links.repository";
@@ -9,6 +12,9 @@ import { OIDCClientsRepository } from "@/modules/oidc/repositories/clients.repos
 import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
 import { LtiResourceLinksRepository as BaseLtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identities.repository";
+import { DrizzleAssignmentsRepository } from "./drizzle/repositories/assignments.repository";
+import { DrizzleCoursesRepository } from "./drizzle/repositories/courses.repository";
+import { DrizzleInstructorsRepository } from "./drizzle/repositories/instructors.repository";
 import { DrizzleLtiToolsRepository } from "./drizzle/repositories/lti-tools.repository";
 import { DrizzleLtiToolsDeploymentsRepository } from "./drizzle/repositories/lti-tools-deployments.repository";
 import { DrizzleODICAccountsRepository } from "./drizzle/repositories/oidc-accounts.repository";
@@ -33,6 +39,9 @@ import { RedisLtiLaunchesRepository } from "./redis/repositories/lti-launches.re
     { provide: LtiLaunchesRepository, useClass: RedisLtiLaunchesRepository },
     { provide: PeopleRepository, useExisting: DrizzlePeopleRepository },
     { provide: LtiUserIdentitiesRespository, useExisting: DrizzlePeopleRepository },
+    { provide: CoursesRepository, useClass: DrizzleCoursesRepository },
+    { provide: AssignmentsRepository, useClass: DrizzleAssignmentsRepository },
+    { provide: InstructorsRepository, useClass: DrizzleInstructorsRepository },
   ],
   exports: [
     UsersRepository,
