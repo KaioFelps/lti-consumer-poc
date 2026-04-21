@@ -26,16 +26,16 @@ import ltiToolsMapper from "../mappers/lti-tools.mapper";
 @Injectable()
 export class DrizzleLtiToolsRepository extends LtiToolsRepository {
   @Inject()
-  private readonly drizzle: DrizzleClient;
+  private readonly drizzle!: DrizzleClient;
 
   public async findManyTools(): Promise<Either<IrrecoverableError, LtiTool[]>> {
     return await pipe(
       taskEither.tryCatch(
         () => this.drizzle.getClient().query.ltiTools.findMany(ltiToolsMapper.requiredQueryConfig),
-        (error: Error) => {
+        (error) => {
           return new IrrecoverableError(
             `An error occurred in ${DrizzleLtiToolsRepository.name} on finding many tools.`,
-            error,
+            error as Error,
           );
         },
       ),
@@ -44,20 +44,20 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
     )();
   }
 
-  public async findToolById(id: string): Promise<Either<LtiRepositoryError, BaseLtiTool>> {
-    return await pipe(
+  public findToolById(id: string) {
+    return pipe(
       taskEither.tryCatch(
         () =>
           this.drizzle.getClient().query.ltiTools.findFirst({
             ...ltiToolsMapper.requiredQueryConfig,
             where: eq(ltiTools.id, id),
           }),
-        (err: Error) => {
+        (err) => {
           return new LtiRepositoryError({
             type: "ExternalError",
             cause: new IrrecoverableError(
               `An error occurred in ${DrizzleLtiToolsRepository.name} when finding LTI tool by id.`,
-              err,
+              err as Error,
             ),
           });
         },
@@ -69,7 +69,7 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
           option.map((record) => new LtiTool(record)),
         );
       }),
-      taskEither.chain(
+      taskEither.chainW(
         taskEither.fromOption(
           () =>
             new LtiRepositoryError({
@@ -150,10 +150,10 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
     return await pipe(
       taskEither.tryCatch(
         () => transaction,
-        (err: Error) => {
+        (err) => {
           return new IrrecoverableError(
             `An error occurred in ${DrizzleLtiToolsRepository.name} when trying to upsert an LTI tool.`,
-            err,
+            err as Error,
           );
         },
       ),
@@ -165,10 +165,10 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
     return await pipe(
       taskEither.tryCatch(
         () => this.drizzle.getClient().delete(oauthClients).where(eq(oauthClients.id, id)),
-        (err: Error) => {
+        (err) => {
           return new IrrecoverableError(
             `An error occurred in ${DrizzleLtiToolsRepository.name} when deleting the LTI Tool with ID ${id}.`,
-            err,
+            err as Error,
           );
         },
       ),
@@ -186,12 +186,12 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
             ...ltiToolsMapper.requiredQueryConfig,
             where: inArray(ltiTools.id, resourceLinksIds),
           }),
-        (error: Error) => {
+        (error) => {
           return new LtiRepositoryError({
             type: "ExternalError",
             cause: new IrrecoverableError(
               `An error occurred in ${DrizzleLtiToolsRepository.name} when finding tools by resource links IDs.`,
-              error,
+              error as Error,
             ),
           });
         },
@@ -207,10 +207,10 @@ export class DrizzleLtiToolsRepository extends LtiToolsRepository {
           this.drizzle
             .getClient()
             .query.ltiTools.findMany(ltiToolPreviewsMapper.requiredQueryConfig),
-        (error: Error) =>
+        (error) =>
           new IrrecoverableError(
             `An error occurred in ${DrizzleLtiToolsRepository.name} when finding tools previews.`,
-            error,
+            error as Error,
           ),
       ),
       taskEither.map((rows) => rows.map(ltiToolPreviewsMapper.fromRow)),

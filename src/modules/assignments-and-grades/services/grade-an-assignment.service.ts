@@ -5,6 +5,7 @@ import { pipe } from "fp-ts/lib/function";
 import { InstructorsRepository } from "@/modules/courses-and-enrollments/repositories/instructors.repository";
 import { PersonNotFoundError } from "@/modules/identity/errors/person-not-found.error";
 import { PeopleRepository } from "@/modules/identity/person/people.repository";
+import { NonGradableAssignmentError } from "../errors/non-gradable-assignment";
 import { StudentNotFoundError } from "../errors/student-not-found.error";
 import policies from "../policies";
 import { AssignmentsRepository } from "../repositories/assignments.repository";
@@ -33,11 +34,16 @@ export class GradeAnAssignmentService {
       te.apS("instructor", () => this.instructorsRepository.findInstructorById(instructorId)),
       te.apS("student", this.findStudent(studentId)),
       te.apS("assignment", () => this.assignmentsRepository.findById(assignmentId)),
+      te.bindW("courseId", ({ assignment }) => {
+        const courseId = assignment.getCourseId();
+        if (!courseId) return te.left(new NonGradableAssignmentError(assignment));
+        return te.right(courseId);
+      }),
       te.bindW(
         "course",
-        ({ assignment }) =>
+        ({ courseId }) =>
           () =>
-            this.coursesRepository.findById(assignment.getCourseId()),
+            this.coursesRepository.findById(courseId),
       ),
       te.chainFirstEitherKW(({ instructor, course }) =>
         policies.instructorIsAuthorized(instructor, course),

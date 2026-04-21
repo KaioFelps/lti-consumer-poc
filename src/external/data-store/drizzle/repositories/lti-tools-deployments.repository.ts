@@ -16,64 +16,62 @@ import ltiToolsDeploymentsMapper from "../mappers/lti-tools-deployments.mapper";
 @Injectable()
 export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRepository {
   @Inject()
-  private readonly drizzle: DrizzleClient;
+  private readonly drizzle!: DrizzleClient;
 
-  public async save(deployment: LtiToolDeployment): Promise<Either<IrrecoverableError, void>> {
-    return await pipe(
+  public save(deployment: LtiToolDeployment): Promise<Either<IrrecoverableError, void>> {
+    return pipe(
       te.tryCatch(
         () =>
           this.drizzle.getClient().insert(ltiToolDeployments).values(mapper.intoRow(deployment)),
-        (error: Error) =>
+        (error) =>
           new IrrecoverableError(
             `Error occurred in ${DrizzleLtiToolsDeploymentsRepository.name} when deploying an LTI tool.`,
-            error,
+            error as Error,
           ),
       ),
       te.map((_rows) => {}),
     )();
   }
 
-  public async findManyByToolId(
+  public findManyByToolId(
     toolId: string,
   ): Promise<Either<IrrecoverableError, LtiToolDeployment[]>> {
-    return await pipe(
+    return pipe(
       te.tryCatch(
         () =>
           this.drizzle.getClient().query.ltiToolDeployments.findMany({
             where: eq(ltiToolDeployments.clientId, toolId),
           }),
-        (error: Error) =>
+        (error) =>
           new IrrecoverableError(
             `Error occurred in ${DrizzleLtiToolsDeploymentsRepository.name} when finding many deployments by tool id.`,
-            error,
+            error as Error,
           ),
       ),
       te.map((rows) => rows.map(mapper.fromRow)),
     )();
   }
 
-  public async delete(deploymentId: UUID): Promise<Either<IrrecoverableError, void>> {
-    return await pipe(
+  public delete(deploymentId: UUID): Promise<Either<IrrecoverableError, void>> {
+    return pipe(
       te.tryCatch(
         () =>
           this.drizzle
             .getClient()
             .delete(ltiToolDeployments)
             .where(eq(ltiToolDeployments.id, deploymentId.toString())),
-        (error: Error) =>
+        (error) =>
           new IrrecoverableError(
             `An error occurred in ${DrizzleLtiToolsDeploymentsRepository.name} when deleting deployment.`,
-            error,
+            error as Error,
           ),
       ),
       te.map((_result) => {}),
     )();
   }
 
-  public async findById(
-    deploymentId: UUID,
-  ): Promise<Either<IrrecoverableError | ResourceNotFoundError, LtiToolDeployment>> {
-    return await pipe(
+  public findById(deploymentId: UUID) {
+    return pipe(
       te.tryCatch(
         () =>
           this.drizzle
@@ -86,14 +84,14 @@ export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRep
             .from(ltiToolDeployments)
             .where(eq(ltiToolDeployments.id, deploymentId.toString()))
             .limit(1),
-        (error: Error) =>
+        (error) =>
           new IrrecoverableError(
             `An error occurred in ${DrizzleLtiToolsDeploymentsRepository.name} when finding deployment by id.`,
-            error,
+            error as Error,
           ),
       ),
       te.map((rows) => rows[0]),
-      te.chain(
+      te.chainW(
         te.fromNullable(
           new ResourceNotFoundError({
             errorMessageIdentifier:
@@ -102,7 +100,7 @@ export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRep
           }),
         ),
       ),
-      te.map(ltiToolsDeploymentsMapper.fromRow),
+      te.map((a) => ltiToolsDeploymentsMapper.fromRow(a)),
     )();
   }
 }
