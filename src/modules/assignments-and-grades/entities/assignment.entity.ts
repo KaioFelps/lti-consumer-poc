@@ -18,6 +18,8 @@ type Props = {
   createdAt: Date;
 };
 
+const maxSmallInt = 0x7fff;
+
 export class Assignment extends EntityBase<Props> {
   public static create(props: Omit<Props, "id" | "createdAt">) {
     const now = new Date();
@@ -26,6 +28,26 @@ export class Assignment extends EntityBase<Props> {
         new InvalidAssignmentError({
           argumentName: "deadline",
           errorMessageIdentifier: "assignments:errors:deadline-cannot-be-past",
+        }),
+      );
+    }
+
+    if (props.maxScore > maxSmallInt) {
+      return e.left(
+        new InvalidAssignmentError({
+          argumentName: "maxScore",
+          errorMessageIdentifier: "assignments:errors:max-score-too-big",
+          messageParams: { maximum: maxSmallInt },
+        }),
+      );
+    }
+
+    if (props.maxScore <= 0) {
+      return e.left(
+        new InvalidAssignmentError({
+          argumentName: "maxScore",
+          errorMessageIdentifier: "assignments:errors:max-score-too-small",
+          messageParams: { minimum: 1 },
         }),
       );
     }
