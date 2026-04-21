@@ -123,4 +123,12 @@ export class Assignment extends EntityBase<Props> {
   public getCreatedAt() {
     return this.props.createdAt;
   }
+
+  public getDeadline() {
+    return this.props.deadline;
+  }
+
+  public getMaxScore() {
+    return this.props.maxScore;
+  }
 }
