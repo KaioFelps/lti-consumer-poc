@@ -1,5 +1,16 @@
 import { relations } from "drizzle-orm";
-import { jsonb, pgEnum, pgTable, primaryKey, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  foreignKey,
+  jsonb,
+  pgEnum,
+  pgTable,
+  primaryKey,
+  smallint,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { PersonGender } from "@/modules/identity/person/enums/gender";
 import { SystemRole } from "@/modules/identity/user/enums/system-role";
 
@@ -36,6 +47,7 @@ export const usersTable = pgTable("users", {
   email: varchar({ length: 255 }).unique(),
 });
 
+// #region LTI & OAuth
 export const oauthApplicationTypeEnum = pgEnum("oauth_application_type", ["web", "native"]);
 
 export const oauthClients = pgTable("oauth_client", {
@@ -152,9 +164,88 @@ export const ltiResourceLinks = pgTable("lti_resource_link", {
   customParameters: jsonb("custom_parameters").$type<Record<string, string>>(),
 });
 
-/**
+// #endregion
+
+// #region Assignments and Grading
+export const coursesT = pgTable("courses", {
+  id: uuid().primaryKey(),
+  title: varchar({ length: 400 }).notNull(),
+  instructorId: uuid("instructor_id")
+    .references(() => usersTable.id)
+    .notNull(),
+});
+
+export const enrollmentsT = pgTable(
+  "enrollments",
+  {
+    studentId: uuid("student_id")
+      .references(() => usersTable.id)
+      .notNull(),
+    courseId: uuid("course_id")
+      .references(() => coursesT.id)
+      .notNull(),
+    enrolledAt: timestamp("enrolled_at", { withTimezone: true }).notNull().defaultNow(),
+    concludedAt: timestamp("concluded_at", { withTimezone: true }),
+    withdrawnAt: timestamp("withdrawn_at", { withTimezone: true }),
+  },
+  (table) => [primaryKey({ columns: [table.studentId, table.courseId] })],
+);
+
+export const assignmentsT = pgTable("assignments", {
+  id: uuid().primaryKey(),
+  courseId: uuid("course_id").references(() => coursesT.id),
+  title: varchar({ length: 400 }).notNull(),
+  maxScore: smallint("max_score").notNull(),
+  releasedAt: timestamp("released_at", { withTimezone: true }),
+  deadline: timestamp("deadline", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const studentsAssignmentsT = pgTable(
+  "student_assignments",
+  {
+    assignmentId: uuid("assignment_id")
+      .references(() => assignmentsT.id)
+      .notNull(),
+    studentId: uuid("student_id")
+      .references(() => usersTable.id)
+      .notNull(),
+    releasedAt: timestamp("released_at", { withTimezone: true }),
+    assignedAt: timestamp("assignedAt", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [primaryKey({ columns: [table.assignmentId, table.studentId] })],
+);
+
+export const gradesT = pgTable(
+  "grades",
+  {
+    studentId: uuid("student_id").notNull(),
+    courseId: uuid("course_id").notNull(),
+    assignmentId: uuid("assignment_id")
+      .references(() => assignmentsT.id)
+      .notNull(),
+    score: smallint().notNull().default(0),
+    maxScore: smallint("max_score").notNull(),
+    released: boolean().notNull().default(false),
+    lastUpdatedAt: timestamp("last_updated_at", { withTimezone: true }),
+    gradedAt: timestamp("graded_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.studentId, table.courseId, table.assignmentId] }),
+    foreignKey({
+      columns: [table.studentId, table.courseId],
+      foreignColumns: [enrollmentsT.studentId, enrollmentsT.courseId],
+    }),
+  ],
+);
+
+// #endregion
+
+/***************************************
  * Relations
- */
+ ***************************************/
+
+// #region LTI & OAuth
 export const ltiToolsRelations = relations(ltiTools, ({ many, one }) => ({
   oauthClient: one(oauthClients, {
     fields: [ltiTools.id],
@@ -234,4 +325,67 @@ export const ltiContextsTypesRelations = relations(ltiContextsTypes, ({ one }) =
     fields: [ltiContextsTypes.contextId],
     references: [ltiContexts.id],
   }),
+}));
+
+// #endregion
+
+// #region Assignments and Grading
+export const coursesRelations = relations(coursesT, ({ many, one }) => ({
+  enrollments: many(enrollmentsT),
+  instructor: one(usersTable, {
+    fields: [coursesT.instructorId],
+    references: [usersTable.id],
+  }),
+  assignments: many(assignmentsT),
+}));
+
+export const enrollmentsRelations = relations(enrollmentsT, ({ many, one }) => ({
+  course: one(coursesT, {
+    fields: [enrollmentsT.courseId],
+    references: [coursesT.id],
+  }),
+  student: one(usersTable, {
+    fields: [enrollmentsT.studentId],
+    references: [usersTable.id],
+  }),
+  grades: many(gradesT),
+}));
+
+export const assignmentsRelations = relations(assignmentsT, ({ one, many }) => ({
+  course: one(coursesT, {
+    fields: [assignmentsT.courseId],
+    references: [coursesT.id],
+  }),
+  grades: many(gradesT),
+  studentsAssignments: many(studentsAssignmentsT),
+}));
+
+export const studentAssignmentsRelations = relations(studentsAssignmentsT, ({ one }) => ({
+  assignment: one(assignmentsT, {
+    fields: [studentsAssignmentsT.assignmentId],
+    references: [assignmentsT.id],
+  }),
+  student: one(usersTable, {
+    fields: [studentsAssignmentsT.studentId],
+    references: [usersTable.id],
+  }),
+}));
+
+export const gradesRelations = relations(gradesT, ({ one }) => ({
+  enrollment: one(enrollmentsT, {
+    fields: [gradesT.courseId, gradesT.studentId],
+    references: [enrollmentsT.courseId, enrollmentsT.studentId],
+  }),
+  assignment: one(assignmentsT, {
+    fields: [gradesT.assignmentId],
+    references: [assignmentsT.id],
+  }),
+}));
+
+// #endregion
+
+export const usersRelations = relations(usersTable, ({ many }) => ({
+  coursesTaught: many(coursesT),
+  enrollments: many(enrollmentsT),
+  specificAssignments: many(studentsAssignmentsT),
 }));
