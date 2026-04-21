@@ -5,8 +5,8 @@ import { EntityBase } from "@/core/entity-base";
 import { Course } from "@/modules/courses-and-enrollments/entities/course.entity";
 import { Person } from "@/modules/identity/person/person.entity";
 import { GradeOfAssignment } from "../aggregates/grade-of-assignment.aggregate";
-import { AssignmentNotGradableError } from "../errors/assignment-not-gradable.error";
 import { InvalidAssignmentError } from "../errors/invalid-assignment.error";
+import { NonGradableAssignmentError } from "../errors/non-gradable-assignment";
 import { Grade } from "./grade.entity";
 
 type Props = {
@@ -65,7 +65,7 @@ export class Assignment extends EntityBase<Props> {
   public grade(student: Person, score: number, isReleased: boolean) {
     return pipe(
       option.fromNullable(this.getCourseId()),
-      e.fromOption(() => new AssignmentNotGradableError(this)),
+      e.fromOption(() => new NonGradableAssignmentError(this)),
       e.chainW((courseId) =>
         Grade.create({
           studentId: student.getUser().getId(),

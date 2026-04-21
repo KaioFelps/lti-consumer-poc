@@ -9,6 +9,7 @@ import { Assignment } from "./assignment.entity";
 type Props = {
   studentId: UUID;
   assignmentId: UUID;
+  courseId: UUID;
   score: number;
   maxScore: number;
   released: boolean;
