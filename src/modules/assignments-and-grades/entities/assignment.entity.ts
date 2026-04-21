@@ -1,16 +1,17 @@
 import { type UUID } from "common/src/types/uuid";
-import { either as e } from "fp-ts";
+import { either as e, option } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { EntityBase } from "@/core/entity-base";
 import { Course } from "@/modules/courses-and-enrollments/entities/course.entity";
 import { Person } from "@/modules/identity/person/person.entity";
 import { GradeOfAssignment } from "../aggregates/grade-of-assignment.aggregate";
+import { AssignmentNotGradableError } from "../errors/assignment-not-gradable.error";
 import { InvalidAssignmentError } from "../errors/invalid-assignment.error";
 import { Grade } from "./grade.entity";
 
 type Props = {
   id: UUID;
-  courseId: UUID;
+  courseId?: UUID;
   title: string;
   maxScore: number;
   releasedAt?: Date;
@@ -63,13 +64,18 @@ export class Assignment extends EntityBase<Props> {
 
   public grade(student: Person, score: number, isReleased: boolean) {
     return pipe(
-      Grade.create({
-        studentId: student.getUser().getId(),
-        assignmentId: this.props.id,
-        score,
-        maxScore: this.props.maxScore,
-        released: isReleased,
-      }),
+      option.fromNullable(this.getCourseId()),
+      e.fromOption(() => new AssignmentNotGradableError(this)),
+      e.chainW((courseId) =>
+        Grade.create({
+          studentId: student.getUser().getId(),
+          assignmentId: this.props.id,
+          score,
+          maxScore: this.props.maxScore,
+          released: isReleased,
+          courseId,
+        }),
+      ),
       e.map((grade) => new GradeOfAssignment({ assignment: this, grade })),
     );
   }
