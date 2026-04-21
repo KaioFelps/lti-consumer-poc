@@ -1,4 +1,5 @@
 import { HttpStatus } from "@nestjs/common";
+import { BadRequestError } from "@/core/errors/bad-request.error";
 import { type IErrorBase } from "@/core/errors/error-base";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { RenderableError } from "@/core/errors/renderable/renderable-error";
@@ -14,6 +15,8 @@ export function resolveStatus(error: IErrorBase | RenderableError) {
   if (error instanceof UnauthorizedError) return HttpStatus.UNAUTHORIZED;
 
   if (error instanceof ResourceNotFoundError) return HttpStatus.NOT_FOUND;
+
+  if (error instanceof BadRequestError) return HttpStatus.BAD_REQUEST;
 
   const irrecoverableError = new IrrecoverableError(
     `ExceptionsFactory received an unregistered error ${error.errorType}.`,

@@ -1,5 +1,7 @@
 import { ptBR } from "@/message-string/internal/translations/pt-BR";
 
+ptBR["grading:errors:assignment-not-gradable"] = ({ title }) =>
+  `A atividade '${title}' não está apta a ser pontuada.`;
 ptBR["grading:scores:errors:too-big"] = ({ maximum }) =>
   `A nota atribuída deve ser, no máximo, ${maximum}.`;
 ptBR["grading:scores:errors:too-small"] = ({ minimum }) =>
@@ -26,3 +28,11 @@ ptBR["grading:errors:instructor-unauthorized-in-course"] = ({ instructorName, co
   `${instructorName} não é instrutor do curso ${courseTitle}, portanto não está autorizado.`;
 ptBR["grading:courses-repository:errors:not-found"] = ({ courseId }) =>
   `Não foi encontrado nenhum curso com ID '${courseId}'.`;
+
+ptBR["assignments:errors:deadline-cannot-be-past"] =
+  "O prazo para esta atividade deve ser uma data no futuro.";
+ptBR["assignments:errors:max-score-too-big"] = ({ maximum: maxSmallInt }) =>
+  `Sua atividade deve limitar suas pontuações a ${maxSmallInt} pontos.`;
+
+ptBR["assignments:errors:max-score-too-small"] = ({ minimum }) =>
+  `A pontuação limite da atividade deve ser, no mínimo, ${minimum} pontos.`;
