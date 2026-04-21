@@ -14,14 +14,19 @@ type Props = {
   maxScore: number;
   released: boolean;
   lastUpdatedAt?: Date;
+  gradedAt: Date;
 };
 
 export class Grade extends EntityBase<Props> {
-  public static create(props: Omit<Props, "lastUpdatedAt">) {
+  public static create(props: Omit<Props, "lastUpdatedAt" | "gradedAt">) {
     return pipe(
       checkScore(props.score, props.maxScore),
-      e.map(() => new Grade({ ...props, lastUpdatedAt: undefined })),
+      e.map(() => new Grade({ ...props, lastUpdatedAt: undefined, gradedAt: new Date() })),
     );
+  }
+
+  public static createUnchecked(props: Props) {
+    return new Grade(props);
   }
 
   public getScore() {
@@ -30,6 +35,10 @@ export class Grade extends EntityBase<Props> {
 
   public belongsToStudent(student: Person) {
     return student.getUser().getId() === this.props.studentId;
+  }
+
+  public getStudentId() {
+    return this.props.studentId;
   }
 
   public belongsToAssignment(assignment: Assignment) {
@@ -64,6 +73,14 @@ export class Grade extends EntityBase<Props> {
 
   public getLastUpdatedAt() {
     return this.props.lastUpdatedAt;
+  }
+
+  public getGradedAt() {
+    return this.props.gradedAt;
+  }
+
+  public getCourseId() {
+    return this.props.courseId;
   }
 
   public setScore(newScore: number) {
