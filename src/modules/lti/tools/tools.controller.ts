@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, Render, Res, Session } from "@nestj
 import { either, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { ErrorBase } from "@/core/errors/error-base";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ErrorBaseRenderableError } from "@/core/errors/renderable/error-base.error";
 import { LtiToolPresenter } from "@/external/presenters/entities/lti-tool.presenter";
 import { LtiToolDeploymentPresenter } from "@/external/presenters/entities/lti-tool-deployment.presenter";
@@ -12,7 +13,6 @@ import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { Routes } from "@/routes";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { Platform } from "$/core/platform";
 import { LtiRegistrationInitiationRequest } from "$/messages/initiate-register";
 import { RegisterToolDTO } from "./dtos/register-tool.dto";
@@ -87,8 +87,9 @@ export class LtiToolsController {
   public async showToolDetails(@Param("id") toolId: string) {
     const toolDetails = await pipe(
       () => this.getToolDetailsService.exec({ toolId }),
-      te.getOrElseW((error: LtiRepositoryError<ErrorBase>) => async () => {
-        const renderable = await ErrorBaseRenderableError.create(error.cause, this.t);
+      te.getOrElseW((error) => async () => {
+        const innerError = error instanceof IrrecoverableError ? error : (error.cause as ErrorBase);
+        const renderable = await ErrorBaseRenderableError.create(innerError, this.t);
         throw ExceptionsFactory.fromError(renderable);
       }),
     )();
