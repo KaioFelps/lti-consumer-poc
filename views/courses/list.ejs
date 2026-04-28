@@ -1,3 +1,42 @@
 <main class="main">
     <h1><%= title %></h1>
+    <hr>
+
+    <% if (error) {%>
+        <br>
+        <div class="error-alert">
+            <span><%= error %></span>
+        </div>
+    <% } else { %>
+        <br>
+    <% } %>
+
+
+    <% if (courses.length === 0) { %>
+        <div class="warning-alert">
+            <span><%= await t.translate("courses:list:no-courses") %></span>
+            <br>
+            <a href="<%= routes.courses.create() %>"><%= await t.translate("courses:list:buttons:add-new-course") %></a>
+        </div>
+    <% } else { %>
+        <table class="base-table">
+            <thead>
+                <th><%= await t.translate("courses:list:thead:title") %></th>
+                <th><%= await t.translate("courses:list:thead:instructor") %></th>
+                <th><%= await t.translate("table-headings:actions") %></th>
+            </thead>
+            <% for (const course of courses) { %>
+                <tr>
+                    <td><%= course.title %></td>
+                    <td><%= course.instructor.name %></td>
+                    <td>
+                        <ul>
+                        </ul>
+                    </td>
+                </tr>
+            <% } %>
+        </table>
+        <br/>
+        <a href="<%= routes.courses.create() %>"><%= await t.translate("courses:list:buttons:add-new-course") %></a>
+    <% } %>
 </main>

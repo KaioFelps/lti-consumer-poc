@@ -8,6 +8,10 @@ ptBR["courses:navigation:list-courses"] = "Todos os cursos";
 ptBR["courses:navigation:create"] = "Criar um novo curso";
 
 ptBR["courses:list:title"] = "Cursos da plataforma";
+ptBR["courses:list:no-courses"] = "Nenhum curso criado até o momento. Que tal criar um?";
+ptBR["courses:list:thead:title"] = "Curso";
+ptBR["courses:list:thead:instructor"] = "Professor";
+ptBR["courses:list:buttons:add-new-course"] = "Crie um novo curso";
 
 ptBR["courses:create:title"] = "Criar um novo curso";
 
@@ -22,4 +26,4 @@ ptBR["courses:create:errors:title-too-small"] = ({ minimum }) =>
 
 ptBR["courses:create:form:labels:title"] = "Título do curso";
 
-ptBR["courses:create:form:buttons:create"] = "Criar ofrm";
+ptBR["courses:create:form:buttons:create"] = "Criar curso";

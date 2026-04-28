@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Render, Res, Session } from "@nestjs/common";
-import { either as e } from "fp-ts";
+import { either as e, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
+import { CourseWithInstructorPresenter } from "@/external/presenters/entities/course-with-instructor.presenter";
 import type { HttpResponse, RequestSession } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { Mvc } from "@/lib/mvc-routes";
@@ -9,6 +10,7 @@ import { SessionUser } from "../auth/session-user";
 import { User } from "../identity/user/user.entity";
 import { CreateCourseDTO } from "./dtos/create-course.dto";
 import { CreateCourseService } from "./services/create-course.service";
+import { FetchManyCoursesService } from "./services/fetch-many-courses.service";
 
 @Mvc()
 @Controller("/courses")
@@ -16,15 +18,22 @@ export class CoursesAndEnrollmentsController {
   public constructor(
     private readonly t: TranslatorService,
     private readonly createCourseService: CreateCourseService,
+    private readonly fetchManyCoursesService: FetchManyCoursesService,
   ) {}
 
   @Get("/")
   @Render("courses/list")
   public async listCourses() {
-    return {
-      title: await this.t.translate("courses:list:title"),
-      courses: [],
-    };
+    const title = await this.t.translate("courses:list:title");
+
+    return await pipe(
+      () => this.fetchManyCoursesService.execute(),
+      te.map((courses) => courses.map(CourseWithInstructorPresenter.present)),
+      te.map((courses) => ({ title, courses })),
+      te.getOrElse((error) => {
+        throw ExceptionsFactory.fromError(error);
+      }),
+    )();
   }
 
   @Get("new")
