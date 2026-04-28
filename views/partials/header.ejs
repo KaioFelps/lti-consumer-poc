@@ -11,6 +11,16 @@
                     </ul>
                 </details>
             </li>
+            <li>
+                <details class="nav-dropdown">
+                    <summary><%= await t.translate("courses:navigation:courses") %></summary>
+                    <ul class="nav-dropdown-content">
+                        <li><a href="<%= routes.courses.list() %>"><%= await t.translate("courses:navigation:list-courses") %></a></li>
+                        <li><a href="<%= routes.courses.createForm() %>"><%= await t.translate("courses:navigation:create") %></a></li>
+                    </ul>
+                </details>
+            </li>
+
             <% if (auth) { %>
                 <li>
                     <details class="nav-dropdown">
