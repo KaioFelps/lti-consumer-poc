@@ -52,4 +52,9 @@ export const Routes = {
       return: () => `/lti/launches/post-launch`,
     },
   },
+  courses: {
+    list: () => `/courses`,
+    createForm: () => `/courses/new`,
+    create: () => `/courses/new`,
+  },
 } as const;
