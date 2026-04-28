@@ -1,8 +1,9 @@
 import { Person } from "@/modules/identity/person/person.entity";
 
-type PresentedPerson = {
+export type PresentedPerson = {
   id: string;
   systemRole: string;
+  name: string;
   username: string;
   email: string;
   firstName: string;
@@ -16,6 +17,7 @@ type PresentedPerson = {
 export class PersonPresenter {
   public static present(entity: Person): PresentedPerson {
     return {
+      name: entity.getName(),
       birthDate: entity.getBirthDate(),
       cpf: entity.getCpf().toString(),
       email: entity.getEmail(),
