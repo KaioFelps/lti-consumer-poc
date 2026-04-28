@@ -21,6 +21,10 @@ export class Instructor extends EntityBase<Props> {
     return e.right(new Instructor({ person }));
   }
 
+  public static createUnchecked({ person }: Props) {
+    return new Instructor({ person });
+  }
+
   public createCourse({ title }: CreateCourseParams) {
     const course = Course.create({ instructorId: this.getId(), title });
     return CourseWithInstructor.create({ instructor: this, course });

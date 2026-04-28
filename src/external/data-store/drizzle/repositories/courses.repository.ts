@@ -10,6 +10,7 @@ import { CoursesRepository } from "@/modules/assignments-and-grades/repositories
 import { Course } from "@/modules/courses-and-enrollments/entities/course.entity";
 import { DrizzleClient } from "../client";
 import coursesMapper from "../mappers/courses.mapper";
+import coursesWithInstructorsMapper from "../mappers/courses-with-instructors.mapper";
 
 @Injectable()
 export class DrizzleCoursesRepository extends CoursesRepository {
@@ -52,11 +53,29 @@ export class DrizzleCoursesRepository extends CoursesRepository {
             }),
         (error) =>
           new IrrecoverableError(
-            `Error occurred when trying to save/update course with tuple '${JSON.stringify(payload)}`,
+            `Error occurred in ${DrizzleCoursesRepository.name} when trying ` +
+              `to save/update course with tuple '${JSON.stringify(payload)}'.`,
             error as Error,
           ),
       ),
       te.map(() => course),
+    )();
+  }
+
+  public findManyCoursesWithInstructors() {
+    return pipe(
+      te.tryCatch(
+        () =>
+          this.drizzle
+            .getClient()
+            .query.coursesT.findMany(coursesWithInstructorsMapper.requiredQueryConfig),
+        (error) =>
+          new IrrecoverableError(
+            `Error occurred in ${DrizzleCoursesRepository.name} when trying to fetch courses.`,
+            error as Error,
+          ),
+      ),
+      te.map((rawCourses) => rawCourses.map(coursesWithInstructorsMapper.fromRow)),
     )();
   }
 }
