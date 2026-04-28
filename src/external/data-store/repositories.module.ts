@@ -54,6 +54,9 @@ import { RedisLtiLaunchesRepository } from "./redis/repositories/lti-launches.re
     BaseLtiResourceLinksRepository,
     LtiLaunchesRepository,
     LtiUserIdentitiesRespository,
+    CoursesRepository,
+    AssignmentsRepository,
+    InstructorsRepository,
   ],
 })
 export class RepositoriesModule {}
