@@ -13,6 +13,7 @@ import { GlobalInterceptorsModule } from "./lib/globals/interceptors.module";
 import { GlobalPipesModule } from "./lib/globals/pipes.module";
 import middlewares from "./lib/middlewares";
 import { MessageStringModule } from "./message-string/message-string.module";
+import { CoursesModule } from "./modules/courses/courses.module";
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { MessageStringModule } from "./message-string/message-string.module";
     IdentityModule,
     OIDCModule,
     LtiModule,
+    CoursesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
