@@ -31,6 +31,7 @@
                     <td><%= course.instructor.name %></td>
                     <td>
                         <ul>
+                            <a href="<%= routes.assignments.create(course.id) %>"><%= await t.translate("assignments:create-assignment:title") %></a>
                         </ul>
                     </td>
                 </tr>
