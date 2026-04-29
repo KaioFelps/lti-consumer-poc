@@ -1,4 +1,77 @@
 <main class="main">
     <h1><%= title %></h1>
+    <hr>
     <br>
+
+    <% if (flash?.success) { %>
+        <div class="success-alert">
+            <span><%= flash.success.message %></span><br>
+        </div>
+    <% } %>
+
+    <% if (error) { %>
+        <div class="error-alert">
+            <span><%= error %></span><br>
+        </div>
+    <% } %>
+
+    <form action="<%= routes.assignments.create(course.id) %>" method="post">
+        <label>
+            <span><%= await t.translate("assignments:create-assignment:labels:title") %></span>
+            <% (validationErrors?.title ?? []).forEach(error => { %>
+                <span class="error-span"><%- error.message %></span>
+            <% }) %>
+            <input
+                type="text"
+                name="title"
+                style="width: fit-content;"
+                value="<%= flash?.values?.title %>"
+                required
+            >
+        </label>
+
+          <label>
+            <span><%= await t.translate("assignments:create-assignment:labels:max-score") %></span>
+            <% (validationErrors?.maxScore ?? []).forEach(error => { %>
+                <span class="error-span"><%- error.message %></span>
+            <% }) %>
+            <input
+                type="number"
+                max="32767"
+                min="1"
+                name="maxScore"
+                style="width: fit-content;"
+                value="<%= flash?.values?.maxScore %>"
+                required
+            >
+        </label>
+        
+          <label>
+            <span><%= await t.translate("assignments:create-assignment:labels:released-at") %></span>
+            <% (validationErrors?.releasedAt ?? []).forEach(error => { %>
+                <span class="error-span"><%- error.message %></span>
+            <% }) %>
+            <input
+                type="datetime-local"
+                name="releasedAt"
+                style="width: fit-content;"
+                value="<%= flash?.values?.releasedAt %>"
+            >
+        </label>
+        
+          <label>
+            <span><%= await t.translate("assignments:create-assignment:labels:deadline") %></span>
+            <% (validationErrors?.deadline ?? []).forEach(error => { %>
+                <span class="error-span"><%- error.message %></span>
+            <% }) %>
+            <input
+                type="datetime-local"
+                name="deadline"
+                style="width: fit-content;"
+                value="<%= flash?.values?.deadline %>"
+            >
+        </label>
+        
+        <button><%= await t.translate("assignments:create-assignment:buttons:create-assignment") %></button>
+    </form>
 </main>

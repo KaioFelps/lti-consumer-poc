@@ -51,7 +51,14 @@ ptBR["assignments:create-assignment:max-score-too-short"] = ({ minimum }) =>
   `A pontuação máxima deve ser, no mínimo, ${minimum}.`;
 ptBR["assignments:create-assignment:max-score-too-long"] = ({ maximum }) =>
   `A pontuação máxima permitida não deve ultrapassar ${maximum}.`;
-ptBR["assignments:create-assignment:released-date-must-be-date"] =
+ptBR["assignments:create-assignment:release-date-must-be-date"] =
   "A data de lançamento informada é inválida.";
 ptBR["assignments:create-assignment:deadline-must-be-date"] =
   "O prazo de entrega informado precisa ser uma data válida.";
+ptBR["assignments:create-assignment:labels:title"] = "Título";
+ptBR["assignments:create-assignment:labels:max-score"] = "Pontuação máxima";
+ptBR["assignments:create-assignment:labels:released-at"] = "Data de abertura";
+ptBR["assignments:create-assignment:labels:deadline"] = "Prazo de entrega";
+ptBR["assignments:create-assignment:buttons:create-assignment"] = "Salvar atividade";
+ptBR["assignments:create-assignment:success-message"] = ({ assignmentTitle }) =>
+  `A atividade ${assignmentTitle} foi criada com sucesso!`;
