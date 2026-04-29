@@ -16,12 +16,16 @@ export class CreateAssignmentDTO implements DTO {
       .number({ error: "assignments:create-assignment:max-score-must-be-number" })
       .min(1, { error: "assignments:create-assignment:max-score-too-short" })
       .max(0x7fff, { error: "assignments:create-assignment:max-score-too-long" }),
-    releasedAt: z.coerce
-      .date({ error: "assignments:create-assignment:released-date-must-be-date" })
-      .optional(),
-    deadline: z.coerce
-      .date({ error: "assignments:create-assignment:deadline-must-be-date" })
-      .optional(),
+    releasedAt: z.preprocess(
+      (arg) => (arg === "" ? undefined : arg),
+      z.coerce
+        .date({ error: "assignments:create-assignment:release-date-must-be-date" })
+        .optional(),
+    ),
+    deadline: z.preprocess(
+      (arg) => (arg === "" ? undefined : arg),
+      z.coerce.date({ error: "assignments:create-assignment:deadline-must-be-date" }).optional(),
+    ),
   });
 
   @Expose() public title!: string;
