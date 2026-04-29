@@ -13,6 +13,7 @@ import { GlobalInterceptorsModule } from "./lib/globals/interceptors.module";
 import { GlobalPipesModule } from "./lib/globals/pipes.module";
 import middlewares from "./lib/middlewares";
 import { MessageStringModule } from "./message-string/message-string.module";
+import { AssignmentsAndGradesModule } from "./modules/assignments-and-grades/assignments-and-grades.module";
 import { CoursesModule } from "./modules/courses-and-enrollments/courses.module";
 
 @Module({
@@ -29,6 +30,7 @@ import { CoursesModule } from "./modules/courses-and-enrollments/courses.module"
     OIDCModule,
     LtiModule,
     CoursesModule,
+    AssignmentsAndGradesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

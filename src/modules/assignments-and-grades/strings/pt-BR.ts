@@ -36,3 +36,22 @@ ptBR["assignments:errors:max-score-too-big"] = ({ maximum: maxSmallInt }) =>
 
 ptBR["assignments:errors:max-score-too-small"] = ({ minimum }) =>
   `A pontuação limite da atividade deve ser, no mínimo, ${minimum} pontos.`;
+
+ptBR["assignments:create-assignment:title"] = "Criar uma nova atividade";
+
+ptBR["assignments:create-assignment:title-must-be-string"] =
+  "O título precisa ser um texto... O que você está fazendo?!";
+ptBR["assignments:create-assignment:title-must-not-be-empty"] =
+  "O título da atividade não pode estar em branco.";
+ptBR["assignments:create-assignment:title-too-long"] = ({ maximum }) =>
+  `O título da atividade deve ser limitado a ${maximum} caracteres.`;
+ptBR["assignments:create-assignment:max-score-must-be-number"] =
+  "Selecione um valor numérico válido para ser a pontuação máxima desta atividade.";
+ptBR["assignments:create-assignment:max-score-too-short"] = ({ minimum }) =>
+  `A pontuação máxima deve ser, no mínimo, ${minimum}.`;
+ptBR["assignments:create-assignment:max-score-too-long"] = ({ maximum }) =>
+  `A pontuação máxima permitida não deve ultrapassar ${maximum}.`;
+ptBR["assignments:create-assignment:released-date-must-be-date"] =
+  "A data de lançamento informada é inválida.";
+ptBR["assignments:create-assignment:deadline-must-be-date"] =
+  "O prazo de entrega informado precisa ser uma data válida.";
