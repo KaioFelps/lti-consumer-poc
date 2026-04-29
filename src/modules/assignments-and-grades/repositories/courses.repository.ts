@@ -15,4 +15,8 @@ export abstract class CoursesRepository {
   public abstract findManyCoursesWithInstructors(): Promise<
     Either<IrrecoverableError, CourseWithInstructor[]>
   >;
+
+  public abstract findCourseWithInstructorById(
+    courseId: UUID,
+  ): Promise<Either<IrrecoverableError | CourseNotFoundError, CourseWithInstructor>>;
 }

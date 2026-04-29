@@ -78,4 +78,25 @@ export class DrizzleCoursesRepository extends CoursesRepository {
       te.map((rawCourses) => rawCourses.map(coursesWithInstructorsMapper.fromRow)),
     )();
   }
+
+  public findCourseWithInstructorById(courseId: UUID) {
+    return pipe(
+      te.tryCatch(
+        () =>
+          this.drizzle
+            .getClient()
+            .query.coursesT.findFirst(coursesWithInstructorsMapper.requiredQueryConfig),
+        (error) =>
+          new IrrecoverableError(
+            `Error occurred in ${DrizzleCoursesRepository.name} when trying to find course with id '${courseId}' with its instructor.`,
+            error as Error,
+          ),
+      ),
+      te.chainEitherKW((rawPayload) => {
+        if (!rawPayload) return e.left(new CourseNotFoundError(courseId));
+        return e.right(rawPayload);
+      }),
+      te.map(coursesWithInstructorsMapper.fromRow),
+    )();
+  }
 }
