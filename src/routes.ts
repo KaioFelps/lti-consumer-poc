@@ -57,4 +57,8 @@ export const Routes = {
     createForm: () => `/courses/new`,
     create: () => `/courses/new`,
   },
+  assignments: {
+    createForm: (courseId: string) => `/courses/${courseId}/assignments/create`,
+    create: (courseId: string) => `/courses/${courseId}/assignments/create`,
+  },
 } as const;
