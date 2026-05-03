@@ -1,0 +1,67 @@
+<%
+const dateFormattingOptions = {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23'
+};
+%>
+
+<main class="main">
+    <h1><%= course.title %></h1>
+    <hr>
+    <br>
+
+    <section class="card outline">
+        <h2><%= await t.translate("courses:details:author-section-title") %></h2>
+        <br>
+        <ul style="list-style: none;">
+            <li><strong><%= await t.translate("courses:details:author-name") %></strong>: <%= course.instructor.name %></li>
+            <li><strong><%= await t.translate("courses:details:author-email") %></strong>: <%= course.instructor.email %></li>
+        </ul>
+    </section>
+
+    <section class="card outline">
+        <h2><%= await t.translate("courses:details:assignments-section-title") %></h2>
+        <br>
+
+        <% if (assignments.length === 0) { %>
+            <div class="warning-alert">
+                <span><%= await t.translate("courses:details:content:no-assignments-msg") %></span>
+                <% if (auth.id === course.instructor.id) { %>
+                    <br>
+                    <a href="<%= routes.assignments.create(course.id) %>"><%= await t.translate("courses:details:buttons:add-new-assignment") %></a>
+                <% } %>
+            </div>
+        <% } else { %>
+            <ul style="list-style: none;">
+                <% for (const assignment of assignments) { %>
+                    <li class="card outline">
+                        <h3><%= assignment.title %></h3>
+                        <br>
+                        <ul style="list-style: none;">
+                            <li><strong><%= await t.translate("courses:details:assignments:max-score") %></strong>: <%= assignment.maxScore %></li>
+                            <% if (assignment.deadline) { %>
+                                <li><strong><%= await t.translate("courses:details:assignments:deadline") %></strong>: <%= assignment.deadline.toLocaleString("pt-BR", dateFormattingOptions) %></li>
+                            <% } %>
+                            <% const releaseDateToShow = assignment.releasedAt ?? assignment.createdAt; %>
+                            <li><strong><%= await t.translate("courses:details:assignments:released-at") %></strong>: <%= releaseDateToShow.toLocaleString("pt-BR", dateFormattingOptions) %> </li>
+                        </ul>
+
+                        <br>
+                        <div>
+                            <a href="<%= routes.assignments.view(assignment.id) %>"><%= await t.translate("courses:details:buttons:view-assignment-details") %></a>
+                        </div>
+                    </li>   
+                <% } %>
+                </ul>
+            <% if (auth.id === course.instructor.id) { %>
+                <br/>
+                <a href="<%= routes.assignments.create(course.id) %>"><%= await t.translate("courses:details:buttons:add-new-assignment") %></a>
+            <% } %>
+        <% } %>
+    </section>
+</main>

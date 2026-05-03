@@ -33,6 +33,9 @@
                         <ul>
                             <a href="<%= routes.assignments.create(course.id) %>"><%= await t.translate("assignments:create-assignment:title") %></a>
                         </ul>
+                        <ul>
+                            <a href="<%= routes.courses.view(course.id) %>"><%= await t.translate("courses:list:buttons:view-course") %></a>
+                        </ul>
                     </td>
                 </tr>
             <% } %>

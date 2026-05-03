@@ -178,3 +178,15 @@ label.checkbox-item > span {
         backdrop-filter: blur(3px);
     }
 }
+
+.card {
+    padding: 8px;
+
+    &.outline {
+        border: 2px solid black !important;
+    }
+
+    &:not(:last-child) {
+        margin-bottom: 1rem;
+    }
+}

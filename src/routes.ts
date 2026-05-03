@@ -56,9 +56,11 @@ export const Routes = {
     list: () => `/courses`,
     createForm: () => `/courses/new`,
     create: () => `/courses/new`,
+    view: (courseId: string) => `/courses/${courseId}`,
   },
   assignments: {
     createForm: (courseId: string) => `/courses/${courseId}/assignments/create`,
     create: (courseId: string) => `/courses/${courseId}/assignments/create`,
+    view: (assignmentId: string) => `/assignments/${assignmentId}`,
   },
 } as const;

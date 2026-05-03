@@ -12,6 +12,7 @@ ptBR["courses:list:no-courses"] = "Nenhum curso criado até o momento. Que tal c
 ptBR["courses:list:thead:title"] = "Curso";
 ptBR["courses:list:thead:instructor"] = "Professor";
 ptBR["courses:list:buttons:add-new-course"] = "Crie um novo curso";
+ptBR["courses:list:buttons:view-course"] = "Ver detalhes do curso";
 
 ptBR["courses:create:title"] = "Criar um novo curso";
 
@@ -27,3 +28,16 @@ ptBR["courses:create:errors:title-too-small"] = ({ minimum }) =>
 ptBR["courses:create:form:labels:title"] = "Título do curso";
 
 ptBR["courses:create:form:buttons:create"] = "Criar curso";
+
+ptBR["courses:details:author-section-title"] = "Professor do curso";
+ptBR["courses:details:author-name"] = "Nome";
+ptBR["courses:details:author-email"] = "E-mail de contato";
+ptBR["courses:details:assignments-section-title"] = "Atividades disponíveis";
+ptBR["courses:details:content:no-assignments-msg"] =
+  "Nenhuma atividade disponível para este curso.";
+ptBR["courses:details:buttons:add-new-assignment"] = "Adicionar nova atividade";
+ptBR["courses:details:assignments:max-score"] = "Pontuação máxima";
+ptBR["courses:details:assignments:deadline"] = "Prazo de entrega";
+ptBR["courses:details:assignments:released-at"] = "Data de lançamento";
+
+ptBR["courses:details:buttons:view-assignment-details"] = "Ver detalhes da atividade";
