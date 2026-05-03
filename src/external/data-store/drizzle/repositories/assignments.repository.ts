@@ -125,4 +125,23 @@ export class DrizzleAssignmentsRepository extends AssignmentsRepository {
       te.map((_queryResult) => assignment),
     )();
   }
+
+  public findManyAssignmentsByCourseId(
+    courseId: UUID,
+  ): Promise<Either<IrrecoverableError, Assignment[]>> {
+    return pipe(
+      te.tryCatch(
+        () =>
+          this.drizzle
+            .getClient()
+            .query.assignmentsT.findMany({ where: eq(assignmentsT.courseId, courseId.toString()) }),
+        (error) =>
+          new IrrecoverableError(
+            `Error occurred when trying to find assignments with course id '${courseId.toString()}'.`,
+            error as Error,
+          ),
+      ),
+      te.map((rawAssignments) => rawAssignments.map(assignmentsMapper.fromRow)),
+    )();
+  }
 }

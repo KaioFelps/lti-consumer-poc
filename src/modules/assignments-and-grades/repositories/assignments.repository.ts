@@ -29,4 +29,8 @@ export abstract class AssignmentsRepository {
   public abstract createAssignment(
     assignment: Assignment,
   ): Promise<Either<IrrecoverableError, Assignment>>;
+
+  public abstract findManyAssignmentsByCourseId(
+    courseId: UUID,
+  ): Promise<Either<IrrecoverableError, Assignment[]>>;
 }
