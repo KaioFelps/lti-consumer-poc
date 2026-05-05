@@ -22,6 +22,8 @@ export const personGenderEnum = pgEnum("person_gender", [
   PersonGender.NonBinary,
 ]);
 
+export const concreteContextTypeEnum = pgEnum("concrete_context_type_e", ["course"]);
+
 export const usersTable = pgTable("users", {
   // user fields
   id: uuid().primaryKey(),
@@ -99,13 +101,24 @@ export const oauthContacts = pgTable(
   (table) => [primaryKey({ columns: [table.clientId, table.email] })],
 );
 
-export const ltiToolDeployments = pgTable("lti_deployments", {
-  clientId: varchar("client_id", { length: 64 })
-    .notNull()
-    .references(() => ltiTools.id, { onDelete: "cascade" }),
-  id: uuid().primaryKey(),
-  label: varchar({ length: 255 }).notNull(),
-});
+export const ltiToolDeployments = pgTable(
+  "lti_deployments",
+  {
+    clientId: varchar("client_id", { length: 64 })
+      .notNull()
+      .references(() => ltiTools.id, { onDelete: "cascade" }),
+    id: uuid().primaryKey(),
+    label: varchar({ length: 255 }).notNull(),
+    contextId: uuid("context_id"),
+    contextConcreteType: concreteContextTypeEnum("context_concrete_type"),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.contextId, table.contextConcreteType],
+      foreignColumns: [ltiContexts.concreteContextId, ltiContexts.concreteContextType],
+    }),
+  ],
+);
 
 export const ltiToolSupportedMessages = pgTable(
   "lti_tool_supported_messages",
@@ -135,34 +148,44 @@ export const ltiToolSupportedMessageRoles = pgTable(
   (table) => [primaryKey({ columns: [table.clientId, table.messageType, table.role] })],
 );
 
-export const ltiContexts = pgTable("lti_context", {
-  id: uuid().primaryKey(),
-  label: varchar(),
-  title: varchar(),
-});
-
-export const ltiContextsTypes = pgTable(
-  "lti_contexts_types",
+export const ltiContexts = pgTable(
+  "lti_context",
   {
-    contextId: uuid("context_id")
-      .notNull()
-      .references(() => ltiContexts.id),
-    type: varchar().notNull(),
+    concreteContextId: uuid().notNull(),
+    concreteContextType: concreteContextTypeEnum("concrete_context_type").notNull(),
+    parentContextId: uuid("parent_context_id"),
+    parentContextType: concreteContextTypeEnum("parent_context_type"),
   },
-  (table) => [primaryKey({ columns: [table.contextId, table.type] })],
+  (table) => [
+    primaryKey({ columns: [table.concreteContextId, table.concreteContextType] }),
+    foreignKey({
+      columns: [table.parentContextId, table.parentContextType],
+      foreignColumns: [table.concreteContextId, table.concreteContextType],
+    }),
+  ],
 );
 
-export const ltiResourceLinks = pgTable("lti_resource_link", {
-  id: uuid().primaryKey(),
-  deploymentId: uuid("deployment_id")
-    .notNull()
-    .references(() => ltiToolDeployments.id, { onDelete: "cascade" }),
-  contextId: uuid("context_id").references(() => ltiContexts.id),
-  resourceUrl: varchar("resource_url"),
-  title: varchar(), // nullable
-  description: varchar(), // nullable
-  customParameters: jsonb("custom_parameters").$type<Record<string, string>>(),
-});
+export const ltiResourceLinks = pgTable(
+  "lti_resource_link",
+  {
+    id: uuid().primaryKey(),
+    deploymentId: uuid("deployment_id")
+      .notNull()
+      .references(() => ltiToolDeployments.id, { onDelete: "cascade" }),
+    contextId: uuid("context_id"),
+    contextConcreteType: concreteContextTypeEnum("concrete_context_type"),
+    resourceUrl: varchar("resource_url"),
+    title: varchar(), // nullable
+    description: varchar(), // nullable
+    customParameters: jsonb("custom_parameters").$type<Record<string, string>>(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.contextConcreteType, table.contextId],
+      foreignColumns: [ltiContexts.concreteContextType, ltiContexts.concreteContextId],
+    }),
+  ],
+);
 
 // #endregion
 
@@ -241,6 +264,31 @@ export const gradesT = pgTable(
 
 // #endregion
 
+// #region LTI AGS
+
+export const externalLtiResourcesT = pgTable("external_lti_resources", {
+  id: uuid().primaryKey(),
+  tool_id: varchar()
+    .references(() => ltiTools.id)
+    .notNull(),
+  external_tool_resource_id: varchar("external_tool_resource_id").notNull(),
+});
+
+export const ltiAssignmentsT = pgTable(
+  "lti_assignments",
+  {
+    assignment_id: uuid("assignment_id")
+      .notNull()
+      .references(() => assignmentsT.id),
+    resourceLinkId: uuid("resource_link_id")
+      .references(() => ltiResourceLinks.id)
+      .notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.assignment_id, table.resourceLinkId] })],
+);
+
+// #endregion
+
 /***************************************
  * Relations
  ***************************************/
@@ -261,6 +309,10 @@ export const ltiToolDeploymentsRelations = relations(ltiToolDeployments, ({ one,
     references: [ltiTools.id],
   }),
   resourceLinks: many(ltiResourceLinks),
+  context: one(ltiContexts, {
+    fields: [ltiToolDeployments.contextId, ltiToolDeployments.contextConcreteType],
+    references: [ltiContexts.concreteContextId, ltiContexts.concreteContextType],
+  }),
 }));
 
 export const ltiToolSupportedMessagesRelations = relations(
@@ -310,21 +362,13 @@ export const ltiResourceLinksRelations = relations(ltiResourceLinks, ({ one }) =
     references: [ltiToolDeployments.id],
   }),
   context: one(ltiContexts, {
-    fields: [ltiResourceLinks.contextId],
-    references: [ltiContexts.id],
+    fields: [ltiResourceLinks.contextId, ltiResourceLinks.contextConcreteType],
+    references: [ltiContexts.concreteContextId, ltiContexts.concreteContextType],
   }),
 }));
 
 export const ltiContextsRelations = relations(ltiContexts, ({ many }) => ({
   resourceLinks: many(ltiResourceLinks),
-  types: many(ltiContextsTypes),
-}));
-
-export const ltiContextsTypesRelations = relations(ltiContextsTypes, ({ one }) => ({
-  context: one(ltiContexts, {
-    fields: [ltiContextsTypes.contextId],
-    references: [ltiContexts.id],
-  }),
 }));
 
 // #endregion
