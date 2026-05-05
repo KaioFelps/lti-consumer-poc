@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { UUID } from "common/src/types/uuid";
 import { ltiResourceLinks, ltiToolDeployments } from "drizzle/schema";
 import { and, eq, inArray, SQLWrapper } from "drizzle-orm";
@@ -16,8 +16,9 @@ import ltiResourceLinksMapper from "../mappers/lti-resource-links.mapper";
 
 @Injectable()
 export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepository {
-  @Inject()
-  private drizzle: DrizzleClient;
+  public constructor(private readonly drizzle: DrizzleClient) {
+    super();
+  }
 
   public async findMany({
     withDeploymentId,
@@ -51,12 +52,12 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
             ...ltiResourceLinksMapper.requiredQueryConfig,
             where: rootFilters.length > 0 ? and(...rootFilters) : undefined,
           }),
-        (error: Error) =>
+        (error) =>
           new LtiRepositoryError({
             type: "ExternalError",
             cause: new IrrecoverableError(
               `Error occurred in ${DrizzleLtiResourceLinksRepository.name} when finding many resource links from database.`,
-              error,
+              error as Error,
             ),
           }),
       ),
@@ -66,18 +67,19 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
 
   public async create(resourceLink: LtiResourceLink): Promise<Either<IrrecoverableError, void>> {
     return await pipe(
-      te.tryCatch(
-        async () => {
-          await this.drizzle
-            .getClient()
-            .insert(ltiResourceLinks)
-            .values(ltiResourceLinksMapper.intoRow(resourceLink));
-        },
-        (error: Error) =>
-          new IrrecoverableError(
-            `Error occurred in ${DrizzleLtiResourceLinksRepository.name} when creating resource link.`,
-            error,
-          ),
+      ltiResourceLinksMapper.intoRow(resourceLink),
+      te.fromEither,
+      te.chainW((value) =>
+        te.tryCatch(
+          async () => {
+            await this.drizzle.getClient().insert(ltiResourceLinks).values(value);
+          },
+          (error) =>
+            new IrrecoverableError(
+              `Error occurred in ${DrizzleLtiResourceLinksRepository.name} when creating resource link.`,
+              error as Error,
+            ),
+        ),
       ),
     )();
   }
@@ -91,10 +93,10 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
             .delete(ltiResourceLinks)
             .where(eq(ltiResourceLinks.id, resourceLinkId.toString()));
         },
-        (error: Error) =>
+        (error) =>
           new IrrecoverableError(
             `An error occurred in ${DrizzleLtiResourceLinksRepository.name} when deleting a resource link by id.`,
-            error,
+            error as Error,
           ),
       ),
     )();
@@ -110,12 +112,12 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
             ...ltiResourceLinksMapper.requiredQueryConfig,
             where: eq(ltiResourceLinks.id, resourceLinkId),
           }),
-        (error: Error) => {
+        (error) => {
           return new LtiRepositoryError({
             type: "ExternalError",
             cause: new IrrecoverableError(
               `An error occurred in ${DrizzleLtiResourceLinksRepository.name} when finding resource link by id.`,
-              error,
+              error as Error,
             ),
           });
         },
