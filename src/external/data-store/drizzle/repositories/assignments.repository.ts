@@ -14,10 +14,14 @@ import { AssignmentsRepository } from "@/modules/assignments-and-grades/reposito
 import { DrizzleClient } from "../client";
 import assignmentsMapper from "../mappers/assignments.mapper";
 import gradesMapper from "../mappers/grades.mapper";
+import { DrizzleTransactionManager } from "../transaction-manager";
 
 @Injectable()
 export class DrizzleAssignmentsRepository extends AssignmentsRepository {
-  public constructor(private readonly drizzle: DrizzleClient) {
+  public constructor(
+    private readonly drizzle: DrizzleClient,
+    private readonly txManager: DrizzleTransactionManager,
+  ) {
     super();
   }
 
@@ -112,15 +116,17 @@ export class DrizzleAssignmentsRepository extends AssignmentsRepository {
   }
 
   public createAssignment(assignment: Assignment) {
+    const client = this.txManager.getTx() ?? this.drizzle.getClient();
     const payload = assignmentsMapper.intoRow(assignment);
     return pipe(
       te.tryCatch(
-        () => this.drizzle.getClient().insert(assignmentsT).values(payload),
-        (error) =>
-          new IrrecoverableError(
+        () => client.insert(assignmentsT).values(payload),
+        (error) => {
+          return new IrrecoverableError(
             `Error occurred when trying to persist assignment '${JSON.stringify(payload)}'.`,
             error as Error,
-          ),
+          );
+        },
       ),
       te.map((_queryResult) => assignment),
     )();

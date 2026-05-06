@@ -13,10 +13,14 @@ import { FindManyParams } from "$/core/repositories/resource-links.repository";
 import { LtiResourceLink } from "$/core/resource-link";
 import { DrizzleClient } from "../client";
 import ltiResourceLinksMapper from "../mappers/lti-resource-links.mapper";
+import { DrizzleTransactionManager } from "../transaction-manager";
 
 @Injectable()
 export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepository {
-  public constructor(private readonly drizzle: DrizzleClient) {
+  public constructor(
+    private readonly drizzle: DrizzleClient,
+    private readonly txManager: DrizzleTransactionManager,
+  ) {
     super();
   }
 
@@ -66,19 +70,22 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
   }
 
   public async create(resourceLink: LtiResourceLink): Promise<Either<IrrecoverableError, void>> {
+    const client = this.txManager.getTx() ?? this.drizzle.getClient();
+
     return await pipe(
       ltiResourceLinksMapper.intoRow(resourceLink),
       te.fromEither,
       te.chainW((value) =>
         te.tryCatch(
           async () => {
-            await this.drizzle.getClient().insert(ltiResourceLinks).values(value);
+            await client.insert(ltiResourceLinks).values(value);
           },
-          (error) =>
-            new IrrecoverableError(
+          (error) => {
+            return new IrrecoverableError(
               `Error occurred in ${DrizzleLtiResourceLinksRepository.name} when creating resource link.`,
               error as Error,
-            ),
+            );
+          },
         ),
       ),
     )();
