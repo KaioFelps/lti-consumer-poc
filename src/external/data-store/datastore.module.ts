@@ -1,6 +1,8 @@
 import { Module } from "@nestjs/common";
 import { EnvironmentVars } from "@/config/environment-vars";
+import { TransactionManager } from "@/core/transaction-manager";
 import { DrizzleClient } from "./drizzle/client";
+import { DrizzleTransactionManager } from "./drizzle/transaction-manager";
 import { Redis } from "./redis/client";
 import { RepositoriesModule } from "./repositories.module";
 
@@ -12,8 +14,13 @@ import { RepositoriesModule } from "./repositories.module";
       inject: [EnvironmentVars],
     },
     Redis,
+    DrizzleTransactionManager,
+    {
+      provide: TransactionManager,
+      useExisting: DrizzleTransactionManager,
+    },
   ],
-  exports: [DrizzleClient, Redis],
+  exports: [DrizzleClient, Redis, TransactionManager],
   imports: [RepositoriesModule],
 })
 export class DataStoreModule {}
