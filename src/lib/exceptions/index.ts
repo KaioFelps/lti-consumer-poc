@@ -1,6 +1,7 @@
 import { HttpStatus } from "@nestjs/common";
 import { BadRequestError } from "@/core/errors/bad-request.error";
 import { type IErrorBase } from "@/core/errors/error-base";
+import { ForbiddenError } from "@/core/errors/forbidden.error";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { RenderableError } from "@/core/errors/renderable/renderable-error";
 import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
@@ -13,6 +14,8 @@ export function resolveStatus(error: IErrorBase | RenderableError) {
   if (error instanceof RenderableError) return error.status;
 
   if (error instanceof UnauthorizedError) return HttpStatus.UNAUTHORIZED;
+
+  if (error instanceof ForbiddenError) return HttpStatus.FORBIDDEN;
 
   if (error instanceof ResourceNotFoundError) return HttpStatus.NOT_FOUND;
 
