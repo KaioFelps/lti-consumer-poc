@@ -151,7 +151,7 @@ export const ltiToolSupportedMessageRoles = pgTable(
 export const ltiContexts = pgTable(
   "lti_context",
   {
-    concreteContextId: uuid().notNull(),
+    concreteContextId: uuid("concrete_context_id").notNull(),
     concreteContextType: concreteContextTypeEnum("concrete_context_type").notNull(),
     parentContextId: uuid("parent_context_id"),
     parentContextType: concreteContextTypeEnum("parent_context_type"),
