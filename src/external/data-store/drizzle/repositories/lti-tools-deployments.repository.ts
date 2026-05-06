@@ -1,22 +1,27 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { UUID } from "common/src/types/uuid";
 import { ltiToolDeployments } from "drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { taskEither as te } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
+import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type";
 import { LtiToolDeployment } from "@/modules/lti/tools/entities/lti-tool-deployment.entity";
+import { DeploymentNotFoundError } from "@/modules/lti/tools/errors/deployment-not-found.error";
 import { LtiToolsDeploymentsRepository } from "@/modules/lti/tools/lti-tools-deployments.repository";
 import { DrizzleClient } from "../client";
-import mapper from "../mappers/lti-tools-deployments.mapper";
-import ltiToolsDeploymentsMapper from "../mappers/lti-tools-deployments.mapper";
+import mapper, { type LtiToolDeploymentRow } from "../mappers/lti-tools-deployments.mapper";
+import { DrizzleTransactionManager } from "../transaction-manager";
 
 @Injectable()
 export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRepository {
   @Inject()
   private readonly drizzle!: DrizzleClient;
+
+  @Inject()
+  private readonly txManager!: DrizzleTransactionManager;
 
   public save(deployment: LtiToolDeployment): Promise<Either<IrrecoverableError, void>> {
     return pipe(
@@ -92,15 +97,80 @@ export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRep
       ),
       te.map((rows) => rows[0]),
       te.chainW(
-        te.fromNullable(
-          new ResourceNotFoundError({
-            errorMessageIdentifier:
-              LtiToolsDeploymentsRepository.messages.findById.resourceNotFound,
-            messageParams: { deploymentId: deploymentId.toString() },
-          }),
-        ),
+        te.fromNullable(new DeploymentNotFoundError({ deploymentId: deploymentId.toString() })),
       ),
-      te.map((a) => ltiToolsDeploymentsMapper.fromRow(a)),
+      te.map((a) => mapper.fromRow(a)),
+    )();
+  }
+
+  public findMostAppropriateDeploymentForTool(
+    toolId: string,
+    contextConcreteId: string,
+    contextConcreteType: ContextConcreteType,
+  ): Promise<Either<IrrecoverableError | ResourceNotFoundError, LtiToolDeployment>> {
+    const client = this.txManager.getTx() ?? this.drizzle.getClient();
+    this.drizzle.getClient();
+
+    const query = sql`
+    WITH RECURSIVE context_path AS (
+        SELECT 
+            concrete_context_id, 
+            concrete_context_type, 
+            parent_context_id, 
+            parent_context_type, 
+            1 as depth
+        FROM lti_context
+        WHERE concrete_context_id = ${contextConcreteId} 
+          AND concrete_context_type = ${contextConcreteType.toString()}
+
+        UNION ALL
+
+        SELECT 
+            c.concrete_context_id, 
+            c.concrete_context_type, 
+            c.parent_context_id, 
+            c.parent_context_type, 
+            cp.depth + 1
+        FROM lti_context c
+        INNER JOIN context_path cp ON 
+            c.concrete_context_id = cp.parent_context_id AND 
+            c.concrete_context_type = cp.parent_context_type
+    )
+
+    SELECT
+      d.client_id as "clientId",
+      d.id as "id",
+      d.label as "label"
+    FROM lti_deployments d
+    JOIN context_path cp ON 
+        d.context_id = cp.concrete_context_id AND 
+        d.context_concrete_type = cp.concrete_context_type
+    WHERE d.client_id = ${toolId}
+    ORDER BY cp.depth ASC
+    LIMIT 1;
+  `;
+
+    return pipe(
+      te.tryCatch(
+        async () => {
+          const result = await client.execute(query);
+
+          if (result.rows.length === 0) {
+            throw new DeploymentNotFoundError({ toolId });
+          }
+
+          const row = result.rows[0] as LtiToolDeploymentRow;
+          return mapper.fromRow(row);
+        },
+        (error) =>
+          error instanceof ResourceNotFoundError
+            ? error
+            : new IrrecoverableError(
+                `Error occurred in ${DrizzleLtiToolsDeploymentsRepository.name} when finding the most appropriate ` +
+                  `deployments for the tool of id '${toolId}'.`,
+                error as Error,
+              ),
+      ),
     )();
   }
 }
