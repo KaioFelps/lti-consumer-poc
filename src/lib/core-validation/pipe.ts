@@ -8,6 +8,7 @@ import {
 } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
 import { plainToInstance } from "class-transformer";
+import { unflatten } from "flat";
 import { either } from "fp-ts";
 import type { DTO } from "@/core/interfaces/dto";
 import { DTOValidationException } from "@/lib/exceptions/dto-validation/exception";
@@ -22,7 +23,7 @@ import coreValidation from ".";
  */
 @Injectable({ scope: Scope.REQUEST })
 export class CoreValidationPipe implements PipeTransform {
-  @Inject(REQUEST) private request: HttpRequest;
+  @Inject(REQUEST) private request!: HttpRequest;
 
   transform(value: unknown, metadata: ArgumentMetadata) {
     const workableTypes: Paramtype[] = ["body", "query", "param"];
@@ -40,6 +41,8 @@ export class CoreValidationPipe implements PipeTransform {
       typeof metadata.metatype.prototype.validate === "function";
 
     if (!isDtoCompliant) return value;
+
+    value = unflatten(value);
 
     const valueAsInstanceOfADto: DTO = plainToInstance(metadata.metatype, value, {
       excludeExtraneousValues: true,

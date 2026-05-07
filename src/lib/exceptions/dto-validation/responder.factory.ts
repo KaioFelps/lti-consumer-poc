@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { HttpArgumentsHost } from "@nestjs/common/interfaces";
+import { unflatten } from "flat";
 import { HttpRequest, HttpResponse } from "@/lib";
 import { ExceptionFilterResponderFactory } from "../../exception-responders/factory";
 import { ExceptionFilterResponder } from "../../exception-responders/responder";
@@ -32,12 +33,10 @@ export class MvcResponder extends ExceptionFilterResponder<Body, Output> {
     const session = request["session"] as Record<string, unknown>;
 
     session.validationErrors = errors;
-    if (session.flash) session.flash["values"] = request.body;
-    else {
-      session.flash = {
-        values: request.body,
-      };
-    }
+    const flashValues = unflatten(request.body);
+
+    if (session.flash) session.flash["values"] = flashValues;
+    else session.flash = { values: flashValues };
 
     return response.redirectBack();
   }
