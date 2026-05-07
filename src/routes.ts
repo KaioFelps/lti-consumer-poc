@@ -51,6 +51,10 @@ export const Routes = {
       login: () => `/lti/launches/login`,
       return: () => `/lti/launches/post-launch`,
     },
+    ags: {
+      createExternalAssignmentForm: () => `/lti/ags/assignments/new`,
+      createExternalAssignment: () => `/lti/ags/assignments/new`,
+    },
   },
   courses: {
     list: () => `/courses`,
@@ -62,5 +66,6 @@ export const Routes = {
     createForm: (courseId: string) => `/courses/${courseId}/assignments/create`,
     create: (courseId: string) => `/courses/${courseId}/assignments/create`,
     view: (assignmentId: string) => `/assignments/${assignmentId}`,
+    createExternal: () => Routes.lti.ags.createExternalAssignmentForm(),
   },
 } as const;

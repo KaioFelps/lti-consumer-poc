@@ -73,5 +73,8 @@
         </label>
         
         <button><%= await t.translate("assignments:create-assignment:buttons:create-assignment") %></button>
+        <a href="<%= routes.assignments.createExternal() %>" style="margin-left: 1rem;">
+            <%= await t.translate("assignments:create-assignments:buttons:create-external-assignment") %>
+        </a>
     </form>
 </main>

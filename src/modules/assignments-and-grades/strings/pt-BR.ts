@@ -62,3 +62,5 @@ ptBR["assignments:create-assignment:labels:deadline"] = "Prazo de entrega";
 ptBR["assignments:create-assignment:buttons:create-assignment"] = "Salvar atividade";
 ptBR["assignments:create-assignment:success-message"] = ({ assignmentTitle }) =>
   `A atividade ${assignmentTitle} foi criada com sucesso!`;
+ptBR["assignments:create-assignments:buttons:create-external-assignment"] =
+  "Criar uma atividade utilizando ferramenta externa";
