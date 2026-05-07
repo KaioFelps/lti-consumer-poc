@@ -10,7 +10,7 @@ import { ListAssignmentsFromCourseService } from "./services/list-assignments-fr
   imports: [forwardRef(() => CoursesModule)],
   providers: [CreateAssignmentService, GradeAnAssignmentService, ListAssignmentsFromCourseService],
   controllers: [AssignmentsController],
-  exports: [ListAssignmentsFromCourseService],
+  exports: [ListAssignmentsFromCourseService, CreateAssignmentService],
 })
 export class AssignmentsAndGradesModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

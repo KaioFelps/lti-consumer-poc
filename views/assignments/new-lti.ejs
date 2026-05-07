@@ -1,0 +1,235 @@
+<% 
+    const customParameterDivClassName = "resource-link-custom-parameter";
+    const customParameterDivStyles = "display: flex; flex: 1; justify-content: space-between;";
+    const customParametersProperty = "resourceLink.customParameters";
+    const removalBtnText = await t.translate("buttons:remove");
+%>
+
+<style>
+    fieldset {
+        padding: 8px; border: 2px solid;
+    }
+</style>
+
+<main class="main">
+    <h1><%= title %></h1>
+    <hr>
+    <br>
+
+    <% if (flash?.success) { %>
+        <div class="success-alert">
+            <span><%= flash.success.message %></span><br>
+        </div>
+    <% } %>
+
+    <% if (error) { %>
+        <div class="error-alert">
+            <span><%= error %></span><br>
+        </div>
+    <% } %>
+
+    <form action="<%= routes.lti.ags.createExternalAssignment() %>" method="post">
+        <label>
+            <span><%= await t.translate("assignments:create-assignment:labels:title") %></span>
+            <% (validationErrors?.assignment?.title ?? []).forEach(error => { %>
+                <span class="error-span"><%- error.message %></span>
+            <% }) %>
+            <input
+                type="text"
+                name="assignment.title"
+                style="width: fit-content;"
+                value="<%= flash?.values?.assignment?.title %>"
+                required
+            >
+        </label>
+
+        <label>
+            <span><%= await t.translate("assignments:create-assignment:labels:max-score") %></span>
+            <% (validationErrors?.assignment?.maxScore ?? []).forEach(error => { %>
+                <span class="error-span"><%- error.message %></span>
+            <% }) %>
+            <input
+                type="number"
+                max="32767"
+                min="1"
+                name="assignment.maxScore"
+                style="width: fit-content;"
+                value="<%= flash?.values?.assignment?.maxScore %>"
+                required
+            >
+        </label>
+        
+        <label>
+            <span><%= await t.translate("assignments:create-assignment:labels:released-at") %></span>
+            <% (validationErrors?.assignment?.releasedAt ?? []).forEach(error => { %>
+                <span class="error-span"><%- error.message %></span>
+            <% }) %>
+            <input
+                type="datetime-local"
+                name="assignment.releasedAt"
+                style="width: fit-content;"
+                value="<%= flash?.values?.assignment?.releasedAt %>"
+            >
+        </label>
+        
+        <label>
+            <span><%= await t.translate("assignments:create-assignment:labels:deadline") %></span>
+            <% (validationErrors?.assignment?.deadline ?? []).forEach(error => { %>
+                <span class="error-span"><%- error.message %></span>
+            <% }) %>
+            <input
+                type="datetime-local"
+                name="assignment.deadline"
+                style="width: fit-content;"
+                value="<%= flash?.values?.assignment?.deadline %>"
+            >
+        </label>
+
+        <br>
+        <fieldset>
+            <legend><%= await t.translate("lti:ags:create-assignment:resource-link-fieldset-title") %></legend>
+            <label>
+                <span><%= await t.translate("lti:ags:create-assignment:labels:select-tool") %></span>
+                <% (validationErrors?.assignment?.deadline ?? []).forEach(error => { %>
+                    <span class="error-span"><%- error.message %></span>
+                <% }) %>
+                <select name="toolId">
+                    <option value=""><%= await t.translate("lti:ags:create-assignment:labels:select-tool-placeholder") %></option>
+                    <% registeredTools.forEach(tool => { %>
+                        <option value="<%= tool.id %>">
+                            <%= tool.name %>
+                        </option>
+                    <% }) %>
+                </select>
+            </label>
+
+            <label>
+                <span><%= await t.translate("lti:ags:create-assignment:labels:resource-url") %></span>
+                <% (validationErrors?.resourceLink?.resourceUrl ?? []).forEach(error => { %>
+                    <span class="error-span"><%- error.message %></span>
+                <% }) %>
+                <input
+                    type="url"
+                    name="resourceLink.resourceUrl"
+                    style="width: fit-content;"
+                    value="<%= flash?.values?.resourceLink?.resourceUrl %>"
+                >
+            </label>
+
+            <br>
+            <fieldset id="new-resource-link-parameter-form">
+                <legend><%= await t.translate("lti:new-resource-link-param:form:title") %></legend>
+
+                <div class="errors-container">
+                    <% (validationErrors?.resourceLink?.customParameters ?? []).forEach(error => { %>
+                        <span class="error-span"><%- error.message %></span>
+                    <% }) %>
+                </div>
+
+                <div
+                    id="resource-link-parameters"
+                    style="border-block: 1px solid black; margin-block: 8px; display: flex; flex-direction: column; gap: 4px; padding-block: 4px;"
+                >
+                    <% Object.entries(flash?.values?.resourceLink?.customParameters ?? {}).forEach(([key, value]) => { %> 
+                        <div
+                            class="<%= customParameterDivClassName %>"
+                            style="<%= customParameterDivStyles %>"
+                        >
+                            <input type="hidden" name="<%= customParametersProperty %>.<%= key %>" value="<%= value %>">
+                            <span><strong><%= key %></strong>: <%= value %></span>
+                            <button type="button"><%= removalBtnText %></button>
+                        </div>
+                    <% }) %>
+                </div>
+
+                <label>
+                    <span><%= await t.translate("lti:new-resource-link-param:form:param-key") %></span>
+                    <input id="resource-link-parameters-parameter-key" type="text" placeholder="Chave">
+                </label>
+                <label>
+                    <span><%= await t.translate("lti:new-resource-link-param:form:param-value") %></span>
+                    <input id="resource-link-parameters-parameter-value" type="text" placeholder="Valor">
+                </label>
+                <button type="button" id="add-custom-parameter-btn"><%= await t.translate("buttons:add") %></button>
+            </fieldset>
+        </fieldset>
+        
+        <br>
+        <button type="submit"><%= await t.translate("assignments:create-assignment:buttons:create-assignment") %></button>
+        <a href="<%= routes.assignments.create() %>" style="margin-left: 1rem;">
+            <%= await t.translate("lti:ags:create-assignments:buttons:create-local-assignment") %>
+        </a>
+    </form>
+
+    <script type="module">
+        const customParametersProperty = "<%= customParametersProperty %>";
+        
+        const customParametersFieldset = document.getElementById("resource-link-parameters");
+        const submitButton = document.getElementById("add-custom-parameter-btn");
+        const keyInput = document.getElementById("resource-link-parameters-parameter-key");
+        const valueInput = document.getElementById("resource-link-parameters-parameter-value");
+        const errorsContainer = document.querySelector("#new-resource-link-parameter-form .errors-container");
+
+        const removeCustomParametersCsrErrorSpans = () => {
+            errorsContainer.querySelectorAll(".csr").forEach(span => span.remove());
+        }
+
+        const appendCustomParameterCsrErrorSpan = (message) => {
+            const errorSpan = document.createElement("span");
+            errorSpan.classList.add("error-span", "csr");
+            errorSpan.textContent = message;
+            errorsContainer.appendChild(errorSpan);
+        }
+
+        const handleAddNewCustomParameter = () => {
+            removeCustomParametersCsrErrorSpans();
+
+            const key = keyInput.value;
+            const value = valueInput.value;
+
+            const isInvalid = !key || !value;
+            if (isInvalid) {
+                const errorMsg = '<%= await t.translate("lti:create-resource-link:custom-parameters-must-be-a-key-value-map") %>';
+                appendCustomParameterCsrErrorSpan(errorMsg);
+                return;
+            }
+
+            keyInput.value = "";
+            valueInput.value = "";
+
+            const divContainer = document.createElement("div");
+            divContainer.classList.add("<%= customParameterDivClassName %>");
+            divContainer.style = "<%= customParameterDivStyles %>";
+
+            const customParameterInput = document.createElement("input");
+            customParameterInput.name = `${customParametersProperty}.${key}`;
+            customParameterInput.value = value;
+            customParameterInput.type = "hidden";
+
+            const displaySpan = document.createElement("span");
+            displaySpan.innerHTML = `<strong>${key}</strong>: ${value}`;
+
+            const removalButton = document.createElement("button");
+            removalButton.type = "button";
+            removalButton.textContent = '<%= await t.translate("buttons:remove") %>';
+            removalButton.addEventListener("click", () => { divContainer.remove(); });
+
+            divContainer.appendChild(customParameterInput);
+            divContainer.appendChild(displaySpan);
+            divContainer.appendChild(removalButton);
+
+            customParametersFieldset.appendChild(divContainer);
+        }
+
+        const registerFlashCustomParametersRemovalCallback = () => {
+            const flashCustomParameters = document.querySelectorAll(".<%= customParameterDivClassName %>");
+            for (const customParameter of flashCustomParameters) {
+                const removalButton = customParameter.querySelector("button");
+                removalButton.addEventListener("click", () => { customParameter.remove(); });
+            }
+        }
+
+        submitButton.addEventListener("click", handleAddNewCustomParameter);
+        window.addEventListener("DOMContentLoaded", registerFlashCustomParametersRemovalCallback);
+    </script>
+</main>
