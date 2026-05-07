@@ -20,7 +20,7 @@ import { RepositoriesModule } from "./repositories.module";
       useExisting: DrizzleTransactionManager,
     },
   ],
-  exports: [DrizzleClient, Redis, TransactionManager],
+  exports: [DrizzleClient, Redis, TransactionManager, DrizzleTransactionManager],
   imports: [RepositoriesModule],
 })
 export class DataStoreModule {}
