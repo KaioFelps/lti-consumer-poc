@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { HttpArgumentsHost } from "@nestjs/common/interfaces";
-import { unflatten } from "flat";
-import { HttpRequest, HttpResponse } from "@/lib";
+import { HttpRequest, HttpResponse, RequestSession } from "@/lib";
 import { ExceptionFilterResponderFactory } from "../../exception-responders/factory";
 import { ExceptionFilterResponder } from "../../exception-responders/responder";
+import { flashRequestBody } from "..";
 import { SerializedValidationError, SerializedValidationErrorsMap } from ".";
 
 type Body = SerializedValidationErrorsMap | SerializedValidationError[];
@@ -30,13 +30,10 @@ export class MvcResponder extends ExceptionFilterResponder<Body, Output> {
   public override async respond(_status: number, ctx: HttpArgumentsHost, errors: Body) {
     const request = ctx.getRequest<HttpRequest>();
     const response = ctx.getResponse<HttpResponse>();
-    const session = request["session"] as Record<string, unknown>;
+    const session = request["session"] as RequestSession;
 
     session.validationErrors = errors;
-    const flashValues = unflatten(request.body);
-
-    if (session.flash) session.flash["values"] = flashValues;
-    else session.flash = { values: flashValues };
+    flashRequestBody(request, session);
 
     return response.redirectBack();
   }
