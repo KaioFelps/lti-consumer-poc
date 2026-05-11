@@ -109,55 +109,58 @@ export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRep
     contextConcreteType: ContextConcreteType,
   ): Promise<Either<IrrecoverableError | ResourceNotFoundError, LtiToolDeployment>> {
     const client = this.txManager.getTx() ?? this.drizzle.getClient();
-    this.drizzle.getClient();
 
     const query = sql`
-    WITH RECURSIVE context_path AS (
-        SELECT 
-            concrete_context_id, 
-            concrete_context_type, 
-            parent_context_id, 
-            parent_context_type, 
-            1 as depth
-        FROM lti_context
-        WHERE concrete_context_id = ${contextConcreteId} 
-          AND concrete_context_type = ${contextConcreteType.toString()}
-
-        UNION ALL
-
-        SELECT 
-            c.concrete_context_id, 
-            c.concrete_context_type, 
-            c.parent_context_id, 
-            c.parent_context_type, 
-            cp.depth + 1
-        FROM lti_context c
-        INNER JOIN context_path cp ON 
-            c.concrete_context_id = cp.parent_context_id AND 
-            c.concrete_context_type = cp.parent_context_type
-    )
-
-    SELECT
-      d.client_id as "clientId",
-      d.id as "id",
-      d.label as "label"
-    FROM lti_deployments d
-    JOIN context_path cp ON 
-        d.context_id = cp.concrete_context_id AND 
-        d.context_concrete_type = cp.concrete_context_type
-    WHERE d.client_id = ${toolId}
-    ORDER BY cp.depth ASC
-    LIMIT 1;
-  `;
+      WITH RECURSIVE context_path AS (
+          SELECT 
+              concrete_context_id, 
+              concrete_context_type, 
+              parent_context_id, 
+              parent_context_type, 
+              1 AS depth
+          FROM lti_context
+          WHERE concrete_context_id = ${contextConcreteId}::uuid
+            AND concrete_context_type = ${contextConcreteType.toString()}::concrete_context_type_e
+          UNION ALL
+          SELECT 
+              c.concrete_context_id, 
+              c.concrete_context_type, 
+              c.parent_context_id, 
+              c.parent_context_type, 
+              cp.depth + 1
+          FROM lti_context c
+          INNER JOIN context_path cp ON 
+              c.concrete_context_id = cp.parent_context_id AND 
+              c.concrete_context_type = cp.parent_context_type
+      )
+      SELECT
+        d.client_id  AS "clientId",
+        d.id         AS "id",
+        d.label      AS "label",
+        CASE WHEN d.context_id IS NULL THEN 999999 ELSE cp.depth END AS _rank
+      FROM lti_deployments d
+      LEFT JOIN context_path cp ON 
+          d.context_id = cp.concrete_context_id AND 
+          d.context_concrete_type = cp.concrete_context_type
+      WHERE d.client_id = ${toolId}
+        AND (
+          -- deployment attached to some specific context
+          cp.concrete_context_id IS NOT NULL
+          OR
+          -- global deployment (no context)
+          d.context_id IS NULL
+        )
+      ORDER BY _rank ASC
+      LIMIT 1
+    `;
 
     return pipe(
       te.tryCatch(
         async () => {
           const result = await client.execute(query);
+          console.log(result);
 
-          if (result.rows.length === 0) {
-            throw new DeploymentNotFoundError({ toolId });
-          }
+          if (result.rows.length === 0) throw new DeploymentNotFoundError({ toolId });
 
           const row = result.rows[0] as LtiToolDeploymentRow;
           return mapper.fromRow(row);
@@ -167,7 +170,7 @@ export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRep
             ? error
             : new IrrecoverableError(
                 `Error occurred in ${DrizzleLtiToolsDeploymentsRepository.name} when finding the most appropriate ` +
-                  `deployments for the tool of id '${toolId}'.`,
+                  `deployment for tool '${toolId}'.`,
                 error as Error,
               ),
       ),
