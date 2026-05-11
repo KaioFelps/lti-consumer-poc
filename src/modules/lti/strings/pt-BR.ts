@@ -207,3 +207,6 @@ ptBR["lti:ags:create-assignments:resource-link-property-should-be-object"] =
   "Você precisa configurar o resource link corretamente.";
 ptBR["lti:ags:create-assignments:assignment-property-should-be-object"] =
   "Você deve configurar as informações básicas da atividade corretamente.";
+
+ptBR["lti:ags:tool-not-deployed"] =
+  "A ferramenta LTI selecionada ainda não foi implantada neste contexto.";
