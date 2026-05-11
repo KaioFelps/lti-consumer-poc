@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { forwardRef, MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import middlewares from "@/lib/middlewares";
 import { AuthModule } from "@/modules/auth/auth.module";
 import { IdentityModule } from "@/modules/identity/identity.module";
@@ -10,6 +10,7 @@ import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identitie
 import { LtiLaunchServices } from "$/core/services/launch";
 import { LtiResourceLinkServices } from "$/core/services/resource-link.services";
 import { AssignmentsAndGradesModule } from "../assignments-and-grades/assignments-and-grades.module";
+import { CoursesModule } from "../courses-and-enrollments/courses.module";
 import { LtiAssignmentsController } from "./ags/controllers/lti-assignments.controller";
 import { CreateExternalLtiAssignmentService } from "./ags/services/create-external-lti-assignment.service";
 import { LtiDeploymentsController } from "./deployments/deployments.controller";
@@ -31,7 +32,13 @@ import { GetToolRegistrationDetailsService } from "./tools/services/get-tool-reg
 import { LtiToolsController } from "./tools/tools.controller";
 
 @Module({
-  imports: [OIDCModule, AuthModule, IdentityModule, AssignmentsAndGradesModule],
+  imports: [
+    OIDCModule,
+    AuthModule,
+    IdentityModule,
+    AssignmentsAndGradesModule,
+    forwardRef(() => CoursesModule),
+  ],
   providers: [
     PlatformFactory,
     {
