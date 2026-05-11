@@ -13,12 +13,11 @@
 
 <main class="main">
     <h1><%= title %></h1>
-    <h2><%= course.title %></h2>
-    <span><%= course.id %></span>
+    <p><%= course.title %></p>
     <hr>
     <br>
 
-    <% if (flash?.success) { %>
+    <% if (flash.success) { %>
         <div class="success-alert">
             <span><%= flash.success.message %></span><br>
         </div>
@@ -40,7 +39,7 @@
                 type="text"
                 name="assignment.title"
                 style="width: fit-content;"
-                value="<%= flash?.values?.assignment?.title %>"
+                value="<%= flash.values?.assignment?.title %>"
                 required
             >
         </label>
@@ -56,7 +55,7 @@
                 min="1"
                 name="assignment.maxScore"
                 style="width: fit-content;"
-                value="<%= flash?.values?.assignment?.maxScore %>"
+                value="<%= flash.values?.assignment?.maxScore %>"
                 required
             >
         </label>
@@ -70,7 +69,7 @@
                 type="datetime-local"
                 name="assignment.releasedAt"
                 style="width: fit-content;"
-                value="<%= flash?.values?.assignment?.releasedAt %>"
+                value="<%= flash.values?.assignment?.releasedAt %>"
             >
         </label>
         
@@ -83,7 +82,7 @@
                 type="datetime-local"
                 name="assignment.deadline"
                 style="width: fit-content;"
-                value="<%= flash?.values?.assignment?.deadline %>"
+                value="<%= flash.values?.assignment?.deadline %>"
             >
         </label>
 
@@ -96,9 +95,12 @@
                     <span class="error-span"><%- error.message %></span>
                 <% }) %>
                 <select name="toolId">
-                    <option value=""><%= await t.translate("lti:ags:create-assignment:labels:select-tool-placeholder") %></option>
+                    <option value="" hidden><%= await t.translate("lti:ags:create-assignment:labels:select-tool-placeholder") %></option>
                     <% registeredTools.forEach(tool => { %>
-                        <option value="<%= tool.id %>">
+                        <option
+                            value="<%= tool.id %>"
+                            <%= flash.values?.toolId === tool.id ? "selected" : "" %>
+                        >
                             <%= tool.name %>
                         </option>
                     <% }) %>
@@ -114,7 +116,7 @@
                     type="url"
                     name="resourceLink.resourceUrl"
                     style="width: fit-content;"
-                    value="<%= flash?.values?.resourceLink?.resourceUrl %>"
+                    value="<%= flash.values?.resourceLink?.resourceUrl %>"
                 >
             </label>
 
@@ -132,7 +134,7 @@
                     id="resource-link-parameters"
                     style="border-block: 1px solid black; margin-block: 8px; display: flex; flex-direction: column; gap: 4px; padding-block: 4px;"
                 >
-                    <% Object.entries(flash?.values?.resourceLink?.customParameters ?? {}).forEach(([key, value]) => { %> 
+                    <% Object.entries(flash.values?.resourceLink?.customParameters ?? {}).forEach(([key, value]) => { %> 
                         <div
                             class="<%= customParameterDivClassName %>"
                             style="<%= customParameterDivStyles %>"
