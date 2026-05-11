@@ -28,7 +28,7 @@ export class AssignmentsController {
     const title = await this.t.translate("assignments:create-assignment:title");
 
     return await pipe(
-      () => this.findCourseByIdService.execute({ courseId }),
+      () => this.findCourseByIdService.exec({ courseId }),
       te.map(CourseWithInstructorPresenter.present),
       te.map((course) => ({ course, title })),
       te.getOrElse((error) => {

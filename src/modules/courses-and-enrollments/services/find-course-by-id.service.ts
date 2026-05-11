@@ -10,7 +10,7 @@ type Params = {
 export class FindCourseByIdService {
   public constructor(private readonly coursesRepository: CoursesRepository) {}
 
-  public execute({ courseId }: Params) {
+  public exec({ courseId }: Params) {
     return this.coursesRepository.findCourseWithInstructorById(courseId);
   }
 }

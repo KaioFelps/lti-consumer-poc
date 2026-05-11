@@ -76,7 +76,7 @@ export class CoursesAndEnrollmentsController {
   public listAssignments(@Param("courseId") courseId: UUID) {
     return pipe(
       te.Do,
-      te.bindW("courseAndInstructor", () => () => this.findCourseByIdService.execute({ courseId })),
+      te.bindW("courseAndInstructor", () => () => this.findCourseByIdService.exec({ courseId })),
       te.bindW("course", ({ courseAndInstructor }) => te.right(courseAndInstructor.getCourse())),
       te.bindW("title", ({ course }) => te.right(course.getTitle())),
       te.bindW("assignments", ({ course }) => this.getPresentedAssignmentsFromCourse(course)),
