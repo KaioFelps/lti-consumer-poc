@@ -56,14 +56,14 @@ export class CoreValidationPipe implements PipeTransform {
 
     const config = coreValidation.getConfigsFromRequest(this.request);
 
-    if (!config.renderErrorsWithView) {
-      throw new DTOValidationException(validationErrors, config.status);
+    const shouldRender =
+      !!config.renderErrorsWithView && this.request.method.toLowerCase() === "get";
+
+    if (shouldRender) {
+      const view = config.renderErrorsWithView!;
+      throw new RenderableDtoValidationException(validationErrors, view, config.status);
     }
 
-    throw new RenderableDtoValidationException(
-      validationErrors,
-      config.renderErrorsWithView,
-      config.status,
-    );
+    throw new DTOValidationException(validationErrors, config.status);
   }
 }

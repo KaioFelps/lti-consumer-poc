@@ -6,6 +6,10 @@ as messages.
 Errors and other services **should never request a message directly, but rather a
 identifier for a message string that will be parsed used `translate` further on**.
 
+> [!CAUTION]
+> This implementation is not as optimized as i18n standard libraries. Also it
+> provides no support for pluralization; use ternary operators instead.
+
 ## Defining Message Strings
 
 Modules may contain a `strings/` directory with typescript files that augments
