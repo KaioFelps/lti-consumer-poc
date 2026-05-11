@@ -1,5 +1,4 @@
-import { Injectable } from "@nestjs/common";
-import { HttpArgumentsHost } from "@nestjs/common/interfaces";
+import type { HttpArgumentsHost } from "@nestjs/common/interfaces";
 import { ExceptionPresenter } from "@/external/presenters/exception-presenter";
 import { SimpleExceptionPresenter } from "@/external/presenters/exceptions/simple-exception.presenter";
 import { HttpRequest, HttpResponse } from "@/lib";
@@ -11,7 +10,6 @@ import { BaseException } from "./exception";
 type Body = BaseException;
 type Output = object | void;
 
-@Injectable()
 export class BaseExceptionFilterResponderFactory extends ExceptionFilterResponderFactory<
   Body,
   Output
