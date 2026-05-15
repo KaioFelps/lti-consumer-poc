@@ -158,7 +158,6 @@ export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRep
       te.tryCatch(
         async () => {
           const result = await client.execute(query);
-          console.log(result);
 
           if (result.rows.length === 0) throw new DeploymentNotFoundError({ toolId });
 
