@@ -13,11 +13,12 @@ CREATE TABLE "lti_assignments" (
 --> statement-breakpoint
 ALTER TABLE "lti_contexts_types" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
 DROP TABLE "lti_contexts_types" CASCADE;--> statement-breakpoint
+ALTER TABLE "lti_context" ADD COLUMN "concrete_context_type" "concrete_context_type_e" NOT NULL;--> statement-breakpoint
 ALTER TABLE "lti_context" RENAME COLUMN "id" TO "concreteContextId";--> statement-breakpoint
 ALTER TABLE "lti_resource_link" DROP CONSTRAINT "lti_resource_link_context_id_lti_context_id_fk";
 --> statement-breakpoint
+ALTER TABLE "lti_context" DROP CONSTRAINT IF EXISTS "lti_context_pkey";
 ALTER TABLE "lti_context" ADD CONSTRAINT "lti_context_concreteContextId_concrete_context_type_pk" PRIMARY KEY("concreteContextId","concrete_context_type");--> statement-breakpoint
-ALTER TABLE "lti_context" ADD COLUMN "concrete_context_type" "concrete_context_type_e" NOT NULL;--> statement-breakpoint
 ALTER TABLE "lti_context" ADD COLUMN "parent_context_id" uuid;--> statement-breakpoint
 ALTER TABLE "lti_context" ADD COLUMN "parent_context_type" "concrete_context_type_e";--> statement-breakpoint
 ALTER TABLE "lti_resource_link" ADD COLUMN "concrete_context_type" "concrete_context_type_e";--> statement-breakpoint
