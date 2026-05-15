@@ -24,6 +24,8 @@ export const personGenderEnum = pgEnum("person_gender", [
 
 export const concreteContextTypeEnum = pgEnum("concrete_context_type_e", ["course"]);
 
+export const assignmentKindEnum = pgEnum("assignment_kind_e", ["local", "external_lti"]);
+
 export const usersTable = pgTable("users", {
   // user fields
   id: uuid().primaryKey(),
@@ -222,6 +224,7 @@ export const assignmentsT = pgTable("assignments", {
   releasedAt: timestamp("released_at", { withTimezone: true }),
   deadline: timestamp("deadline", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  kind: assignmentKindEnum().notNull().default(assignmentKindEnum.enumValues[0]),
 });
 
 export const studentsAssignmentsT = pgTable(
@@ -277,14 +280,14 @@ export const externalLtiResourcesT = pgTable("external_lti_resources", {
 export const ltiAssignmentsT = pgTable(
   "lti_assignments",
   {
-    assignment_id: uuid("assignment_id")
+    assignmentId: uuid("assignment_id")
       .notNull()
       .references(() => assignmentsT.id),
     resourceLinkId: uuid("resource_link_id")
       .references(() => ltiResourceLinks.id)
       .notNull(),
   },
-  (table) => [primaryKey({ columns: [table.assignment_id, table.resourceLinkId] })],
+  (table) => [primaryKey({ columns: [table.assignmentId, table.resourceLinkId] })],
 );
 
 // #endregion
