@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { ltiAssignmentsT } from "drizzle/schema";
+import { assignmentsT, ltiAssignmentsT } from "drizzle/schema";
+import { eq } from "drizzle-orm";
 import { taskEither as te } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
@@ -27,11 +28,23 @@ export class DrizzleExternalLtiAssignmentsRepository extends ExternalLtiAssignme
 
     return pipe(
       te.tryCatch(
-        () =>
-          client.insert(ltiAssignmentsT).values({
-            assignment_id: assignment.getId().toString(),
-            resourceLinkId: resourceLink.id,
-          }),
+        async () => {
+          // yes, drizzle _does_ support nested transactions (in case client is already a transaction ATP)
+          // see: https://orm.drizzle.team/docs/transactions
+          return client.transaction(async (tx) => {
+            const data = await tx.insert(ltiAssignmentsT).values({
+              assignmentId: assignment.getId().toString(),
+              resourceLinkId: resourceLink.id,
+            });
+
+            await tx
+              .update(assignmentsT)
+              .set({ kind: "external_lti" })
+              .where(eq(assignmentsT.id, assignment.getId().toString()));
+
+            return data;
+          });
+        },
         (error) =>
           new IrrecoverableError(
             `Error occurred in ${DrizzleExternalLtiAssignmentsRepository.name} when ` +
