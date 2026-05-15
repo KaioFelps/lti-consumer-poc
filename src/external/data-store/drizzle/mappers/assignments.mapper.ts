@@ -25,6 +25,7 @@ function intoRow(assignment: Assignment): AssignmentRow {
     deadline: assignment.getDeadline() ?? null,
     maxScore: assignment.getMaxScore(),
     releasedAt: assignment.getReleasedAt() ?? null,
+    kind: "local",
   };
 }
 
