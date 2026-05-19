@@ -24,11 +24,7 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
     super();
   }
 
-  public async findMany({
-    withDeploymentId,
-    withToolId,
-    withContextId,
-  }: FindManyParams = {}): Promise<Either<LtiRepositoryError, LtiResourceLink[]>> {
+  public async findMany({ withDeploymentId, withToolId, withContextId }: FindManyParams = {}) {
     const rootFilters: SQLWrapper[] = [];
 
     if (withDeploymentId) {
@@ -109,9 +105,7 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
     )();
   }
 
-  public async findById(
-    resourceLinkId: string,
-  ): Promise<Either<LtiRepositoryError, LtiResourceLink>> {
+  public async findById(resourceLinkId: string) {
     return await pipe(
       te.tryCatch(
         () =>
