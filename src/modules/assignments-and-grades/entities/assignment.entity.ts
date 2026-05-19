@@ -5,6 +5,7 @@ import { EntityBase } from "@/core/entity-base";
 import { Course } from "@/modules/courses-and-enrollments/entities/course.entity";
 import { Person } from "@/modules/identity/person/person.entity";
 import { GradeOfAssignment } from "../aggregates/grade-of-assignment.aggregate";
+import { AssignmentKind } from "../enums/assignment-kind";
 import { InvalidAssignmentError } from "../errors/invalid-assignment.error";
 import { NonGradableAssignmentError } from "../errors/non-gradable-assignment";
 import { Grade } from "./grade.entity";
@@ -17,6 +18,7 @@ type Props = {
   releasedAt?: Date;
   deadline?: Date;
   createdAt: Date;
+  kind: AssignmentKind;
 };
 
 const maxSmallInt = 0x7fff;
@@ -130,5 +132,9 @@ export class Assignment extends EntityBase<Props> {
 
   public getMaxScore() {
     return this.props.maxScore;
+  }
+
+  public getKind() {
+    return this.props.kind;
   }
 }

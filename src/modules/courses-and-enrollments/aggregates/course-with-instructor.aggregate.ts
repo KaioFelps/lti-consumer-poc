@@ -1,5 +1,6 @@
 import { EntityBase } from "@/core/entity-base";
 import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity";
+import { AssignmentKind } from "@/modules/assignments-and-grades/enums/assignment-kind";
 import { Course } from "../entities/course.entity";
 import { Instructor } from "../entities/instructor.entity";
 
@@ -27,6 +28,10 @@ export class CourseWithInstructor extends EntityBase<Props> {
     deadline?: Date;
     releasedAt?: Date;
   }) {
-    return Assignment.create({ ...params, courseId: this.props.course.getId() });
+    return Assignment.create({
+      ...params,
+      courseId: this.props.course.getId(),
+      kind: AssignmentKind.Local,
+    });
   }
 }

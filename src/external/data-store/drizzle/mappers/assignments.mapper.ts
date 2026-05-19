@@ -6,6 +6,7 @@ import {
 } from "drizzle-orm";
 import { pipe } from "fp-ts/lib/function";
 import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity";
+import { AssignmentKind } from "@/modules/assignments-and-grades/enums/assignment-kind";
 import { trimNullProperties } from "@/utils/trim-null-properties";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
@@ -30,7 +31,12 @@ function intoRow(assignment: Assignment): AssignmentRow {
 }
 
 function fromRow(row: AssignmentRow): Assignment {
-  return pipe(row, trimNullProperties, Assignment.createUnchecked);
+  return pipe(
+    row,
+    trimNullProperties,
+    (row) => ({ ...row, kind: row.kind as AssignmentKind }),
+    Assignment.createUnchecked,
+  );
 }
 
 export default {

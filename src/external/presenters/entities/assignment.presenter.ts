@@ -7,6 +7,7 @@ type PresentedAssignment = {
   releasedAt?: Date;
   deadline?: Date;
   createdAt: Date;
+  kind: string;
 };
 
 export class AssignmentPresenter {
@@ -18,6 +19,7 @@ export class AssignmentPresenter {
       releasedAt: entity.getReleasedAt(),
       deadline: entity.getDeadline(),
       createdAt: entity.getCreatedAt(),
+      kind: entity.getKind().toString(),
     };
   }
 }
