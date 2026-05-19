@@ -53,9 +53,11 @@ export const Routes = {
     },
     ags: {
       createExternalAssignmentForm: (courseId: string) =>
-        `/lti/ags/assignments/courses/${courseId}/new`,
+        `/lti/ags/courses/${courseId}/assignments/new`,
       createExternalAssignment: (courseId: string) =>
-        `/lti/ags/assignments/courses/${courseId}/new`,
+        `/lti/ags/courses/${courseId}/assignments/new`,
+      showExternalAssignmentDetails: (assignmentId: string) =>
+        `/lti/ags/assignments/${assignmentId}`,
     },
   },
   courses: {

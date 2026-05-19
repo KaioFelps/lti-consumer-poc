@@ -53,7 +53,8 @@ const dateFormattingOptions = {
 
                         <br>
                         <div>
-                            <a href="<%= routes.assignments.view(assignment.id) %>"><%= await t.translate("courses:details:buttons:view-assignment-details") %></a>
+                            <% const route = assignment.kind === "local" ? routes.assignments.view(assignment.id) : routes.lti.ags.showExternalAssignmentDetails(assignment.id); %>
+                            <a href="<%= route %>"><%= await t.translate("courses:details:buttons:view-assignment-details") %></a>
                         </div>
                     </li>   
                 <% } %>
