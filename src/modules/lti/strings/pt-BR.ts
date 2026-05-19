@@ -210,3 +210,14 @@ ptBR["lti:ags:create-assignments:assignment-property-should-be-object"] =
 
 ptBR["lti:ags:tool-not-deployed"] =
   "A ferramenta LTI selecionada ainda não foi implantada neste contexto.";
+
+ptBR["lti:ags:show-assignment:title"] = ({ assignmentTitle, courseTitle }) =>
+  courseTitle ? `${courseTitle}: ${assignmentTitle}` : `Atividade: ${assignmentTitle}`;
+ptBR["lti:ags:show-assignment:errors:invalid-assignment-id"] = () =>
+  `O ID fornecido não é um ID válido para uma atividade.`;
+ptBR["lti:ags:show-assignment:errors:external-assignment-not-found"] = ({ id }) =>
+  `Não foi encontrada nenhuma atividade externa com o ID "${id}".`;
+
+ptBR["lti:assignment-details:section:assignment"] = "Atividade";
+ptBR["lti:assignment-details:thead:id"] = "ID da atividade";
+ptBR["lti:assignment-details:thead:title"] = "Título";

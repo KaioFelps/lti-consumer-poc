@@ -64,3 +64,7 @@ ptBR["assignments:create-assignment:success-message"] = ({ assignmentTitle }) =>
   `A atividade ${assignmentTitle} foi criada com sucesso!`;
 ptBR["assignments:create-assignments:buttons:create-external-assignment"] =
   "Criar uma atividade utilizando ferramenta externa";
+
+ptBR["assignments:details:sections:professor"] = "Professor responsável";
+ptBR["assignments:details:buttons:back-to-course"] = ({ courseTitle }) =>
+  `Voltar ao curso ${courseTitle}`;

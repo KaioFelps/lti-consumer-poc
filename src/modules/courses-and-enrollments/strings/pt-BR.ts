@@ -39,5 +39,6 @@ ptBR["courses:details:buttons:add-new-assignment"] = "Adicionar nova atividade";
 ptBR["courses:details:assignments:max-score"] = "Pontuação máxima";
 ptBR["courses:details:assignments:deadline"] = "Prazo de entrega";
 ptBR["courses:details:assignments:released-at"] = "Data de lançamento";
+ptBR["courses:details:assignments:created-at"] = "Data de criação (quando foi inserida)";
 
 ptBR["courses:details:buttons:view-assignment-details"] = "Ver detalhes da atividade";
