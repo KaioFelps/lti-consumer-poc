@@ -13,10 +13,10 @@ import { FindCourseByIdService } from "@/modules/courses-and-enrollments/service
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { Platform } from "$/core/platform";
 import { presentLtiResourceLink } from "$/core/presenters/resource-link.presenter";
+import { ShowAssignmentsDetailsDto } from "../../../assignments-and-grades/dtos/show-assignments-details-params.dto";
 import { mountContextId } from "../../advantage/context";
 import { FindManyToolsPreviewsService } from "../../tools/services/find-many-tools-previews.service";
 import { CreateExternalLtiAssignmentDto } from "../dtos/create-external-lti-assignment.dto";
-import { ShowAssignmentsDetailsDto } from "../dtos/show-assignments-details-params.dto";
 import { ContextConcreteType } from "../enums/context-concrete-type";
 import { CreateExternalLtiAssignmentService } from "../services/create-external-lti-assignment.service";
 import { FindExternalLtiAssignmentByIdService } from "../services/find-external-lti-assignment-by-id.service";
@@ -111,7 +111,7 @@ export class LtiAssignmentsController {
         return courseId ? () => this.findCourseByIdService.exec({ courseId }) : te.right(undefined);
       }),
       te.chainTaskK(({ course, externalAssignmentRecord }) => async () => ({
-        title: await this.t.translate("lti:ags:show-assignment:title", {
+        title: await this.t.translate("assignments:details:title", {
           courseTitle: course?.getCourse().getTitle(),
           assignmentTitle: externalAssignmentRecord.assignment.getTitle(),
         }),

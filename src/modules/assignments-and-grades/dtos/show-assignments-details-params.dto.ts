@@ -7,7 +7,7 @@ import { ValidationErrors } from "@/core/validation/validation-errors";
 import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
 
 const schema = z.object({
-  assignmentId: z.uuid("lti:ags:show-assignment:errors:invalid-assignment-id"),
+  assignmentId: z.uuid("assignments:details:errors:invalid-assignment-id"),
 });
 
 type Schema = z.infer<typeof schema>;

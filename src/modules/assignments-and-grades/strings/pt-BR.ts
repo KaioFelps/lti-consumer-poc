@@ -68,3 +68,9 @@ ptBR["assignments:create-assignments:buttons:create-external-assignment"] =
 ptBR["assignments:details:sections:professor"] = "Professor responsável";
 ptBR["assignments:details:buttons:back-to-course"] = ({ courseTitle }) =>
   `Voltar ao curso ${courseTitle}`;
+
+ptBR["assignments:details:errors:invalid-assignment-id"] = () =>
+  `O ID fornecido não é um ID válido para uma atividade.`;
+
+ptBR["assignments:details:title"] = ({ assignmentTitle, courseTitle }) =>
+  courseTitle ? `${courseTitle}: ${assignmentTitle}` : `Atividade: ${assignmentTitle}`;
