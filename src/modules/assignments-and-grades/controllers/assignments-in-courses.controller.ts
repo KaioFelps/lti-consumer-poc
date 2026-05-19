@@ -7,15 +7,15 @@ import { HttpResponse, RequestSession } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
-import { SessionUser } from "../auth/session-user";
-import { FindCourseByIdService } from "../courses-and-enrollments/services/find-course-by-id.service";
-import { User } from "../identity/user/user.entity";
-import { CreateAssignmentDTO } from "./dtos/create-assignment.dto";
-import { CreateAssignmentService } from "./services/create-assignment.service";
+import { SessionUser } from "../../auth/session-user";
+import { FindCourseByIdService } from "../../courses-and-enrollments/services/find-course-by-id.service";
+import { User } from "../../identity/user/user.entity";
+import { CreateAssignmentDTO } from "../dtos/create-assignment.dto";
+import { CreateAssignmentService } from "../services/create-assignment.service";
 
 @Mvc()
 @Controller("/courses/:courseId/assignments")
-export class AssignmentsController {
+export class AssignmentsInCoursesController {
   public constructor(
     private readonly t: TranslatorService,
     private readonly createAssignmentService: CreateAssignmentService,
