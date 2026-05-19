@@ -83,7 +83,6 @@ export class LtiAssignmentsController {
             instructorId: course.getInstructor().getId(),
           }),
       ),
-      (a) => a,
       te.getOrElse((error) => {
         throw ExceptionsFactory.fromError(error);
       }),
