@@ -1,6 +1,8 @@
 import { ArgumentsHost, Catch, ExceptionFilter, Injectable, Scope } from "@nestjs/common";
 import { TranslatorService } from "@/message-string/translator.service";
 import { HttpRequest } from "../..";
+import { RenderableDtoValidationException } from "../renderable-dto-validation/exception";
+import { RenderableDtoValidationExceptionFilter } from "../renderable-dto-validation/exception-filter";
 import { serializeValidationError } from ".";
 import { DTOValidationException } from "./exception";
 import { DtoValidationExceptionFilterResponderFactory } from "./responder.factory";
@@ -15,6 +17,7 @@ export class DTOValidationExceptionFilter implements ExceptionFilter {
   public constructor(
     private readonly translator: TranslatorService,
     private readonly responderFactory: DtoValidationExceptionFilterResponderFactory,
+    private readonly renderableFitler: RenderableDtoValidationExceptionFilter,
   ) {}
 
   async catch(exception: DTOValidationException, host: ArgumentsHost) {
@@ -27,6 +30,16 @@ export class DTOValidationExceptionFilter implements ExceptionFilter {
       this.translator,
     );
 
-    return this.responderFactory.create(request).respond(status, ctx, errors);
+    const shouldRender = request.method.toLowerCase() === "get";
+
+    if (!shouldRender) return this.responderFactory.create(request).respond(status, ctx, errors);
+
+    const renderableDtoException = new RenderableDtoValidationException(
+      exception.validationErrors,
+      "dto-validation-error",
+      exception.getStatus(),
+    );
+
+    this.renderableFitler.catch(renderableDtoException, host);
   }
 }

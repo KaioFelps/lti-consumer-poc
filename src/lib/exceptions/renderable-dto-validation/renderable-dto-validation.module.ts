@@ -6,10 +6,12 @@ import { RenderableDtoValidationExceptionFilter } from "./exception-filter";
 @Module({
   imports: [RenderableExceptionModule],
   providers: [
+    RenderableDtoValidationExceptionFilter,
     {
       provide: APP_FILTER,
-      useClass: RenderableDtoValidationExceptionFilter,
+      useExisting: RenderableDtoValidationExceptionFilter,
     },
   ],
+  exports: [RenderableDtoValidationExceptionFilter],
 })
 export class RenderableDtoValidationModule {}

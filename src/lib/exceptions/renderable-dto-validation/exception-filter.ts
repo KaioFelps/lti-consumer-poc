@@ -10,10 +10,10 @@ import { RenderableDtoValidationException } from "./exception";
 @Catch(RenderableDtoValidationException)
 export class RenderableDtoValidationExceptionFilter implements ExceptionFilter {
   @Inject()
-  private t: TranslatorService;
+  private t!: TranslatorService;
 
   @Inject()
-  private renderableExceptionFilter: RenderableExceptionFilter;
+  private renderableExceptionFilter!: RenderableExceptionFilter;
 
   async catch(exception: RenderableDtoValidationException, host: ArgumentsHost) {
     const status = exception.getStatus();
