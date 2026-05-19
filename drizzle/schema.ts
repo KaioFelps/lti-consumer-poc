@@ -277,18 +277,15 @@ export const externalLtiResourcesT = pgTable("external_lti_resources", {
   external_tool_resource_id: varchar("external_tool_resource_id").notNull(),
 });
 
-export const ltiAssignmentsT = pgTable(
-  "lti_assignments",
-  {
-    assignmentId: uuid("assignment_id")
-      .notNull()
-      .references(() => assignmentsT.id),
-    resourceLinkId: uuid("resource_link_id")
-      .references(() => ltiResourceLinks.id)
-      .notNull(),
-  },
-  (table) => [primaryKey({ columns: [table.assignmentId, table.resourceLinkId] })],
-);
+export const ltiAssignmentsT = pgTable("lti_assignments", {
+  assignmentId: uuid("assignment_id")
+    .notNull()
+    .references(() => assignmentsT.id)
+    .primaryKey(),
+  resourceLinkId: uuid("resource_link_id")
+    .references(() => ltiResourceLinks.id)
+    .notNull(),
+});
 
 // #endregion
 
@@ -368,6 +365,9 @@ export const ltiResourceLinksRelations = relations(ltiResourceLinks, ({ one }) =
     fields: [ltiResourceLinks.contextId, ltiResourceLinks.contextConcreteType],
     references: [ltiContexts.concreteContextId, ltiContexts.concreteContextType],
   }),
+
+  // AGS
+  ltiAssignment: one(ltiAssignmentsT),
 }));
 
 export const ltiContextsRelations = relations(ltiContexts, ({ many }) => ({
@@ -405,6 +405,7 @@ export const assignmentsRelations = relations(assignmentsT, ({ one, many }) => (
   }),
   grades: many(gradesT),
   studentsAssignments: many(studentsAssignmentsT),
+  externalLtiAssignment: one(ltiAssignmentsT),
 }));
 
 export const studentAssignmentsRelations = relations(studentsAssignmentsT, ({ one }) => ({
@@ -426,6 +427,21 @@ export const gradesRelations = relations(gradesT, ({ one }) => ({
   assignment: one(assignmentsT, {
     fields: [gradesT.assignmentId],
     references: [assignmentsT.id],
+  }),
+}));
+
+// #endregion
+
+// #region LTI AGS
+
+export const ltiAssignmentsRelations = relations(ltiAssignmentsT, ({ one }) => ({
+  assignmemnt: one(assignmentsT, {
+    fields: [ltiAssignmentsT.assignmentId],
+    references: [assignmentsT.id],
+  }),
+  resourceLink: one(ltiResourceLinks, {
+    fields: [ltiAssignmentsT.resourceLinkId],
+    references: [ltiResourceLinks.id],
   }),
 }));
 

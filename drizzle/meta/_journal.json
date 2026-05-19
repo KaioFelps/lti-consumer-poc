@@ -99,6 +99,13 @@
       "when": 1778695301704,
       "tag": "0013_add_kind_column_to_base_assignments_table",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1779171512984,
+      "tag": "0014_change_lti_assignments_pk",
+      "breakpoints": true
     }
   ]
 }
