@@ -1,5 +1,16 @@
 import { relations } from "drizzle-orm";
-import { jsonb, pgEnum, pgTable, primaryKey, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  foreignKey,
+  jsonb,
+  pgEnum,
+  pgTable,
+  primaryKey,
+  smallint,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { PersonGender } from "@/modules/identity/person/enums/gender";
 import { SystemRole } from "@/modules/identity/user/enums/system-role";
 
@@ -10,6 +21,10 @@ export const personGenderEnum = pgEnum("person_gender", [
   PersonGender.Male,
   PersonGender.NonBinary,
 ]);
+
+export const concreteContextTypeEnum = pgEnum("concrete_context_type_e", ["course"]);
+
+export const assignmentKindEnum = pgEnum("assignment_kind_e", ["local", "external_lti"]);
 
 export const usersTable = pgTable("users", {
   // user fields
@@ -36,6 +51,7 @@ export const usersTable = pgTable("users", {
   email: varchar({ length: 255 }).unique(),
 });
 
+// #region LTI & OAuth
 export const oauthApplicationTypeEnum = pgEnum("oauth_application_type", ["web", "native"]);
 
 export const oauthClients = pgTable("oauth_client", {
@@ -87,13 +103,24 @@ export const oauthContacts = pgTable(
   (table) => [primaryKey({ columns: [table.clientId, table.email] })],
 );
 
-export const ltiToolDeployments = pgTable("lti_deployments", {
-  clientId: varchar("client_id", { length: 64 })
-    .notNull()
-    .references(() => ltiTools.id, { onDelete: "cascade" }),
-  id: uuid().primaryKey(),
-  label: varchar({ length: 255 }).notNull(),
-});
+export const ltiToolDeployments = pgTable(
+  "lti_deployments",
+  {
+    clientId: varchar("client_id", { length: 64 })
+      .notNull()
+      .references(() => ltiTools.id, { onDelete: "cascade" }),
+    id: uuid().primaryKey(),
+    label: varchar({ length: 255 }).notNull(),
+    contextId: uuid("context_id"),
+    contextConcreteType: concreteContextTypeEnum("context_concrete_type"),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.contextId, table.contextConcreteType],
+      foreignColumns: [ltiContexts.concreteContextId, ltiContexts.concreteContextType],
+    }),
+  ],
+);
 
 export const ltiToolSupportedMessages = pgTable(
   "lti_tool_supported_messages",
@@ -123,38 +150,150 @@ export const ltiToolSupportedMessageRoles = pgTable(
   (table) => [primaryKey({ columns: [table.clientId, table.messageType, table.role] })],
 );
 
-export const ltiContexts = pgTable("lti_context", {
-  id: uuid().primaryKey(),
-  label: varchar(),
-  title: varchar(),
-});
-
-export const ltiContextsTypes = pgTable(
-  "lti_contexts_types",
+export const ltiContexts = pgTable(
+  "lti_context",
   {
-    contextId: uuid("context_id")
-      .notNull()
-      .references(() => ltiContexts.id),
-    type: varchar().notNull(),
+    concreteContextId: uuid("concrete_context_id").notNull(),
+    concreteContextType: concreteContextTypeEnum("concrete_context_type").notNull(),
+    parentContextId: uuid("parent_context_id"),
+    parentContextType: concreteContextTypeEnum("parent_context_type"),
   },
-  (table) => [primaryKey({ columns: [table.contextId, table.type] })],
+  (table) => [
+    primaryKey({ columns: [table.concreteContextId, table.concreteContextType] }),
+    foreignKey({
+      columns: [table.parentContextId, table.parentContextType],
+      foreignColumns: [table.concreteContextId, table.concreteContextType],
+    }),
+  ],
 );
 
-export const ltiResourceLinks = pgTable("lti_resource_link", {
+export const ltiResourceLinks = pgTable(
+  "lti_resource_link",
+  {
+    id: uuid().primaryKey(),
+    deploymentId: uuid("deployment_id")
+      .notNull()
+      .references(() => ltiToolDeployments.id, { onDelete: "cascade" }),
+    contextId: uuid("context_id"),
+    contextConcreteType: concreteContextTypeEnum("concrete_context_type"),
+    resourceUrl: varchar("resource_url"),
+    title: varchar(), // nullable
+    description: varchar(), // nullable
+    customParameters: jsonb("custom_parameters").$type<Record<string, string>>(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.contextConcreteType, table.contextId],
+      foreignColumns: [ltiContexts.concreteContextType, ltiContexts.concreteContextId],
+    }),
+  ],
+);
+
+// #endregion
+
+// #region Assignments and Grading
+export const coursesT = pgTable("courses", {
   id: uuid().primaryKey(),
-  deploymentId: uuid("deployment_id")
-    .notNull()
-    .references(() => ltiToolDeployments.id, { onDelete: "cascade" }),
-  contextId: uuid("context_id").references(() => ltiContexts.id),
-  resourceUrl: varchar("resource_url"),
-  title: varchar(), // nullable
-  description: varchar(), // nullable
-  customParameters: jsonb("custom_parameters").$type<Record<string, string>>(),
+  title: varchar({ length: 400 }).notNull(),
+  instructorId: uuid("instructor_id")
+    .references(() => usersTable.id)
+    .notNull(),
 });
 
-/**
+export const enrollmentsT = pgTable(
+  "enrollments",
+  {
+    studentId: uuid("student_id")
+      .references(() => usersTable.id)
+      .notNull(),
+    courseId: uuid("course_id")
+      .references(() => coursesT.id)
+      .notNull(),
+    enrolledAt: timestamp("enrolled_at", { withTimezone: true }).notNull().defaultNow(),
+    concludedAt: timestamp("concluded_at", { withTimezone: true }),
+    withdrawnAt: timestamp("withdrawn_at", { withTimezone: true }),
+  },
+  (table) => [primaryKey({ columns: [table.studentId, table.courseId] })],
+);
+
+export const assignmentsT = pgTable("assignments", {
+  id: uuid().primaryKey(),
+  courseId: uuid("course_id").references(() => coursesT.id),
+  title: varchar({ length: 400 }).notNull(),
+  maxScore: smallint("max_score").notNull(),
+  releasedAt: timestamp("released_at", { withTimezone: true }),
+  deadline: timestamp("deadline", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  kind: assignmentKindEnum().notNull().default(assignmentKindEnum.enumValues[0]),
+});
+
+export const studentsAssignmentsT = pgTable(
+  "student_assignments",
+  {
+    assignmentId: uuid("assignment_id")
+      .references(() => assignmentsT.id)
+      .notNull(),
+    studentId: uuid("student_id")
+      .references(() => usersTable.id)
+      .notNull(),
+    releasedAt: timestamp("released_at", { withTimezone: true }),
+    assignedAt: timestamp("assignedAt", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [primaryKey({ columns: [table.assignmentId, table.studentId] })],
+);
+
+export const gradesT = pgTable(
+  "grades",
+  {
+    studentId: uuid("student_id").notNull(),
+    courseId: uuid("course_id").notNull(),
+    assignmentId: uuid("assignment_id")
+      .references(() => assignmentsT.id)
+      .notNull(),
+    score: smallint().notNull().default(0),
+    maxScore: smallint("max_score").notNull(),
+    released: boolean().notNull().default(false),
+    lastUpdatedAt: timestamp("last_updated_at", { withTimezone: true }),
+    gradedAt: timestamp("graded_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.studentId, table.courseId, table.assignmentId] }),
+    foreignKey({
+      columns: [table.studentId, table.courseId],
+      foreignColumns: [enrollmentsT.studentId, enrollmentsT.courseId],
+    }),
+  ],
+);
+
+// #endregion
+
+// #region LTI AGS
+
+export const externalLtiResourcesT = pgTable("external_lti_resources", {
+  id: uuid().primaryKey(),
+  tool_id: varchar()
+    .references(() => ltiTools.id)
+    .notNull(),
+  external_tool_resource_id: varchar("external_tool_resource_id").notNull(),
+});
+
+export const ltiAssignmentsT = pgTable("lti_assignments", {
+  assignmentId: uuid("assignment_id")
+    .notNull()
+    .references(() => assignmentsT.id)
+    .primaryKey(),
+  resourceLinkId: uuid("resource_link_id")
+    .references(() => ltiResourceLinks.id)
+    .notNull(),
+});
+
+// #endregion
+
+/***************************************
  * Relations
- */
+ ***************************************/
+
+// #region LTI & OAuth
 export const ltiToolsRelations = relations(ltiTools, ({ many, one }) => ({
   oauthClient: one(oauthClients, {
     fields: [ltiTools.id],
@@ -170,6 +309,10 @@ export const ltiToolDeploymentsRelations = relations(ltiToolDeployments, ({ one,
     references: [ltiTools.id],
   }),
   resourceLinks: many(ltiResourceLinks),
+  context: one(ltiContexts, {
+    fields: [ltiToolDeployments.contextId, ltiToolDeployments.contextConcreteType],
+    references: [ltiContexts.concreteContextId, ltiContexts.concreteContextType],
+  }),
 }));
 
 export const ltiToolSupportedMessagesRelations = relations(
@@ -219,19 +362,93 @@ export const ltiResourceLinksRelations = relations(ltiResourceLinks, ({ one }) =
     references: [ltiToolDeployments.id],
   }),
   context: one(ltiContexts, {
-    fields: [ltiResourceLinks.contextId],
-    references: [ltiContexts.id],
+    fields: [ltiResourceLinks.contextId, ltiResourceLinks.contextConcreteType],
+    references: [ltiContexts.concreteContextId, ltiContexts.concreteContextType],
   }),
+
+  // AGS
+  ltiAssignment: one(ltiAssignmentsT),
 }));
 
 export const ltiContextsRelations = relations(ltiContexts, ({ many }) => ({
   resourceLinks: many(ltiResourceLinks),
-  types: many(ltiContextsTypes),
 }));
 
-export const ltiContextsTypesRelations = relations(ltiContextsTypes, ({ one }) => ({
-  context: one(ltiContexts, {
-    fields: [ltiContextsTypes.contextId],
-    references: [ltiContexts.id],
+// #endregion
+
+// #region Assignments and Grading
+export const coursesRelations = relations(coursesT, ({ many, one }) => ({
+  enrollments: many(enrollmentsT),
+  instructor: one(usersTable, {
+    fields: [coursesT.instructorId],
+    references: [usersTable.id],
   }),
+  assignments: many(assignmentsT),
+}));
+
+export const enrollmentsRelations = relations(enrollmentsT, ({ many, one }) => ({
+  course: one(coursesT, {
+    fields: [enrollmentsT.courseId],
+    references: [coursesT.id],
+  }),
+  student: one(usersTable, {
+    fields: [enrollmentsT.studentId],
+    references: [usersTable.id],
+  }),
+  grades: many(gradesT),
+}));
+
+export const assignmentsRelations = relations(assignmentsT, ({ one, many }) => ({
+  course: one(coursesT, {
+    fields: [assignmentsT.courseId],
+    references: [coursesT.id],
+  }),
+  grades: many(gradesT),
+  studentsAssignments: many(studentsAssignmentsT),
+  externalLtiAssignment: one(ltiAssignmentsT),
+}));
+
+export const studentAssignmentsRelations = relations(studentsAssignmentsT, ({ one }) => ({
+  assignment: one(assignmentsT, {
+    fields: [studentsAssignmentsT.assignmentId],
+    references: [assignmentsT.id],
+  }),
+  student: one(usersTable, {
+    fields: [studentsAssignmentsT.studentId],
+    references: [usersTable.id],
+  }),
+}));
+
+export const gradesRelations = relations(gradesT, ({ one }) => ({
+  enrollment: one(enrollmentsT, {
+    fields: [gradesT.courseId, gradesT.studentId],
+    references: [enrollmentsT.courseId, enrollmentsT.studentId],
+  }),
+  assignment: one(assignmentsT, {
+    fields: [gradesT.assignmentId],
+    references: [assignmentsT.id],
+  }),
+}));
+
+// #endregion
+
+// #region LTI AGS
+
+export const ltiAssignmentsRelations = relations(ltiAssignmentsT, ({ one }) => ({
+  assignmemnt: one(assignmentsT, {
+    fields: [ltiAssignmentsT.assignmentId],
+    references: [assignmentsT.id],
+  }),
+  resourceLink: one(ltiResourceLinks, {
+    fields: [ltiAssignmentsT.resourceLinkId],
+    references: [ltiResourceLinks.id],
+  }),
+}));
+
+// #endregion
+
+export const usersRelations = relations(usersTable, ({ many }) => ({
+  coursesTaught: many(coursesT),
+  enrollments: many(enrollmentsT),
+  specificAssignments: many(studentsAssignmentsT),
 }));

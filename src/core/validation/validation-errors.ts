@@ -1,8 +1,30 @@
 import { option } from "fp-ts";
 import { Option } from "fp-ts/lib/Option";
+import { ErrorClassProperties } from "../errors/error-base";
 import { InvalidArgumentError } from "../errors/invalid-argument.error";
 
-export type ValidationError = InvalidArgumentError;
+export class ValidationError extends InvalidArgumentError {
+  public readonly argumentName: string;
+
+  public constructor(props: ErrorClassProperties<InvalidArgumentError> & { argumentName: string }) {
+    super(props);
+    this.argumentName = props.argumentName;
+  }
+
+  public static from(error: InvalidArgumentError) {
+    if (typeof error.argumentName === "undefined") {
+      throw new Error(
+        "Every validation error's `InvalidArgumentError` instance needs to have a defined `argumentName` value.",
+      );
+    }
+
+    return new ValidationError({
+      argumentName: error.argumentName,
+      errorMessageIdentifier: error.errorMessageIdentifier,
+      messageParams: error.messageParams,
+    });
+  }
+}
 
 export type ValidationErrorsMap = Record<
   string,
@@ -46,13 +68,13 @@ export class ValidationErrors {
     );
   }
 
-  public appendError(error: ValidationError) {
+  public appendError(error: ValidationError | InvalidArgumentError) {
     if (!this.ensureErrorRequiredFields(error)) return;
     const path = error.argumentName.split(".");
     this.recursivelyInsertError(error, path);
   }
 
-  private recursivelyInsertError(error: Required<ValidationError>, path: string[]) {
+  private recursivelyInsertError(error: ValidationError, path: string[]) {
     let errorsWindow = this.errors;
     const lastSegment = path[path.length - 1];
     path = path.slice(0, path.length - 1);
@@ -75,9 +97,7 @@ export class ValidationErrors {
     this.errors = { ...this.errors, ...valiationErrors.errors };
   }
 
-  private ensureErrorRequiredFields(
-    error: InvalidArgumentError,
-  ): error is Required<InvalidArgumentError> {
+  private ensureErrorRequiredFields(error: InvalidArgumentError): error is ValidationError {
     if (typeof error.argumentName === "undefined")
       throw new Error(
         "Every validation error's `InvalidArgumentError` instance needs to have a defined `argumentName` value.",

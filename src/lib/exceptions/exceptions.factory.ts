@@ -1,5 +1,5 @@
 import { HttpException } from "@nestjs/common";
-import { ErrorBase } from "@/core/errors/error-base";
+import { type IErrorBase } from "@/core/errors/error-base";
 import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { RenderableError } from "@/core/errors/renderable/renderable-error";
@@ -16,7 +16,7 @@ import { RenderableException } from "./renderable/exception";
  * filters handle the translation of each specific format of error.
  */
 export abstract class ExceptionsFactory {
-  public static fromError(error: ErrorBase | RenderableError): HttpException {
+  public static fromError(error: IErrorBase | RenderableError): HttpException {
     if (error instanceof IrrecoverableError) {
       return new IrrecoverableException(error);
     }

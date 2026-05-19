@@ -4,7 +4,7 @@ ptBR["lti:navigation:lti"] = "LTI";
 ptBR["lti:navigation:show-tools"] = "Ver ferramentas";
 ptBR["lti:navigation:register-tool"] = "Registrar nova ferramenta";
 
-ptBR["lti:tool-not-found-by-id"] = ({ toolId }: { toolId: string }) => {
+ptBR["lti:tool-not-found-by-id"] = ({ toolId }) => {
   return `Não foi possível encontrar nenhuma ferramenta com ID ${toolId}`;
 };
 
@@ -189,3 +189,31 @@ ptBR["lti:post-launch:err-msg-must-be-string"] = "A mensagem de erro precisa ser
 ptBR["lti:post-launch:msg-must-be-string"] = "A mensagem de sucesso precisa ser um texto.";
 ptBR["lti:post-launch:err-log-must-be-string"] = "O log de erro precisa ser um texto.";
 ptBR["lti:post-launch:log-must-be-string"] = "O log de sucesso precisa ser um texto.";
+
+ptBR["lti:ags:create-assignment:resource-link-fieldset-title"] = "Configurar link de recurso LTI";
+ptBR["lti:ags:create-assignment:labels:select-tool"] = "Selecione uma ferramenta LTI";
+ptBR["lti:ags:create-assignment:labels:select-tool-placeholder"] = "~~ Escolha uma opção ~~";
+ptBR["lti:ags:create-assignment:labels:resource-url"] = "URL do recurso LTI";
+ptBR["lti:ags:create-assignment:title"] = "Criar uma nova atividade com ferramenta LTI";
+ptBR["lti:ags:create-assignments:buttons:create-local-assignment"] = "Criar atividade local";
+
+ptBR["lti:ags:create-assignment:errors:invalid-tool-id"] =
+  "A ferramenta escolhida não apresenta um identificador válido.";
+ptBR["lti:ags:create-assignment:errors:resource-url-must-be-url"] = "";
+ptBR["lti:ags:create-assignment:errors:custom-parameters-keys-must-be-string"] = "";
+ptBR["lti:ags:create-assignment:errors:custom-parameters-values-must-be-string"] = "";
+
+ptBR["lti:ags:create-assignments:resource-link-property-should-be-object"] =
+  "Você precisa configurar o resource link corretamente.";
+ptBR["lti:ags:create-assignments:assignment-property-should-be-object"] =
+  "Você deve configurar as informações básicas da atividade corretamente.";
+
+ptBR["lti:ags:tool-not-deployed"] =
+  "A ferramenta LTI selecionada ainda não foi implantada neste contexto.";
+
+ptBR["lti:ags:show-assignment:errors:external-assignment-not-found"] = ({ id }) =>
+  `Não foi encontrada nenhuma atividade externa com o ID "${id}".`;
+
+ptBR["lti:assignment-details:section:assignment"] = "Atividade";
+ptBR["lti:assignment-details:thead:id"] = "ID da atividade";
+ptBR["lti:assignment-details:thead:title"] = "Título";

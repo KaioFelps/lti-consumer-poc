@@ -1,10 +1,11 @@
 import type { HttpArgumentsHost } from "@nestjs/common/interfaces";
 import { ExceptionPresenter } from "@/external/presenters/exception-presenter";
 import { SimpleExceptionPresenter } from "@/external/presenters/exceptions/simple-exception.presenter";
-import { HttpRequest, HttpResponse } from "@/lib";
+import { HttpRequest, HttpResponse, RequestSession } from "@/lib";
 import { TranslatorService } from "@/message-string/translator.service";
 import { ExceptionFilterResponderFactory } from "../../exception-responders/factory";
 import { ExceptionFilterResponder } from "../../exception-responders/responder";
+import { flashRequestBody } from "..";
 import { BaseException } from "./exception";
 
 type Body = BaseException;
@@ -35,7 +36,7 @@ class MVCStrategy extends ExceptionFilterResponder<unknown, void> {
   public async respond(_status: number, ctx: HttpArgumentsHost, exception: Body): Promise<void> {
     const request = ctx.getRequest<HttpRequest>();
     const response = ctx.getResponse<HttpResponse>();
-    const session = request["session"] as Record<string, unknown>;
+    const session = request["session"] as RequestSession;
 
     const errorMessage = await this.t.translate(
       exception.error.errorMessageIdentifier,
@@ -43,12 +44,7 @@ class MVCStrategy extends ExceptionFilterResponder<unknown, void> {
     );
 
     session.error = errorMessage;
-    if (session.flash) session.flash["values"] = request.body;
-    else {
-      session.flash = {
-        values: request.body,
-      };
-    }
+    flashRequestBody(request, session);
 
     return response.redirectBack();
   }

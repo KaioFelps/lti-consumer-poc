@@ -51,5 +51,25 @@ export const Routes = {
       login: () => `/lti/launches/login`,
       return: () => `/lti/launches/post-launch`,
     },
+    ags: {
+      createExternalAssignmentForm: (courseId: string) =>
+        `/lti/ags/courses/${courseId}/assignments/new`,
+      createExternalAssignment: (courseId: string) =>
+        `/lti/ags/courses/${courseId}/assignments/new`,
+      showExternalAssignmentDetails: (assignmentId: string) =>
+        `/lti/ags/assignments/${assignmentId}`,
+    },
+  },
+  courses: {
+    list: () => `/courses`,
+    createForm: () => `/courses/new`,
+    create: () => `/courses/new`,
+    view: (courseId: string) => `/courses/${courseId}`,
+  },
+  assignments: {
+    createForm: (courseId: string) => `/courses/${courseId}/assignments/create`,
+    create: (courseId: string) => `/courses/${courseId}/assignments/create`,
+    view: (assignmentId: string) => `/assignments/${assignmentId}`,
+    createExternal: (courseId: string) => Routes.lti.ags.createExternalAssignmentForm(courseId),
   },
 } as const;

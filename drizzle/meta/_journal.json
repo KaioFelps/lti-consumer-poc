@@ -71,6 +71,41 @@
       "when": 1773289335807,
       "tag": "0009_make_lti_resource_link_resource_url_nullable",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1776811474317,
+      "tag": "0010_add_core_assignments_and_grading_models",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1778016457821,
+      "tag": "0011_add_lti_assignment_tables_and_change_context",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1778082718516,
+      "tag": "0012_rename_lti_context_id_column",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1778695301704,
+      "tag": "0013_add_kind_column_to_base_assignments_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1779171512984,
+      "tag": "0014_change_lti_assignments_pk",
+      "breakpoints": true
     }
   ]
 }

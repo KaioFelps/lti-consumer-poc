@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
-import { ErrorBase } from "@/core/errors/error-base";
+import type { ErrorBase, IErrorBase } from "@/core/errors/error-base";
 
 /**
  * This exception may decorate any core error that inherits
@@ -13,7 +13,7 @@ import { ErrorBase } from "@/core/errors/error-base";
  * may not fit in, and therefore must implement their own
  * presenters and filters.
  */
-export class BaseException<E extends ErrorBase = ErrorBase> extends HttpException {
+export class BaseException<E extends IErrorBase = ErrorBase> extends HttpException {
   public constructor(
     public error: E,
     status: HttpStatus,

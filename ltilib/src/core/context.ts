@@ -49,10 +49,12 @@ export interface IContext<CustomContextType = never> {
   type?: [ContextType, ...(CustomContextType | ContextType)[]];
   /**
    * A short and meaningful name for the context.
+   * @example "CSI1001"
    */
   label?: string;
   /**
    * The descriptive full name of this context.
+   * @example "Introduction to Computer Science"
    */
   title?: string;
 }

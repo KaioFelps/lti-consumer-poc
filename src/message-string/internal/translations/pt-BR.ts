@@ -11,6 +11,7 @@ export const ptBR: MessageStringTranslationMap = {
 
   "table-headings:actions": "Ações",
 
+  "buttons:create": "Criar",
   "buttons:cancel": "Cancelar",
   "buttons:confirm": "Confirmar",
   "buttons:add": "Adicionar",

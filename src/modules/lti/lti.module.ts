@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { forwardRef, MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import middlewares from "@/lib/middlewares";
 import { AuthModule } from "@/modules/auth/auth.module";
 import { IdentityModule } from "@/modules/identity/identity.module";
@@ -9,6 +9,11 @@ import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.r
 import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identities.repository";
 import { LtiLaunchServices } from "$/core/services/launch";
 import { LtiResourceLinkServices } from "$/core/services/resource-link.services";
+import { AssignmentsAndGradesModule } from "../assignments-and-grades/assignments-and-grades.module";
+import { CoursesModule } from "../courses-and-enrollments/courses.module";
+import { LtiAssignmentsController } from "./ags/controllers/lti-assignments.controller";
+import { CreateExternalLtiAssignmentService } from "./ags/services/create-external-lti-assignment.service";
+import { FindExternalLtiAssignmentByIdService } from "./ags/services/find-external-lti-assignment-by-id.service";
 import { LtiDeploymentsController } from "./deployments/deployments.controller";
 import { DeployToolService } from "./deployments/services/deploy-tool.service";
 import { FindDeploymentByIdService } from "./deployments/services/find-deployment-by-id.service";
@@ -28,7 +33,13 @@ import { GetToolRegistrationDetailsService } from "./tools/services/get-tool-reg
 import { LtiToolsController } from "./tools/tools.controller";
 
 @Module({
-  imports: [OIDCModule, AuthModule, IdentityModule],
+  imports: [
+    OIDCModule,
+    AuthModule,
+    IdentityModule,
+    AssignmentsAndGradesModule,
+    forwardRef(() => CoursesModule),
+  ],
   providers: [
     PlatformFactory,
     {
@@ -77,6 +88,8 @@ import { LtiToolsController } from "./tools/tools.controller";
     DeleteResourceLinkService,
     findResourceLinkByIdService,
     InitiateLaunchService,
+    CreateExternalLtiAssignmentService,
+    FindExternalLtiAssignmentByIdService,
   ],
   exports: [LtiLaunchServices, Platform],
   controllers: [
@@ -85,6 +98,7 @@ import { LtiToolsController } from "./tools/tools.controller";
     LtiDeploymentsController,
     LtiResourceLinksController,
     LtiLaunchesController,
+    LtiAssignmentsController,
   ],
 })
 export class LtiModule implements NestModule {
@@ -96,6 +110,7 @@ export class LtiModule implements NestModule {
         LtiDeploymentsController,
         LtiResourceLinksController,
         LtiLaunchesController,
+        LtiAssignmentsController,
       );
   }
 }

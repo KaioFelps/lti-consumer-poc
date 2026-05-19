@@ -11,7 +11,7 @@ type LtiToolsDeploymentsQueryConfig = DBQueryConfig<
   Schema["ltiToolDeployments"]
 >;
 
-type LtiToolDeploymentRow = BuildQueryResult<
+export type LtiToolDeploymentRow = BuildQueryResult<
   Schema,
   Schema["ltiToolDeployments"],
   typeof requiredQueryConfig

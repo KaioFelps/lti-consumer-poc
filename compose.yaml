@@ -38,7 +38,7 @@ services:
       - full
       - local
     volumes:
-      - platform_data:/var/lib/postgresql/data
+      - platform_data:/var/lib/postgresql
 
   moodle_db:
     container_name: lti_consumer_poc_moodle_mariadb
