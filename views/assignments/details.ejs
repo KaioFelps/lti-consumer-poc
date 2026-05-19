@@ -1,0 +1,81 @@
+<%
+const dateFormattingOptions = {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23'
+};
+%>
+
+<main class="main">
+    <h1><%= title %></h1>
+    <a href="<%= routes.courses.view(course.id) %>"><%= await t.translate("assignments:details:buttons:back-to-course", { courseTitle: course.title }) %></a>
+    <br>
+
+    <div id="alerts-container">
+        <% if (flash.successMessage) { %>
+            <div class="success-alert">
+                <span><%= flash.successMessage %></span>
+            </div>
+        <% } %>
+        <% if (flash.errorMessage) { %>
+            <div class="error-alert">
+                <span><%= flash.errorMessage %></span>
+            </div>
+        <% } %>
+    </div>
+
+    <br>
+    <section>
+        <h2><%= await t.translate("lti:assignment-details:section:assignment") %></h2>
+        <div class="vertical-table">
+            <div class="item">
+                <header><%= await t.translate("lti:assignment-details:thead:id") %></header>
+                <span><%= assignment.id %></span>
+            </div>
+            <div class="item">
+                <header><%= await t.translate("lti:assignment-details:thead:title") %></header>
+                <span><%= assignment.title %></span>
+            </div>
+            <div class="item">
+                <header><%= await t.translate("courses:details:assignments:max-score") %></header>
+                <span><%= assignment.maxScore %></span>
+            </div>
+            <% const releaseDateToShow = assignment.releasedAt ?? assignment.createdAt; %>
+            <div class="item">
+                <header><%= await t.translate("courses:details:assignments:released-at") %></header>
+                <span><%= releaseDateToShow.toLocaleString("pt-BR", dateFormattingOptions) %></span>
+            </div>
+            <% if (assignment.deadline) { %>
+                <div class="item">
+                    <header><%= await t.translate("courses:details:assignments:deadline") %></header>
+                    <span><%= assignment.deadline.toLocaleString("pt-BR", dateFormattingOptions) %></span>
+                </div>
+            <% } %>
+            <% if (!!assignment.releasedAt) { %>
+                <div class="item">
+                    <header><%= await t.translate("courses:details:assignments:created-at") %></header>
+                    <span><%= assignment.createdAt.toLocaleString("pt-BR", dateFormattingOptions) %></span>
+                </div>
+            <% } %>
+        </div>
+    </section>
+
+    <br>
+    <section>
+        <h2><%= await t.translate("assignments:details:sections:professor") %></h2>
+        <div class="vertical-table">
+            <div class="item">
+                <header><%= await t.translate("courses:details:author-name") %></header>
+                <span><%= course.instructor.name %></span>
+            </div>
+            <div class="item">
+                <header><%= await t.translate("courses:details:author-email") %></header>
+                <span><%= course.instructor.email %></span>
+            </div>
+        </div>
+    </section>
+</main>
