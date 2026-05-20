@@ -16,7 +16,7 @@ import { ListAssignmentsFromCourseService } from "./services/list-assignments-fr
     ListAssignmentsFromCourseService,
     FindAssignmentByIdService,
   ],
-  controllers: [AssignmentsInCoursesController],
+  controllers: [AssignmentsInCoursesController, AssignmentsController],
   exports: [ListAssignmentsFromCourseService, CreateAssignmentService],
 })
 export class AssignmentsAndGradesModule implements NestModule {
