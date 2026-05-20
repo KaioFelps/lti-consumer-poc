@@ -287,6 +287,36 @@ export const ltiAssignmentsT = pgTable("lti_assignments", {
     .notNull(),
 });
 
+export const ltiLineItemsT = pgTable(
+  "lti_line_items",
+  {
+    id: uuid().primaryKey(),
+    label: varchar().notNull(),
+    scoreMaximum: smallint("score_maximum").notNull(),
+    externalResourceId: uuid().references(() => externalLtiResourcesT.id),
+    concreteContextType: concreteContextTypeEnum("context_type"),
+    concreteContextId: uuid("context_id"),
+    tag: varchar(),
+    startDateTime: timestamp("start_date_time", { withTimezone: true }),
+    endDateTime: timestamp("end_date_time", { withTimezone: true }),
+    // we shall not add no default value nor make it nonnullable because this is data sent
+    // from the tool; we should only analyse this field to decide whether to display the
+    // grade or not
+    gradesReleased: boolean("grades_released"),
+    customParameters: jsonb("custom_parameters").$type<Record<string, string>>(),
+    // instead of containing an Id for the resource link, we gonna point to the LTI external assignment.
+    // the assignment already has the reference to the resource link, and this way we ensure
+    // that the lineitem refers to a resource link that is actually gradable
+    ltiAssignmentId: uuid().references(() => ltiAssignmentsT.assignmentId),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.concreteContextId, table.concreteContextType],
+      foreignColumns: [ltiContexts.concreteContextId, ltiContexts.concreteContextType],
+    }),
+  ],
+);
+
 // #endregion
 
 /***************************************
@@ -372,6 +402,8 @@ export const ltiResourceLinksRelations = relations(ltiResourceLinks, ({ one }) =
 
 export const ltiContextsRelations = relations(ltiContexts, ({ many }) => ({
   resourceLinks: many(ltiResourceLinks),
+  deployments: many(ltiToolDeployments),
+  lineItems: many(ltiLineItemsT),
 }));
 
 // #endregion
@@ -434,7 +466,7 @@ export const gradesRelations = relations(gradesT, ({ one }) => ({
 
 // #region LTI AGS
 
-export const ltiAssignmentsRelations = relations(ltiAssignmentsT, ({ one }) => ({
+export const ltiAssignmentsRelations = relations(ltiAssignmentsT, ({ one, many }) => ({
   assignmemnt: one(assignmentsT, {
     fields: [ltiAssignmentsT.assignmentId],
     references: [assignmentsT.id],
@@ -442,6 +474,22 @@ export const ltiAssignmentsRelations = relations(ltiAssignmentsT, ({ one }) => (
   resourceLink: one(ltiResourceLinks, {
     fields: [ltiAssignmentsT.resourceLinkId],
     references: [ltiResourceLinks.id],
+  }),
+  lineItems: many(ltiLineItemsT),
+}));
+
+export const ltiLineItemsRelations = relations(ltiLineItemsT, ({ one }) => ({
+  assignment: one(ltiAssignmentsT, {
+    fields: [ltiLineItemsT.ltiAssignmentId],
+    references: [ltiAssignmentsT.assignmentId],
+  }),
+  externalResource: one(externalLtiResourcesT, {
+    fields: [ltiLineItemsT.externalResourceId],
+    references: [externalLtiResourcesT.id],
+  }),
+  context: one(ltiContexts, {
+    fields: [ltiLineItemsT.concreteContextId, ltiLineItemsT.concreteContextType],
+    references: [ltiContexts.concreteContextId, ltiContexts.concreteContextType],
   }),
 }));
 
