@@ -15,10 +15,9 @@ import { loadMessageStrings } from "./message-string/loader";
 
 import "@/lib";
 
-export const DEFAULT_EJS_LAYOUT = "layouts/main";
-
 async function bootstrap() {
   expand(config());
+
   await loadMessageStrings();
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
