@@ -4,7 +4,7 @@ import FastGlob from "fast-glob";
 const isCompiled = __dirname.includes("dist");
 
 export async function loadMessageStrings() {
-  const projectRoot = path.resolve(__dirname, isCompiled ? ".." : ".");
+  const projectRoot = process.cwd();
 
   const pattern = isCompiled
     ? path.join(projectRoot, "**/strings/*.js")

@@ -1,5 +1,5 @@
 import { Controller, Get, Render } from "@nestjs/common";
-import { either } from "fp-ts";
+import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { SessionUser } from "@/modules/auth/session-user";
 import { User } from "@/modules/identity/user/user.entity";
@@ -34,16 +34,20 @@ export class AppController {
   @Render("home")
   public async home(@SessionUser() user: User) {
     const resourceLinks = await pipe(
-      await this.ltiLaunchServices.getLaunchLinks({
-        userRoles: mapRolesToLtiSystemRoles(user.getSystemRole()),
-      }),
-      either.foldW(
-        async (error: LtiRepositoryError<ResourceNotFoundError>) => ({
-          error: await this.t.translate(error.cause.errorMessageIdentifier),
+      () =>
+        this.ltiLaunchServices.getLaunchLinks({
+          userRoles: mapRolesToLtiSystemRoles(user.getSystemRole()),
         }),
-        async (value) => ({ data: value }),
+      te.foldW(
+        (error) => async () => {
+          const { cause } = error as LtiRepositoryError<ResourceNotFoundError>;
+          return {
+            error: await this.t.translate(cause.errorMessageIdentifier),
+          };
+        },
+        (value) => async () => ({ data: value }),
       ),
-    );
+    )();
 
     return {
       title: await this.t.translate("home-title"),

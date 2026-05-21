@@ -1,26 +1,21 @@
 import fs from "node:fs";
 import { join } from "node:path";
-import { NestFactory } from "@nestjs/core";
 import { NestExpressApplication } from "@nestjs/platform-express";
+import { Test, TestingModule } from "@nestjs/testing";
 import { RedisStore } from "connect-redis";
 import cookieParser from "cookie-parser";
-import { config } from "dotenv";
-import { expand } from "dotenv-expand";
 import { middleware as ejsLayoutsMiddleware } from "express-ejs-layouts";
 import session from "express-session";
-import { AppModule } from "./app.module";
-import { EnvironmentVars } from "./config/environment-vars";
-import { Redis } from "./external/data-store/redis/client";
-import { loadMessageStrings } from "./message-string/loader";
+import { AppModule } from "@/app.module";
+import { EnvironmentVars } from "@/config/environment-vars";
+import { Redis } from "@/external/data-store/redis/client";
 
-import "@/lib";
+export async function getTestingApp() {
+  const moduleFixture: TestingModule = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
 
-async function bootstrap() {
-  expand(config());
-
-  await loadMessageStrings();
-
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+  const app = moduleFixture.createNestApplication<NestExpressApplication>({
     httpsOptions: {
       key: fs.readFileSync(join(process.cwd(), "certs", "localhost-key.pem")),
       cert: fs.readFileSync(join(process.cwd(), "certs", "localhost.pem")),
@@ -47,8 +42,8 @@ async function bootstrap() {
     }),
   );
 
-  app.useStaticAssets(join(__dirname, "../..", "public"));
-  app.setBaseViewsDir(join(__dirname, "../..", "views"));
+  app.useStaticAssets(join(process.cwd(), "public"));
+  app.setBaseViewsDir(join(process.cwd(), "views"));
   app.setViewEngine("ejs");
   app.set("view options", {
     async: true,
@@ -56,7 +51,5 @@ async function bootstrap() {
 
   app.use(ejsLayoutsMiddleware);
 
-  await app.listen(process.env.PORT ?? 3000);
+  return app;
 }
-
-bootstrap();
