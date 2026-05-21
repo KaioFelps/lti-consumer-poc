@@ -9,9 +9,7 @@ export default strategyName;
 @Injectable()
 export class SessionStrategy extends PassportStrategy(Strategy, strategyName) {
   public async validate(request: HttpRequest) {
-    console.log("chamou o sessions");
     const session = request["session"] as RequestSession;
-    console.debug(session);
 
     if (!session?.auth) return false;
 
