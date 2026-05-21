@@ -104,6 +104,18 @@ export class OIDCProviderFactory {
             ctx.redirect("/auth/logout");
           },
         },
+        resourceIndicators: {
+          enabled: true,
+          getResourceServerInfo: (_ctx, _resourceIndicator, _client) => ({
+            scope: AvailableScopes.join(" "),
+            accessTokenFormat: "jwt",
+            audience: issuerUrl,
+            accessTokenTTL: 1 * 60 * 60, // 1 hora
+            jwt: {
+              sign: { alg: "RS256" },
+            },
+          }),
+        },
       },
       cookies: {
         names: {
@@ -128,6 +140,10 @@ export class OIDCProviderFactory {
     if (this.environments.nodeEnv === "development") {
       provider.on("server_error", (ctx, error) => {
         console.debug("server error", ctx.url, error);
+      });
+
+      provider.on("access_token.issued", (token) => {
+        console.log("access token issued", token);
       });
 
       provider.on("registration_create.error", (ctx, err) => {
