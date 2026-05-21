@@ -8,6 +8,7 @@ export class AuthJwkSet {
   protected constructor(
     public readonly keySetId: string,
     public readonly privateJwk: JWK,
+    public readonly publicPem: string,
   ) {}
 
   public static async create(envVars: EnvironmentVars) {
@@ -27,7 +28,11 @@ export class AuthJwkSet {
     jwk.use = "sig";
     jwk.alg = algorithm;
 
-    return new AuthJwkSet(kid, jwk);
+    const publicJwk = AuthJwkSet.extractPublicJwk(jwk, kid);
+    const publicKey = (await jose.importJWK(publicJwk, "RS256")) as CryptoKey;
+    const publicPem = await jose.exportSPKI(publicKey);
+
+    return new AuthJwkSet(kid, jwk, publicPem);
   }
 
   public toPrivateKeyset() {
@@ -36,18 +41,22 @@ export class AuthJwkSet {
     };
   }
 
-  public toPublicKeyset() {
+  public static extractPublicJwk(privateJwk: jose.JWK, keySetId: string) {
     const publicJwk = {
-      kty: this.privateJwk.kty,
-      n: this.privateJwk.n,
-      e: this.privateJwk.e,
-      alg: this.privateJwk.alg,
-      use: this.privateJwk.use,
-      kid: this.keySetId,
+      kty: privateJwk.kty,
+      n: privateJwk.n,
+      e: privateJwk.e,
+      alg: privateJwk.alg,
+      use: privateJwk.use,
+      kid: keySetId,
     } satisfies JWK;
 
+    return publicJwk;
+  }
+
+  public toPublicKeyset() {
     return {
-      keys: [publicJwk],
+      keys: [AuthJwkSet.extractPublicJwk(this.privateJwk, this.keySetId)],
     };
   }
 }
