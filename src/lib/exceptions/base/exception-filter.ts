@@ -2,6 +2,7 @@ import { ArgumentsHost, Catch, ExceptionFilter, Injectable, Scope } from "@nestj
 import { RenderableError } from "@/core/errors/renderable/renderable-error";
 import { SimpleExceptionPresenter } from "@/external/presenters/exceptions/simple-exception.presenter";
 import { HttpRequest } from "@/lib";
+import mvcRoutes from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { RenderableException } from "../renderable/exception";
 import { RenderableExceptionFilter } from "../renderable/exception-filter";
@@ -27,7 +28,8 @@ export class BaseExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<HttpRequest>();
     const status = exception.getStatus();
 
-    const shouldRender = request.method.toLowerCase() === "get";
+    const shouldRender =
+      request.method.toLowerCase() === "get" && request[mvcRoutes.requestKey] === true;
 
     if (!shouldRender) return responderFactory.create(request).respond(status, ctx, exception);
 

@@ -14,6 +14,7 @@ import type { DTO } from "@/core/interfaces/dto";
 import { DTOValidationException } from "@/lib/exceptions/dto-validation/exception";
 import { HttpRequest } from "..";
 import { RenderableDtoValidationException } from "../exceptions/renderable-dto-validation/exception";
+import mvcRoutes from "../mvc-routes";
 import coreValidation from ".";
 
 /**
@@ -57,7 +58,9 @@ export class CoreValidationPipe implements PipeTransform {
     const config = coreValidation.getConfigsFromRequest(this.request);
 
     const shouldRender =
-      !!config.renderErrorsWithView && this.request.method.toLowerCase() === "get";
+      this.request[mvcRoutes.requestKey] &&
+      !!config.renderErrorsWithView &&
+      this.request.method.toLowerCase() === "get";
 
     if (shouldRender) {
       const view = config.renderErrorsWithView!;

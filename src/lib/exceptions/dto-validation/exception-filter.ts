@@ -1,4 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter, Injectable, Scope } from "@nestjs/common";
+import mvcRoutes from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { HttpRequest } from "../..";
 import { RenderableDtoValidationException } from "../renderable-dto-validation/exception";
@@ -30,7 +31,7 @@ export class DTOValidationExceptionFilter implements ExceptionFilter {
       this.translator,
     );
 
-    const shouldRender = request.method.toLowerCase() === "get";
+    const shouldRender = request.method.toLowerCase() === "get" && request[mvcRoutes.requestKey];
 
     if (!shouldRender) return this.responderFactory.create(request).respond(status, ctx, errors);
 
