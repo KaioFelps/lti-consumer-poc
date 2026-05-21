@@ -1,11 +1,6 @@
 import { either } from "fp-ts";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { Context } from "$/core/context";
 import { ContextConcreteType } from "../../ags/enums/context-concrete-type";
-
-export interface LtiContextAdapter {
-  getContext(): Context;
-}
 
 export function mountContextId(concreteEntityId: string, concreteType: ContextConcreteType) {
   return `${concreteType}:${concreteEntityId}`;
