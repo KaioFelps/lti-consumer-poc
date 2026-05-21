@@ -25,8 +25,7 @@ type RawLineItemsPayload = {
   scoreMaximum: number;
   tag?: string;
   gradesReleased?: boolean;
-  customParameters?: ILtiLineItem["customParameters"];
-};
+} & Pick<ILtiLineItem, "customParameters">; // this inherits the docstrings, which is valuable!!
 
 export type CreateLineItemServiceParams = {
   /**

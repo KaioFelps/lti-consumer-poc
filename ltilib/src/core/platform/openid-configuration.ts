@@ -13,7 +13,8 @@ export interface IOpenIdConfiguration {
    */
   issuer: string;
   /**
-   * URL of the OAuth 2.0 Authorization Endpoint.
+   * URL of the OAuth 2.0 Authorization Endpoint. This is used during by the tool to
+   * obtain an ID token during launch.
    */
   authorizationEndpoint: URL;
   /**
@@ -26,7 +27,7 @@ export interface IOpenIdConfiguration {
   jwksEndpoint: URL;
   token: {
     /**
-     * URL of the endpoint for the tool to request a token to access LTI services.
+     * URL of the endpoint for the tool to request a Json Web Token to access LTI services.
      */
     endpoint: URL;
     /**
@@ -121,27 +122,28 @@ export interface IOpenIdConfiguration {
  * [LTI Dynamic Linking]: https://www.imsglobal.org/spec/lti-dr/v1p0
  */
 export class OpenIdConfiguration implements IOpenIdConfiguration {
-  public readonly issuer: string;
-  private constructor(metadata: ClassProperties<OpenIdConfiguration>) {
-    Object.assign(this, metadata);
-  }
-  public readonly authorizationEndpoint: URL;
-  public readonly registrationEndpoint: URL;
-  public readonly jwksEndpoint: URL;
-  public readonly token: IOpenIdConfiguration["token"];
+  public readonly issuer!: string;
+  public readonly authorizationEndpoint!: URL;
+  public readonly registrationEndpoint!: URL;
+  public readonly jwksEndpoint!: URL;
+  public readonly token!: IOpenIdConfiguration["token"];
   public readonly extraScopesSupported?: string[] | undefined;
   public readonly extraResponseTypesSupported?: string[] | undefined;
   public readonly extraIdTokenSigningAlgValuesSupported?: string[] | undefined;
-  public readonly claimsSupported: string[];
+  public readonly claimsSupported!: string[];
   public readonly supportPairwiseSubjectType?: boolean | undefined;
   public readonly authorizationServer?: URL | undefined;
-  public readonly productFamilyCode: string;
-  public readonly version: string;
-  public readonly messagesSupported: {
+  public readonly productFamilyCode!: string;
+  public readonly version!: string;
+  public readonly messagesSupported!: {
     type: MessageType;
     placements?: (MessagePlacement.ContentArea | MessagePlacement.RichTextEditor)[];
   }[];
   public readonly variables?: string[] | undefined;
+
+  private constructor(metadata: ClassProperties<OpenIdConfiguration>) {
+    Object.assign(this, metadata);
+  }
 
   public static create(metadata: ClassProperties<OpenIdConfiguration>) {
     return new OpenIdConfiguration(metadata);
