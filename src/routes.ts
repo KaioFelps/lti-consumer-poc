@@ -58,6 +58,12 @@ export const Routes = {
         `/lti/ags/courses/${courseId}/assignments/new`,
       showExternalAssignmentDetails: (assignmentId: string) =>
         `/lti/ags/assignments/${assignmentId}`,
+
+      lineitems: {
+        container: (contextComposedId: string) => `/lti/ags/${contextComposedId}/lineitems`,
+        instance: (contextComposedId: string, lineItemId: string) =>
+          `/lti/ags/${contextComposedId}/lineitems/${lineItemId}`,
+      },
     },
   },
   courses: {
