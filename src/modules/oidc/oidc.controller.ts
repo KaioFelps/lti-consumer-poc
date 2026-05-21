@@ -11,7 +11,7 @@ import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { LoginDTO } from "@/modules/auth/dtos/login.dto";
-import { Public } from "@/modules/auth/public-routes";
+import { Public } from "@/modules/auth/protected-routes";
 import { AuthenticateUserService } from "@/modules/auth/services/authenticate-user.service";
 import { Routes } from "@/routes";
 import { AvailableACRs } from "./consts";

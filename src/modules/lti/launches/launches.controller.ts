@@ -8,7 +8,7 @@ import { HttpResponse } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
-import { Public } from "@/modules/auth/public-routes";
+import { Public } from "@/modules/auth/protected-routes";
 import { SessionUser } from "@/modules/auth/session-user";
 import type { User } from "@/modules/identity/user/user.entity";
 import { Routes } from "@/routes";

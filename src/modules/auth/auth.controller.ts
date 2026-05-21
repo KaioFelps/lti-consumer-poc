@@ -27,7 +27,7 @@ import { LoginViewManager } from "@/modules/oidc/view-manager/login";
 import { Routes } from "@/routes";
 import { LoginDTO } from "./dtos/login.dto";
 import { RegisterPersonDTO } from "./dtos/register-person.dto";
-import { Public } from "./public-routes";
+import { Public } from "./protected-routes";
 import { AuthenticateUserService } from "./services/authenticate-user.service";
 import sessionUser, { SessionUser } from "./session-user";
 
@@ -35,16 +35,16 @@ import sessionUser, { SessionUser } from "./session-user";
 @Controller("auth")
 export class AuthController {
   @Inject()
-  private authenticateUserServer: AuthenticateUserService;
+  private authenticateUserServer!: AuthenticateUserService;
 
   @Inject()
-  private registerNewPersonService: RegisterNewPersonService;
+  private registerNewPersonService!: RegisterNewPersonService;
 
   @Inject()
-  private t: TranslatorService;
+  private t!: TranslatorService;
 
   @Inject()
-  private env: EnvironmentVars;
+  private env!: EnvironmentVars;
 
   @Public()
   @Get("login")
