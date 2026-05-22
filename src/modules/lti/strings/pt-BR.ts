@@ -217,3 +217,26 @@ ptBR["lti:ags:show-assignment:errors:external-assignment-not-found"] = ({ id }) 
 ptBR["lti:assignment-details:section:assignment"] = "Atividade";
 ptBR["lti:assignment-details:thead:id"] = "ID da atividade";
 ptBR["lti:assignment-details:thead:title"] = "Título";
+
+ptBR["lti:advantage:contexts:errors:not-found"] = (args) => {
+  const { contextId, contextType } = args as { contextId: string; contextType: string | string[] };
+
+  if (Array.isArray(contextType)) {
+    if (contextType.length === 0) {
+      return (
+        `O contexto de ID "${contextId}" não tem nenhum tipo reconhecível, ` +
+        "e portanto não pôde ser encontrado."
+      );
+    }
+
+    return (
+      `O contexto de ID "${contextId}" tem o(s) tipo(s): ${contextType.join(", ")}. ` +
+      "Contudo, nenhum foi o suficiente para que pudesse ser encontrado."
+    );
+  }
+
+  return (
+    `O contexto de ID "${contextId}" tem o tipo ${contextId}, mas esse tipo ` +
+    "não é reconhecível. Portanto, não foi possível encontrar este contexto."
+  );
+};
