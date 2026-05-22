@@ -4,7 +4,7 @@ import { pipe } from "fp-ts/lib/function";
 import { Rest } from "@/lib/mvc-routes";
 import { AuthStrategy, ConfigAuthGuard } from "@/modules/auth/protected-routes";
 import { CurrentTool } from "@/modules/auth/protected-routes/decorators/current-tool";
-import { LtiToolJwtPayload } from "@/modules/auth/protected-routes/lti-tool-jwt-payload";
+import { type LtiToolJwtPayload } from "@/modules/auth/protected-routes/lti-tool-jwt-payload";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
 import { FindContextByIdService } from "../../advantage/context/services/find-context-by-id.service";
 import { FindToolByIdService } from "../../tools/services/find-tool-by-id.service";
