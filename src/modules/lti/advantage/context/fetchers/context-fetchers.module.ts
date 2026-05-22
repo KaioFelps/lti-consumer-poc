@@ -1,16 +1,16 @@
 import { Module } from "@nestjs/common";
-import { ContextFetcher } from ".";
+import { CONTEXT_FETCHERS, ContextFetcher } from ".";
 import { CourseContextFetcher } from "./course-context-fetcher";
 
 @Module({
   providers: [
     CourseContextFetcher,
     {
-      provide: ContextFetcher,
+      provide: CONTEXT_FETCHERS,
       useFactory: (...fetchers: ContextFetcher[]) => fetchers,
       inject: [CourseContextFetcher],
     },
   ],
-  exports: [ContextFetcher],
+  exports: [CONTEXT_FETCHERS],
 })
 export class ContextFetchersModule {}

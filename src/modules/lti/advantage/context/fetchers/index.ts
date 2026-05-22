@@ -5,6 +5,8 @@ import { Context } from "$/core/context";
 import { ContextNotFoundError } from "../../errors/context-not-found.error";
 import { LtiContextAdapter } from "../adapters";
 
+export const CONTEXT_FETCHERS = Symbol("context_fetchers");
+
 /**
  * A `ContextFetcher` is a resolver that is responsible for fetching and extracting
  * a context from some instance of the concrete `type` it's specialized in.

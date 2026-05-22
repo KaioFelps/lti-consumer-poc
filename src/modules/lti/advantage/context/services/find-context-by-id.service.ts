@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { option, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { ContextNotFoundError } from "../../errors/context-not-found.error";
 import { unmountContextId } from "..";
-import { ContextFetcher } from "../fetchers";
+import { CONTEXT_FETCHERS, ContextFetcher } from "../fetchers";
 
 type Params = {
   contextComposedId: string;
@@ -11,7 +11,9 @@ type Params = {
 
 @Injectable()
 export class FindContextByIdService {
-  public constructor(private readonly contextFetchers: ContextFetcher[]) {}
+  public constructor(
+    @Inject(CONTEXT_FETCHERS) private readonly contextFetchers: ContextFetcher[],
+  ) {}
 
   public exec({ contextComposedId }: Params) {
     return pipe(
