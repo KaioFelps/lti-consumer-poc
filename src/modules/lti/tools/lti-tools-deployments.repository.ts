@@ -2,10 +2,11 @@ import { UUID } from "common/src/types/uuid";
 import { Either } from "fp-ts/lib/Either";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
+import { LtiToolDeploymentsRepository as LtilibLtiToolsDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
 import { ContextConcreteType } from "../ags/enums/context-concrete-type";
 import { LtiToolDeployment } from "./entities/lti-tool-deployment.entity";
 
-export abstract class LtiToolsDeploymentsRepository {
+export abstract class LtiToolsDeploymentsRepository extends LtilibLtiToolsDeploymentsRepository {
   public abstract save(deployment: LtiToolDeployment): Promise<Either<IrrecoverableError, void>>;
 
   public abstract findManyByToolId(

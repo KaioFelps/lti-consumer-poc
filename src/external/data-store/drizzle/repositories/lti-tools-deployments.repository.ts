@@ -2,15 +2,21 @@ import { Inject, Injectable } from "@nestjs/common";
 import { UUID } from "common/src/types/uuid";
 import { ltiToolDeployments } from "drizzle/schema";
 import { eq, sql } from "drizzle-orm";
-import { taskEither as te } from "fp-ts";
+import { either, taskEither as te } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
+import { unmountContextId } from "@/modules/lti/advantage/context";
+import { ContextNotFoundError } from "@/modules/lti/advantage/errors/context-not-found.error";
 import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type";
 import { LtiToolDeployment } from "@/modules/lti/tools/entities/lti-tool-deployment.entity";
 import { DeploymentNotFoundError } from "@/modules/lti/tools/errors/deployment-not-found.error";
 import { LtiToolsDeploymentsRepository } from "@/modules/lti/tools/lti-tools-deployments.repository";
+import { Context } from "$/core/context";
+import { LtiRepositoryError } from "$/core/errors/repository.error";
+import { LtiTool } from "$/core/tool";
+import { LtiToolDeployment as LtilibToolDeployment } from "$/core/tool-deployment";
 import { DrizzleClient } from "../client";
 import mapper, { type LtiToolDeploymentRow } from "../mappers/lti-tools-deployments.mapper";
 import { DrizzleTransactionManager } from "../transaction-manager";
@@ -173,6 +179,56 @@ export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRep
                 error as Error,
               ),
       ),
+    )();
+  }
+
+  public findDeploymentInContextTreeOrGlobal(
+    toolId: LtiTool["id"],
+    context: Context<ContextConcreteType>,
+  ) {
+    return pipe(
+      unmountContextId(context.id),
+      either.chainW(({ concreteEntityId, concreteType }) => {
+        const isCourse = context.type?.includes(ContextConcreteType.Course) ?? false;
+
+        if (isCourse) either.right({ concreteEntityId, concreteType });
+
+        const contextNotFoundError = new ContextNotFoundError(concreteEntityId, context.type ?? []);
+        const error = new LtiRepositoryError({
+          type: "NotFound",
+          cause: contextNotFoundError,
+          subject: Context.name,
+        });
+        return either.left(error);
+      }),
+      te.fromEither,
+      te.chainW(
+        ({ concreteEntityId, concreteType }) =>
+          () =>
+            this.findMostAppropriateDeploymentForTool(
+              toolId.toString(),
+              concreteEntityId,
+              concreteType,
+            ),
+      ),
+      te.map((deployment) =>
+        LtilibToolDeployment.create({
+          id: deployment.getId().toString(),
+          toolId: deployment.getToolId().toString(),
+          contextId: context.id,
+        }),
+      ),
+      te.mapLeft((error) => {
+        if (error instanceof ResourceNotFoundError) {
+          return new LtiRepositoryError({
+            type: "NotFound",
+            cause: error,
+            subject: LtiToolDeployment.name,
+          });
+        }
+
+        return new LtiRepositoryError({ type: "ExternalError", cause: error });
+      }),
     )();
   }
 }
