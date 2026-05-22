@@ -3,6 +3,9 @@ import middlewares from "@/lib/middlewares";
 import { AuthModule } from "@/modules/auth/auth.module";
 import { IdentityModule } from "@/modules/identity/identity.module";
 import { OIDCModule } from "@/modules/oidc/oidc.module";
+import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
+import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
+import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
 import { Platform } from "$/core/platform";
 import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
@@ -30,6 +33,7 @@ import { CreateResourceLinkService } from "./resource-links/services/create-reso
 import { DeleteResourceLinkService } from "./resource-links/services/delete-resource-link.service";
 import { findResourceLinkByIdService } from "./resource-links/services/find-resource-link-by-id.service";
 import { LtiToolsRepository } from "./tools/lti-tools.repository";
+import { LtiToolsDeploymentsRepository } from "./tools/lti-tools-deployments.repository";
 import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-previews.service";
 import { FindToolByIdService } from "./tools/services/find-tool-by-id.service";
 import { GetToolRegistrationDetailsService } from "./tools/services/get-tool-registration-details.service";
@@ -95,6 +99,23 @@ import { LtiToolsController } from "./tools/tools.controller";
     CreateExternalLtiAssignmentService,
     FindExternalLtiAssignmentByIdService,
     FindContextByIdService,
+    {
+      provide: LtiLineItemServices,
+      useFactory: (
+        platform: Platform,
+        resourceLinksRepo: LtiResourceLinksRepository,
+        externalResourcesRepo: ExternalLtiResourcesRepository,
+        lineItemsRepo: LtiLineItemsRepository,
+        deploymentsRepo: LtiToolsDeploymentsRepository,
+      ) =>
+        new LtiLineItemServices(
+          platform,
+          resourceLinksRepo,
+          externalResourcesRepo,
+          lineItemsRepo,
+          deploymentsRepo,
+        ),
+    },
   ],
   exports: [LtiLaunchServices, Platform],
   controllers: [
