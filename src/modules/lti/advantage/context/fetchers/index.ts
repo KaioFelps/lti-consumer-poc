@@ -28,5 +28,5 @@ export abstract class ContextFetcher {
    */
   public abstract findById(
     id: string,
-  ): Promise<Either<IrrecoverableError | ContextNotFoundError, Context>>;
+  ): Promise<Either<IrrecoverableError | ContextNotFoundError, Context<ContextConcreteType>>>;
 }

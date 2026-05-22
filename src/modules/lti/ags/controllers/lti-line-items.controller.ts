@@ -9,12 +9,13 @@ import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
 import { FindContextByIdService } from "../../advantage/context/services/find-context-by-id.service";
 import { FindToolByIdService } from "../../tools/services/find-tool-by-id.service";
 import { CreateLineItemDTO } from "../dtos/create-line-item.dto";
+import { ContextConcreteType } from "../enums/context-concrete-type";
 
 @Rest()
 @Controller("/lti/ags/:contextId/lineitems")
 export class LtiLineItemsController {
   public constructor(
-    private readonly lineItemsServices: LtiLineItemServices,
+    private readonly lineItemsServices: LtiLineItemServices<ContextConcreteType>,
     private readonly findContextByIdService: FindContextByIdService,
     private readonly findToolByIdService: FindToolByIdService,
   ) {}
