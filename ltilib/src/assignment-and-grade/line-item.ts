@@ -13,7 +13,7 @@ import { InvalidLineItemArgumentError } from "./errors/invalid-line-item-argumen
 
 type CustomParameters = Record<string, JsonValue>;
 
-export interface ILtiLineItem {
+export interface ILtiLineItem<CustomContextType = never> {
   /**
    * The _real_ ID of the line item within the platform. Note that this *is not* the
    * line item ID described by the [LTI AGS specification].
@@ -54,7 +54,7 @@ export interface ILtiLineItem {
   /**
    * The LTI {@link Context `Context`} to which this line item belongs.
    */
-  context: Context;
+  context: Context<CustomContextType>;
   /**
    * A tag the LTI tool may set to this line item.
    *
@@ -101,7 +101,7 @@ export interface ILtiLineItem {
  *
  * @see {@link https://www.imsglobal.org/spec/lti-ags/v2p0 LTI AGS specification}
  */
-export class LtiLineItem implements ILtiLineItem {
+export class LtiLineItem<CustomContextType = unknown> implements ILtiLineItem<CustomContextType> {
   public startDateTime?: Date | undefined;
   public endDateTime?: Date | undefined;
   protected _customParameters: CustomParameters = {};
@@ -110,7 +110,7 @@ export class LtiLineItem implements ILtiLineItem {
     public readonly id: number | UUID | string,
     public label: string,
     public scoreMaximum: number,
-    public readonly context: Context,
+    public readonly context: Context<CustomContextType>,
     private _resourceLink?: LtiResourceLink | undefined,
     public readonly externalResource?: ExternalLtiResource | undefined,
     public readonly tag?: string,
@@ -122,11 +122,14 @@ export class LtiLineItem implements ILtiLineItem {
     if (endDateTime) this.endDateTime = new Date(endDateTime);
   }
 
-  public static create({
+  public static create<CustomContextType = never>({
     id = generateUUID(),
     customParameters = {},
     ...args
-  }: Optional<ILtiLineItem, "id">): Either<InvalidLineItemArgumentError, LtiLineItem> {
+  }: Optional<ILtiLineItem<CustomContextType>, "id">): Either<
+    InvalidLineItemArgumentError,
+    LtiLineItem<CustomContextType>
+  > {
     if (args.scoreMaximum === null || args.scoreMaximum === undefined) {
       return e.left(new InvalidLineItemArgumentError("scoreMaximum", "required"));
     }
@@ -187,7 +190,7 @@ export class LtiLineItem implements ILtiLineItem {
     return toolOwnsByResourceLink && toolOwnsByResource;
   }
 
-  public belongsToContext(context: Context) {
+  public belongsToContext(context: Context<CustomContextType>) {
     return this.context.id === context.id;
   }
 

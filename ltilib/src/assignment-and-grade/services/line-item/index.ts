@@ -18,9 +18,9 @@ import {
 } from "./fetch-line-items-from-container.service";
 import { FindLineItemParams, FindService } from "./find-line-item.service";
 
-type BasicRequestValidationParams = {
+type BasicRequestValidationParams<CustomContextType = never> = {
   tool: LtiTool;
-  context: Context | undefined;
+  context: Context<CustomContextType> | undefined;
   acceptHeader: string | undefined;
   contentTypeHeader: string | undefined;
 };
@@ -32,8 +32,8 @@ export interface ILineItemService<Params = unknown, ReturnType = unknown, Errors
   getRequiredContentType(): Readonly<LtiAdvantageMediaType> | undefined;
 }
 
-export class LtiLineItemServices {
-  private readonly createService: CreateService;
+export class LtiLineItemServices<CustomContextType extends string = never> {
+  private readonly createService: CreateService<CustomContextType>;
   private readonly findService: FindService;
   private readonly containerService: FetchFromContainerService;
 
@@ -54,7 +54,10 @@ export class LtiLineItemServices {
     );
   }
 
-  public async create(params: CreateLineItemServiceParams & BasicRequestValidationParams) {
+  public async create(
+    params: CreateLineItemServiceParams<CustomContextType> &
+      BasicRequestValidationParams<CustomContextType>,
+  ) {
     return await this.executeService(this.createService, params);
   }
 
@@ -75,7 +78,7 @@ export class LtiLineItemServices {
     ErrorType = S extends ILineItemService<unknown, unknown, infer TErrors> ? TErrors : never,
   >(
     service: ILineItemService<Params, ReturnType, ErrorType>,
-    params: Params & BasicRequestValidationParams,
+    params: Params & BasicRequestValidationParams<CustomContextType>,
   ) {
     return await pipe(
       this.checkScopes(params.tool, service),

@@ -52,7 +52,7 @@ export abstract class LtiToolDeploymentsRepository<CustomContextType extends str
    *
    *  public async findDeploymentInContextTreeOrGlobal(toolId: LtiTool["id"], context: Context<CustomContextType>) {
    *    try {
-   *      let whereClause;
+   *      let where;
    *
    *      if (context.type === "Section") {
    *        const [sectionId, courseId] = context.id.split("-");
