@@ -8,7 +8,8 @@ import { environmentVariablesSchema } from "./environment-vars/schema";
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      validate: environmentVariablesSchema.parse,
+      validate: (vars) => environmentVariablesSchema.parse(vars),
+      ignoreEnvFile: true, // we're already injecting environment variables in `main.ts`
     }),
   ],
   exports: [EnvironmentVars],

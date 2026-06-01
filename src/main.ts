@@ -16,7 +16,7 @@ import { loadMessageStrings } from "./message-string/loader";
 import "@/lib";
 
 async function bootstrap() {
-  expand(config());
+  expand(config({ override: false }));
 
   await loadMessageStrings();
 

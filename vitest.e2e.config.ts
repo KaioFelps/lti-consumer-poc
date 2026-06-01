@@ -4,7 +4,7 @@ import swc from "unplugin-swc";
 import tsConfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
-expand(configDotenv());
+expand(configDotenv({ override: false }));
 
 export default defineConfig({
   test: {
