@@ -42,8 +42,9 @@ export function createToolUris(
         termsOfServiceUrl ||
         redirectUrls?.[0],
       o.fromNullable,
+      o.map(String.toString),
       o.getOrElse(() => faker.internet.url({ protocol: "https" })),
-      (url) => new URL(url),
+      (url: string | URL) => new URL(url),
     );
     firstGivenUrl.protocol = "https";
     return firstGivenUrl;
@@ -85,10 +86,9 @@ export const DEFAULT_MOCK_CLAIMS = [
 ] as const;
 
 type LtiToolConstructorArgs = Partial<
-  Omit<
-    ILtiTool,
-    "applicationType" | "tokenEndpointAuthMethod" | "grantTypes" | "responseTypes" | "scope"
-  > & { scopes: string[] }
+  Omit<ILtiTool, "applicationType" | "tokenEndpointAuthMethod" | "responseTypes" | "scope"> & {
+    scopes: string[];
+  }
 >;
 
 /**
@@ -107,6 +107,7 @@ export function createTool({
   messages = [],
   name = faker.company.name(),
   scopes = [],
+  grantTypes = ["client_credentials", "implicit"],
   ...uris
 }: Partial<LtiToolConstructorArgs> = {}) {
   const platformFakeUrl = new URL(faker.internet.url({ protocol: "https", appendSlash: false }));
@@ -116,7 +117,7 @@ export function createTool({
   return pipe(
     LtiTool.create({
       applicationType: "web",
-      grantTypes: ["client_credentials", "implicit"],
+      grantTypes,
       id,
       name,
       scopes: Array.from(new Set([...scopes, "openid"])),
