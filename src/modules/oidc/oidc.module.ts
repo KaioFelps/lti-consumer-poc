@@ -1,50 +1,25 @@
-import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { forwardRef, MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import Provider from "oidc-provider";
-import { EnvironmentVars } from "@/config/environment-vars";
 import middlewares from "@/lib/middlewares";
 import { AuthModule } from "@/modules/auth/auth.module";
-import { AuthJwkSet } from "@/modules/auth/encryption/jwks-set";
-import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository";
-import { OIDCAdapterFactory } from "@/modules/oidc/adapter/factory";
 import { OIDCAdapterModule } from "./adapter/adapter.module";
 import { OIDCController } from "./oidc.controller";
 import { OIDCProviderFactory } from "./provider.factory";
-import { OIDCAccountsRepository } from "./repositories/accounts.repository";
-import { OIDCClientsRepository } from "./repositories/clients.repository";
+import { UnsafeOIDCClientsInjectionContainer } from "./unsafe-clients-injection-container";
 
 @Module({
-  imports: [AuthModule, OIDCAdapterModule],
+  imports: [AuthModule, forwardRef(() => OIDCAdapterModule)],
   controllers: [OIDCController],
   providers: [
+    UnsafeOIDCClientsInjectionContainer,
+    OIDCProviderFactory,
     {
       provide: Provider,
-      useFactory: (
-        envVars: EnvironmentVars,
-        clientsRepository: OIDCClientsRepository,
-        ltiToolsRepository: LtiToolsRepository,
-        oidcAccountsRepository: OIDCAccountsRepository,
-        oidcAdapterFactory: OIDCAdapterFactory,
-        jwks: AuthJwkSet,
-      ) =>
-        new OIDCProviderFactory(
-          envVars,
-          clientsRepository,
-          ltiToolsRepository,
-          oidcAccountsRepository,
-          oidcAdapterFactory,
-          jwks,
-        ).create(),
-      inject: [
-        EnvironmentVars,
-        OIDCClientsRepository,
-        LtiToolsRepository,
-        OIDCAccountsRepository,
-        OIDCAdapterFactory,
-        AuthJwkSet,
-      ],
+      useFactory: (factory: OIDCProviderFactory) => factory.create(),
+      inject: [OIDCProviderFactory],
     },
   ],
-  exports: [Provider],
+  exports: [Provider, UnsafeOIDCClientsInjectionContainer],
 })
 export class OIDCModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

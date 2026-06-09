@@ -6,6 +6,7 @@
 import { either, option, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { Adapter, AdapterPayload, errors } from "oidc-provider";
+import { EnvironmentVars } from "@/config/environment-vars";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ValidationErrors } from "@/core/validation/validation-errors";
 import { OIDCServerErrorException } from "@/lib/exceptions/oidc/exception";
@@ -15,12 +16,15 @@ import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository";
 import { ModelName } from "@/modules/oidc/adapter/factory";
 import { OIDCClient } from "@/modules/oidc/client";
 import { OIDCClientsRepository } from "@/modules/oidc/repositories/clients.repository";
+import { UnsafeOIDCClientsInjectionContainer } from "@/modules/oidc/unsafe-clients-injection-container";
 
 export class DrizzleOIDCClientAdapter implements Adapter {
   public constructor(
     name: ModelName,
     private readonly clientRepository: OIDCClientsRepository,
     private readonly toolsRepository: LtiToolsRepository,
+    private readonly environmenVars: EnvironmentVars,
+    private readonly container: UnsafeOIDCClientsInjectionContainer,
   ) {
     if (name !== "Client") {
       throw new IrrecoverableError(
@@ -53,6 +57,14 @@ export class DrizzleOIDCClientAdapter implements Adapter {
   }
 
   public async find(id: string): Promise<AdapterPayload | undefined> {
+    // only when in tests environment, we'll check a shitty unsafe cache to allow
+    // mocked unregistered oidc clients
+    // this is needed for testing purposes only
+    if (this.environmenVars.nodeEnv === "test") {
+      const clientMetadata = this.container.__findClientMetadataFromUnsafeCache(id);
+      if (clientMetadata) return clientMetadata;
+    }
+
     if (id.startsWith(LtiToolIdPrefix)) {
       return await pipe(
         () => this.toolsRepository.findToolById(id),
