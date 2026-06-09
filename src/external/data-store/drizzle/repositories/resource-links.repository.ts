@@ -65,7 +65,7 @@ export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepositor
     )();
   }
 
-  public async create(resourceLink: LtiResourceLink): Promise<Either<IrrecoverableError, void>> {
+  public async create(resourceLink: LtiResourceLink) {
     const client = this.txManager.getTx() ?? this.drizzle.getClient();
 
     return await pipe(
