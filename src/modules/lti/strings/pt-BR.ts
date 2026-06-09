@@ -240,3 +240,23 @@ ptBR["lti:advantage:contexts:errors:not-found"] = (args) => {
     "não é reconhecível. Portanto, não foi possível encontrar este contexto."
   );
 };
+
+ptBR["lti:advantage:contexts:errors:invalid-composed-context-id"] =
+  "O ID de contexto fornecido é inválido.";
+
+ptBR["lti:ags:create-line-item:errors:score-maximum-must-be-positive"] =
+  "A pontuação máxima precisa ser um número positivo (maior que zero).";
+ptBR["lti:ags:create-line-item:errors:score-maximum-must-be-number"] =
+  "A pontuação máxima precisa ser um valor numérico.";
+ptBR["lti:ags:create-line-item:errors:label-is-required"] = 'A etiqueta ("label") é obrigatória.';
+ptBR["lti:ags:create-line-item:errors:tag-must-be-string"] = "A tag precisa ser um texto.";
+ptBR["lti:ags:create-line-item:errors:start-date-time-must-be-date"] =
+  "A data de abertura precisa ser uma data válida.";
+ptBR["lti:ags:create-line-item:errors:end-date-time-must-be-date"] =
+  "A data de encerramento precisa ser uma data válida.";
+ptBR["lti:ags:create-line-item:errors:resource-id-must-be-string"] =
+  "O ID do recurso precisa ser um texto.";
+ptBR["lti:ags:create-line-item:errors:resource-link-id-must-be-string"] =
+  "O ID do link de recurso precisa ser um texto.";
+ptBR["lti:ags:create-line-item:errors:body-should-be-object"] =
+  "O corpo da requisição é inválido. (Deveria ser um objeto JSON.)";
