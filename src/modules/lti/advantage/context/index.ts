@@ -1,6 +1,6 @@
 import { either } from "fp-ts";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ContextConcreteType } from "../../ags/enums/context-concrete-type";
+import { InvalidComposedContextIdError } from "../errors/invalid-composed-context-id.error";
 
 export function mountContextId(concreteEntityId: string, concreteType: ContextConcreteType) {
   return `${concreteType}:${concreteEntityId}`;
@@ -10,12 +10,7 @@ export function unmountContextId(composedId: string) {
   const partials = composedId.split(":");
 
   if (partials.length !== 2) {
-    const error = new IrrecoverableError(
-      "Found malformed context id. Expected format is <concreteType>:<concreteEntityId>, " +
-        `but found id '${composedId}'.`,
-    );
-
-    return either.left(error);
+    return either.left(new InvalidComposedContextIdError("malformed"));
   }
 
   const [type, id] = partials;
@@ -25,13 +20,7 @@ export function unmountContextId(composedId: string) {
   );
 
   if (!isKnownContextConcreteType) {
-    const error = new IrrecoverableError(
-      "Found unknown context type when decomposing context id. Expected types are: " +
-        Object.values(ContextConcreteType).join(", ") +
-        `, but found type '${type}'.`,
-    );
-
-    return either.left(error);
+    return either.left(new InvalidComposedContextIdError("unknown"));
   }
 
   return either.right({
