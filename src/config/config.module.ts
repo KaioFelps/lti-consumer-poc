@@ -9,7 +9,6 @@ import { environmentVariablesSchema } from "./environment-vars/schema";
     ConfigModule.forRoot({
       isGlobal: true,
       validate: (vars) => environmentVariablesSchema.parse(vars),
-      ignoreEnvFile: true, // we're already injecting environment variables in `main.ts`
     }),
   ],
   exports: [EnvironmentVars],
