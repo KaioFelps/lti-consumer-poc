@@ -8,10 +8,12 @@ import { BaseExceptionFilterResponderFactory } from "./responder.factory";
   imports: [RenderableExceptionModule],
   providers: [
     BaseExceptionFilterResponderFactory,
+    BaseExceptionFilter,
     {
       provide: APP_FILTER,
-      useClass: BaseExceptionFilter,
+      useClass: BaseExceptionFilter, // useExisting makes it fail here... dunno y
     },
   ],
+  exports: [BaseExceptionFilter],
 })
 export class BaseExceptionModule {}
