@@ -9,7 +9,7 @@ export interface IExternalLtiResource {
   /**
    * The platform's context in which the resources are placed.
    */
-  context?: Context;
+  context?: Context<unknown>;
   /**
    * This external resource's ID within the tool to which it belongs.
    */
@@ -26,7 +26,7 @@ export interface IExternalLtiResource {
  */
 export class ExternalLtiResource implements IExternalLtiResource {
   public tool: LtiTool;
-  public context?: Context<never> | undefined;
+  public context?: Context<unknown> | undefined;
   public readonly externalToolResourceId: string;
   public readonly localResourceId: string;
 

@@ -8,7 +8,7 @@ import { createContext } from "./context.factory";
 import { createTool } from "./tool.factory";
 
 type CreateToolDeploymentParams = Partial<
-  NullifyUndefined<{ id: LtiToolDeployment["id"]; context?: Context; tool: LtiTool }>
+  NullifyUndefined<{ id: LtiToolDeployment["id"]; context?: Context<unknown>; tool: LtiTool }>
 >;
 
 export function createToolGlobalDeployment({
