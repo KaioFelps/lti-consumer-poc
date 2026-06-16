@@ -10,6 +10,7 @@ import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository";
 import { LtiToolsDeploymentsRepository } from "@/modules/lti/tools/lti-tools-deployments.repository";
 import { OIDCAccountsRepository } from "@/modules/oidc/repositories/accounts.repository";
 import { OIDCClientsRepository } from "@/modules/oidc/repositories/clients.repository";
+import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
 import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
 import { LtiResourceLinksRepository as BaseLtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identities.repository";
@@ -17,6 +18,7 @@ import { DrizzleAssignmentsRepository } from "./drizzle/repositories/assignments
 import { DrizzleCoursesRepository } from "./drizzle/repositories/courses.repository";
 import { DrizzleExternalLtiAssignmentsRepository } from "./drizzle/repositories/external-lti-assignments.repository";
 import { DrizzleInstructorsRepository } from "./drizzle/repositories/instructors.repository";
+import { DrizzleLtiLineItemsRepository } from "./drizzle/repositories/lti-line-items.repository";
 import { DrizzleLtiToolsRepository } from "./drizzle/repositories/lti-tools.repository";
 import { DrizzleLtiToolsDeploymentsRepository } from "./drizzle/repositories/lti-tools-deployments.repository";
 import { DrizzleODICAccountsRepository } from "./drizzle/repositories/oidc-accounts.repository";
@@ -48,6 +50,7 @@ import { RedisLtiLaunchesRepository } from "./redis/repositories/lti-launches.re
       provide: ExternalLtiAssignmentsRepository,
       useClass: DrizzleExternalLtiAssignmentsRepository,
     },
+    { provide: LtiLineItemsRepository, useClass: DrizzleLtiLineItemsRepository },
   ],
   exports: [
     UsersRepository,
@@ -64,6 +67,7 @@ import { RedisLtiLaunchesRepository } from "./redis/repositories/lti-launches.re
     AssignmentsRepository,
     InstructorsRepository,
     ExternalLtiAssignmentsRepository,
+    LtiLineItemsRepository,
   ],
 })
 export class RepositoriesModule {}
