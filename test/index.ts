@@ -4,10 +4,12 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { Test, TestingModule } from "@nestjs/testing";
 import { RedisStore } from "connect-redis";
 import cookieParser from "cookie-parser";
+import { json } from "express";
 import { middleware as ejsLayoutsMiddleware } from "express-ejs-layouts";
 import session from "express-session";
 import { EnvironmentVars } from "@/config/environment-vars";
 import { Redis } from "@/external/data-store/redis/client";
+import { LtiAdvantageMediaType } from "$/advantage/media-types";
 
 export async function getTestingApp() {
   // we cannot import it normally because it would load the AppConfigModule and its dependencies
@@ -55,6 +57,16 @@ export async function getTestingApp() {
   });
 
   app.use(ejsLayoutsMiddleware);
+
+  app.use(
+    json({
+      type: [
+        "application/json",
+        LtiAdvantageMediaType.LineItem,
+        LtiAdvantageMediaType.LineItemContainer,
+      ],
+    }),
+  );
 
   return app;
 }

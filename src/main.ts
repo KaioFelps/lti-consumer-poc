@@ -6,6 +6,7 @@ import { RedisStore } from "connect-redis";
 import cookieParser from "cookie-parser";
 import { config } from "dotenv";
 import { expand } from "dotenv-expand";
+import { json } from "express";
 import { middleware as ejsLayoutsMiddleware } from "express-ejs-layouts";
 import session from "express-session";
 import { AppModule } from "./app.module";
@@ -14,6 +15,7 @@ import { Redis } from "./external/data-store/redis/client";
 import { loadMessageStrings } from "./message-string/loader";
 
 import "@/lib";
+import { LtiAdvantageMediaType } from "$/advantage/media-types";
 
 async function bootstrap() {
   expand(config({ override: false }));
@@ -55,6 +57,18 @@ async function bootstrap() {
   });
 
   app.use(ejsLayoutsMiddleware);
+
+  // we need to register this otherwise LTI media types will
+  // not be parsed as json
+  app.use(
+    json({
+      type: [
+        "application/json",
+        LtiAdvantageMediaType.LineItem,
+        LtiAdvantageMediaType.LineItemContainer,
+      ],
+    }),
+  );
 
   await app.listen(process.env.PORT ?? 3000);
 }
