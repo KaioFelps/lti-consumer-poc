@@ -271,10 +271,10 @@ export const gradesT = pgTable(
 
 export const externalLtiResourcesT = pgTable("external_lti_resources", {
   id: uuid().primaryKey(),
-  tool_id: varchar()
+  toolId: varchar("tool_id")
     .references(() => ltiTools.id)
     .notNull(),
-  external_tool_resource_id: varchar("external_tool_resource_id").notNull(),
+  externalToolResourceId: varchar("external_tool_resource_id").notNull(),
 });
 
 export const ltiAssignmentsT = pgTable("lti_assignments", {
@@ -331,6 +331,9 @@ export const ltiToolsRelations = relations(ltiTools, ({ many, one }) => ({
   }),
   deployments: many(ltiToolDeployments),
   supportedMessages: many(ltiToolSupportedMessages),
+
+  // LTI AGS
+  externalLtiResources: many(externalLtiResourcesT),
 }));
 
 export const ltiToolDeploymentsRelations = relations(ltiToolDeployments, ({ one, many }) => ({
@@ -479,7 +482,7 @@ export const ltiAssignmentsRelations = relations(ltiAssignmentsT, ({ one, many }
 }));
 
 export const ltiLineItemsRelations = relations(ltiLineItemsT, ({ one }) => ({
-  assignment: one(ltiAssignmentsT, {
+  ltiAssignment: one(ltiAssignmentsT, {
     fields: [ltiLineItemsT.ltiAssignmentId],
     references: [ltiAssignmentsT.assignmentId],
   }),
@@ -490,6 +493,13 @@ export const ltiLineItemsRelations = relations(ltiLineItemsT, ({ one }) => ({
   context: one(ltiContexts, {
     fields: [ltiLineItemsT.concreteContextId, ltiLineItemsT.concreteContextType],
     references: [ltiContexts.concreteContextId, ltiContexts.concreteContextType],
+  }),
+}));
+
+export const externalLtiResourcesRelations = relations(externalLtiResourcesT, ({ one }) => ({
+  tool: one(ltiTools, {
+    fields: [externalLtiResourcesT.toolId],
+    references: [ltiTools.id],
   }),
 }));
 
