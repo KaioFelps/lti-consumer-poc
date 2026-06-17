@@ -191,7 +191,7 @@ export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRep
       either.chainW(({ concreteEntityId, concreteType }) => {
         const isCourse = context.type?.includes(ContextConcreteType.Course) ?? false;
 
-        if (isCourse) either.right({ concreteEntityId, concreteType });
+        if (isCourse) return either.right({ concreteEntityId, concreteType });
 
         const contextNotFoundError = new ContextNotFoundError(concreteEntityId, context.type ?? []);
         const error = new LtiRepositoryError({
