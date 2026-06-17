@@ -219,6 +219,8 @@ export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRep
         }),
       ),
       te.mapLeft((error) => {
+        if (error instanceof LtiRepositoryError) return error;
+
         if (error instanceof ResourceNotFoundError) {
           return new LtiRepositoryError({
             type: "NotFound",
