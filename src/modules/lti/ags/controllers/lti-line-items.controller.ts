@@ -1,16 +1,12 @@
 import { Body, Controller, Headers, Param, Post } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
-import { IErrorBase } from "@/core/errors/error-base";
-import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { LtilibException } from "@/lib/exceptions/ltilib/exception";
+import { ExtendedExceptionsFactory } from "@/lib/exceptions/extended-exceptions.factory";
 import { Rest } from "@/lib/mvc-routes";
 import { AuthStrategy, ConfigAuthGuard } from "@/modules/auth/protected-routes";
 import { CurrentTool } from "@/modules/auth/protected-routes/decorators/current-tool";
 import { type LtiToolJwtPayload } from "@/modules/auth/protected-routes/lti-tool-jwt-payload";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
-import { LtilibError } from "$/core/errors/bases/ltilib.error";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { FindContextByIdService } from "../../advantage/context/services/find-context-by-id.service";
 import { FindToolByIdService } from "../../tools/services/find-tool-by-id.service";
 import { CreateLineItemDTO } from "../dtos/create-line-item.dto";
@@ -50,13 +46,7 @@ export class LtiLineItemsController {
             }),
       ),
       te.mapLeft((error) => {
-        if (error instanceof LtiRepositoryError) {
-          throw ExceptionsFactory.fromError(error.cause as IErrorBase);
-        }
-
-        if (error instanceof LtilibError) throw new LtilibException(error);
-
-        throw ExceptionsFactory.fromError(error);
+        throw ExtendedExceptionsFactory.fromError(error);
       }),
     )();
   }

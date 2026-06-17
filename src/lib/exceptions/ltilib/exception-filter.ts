@@ -54,12 +54,11 @@ export class LtilibExceptionFilter implements ExceptionFilter {
 
     const error = exception.innerError;
 
-    console.log("caiu no ltilib exception...", error);
-
     // handle the most specific errors before the generic ones
 
-    if (error instanceof InvalidRedirectUriError)
+    if (error instanceof InvalidRedirectUriError) {
       return await this.handleInvalidRedurectUriError(error, host);
+    }
 
     if (error instanceof MalformedRequestError) {
       return await this.handleMalformedRequestError(error, host);
