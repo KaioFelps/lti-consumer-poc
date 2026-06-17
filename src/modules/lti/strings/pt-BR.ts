@@ -260,3 +260,6 @@ ptBR["lti:ags:create-line-item:errors:resource-link-id-must-be-string"] =
   "O ID do link de recurso precisa ser um texto.";
 ptBR["lti:ags:create-line-item:errors:body-should-be-object"] =
   "O corpo da requisição é inválido. (Deveria ser um objeto JSON.)";
+
+ptBR["lti:ags:find-external-resource-by-id:errors:not-found"] = ({ id }) =>
+  `Não foi possível encontrar um recurso externo LTI com ID "${id}".`;
