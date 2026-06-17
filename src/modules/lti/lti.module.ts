@@ -115,6 +115,13 @@ import { LtiToolsController } from "./tools/tools.controller";
           lineItemsRepo,
           deploymentsRepo,
         ),
+      inject: [
+        Platform,
+        LtiResourceLinksRepository,
+        ExternalLtiResourcesRepository,
+        LtiLineItemsRepository,
+        LtiToolsDeploymentsRepository,
+      ],
     },
   ],
   exports: [LtiLaunchServices, Platform],
