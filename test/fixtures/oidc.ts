@@ -8,6 +8,7 @@ import { UnsafeOIDCClientsInjectionContainer } from "@/modules/oidc/unsafe-clien
 import { Routes } from "@/routes";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { Platform } from "$/core/platform";
+import { LtiTool as LtilibTool } from "$/core/tool";
 
 export async function generateClientAssertion(
   clientId: string,
@@ -82,11 +83,15 @@ export async function prepareToolOidcTokenRequest(
   };
 }
 
-export async function getToolAndItsOidcAccessToken(app: INestApplication, tool?: LtiTool) {
+export async function getToolAndItsOidcAccessToken(
+  app: INestApplication,
+  tool?: LtiTool | LtilibTool,
+) {
   const platform = app.get(Platform);
   const unsafeOidcClientContainer = app.get(UnsafeOIDCClientsInjectionContainer);
 
-  const client = await injectMockedLtiToolRecord(unsafeOidcClientContainer, tool);
+  const domainTool = tool instanceof LtilibTool ? new LtiTool(tool) : tool;
+  const client = await injectMockedLtiToolRecord(unsafeOidcClientContainer, domainTool);
   const { body, headers, route } = await prepareToolOidcTokenRequest(platform, client);
   let request = supertest(app.getHttpServer()).post(route);
 
