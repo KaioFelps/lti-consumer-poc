@@ -1,16 +1,19 @@
 # LTI AGS
+
 Esse documento contempla a integração do módulo de LTI AGS da _ltilib_ na plataforma
 de prova de conceito. Essa implementação mostra que é possível abstrair uma parte
 considerável da implementação do protocolo, delegando menos afazeres aos sistemas que
 desejam tornarem-se conformantes com o LTI Advantage.
 
 ## Notação
+
 Esse documento utiliza as notações definidas no documento [Notações](./notacoes.md).
 Esse documento utiliza as palavras [_NÃO_] _PODE_, [_NÃO_] _DEVE_, [_NÃO_] _DEVERIA_,
 e suas variações em caixa baixa, porém em negrito, com a mesma semântica das suas
 traduções conforme a [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
 ## Conectando Line Items à Plataforma
+
 A entidade `ltilib::LtiLineItem` **pode** possuir referências para links de recursos
 (_resource links_) ou para os recursos, diretamente. Isso é definido pela especificação
 do protocolo LTI AGS 2.0, e a biblioteca _ltilib_ implementa essa possibilidade.
@@ -22,6 +25,7 @@ O boletim foi idealizado para ser calculado sob demanda, e portanto não constit
 estrutura fixa.
 
 ### Implementação
+
 Para integrar as `Grades` (notas de uma atividade) com os `ltilib::LtiLineItem`, é necessário introduzir
 estruturas intermediárias: a _ltilib_ **não deve** ter ciência da existência de atividades,
 pois são estruturas específicas das plataformas a utilizando — como é o caso desta.
@@ -65,3 +69,8 @@ $\rightarrow$ `platform::Assignment`.
 > O mapeamento ocorre em nível de banco de dados na presente implementação, de modo que não seja
 > necessário acoplar as entidades da _ltilib_ às da plataforma. É o que buscamos, visto que a
 > biblioteca visa ser agnóstica de sistemas e _frameworks_.
+
+## External Resources
+
+Essa plataforma não implementa o uso de contextos nos links externos. Dessa forma, a propriedade
+`ltilib::ExternalLtiResource.context` é sempre nula e desprezada.
