@@ -1,6 +1,7 @@
-import { Body, Controller, Headers, Param, Post } from "@nestjs/common";
+import { Body, Controller, Headers, Param, Post, Res } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
+import { HttpResponse } from "@/lib";
 import { ExtendedExceptionsFactory } from "@/lib/exceptions/extended-exceptions.factory";
 import { Rest } from "@/lib/mvc-routes";
 import { AuthStrategy, ConfigAuthGuard } from "@/modules/auth/protected-routes";
@@ -29,6 +30,7 @@ export class LtiLineItemsController {
     @Body() body: CreateLineItemDTO,
     @CurrentTool() { sub: toolId }: LtiToolJwtPayload,
     @Param("contextId") contextId: string,
+    @Res() response: HttpResponse,
   ) {
     return pipe(
       te.Do,
@@ -45,6 +47,12 @@ export class LtiLineItemsController {
               tool: tool.record,
             }),
       ),
+      te.map((lineItemsResponse) => {
+        response
+          .setHeaders(lineItemsResponse.headers)
+          .status(lineItemsResponse.httpStatusCode)
+          .send(lineItemsResponse.content);
+      }),
       te.mapLeft((error) => {
         throw ExtendedExceptionsFactory.fromError(error);
       }),
