@@ -7,6 +7,7 @@ import {
   FindManyParams,
 } from "$/core/repositories/resource-links.repository";
 import { LtiResourceLink } from "$/core/resource-link";
+import { InvalidComposedContextIdError } from "../advantage/errors/invalid-composed-context-id.error";
 import { ResourceLinkNotFoundError } from "./errors/resource-link-not-found.error";
 
 export abstract class LtiResourceLinksRepository extends BaseLtiResourceLinksRepository {
@@ -20,7 +21,9 @@ export abstract class LtiResourceLinksRepository extends BaseLtiResourceLinksRep
     Either<LtiRepositoryError<ResourceLinkNotFoundError | IrrecoverableError>, LtiResourceLink>
   >;
 
-  public abstract create(resourceLink: LtiResourceLink): Promise<Either<IrrecoverableError, void>>;
+  public abstract create(
+    resourceLink: LtiResourceLink,
+  ): Promise<Either<IrrecoverableError | InvalidComposedContextIdError, void>>;
 
   public abstract deleteById(resourceLinkId: UUID): Promise<Either<IrrecoverableError, void>>;
 }

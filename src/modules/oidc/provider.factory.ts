@@ -1,3 +1,4 @@
+import { Injectable, Scope } from "@nestjs/common";
 import { generateUUID } from "common/src/types/uuid";
 import { taskEither } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
@@ -16,6 +17,7 @@ import { AvailableACRs, AvailableScopes } from "./consts";
 import { OIDCAccountsRepository } from "./repositories/accounts.repository";
 import { OIDCClientsRepository } from "./repositories/clients.repository";
 
+@Injectable({ scope: Scope.DEFAULT }) // ensure it's singletone
 export class OIDCProviderFactory {
   public constructor(
     private environments: EnvironmentVars,
@@ -104,6 +106,20 @@ export class OIDCProviderFactory {
             ctx.redirect("/auth/logout");
           },
         },
+        resourceIndicators: {
+          enabled: true,
+          // the below line forces every token emitted to be a JWT
+          // defaultResource: (_ctx, _client, _oneOf) => issuerUrl.toString(),
+          getResourceServerInfo: (_ctx, _resourceIndicator, _client) => ({
+            scope: AvailableScopes.join(" "),
+            accessTokenFormat: "jwt",
+            audience: issuerUrl,
+            accessTokenTTL: 1 * 60 * 60, // 1 hora
+            jwt: {
+              sign: { alg: "RS256" },
+            },
+          }),
+        },
       },
       cookies: {
         names: {
@@ -113,7 +129,8 @@ export class OIDCProviderFactory {
       // values are expected to be seconds
       ttl: {
         Session: 60 * 60 * 24, // 1 day
-        Interaction: 60 * 5, // 5 minutes,
+        Interaction: 60 * 5, // 5 minutes
+        ClientCredentials: 60 * 60, // 1 hour
       },
       renderError: async (ctx, out, error) => {
         console.debug("renderError", ctx.body);
@@ -130,6 +147,10 @@ export class OIDCProviderFactory {
         console.debug("server error", ctx.url, error);
       });
 
+      provider.on("access_token.issued", (token) => {
+        console.log("access token issued", token);
+      });
+
       provider.on("registration_create.error", (ctx, err) => {
         console.debug("registration error", ctx.body, err);
       });
@@ -138,6 +159,9 @@ export class OIDCProviderFactory {
         console.debug("userinfo error", error, ctx.url);
       });
     }
+    provider.on("grant.error", (ctx, err) => {
+      console.log("grant error", err, err.error_detail, ctx.url);
+    });
 
     return provider;
   }

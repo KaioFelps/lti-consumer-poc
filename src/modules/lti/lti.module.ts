@@ -3,6 +3,9 @@ import middlewares from "@/lib/middlewares";
 import { AuthModule } from "@/modules/auth/auth.module";
 import { IdentityModule } from "@/modules/identity/identity.module";
 import { OIDCModule } from "@/modules/oidc/oidc.module";
+import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
+import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
+import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
 import { Platform } from "$/core/platform";
 import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
@@ -11,7 +14,10 @@ import { LtiLaunchServices } from "$/core/services/launch";
 import { LtiResourceLinkServices } from "$/core/services/resource-link.services";
 import { AssignmentsAndGradesModule } from "../assignments-and-grades/assignments-and-grades.module";
 import { CoursesModule } from "../courses-and-enrollments/courses.module";
+import { ContextFetchersModule } from "./advantage/context/fetchers/context-fetchers.module";
+import { FindContextByIdService } from "./advantage/context/services/find-context-by-id.service";
 import { LtiAssignmentsController } from "./ags/controllers/lti-assignments.controller";
+import { LtiLineItemsController } from "./ags/controllers/lti-line-items.controller";
 import { CreateExternalLtiAssignmentService } from "./ags/services/create-external-lti-assignment.service";
 import { FindExternalLtiAssignmentByIdService } from "./ags/services/find-external-lti-assignment-by-id.service";
 import { LtiDeploymentsController } from "./deployments/deployments.controller";
@@ -27,6 +33,7 @@ import { CreateResourceLinkService } from "./resource-links/services/create-reso
 import { DeleteResourceLinkService } from "./resource-links/services/delete-resource-link.service";
 import { findResourceLinkByIdService } from "./resource-links/services/find-resource-link-by-id.service";
 import { LtiToolsRepository } from "./tools/lti-tools.repository";
+import { LtiToolsDeploymentsRepository } from "./tools/lti-tools-deployments.repository";
 import { FindManyToolsPreviewsService } from "./tools/services/find-many-tools-previews.service";
 import { FindToolByIdService } from "./tools/services/find-tool-by-id.service";
 import { GetToolRegistrationDetailsService } from "./tools/services/get-tool-registration-details.service";
@@ -39,6 +46,7 @@ import { LtiToolsController } from "./tools/tools.controller";
     IdentityModule,
     AssignmentsAndGradesModule,
     forwardRef(() => CoursesModule),
+    ContextFetchersModule,
   ],
   providers: [
     PlatformFactory,
@@ -90,6 +98,31 @@ import { LtiToolsController } from "./tools/tools.controller";
     InitiateLaunchService,
     CreateExternalLtiAssignmentService,
     FindExternalLtiAssignmentByIdService,
+    FindContextByIdService,
+    {
+      provide: LtiLineItemServices,
+      useFactory: (
+        platform: Platform,
+        resourceLinksRepo: LtiResourceLinksRepository,
+        externalResourcesRepo: ExternalLtiResourcesRepository,
+        lineItemsRepo: LtiLineItemsRepository,
+        deploymentsRepo: LtiToolsDeploymentsRepository,
+      ) =>
+        new LtiLineItemServices(
+          platform,
+          resourceLinksRepo,
+          externalResourcesRepo,
+          lineItemsRepo,
+          deploymentsRepo,
+        ),
+      inject: [
+        Platform,
+        LtiResourceLinksRepository,
+        ExternalLtiResourcesRepository,
+        LtiLineItemsRepository,
+        LtiToolsDeploymentsRepository,
+      ],
+    },
   ],
   exports: [LtiLaunchServices, Platform],
   controllers: [
@@ -99,6 +132,7 @@ import { LtiToolsController } from "./tools/tools.controller";
     LtiResourceLinksController,
     LtiLaunchesController,
     LtiAssignmentsController,
+    LtiLineItemsController,
   ],
 })
 export class LtiModule implements NestModule {

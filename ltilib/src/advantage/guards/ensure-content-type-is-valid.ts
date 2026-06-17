@@ -1,4 +1,5 @@
 import { taskEither as te } from "fp-ts";
+import { type TaskEither } from "fp-ts/lib/TaskEither";
 import { InvalidContentTypeError } from "../errors/invalid-content-type.error";
 import { LtiAdvantageMediaType } from "../media-types";
 
@@ -9,7 +10,7 @@ import { LtiAdvantageMediaType } from "../media-types";
 export function ensureContentTypeIsValid(
   contentTypeHeader: string | undefined,
   requiredContentType: LtiAdvantageMediaType,
-) {
+): TaskEither<InvalidContentTypeError, void> {
   if (contentTypeHeader === requiredContentType) return te.right(undefined);
   return te.left(new InvalidContentTypeError(requiredContentType));
 }

@@ -8,7 +8,7 @@ import { environmentVariablesSchema } from "./environment-vars/schema";
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      validate: environmentVariablesSchema.parse,
+      validate: (vars) => environmentVariablesSchema.parse(vars),
     }),
   ],
   exports: [EnvironmentVars],

@@ -17,7 +17,7 @@ import { JoseJwtClaimValidationFailureReason } from "$/lib/jose";
 import { validateMessageToolJwt } from "./validate-message-tool-jwt";
 
 describe("validateMessageToolJwt", async () => {
-  const { jwksResolver, privateKey, jwk, kid } = await createMockKeySet();
+  const { jwksResolver, privateKey, privateJwk: jwk, kid } = await createMockKeySet();
 
   const platformIssuer = "https://lms.uofexample.edu";
   const toolId = "s6BhdRkqt3";

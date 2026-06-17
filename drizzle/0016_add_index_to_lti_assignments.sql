@@ -1,0 +1,1 @@
+CREATE INDEX "idx_lti_assignments_resource_links_id" ON "lti_assignments" USING btree ("resource_link_id");

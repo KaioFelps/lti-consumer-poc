@@ -29,6 +29,7 @@ export async function createMockKeySet(kid: string = generateUUID()) {
     publicKey,
     jwksResolver,
     kid,
-    jwk: privateJwk,
+    privateJwk,
+    jwks,
   };
 }

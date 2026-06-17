@@ -7,7 +7,7 @@ import { LtiTool } from "$/core/tool";
 import { prepareIdToken } from "./prepare-id-token";
 
 describe("prepareIdToken", async () => {
-  const { jwk } = await createMockKeySet();
+  const { privateJwk: jwk } = await createMockKeySet();
 
   const platformIssuer = "https://lms.uofexample.edu";
   const toolId = "s6BhdRkqt3";

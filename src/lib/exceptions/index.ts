@@ -24,7 +24,7 @@ export function resolveStatus(error: IErrorBase | RenderableError) {
   if (error instanceof BadRequestError) return HttpStatus.BAD_REQUEST;
 
   const irrecoverableError = new IrrecoverableError(
-    `ExceptionsFactory received an unregistered error ${error.errorType}.`,
+    `ExceptionsFactory received an unregistered error: "${error.errorType ?? error.constructor.name}".`,
   );
 
   throw new IrrecoverableException(irrecoverableError);

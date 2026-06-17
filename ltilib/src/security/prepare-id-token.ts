@@ -29,7 +29,7 @@ export async function prepareIdToken({ platform, targetTool, claims, nonce }: Pr
       () => jose.importJWK(platform.jsonWebKey, algorithm),
       (error) => error as PrepareIdTokenError,
     ),
-    taskEither.map((privateKey) =>
+    taskEither.chainW((privateKey) =>
       taskEither.tryCatch(
         () =>
           new jose.SignJWT({
@@ -50,7 +50,6 @@ export async function prepareIdToken({ platform, targetTool, claims, nonce }: Pr
         (error) => error as PrepareIdTokenError,
       ),
     ),
-    taskEither.flattenW,
   )();
 
   return idToken;

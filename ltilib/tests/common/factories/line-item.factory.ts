@@ -8,7 +8,7 @@ import { createExternalLtiResource } from "./external-lti-resource.factory";
 import { createResourceLink } from "./resource-link.factory";
 import { createTool } from "./tool.factory";
 
-type CreateResourceLinkConstructorArgs = Partial<ILtiLineItem>;
+type CreateResourceLinkConstructorArgs = Partial<ILtiLineItem<unknown>>;
 
 type CreateFullLineItemExtraArgs = {
   context?: Context;

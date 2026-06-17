@@ -1,5 +1,5 @@
 import { AsyncLocalStorage } from "node:async_hooks";
-import { Injectable, Scope } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import * as schema from "drizzle/schema";
 import { ExtractTablesWithRelations } from "drizzle-orm";
 import { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
@@ -13,7 +13,8 @@ type Transaction = PgTransaction<
   ExtractTablesWithRelations<typeof schema>
 >;
 
-@Injectable({ scope: Scope.REQUEST })
+// it seems it doesn't actually need to be request-scoped
+@Injectable()
 export class DrizzleTransactionManager extends TransactionManager<Transaction> {
   private readonly storage = new AsyncLocalStorage<Transaction>();
 

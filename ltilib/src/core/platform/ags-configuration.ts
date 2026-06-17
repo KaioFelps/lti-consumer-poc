@@ -37,11 +37,9 @@ interface ILtiAssignmentAndGradeServicesConfig {
    * [AGS Claim]: https://www.imsglobal.org/spec/lti-ags/v2p0#assignment-and-grade-service-claim
    *
    * @default
-   * Returns true if the tool has at least one Assignment and Grade Service scope registered.
-   *
-   * @example
    * ```ts
    * async ({ toolAgsScopes }) => {
+   *    // true if the tool has at least one Assignment and Grade Service scope registered.
    *    return toolAgsScopes.length > 0;
    * };
    * ```
@@ -58,11 +56,9 @@ interface ILtiAssignmentAndGradeServicesConfig {
    * Note that issued scopes which the tool has not access per registration will be discarted.
    *
    * @default
-   * Returns every AGS scope the tool has within its registered scopes.
-   *
-   * @example
    * ```ts
    * async ({ tool }) => {
+   *    // returns every AGS scope the tool has within its registered scopes.
    *    return tool.scope
    *        .split(" ")
    *        .filter((scope) => ASSIGNMENT_AND_GRADE_SERVICES_SCOPES.includes(scope))
@@ -82,12 +78,15 @@ interface ILtiAssignmentAndGradeServicesConfig {
  * use ltilib implementations of the LTI AGS specification.
  */
 export class LtiAssignmentAndGradeServicesConfig implements ILtiAssignmentAndGradeServicesConfig {
-  public readonly lineItemsContainerEndpoint: ILtiAssignmentAndGradeServicesConfig["lineItemsContainerEndpoint"];
-  public readonly lineItemEndpoint: ILtiAssignmentAndGradeServicesConfig["lineItemEndpoint"];
+  public readonly lineItemsContainerEndpoint!: ILtiAssignmentAndGradeServicesConfig["lineItemsContainerEndpoint"];
+
+  public readonly lineItemEndpoint!: ILtiAssignmentAndGradeServicesConfig["lineItemEndpoint"];
+
   public readonly deadlinesEnabled: Exclude<
     ILtiAssignmentAndGradeServicesConfig["deadlinesEnabled"],
     undefined
   >;
+
   public readonly authorizeServicesClaim: Exclude<
     ILtiAssignmentAndGradeServicesConfig["authorizeServicesClaim"],
     undefined

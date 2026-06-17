@@ -28,6 +28,7 @@ export class BaseExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<HttpRequest>();
     const status = exception.getStatus();
 
+    // TODO: extract a `exceptionFilterShouldRender` function out of this
     const shouldRender =
       request.method.toLowerCase() === "get" && request[mvcRoutes.requestKey] === true;
 

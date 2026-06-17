@@ -17,4 +17,6 @@ export const ptBR: MessageStringTranslationMap = {
   "buttons:add": "Adicionar",
   "buttons:remove": "Remover",
   "buttons:back": "Voltar",
+
+  "core:pass-through": ({ message }) => message as string,
 };

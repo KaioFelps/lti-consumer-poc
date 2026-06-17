@@ -22,8 +22,8 @@ export type PresentedLtiLineItem = {
 export function presentLtiLineItem<
   CustomParameters extends Record<string, JsonValue> = Record<string, JsonValue>,
 >(
-  lineitem: LtiLineItem,
-  context: Context,
+  lineitem: LtiLineItem<unknown>,
+  context: Context<unknown>,
   platform: Platform,
 ): Either<MisconfiguredPlatformError, PresentedLtiLineItem & CustomParameters> {
   if (!platform.agsConfiguration) {

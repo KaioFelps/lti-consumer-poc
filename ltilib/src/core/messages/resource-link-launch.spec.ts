@@ -26,7 +26,7 @@ describe("[Core] Resource link Launch Request", async () => {
 
   beforeAll(async () => {
     keyset = await createMockKeySet();
-    platform = await createPlatform({ jsonWebKey: keyset.jwk });
+    platform = await createPlatform({ jsonWebKey: keyset.privateJwk });
   });
 
   function getResourceLinkLaunchMessageParameters({

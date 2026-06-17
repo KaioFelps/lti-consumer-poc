@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   foreignKey,
+  index,
   jsonb,
   pgEnum,
   pgTable,
@@ -271,21 +272,25 @@ export const gradesT = pgTable(
 
 export const externalLtiResourcesT = pgTable("external_lti_resources", {
   id: uuid().primaryKey(),
-  tool_id: varchar()
+  toolId: varchar("tool_id")
     .references(() => ltiTools.id)
     .notNull(),
-  external_tool_resource_id: varchar("external_tool_resource_id").notNull(),
+  externalToolResourceId: varchar("external_tool_resource_id").notNull(),
 });
 
-export const ltiAssignmentsT = pgTable("lti_assignments", {
-  assignmentId: uuid("assignment_id")
-    .notNull()
-    .references(() => assignmentsT.id)
-    .primaryKey(),
-  resourceLinkId: uuid("resource_link_id")
-    .references(() => ltiResourceLinks.id)
-    .notNull(),
-});
+export const ltiAssignmentsT = pgTable(
+  "lti_assignments",
+  {
+    assignmentId: uuid("assignment_id")
+      .notNull()
+      .references(() => assignmentsT.id)
+      .primaryKey(),
+    resourceLinkId: uuid("resource_link_id")
+      .references(() => ltiResourceLinks.id)
+      .notNull(),
+  },
+  (table) => [index("idx_lti_assignments_resource_links_id").on(table.resourceLinkId)],
+);
 
 export const ltiLineItemsT = pgTable(
   "lti_line_items",
@@ -331,6 +336,9 @@ export const ltiToolsRelations = relations(ltiTools, ({ many, one }) => ({
   }),
   deployments: many(ltiToolDeployments),
   supportedMessages: many(ltiToolSupportedMessages),
+
+  // LTI AGS
+  externalLtiResources: many(externalLtiResourcesT),
 }));
 
 export const ltiToolDeploymentsRelations = relations(ltiToolDeployments, ({ one, many }) => ({
@@ -479,7 +487,7 @@ export const ltiAssignmentsRelations = relations(ltiAssignmentsT, ({ one, many }
 }));
 
 export const ltiLineItemsRelations = relations(ltiLineItemsT, ({ one }) => ({
-  assignment: one(ltiAssignmentsT, {
+  ltiAssignment: one(ltiAssignmentsT, {
     fields: [ltiLineItemsT.ltiAssignmentId],
     references: [ltiAssignmentsT.assignmentId],
   }),
@@ -490,6 +498,13 @@ export const ltiLineItemsRelations = relations(ltiLineItemsT, ({ one }) => ({
   context: one(ltiContexts, {
     fields: [ltiLineItemsT.concreteContextId, ltiLineItemsT.concreteContextType],
     references: [ltiContexts.concreteContextId, ltiContexts.concreteContextType],
+  }),
+}));
+
+export const externalLtiResourcesRelations = relations(externalLtiResourcesT, ({ one }) => ({
+  tool: one(ltiTools, {
+    fields: [externalLtiResourcesT.toolId],
+    references: [ltiTools.id],
   }),
 }));
 

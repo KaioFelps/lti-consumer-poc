@@ -50,13 +50,13 @@ export interface ILtiResourceLink {
  * execution as one of the activities from some Math Class course).
  */
 export class LtiResourceLink implements ILtiResourceLink, IntoLtiClaim {
-  public readonly id: string;
-  public deploymentId: string;
+  public readonly id!: string;
+  public deploymentId!: string;
   public contextId?: string;
   public resourceUrl?: URL;
   public title?: string;
   public description?: string;
-  public toolId: string;
+  public toolId!: string;
   public customParameters: Record<string, string> = {};
 
   protected constructor(args: ILtiResourceLink) {
@@ -79,7 +79,7 @@ export class LtiResourceLink implements ILtiResourceLink, IntoLtiClaim {
     return this.toolId === tool.id;
   }
 
-  public belongsToContext(context: Context) {
+  public belongsToContext(context: Context<unknown>) {
     return this.contextId === context.id;
   }
 }

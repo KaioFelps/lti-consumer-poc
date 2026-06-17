@@ -6,7 +6,7 @@ type CreateContextConstructorArgs<CT> = Partial<IContext<CT>>;
 
 export const DEFAULT_CONTEXT_TYPE = [ContextType.CourseSection] as const;
 
-export function createContext<CT = never>({
+export function createContext<CT = unknown>({
   id = generateUUID(),
   label = faker.lorem.sentence(),
   title = faker.lorem.words({ min: 1, max: 3 }),

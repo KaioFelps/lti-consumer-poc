@@ -25,15 +25,14 @@ type RawLineItemsPayload = {
   scoreMaximum: number;
   tag?: string;
   gradesReleased?: boolean;
-  customParameters?: ILtiLineItem["customParameters"];
-};
+} & Pick<ILtiLineItem, "customParameters">; // this inherits the docstrings, which is valuable!!
 
-export type CreateLineItemServiceParams = {
+export type CreateLineItemServiceParams<CustomContextType extends string = never> = {
   /**
    * The LTI tool which is trying to create this line item.
    */
   tool: LtiTool;
-  context: Context;
+  context: Context<CustomContextType>;
 } & RawLineItemsPayload;
 
 const REQUIRED_SCOPES = [AssignmentAndGradeServiceScopes.Lineitem] as const;
@@ -44,7 +43,7 @@ const REQUIRED_SCOPES = [AssignmentAndGradeServiceScopes.Lineitem] as const;
  *
  * @internal
  */
-export class CreateService implements ILineItemService {
+export class CreateService<CustomContextType extends string = never> implements ILineItemService {
   public constructor(
     private readonly platform: Platform,
     private readonly resourceLinksRepo: LtiResourceLinksRepository,
@@ -63,7 +62,7 @@ export class CreateService implements ILineItemService {
     return LtiAdvantageMediaType.LineItem;
   }
 
-  public async execute({ tool, context, ...args }: CreateLineItemServiceParams) {
+  public async execute({ tool, context, ...args }: CreateLineItemServiceParams<CustomContextType>) {
     if (!this.platform.agsConfiguration) return e.left(new MissingPlatformAgsConfigurationError());
     const { agsConfiguration } = this.platform;
 
@@ -81,7 +80,7 @@ export class CreateService implements ILineItemService {
       te.bindW("presentedLineItem", ({ lineItem }) => this.presentLineItem(lineItem, context)),
       te.map(
         ({ lineItem, presentedLineItem }) =>
-          new HttpResponseWrapper<LtiLineItem, PresentedLtiLineItem>(
+          new HttpResponseWrapper<LtiLineItem<unknown>, PresentedLtiLineItem>(
             presentedLineItem,
             201,
             lineItem,
@@ -91,7 +90,10 @@ export class CreateService implements ILineItemService {
     )();
   }
 
-  private presentLineItem(lineItem: LtiLineItem, context: Context) {
+  private presentLineItem(
+    lineItem: LtiLineItem<CustomContextType>,
+    context: Context<CustomContextType>,
+  ) {
     return pipe(presentLtiLineItem(lineItem, context, this.platform), te.fromEither);
   }
 
@@ -107,11 +109,12 @@ export class CreateService implements ILineItemService {
         },
         (lineitem) => e.right(o.toUndefined(lineitem)),
       ),
+      te.map((lineitem) => lineitem as LtiLineItem<CustomContextType> | undefined),
     );
   }
 
   private createNewLineItem(
-    context: Context,
+    context: Context<CustomContextType>,
     tool: LtiTool,
     agsConfig: Platform.LtiAssignmentAndGradeServicesConfig,
     { resourceId, resourceLinkId, ...args }: RawLineItemsPayload,
@@ -170,7 +173,7 @@ export class CreateService implements ILineItemService {
   }
 
   private maybeGetAndValidateResourceLink(
-    context: Context,
+    context: Context<CustomContextType>,
     tool: LtiTool,
     resourceLinkId: string | undefined,
   ) {

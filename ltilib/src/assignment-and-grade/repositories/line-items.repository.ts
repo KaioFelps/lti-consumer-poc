@@ -45,7 +45,7 @@ export abstract class LtiLineItemsRepository {
    * [section 3.1 of LTI Core]: https://www.imsglobal.org/spec/lti/v1p3/#platforms-and-tools
    */
   public abstract fetchWithContainerFilters(
-    context: Context,
+    context: Context<unknown>,
     tool: LtiTool,
     limit: number,
     page: number,

@@ -217,3 +217,49 @@ ptBR["lti:ags:show-assignment:errors:external-assignment-not-found"] = ({ id }) 
 ptBR["lti:assignment-details:section:assignment"] = "Atividade";
 ptBR["lti:assignment-details:thead:id"] = "ID da atividade";
 ptBR["lti:assignment-details:thead:title"] = "Título";
+
+ptBR["lti:advantage:contexts:errors:not-found"] = (args) => {
+  const { contextId, contextType } = args as { contextId: string; contextType: string | string[] };
+
+  if (Array.isArray(contextType)) {
+    if (contextType.length === 0) {
+      return (
+        `O contexto de ID "${contextId}" não tem nenhum tipo reconhecível, ` +
+        "e portanto não pôde ser encontrado."
+      );
+    }
+
+    return (
+      `O contexto de ID "${contextId}" tem o(s) tipo(s): ${contextType.join(", ")}. ` +
+      "Contudo, nenhum foi o suficiente para que pudesse ser encontrado."
+    );
+  }
+
+  return (
+    `O contexto de ID "${contextId}" tem o tipo ${contextId}, mas esse tipo ` +
+    "não é reconhecível. Portanto, não foi possível encontrar este contexto."
+  );
+};
+
+ptBR["lti:advantage:contexts:errors:invalid-composed-context-id"] =
+  "O ID de contexto fornecido é inválido.";
+
+ptBR["lti:ags:create-line-item:errors:score-maximum-must-be-positive"] =
+  "A pontuação máxima precisa ser um número positivo (maior que zero).";
+ptBR["lti:ags:create-line-item:errors:score-maximum-must-be-number"] =
+  "A pontuação máxima precisa ser um valor numérico.";
+ptBR["lti:ags:create-line-item:errors:label-is-required"] = 'A etiqueta ("label") é obrigatória.';
+ptBR["lti:ags:create-line-item:errors:tag-must-be-string"] = "A tag precisa ser um texto.";
+ptBR["lti:ags:create-line-item:errors:start-date-time-must-be-date"] =
+  "A data de abertura precisa ser uma data válida.";
+ptBR["lti:ags:create-line-item:errors:end-date-time-must-be-date"] =
+  "A data de encerramento precisa ser uma data válida.";
+ptBR["lti:ags:create-line-item:errors:resource-id-must-be-string"] =
+  "O ID do recurso precisa ser um texto.";
+ptBR["lti:ags:create-line-item:errors:resource-link-id-must-be-string"] =
+  "O ID do link de recurso precisa ser um texto.";
+ptBR["lti:ags:create-line-item:errors:body-should-be-object"] =
+  "O corpo da requisição é inválido. (Deveria ser um objeto JSON.)";
+
+ptBR["lti:ags:find-external-resource-by-id:errors:not-found"] = ({ id }) =>
+  `Não foi possível encontrar um recurso externo LTI com ID "${id}".`;

@@ -51,6 +51,18 @@ export class PlatformFactory {
         ],
         productFamilyCode: this.envVars.app.productCode,
       }),
+      agsConfiguration: Platform.LtiAssignmentAndGradeServicesConfig.create({
+        lineItemEndpoint: (ctx, lineItemId) =>
+          new URL(
+            Routes.lti.ags.lineitems.instance(ctx.id, lineItemId.toString()),
+            this.envVars.app.url,
+          ),
+
+        lineItemsContainerEndpoint: (context) =>
+          new URL(Routes.lti.ags.lineitems.container(context.id), this.envVars.app.url),
+
+        deadlinesEnabled: { end: true, start: true },
+      }),
     });
   }
 }
