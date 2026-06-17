@@ -21,7 +21,7 @@ type GetLaunchLinksFromContext = GetLaunchLinksParams & {
   contextId: string;
 };
 
-export class LtiLaunchServices<CustomRoles extends string = never, CustomContextType = never> {
+export class LtiLaunchServices<CustomRoles extends string = never, CustomContextType = unknown> {
   private prepareLaunchRequestService: PrepareLaunchRequestService<CustomRoles, CustomContextType>;
   private initiateLaunchService: InitiateLaunchService;
   private getLaunchLinksService: GetLaunchLinksService;
@@ -34,7 +34,10 @@ export class LtiLaunchServices<CustomRoles extends string = never, CustomContext
     platform: Platform,
     agsClaimServices: LtiAgsClaimServices | undefined,
   ) {
-    this.prepareLaunchRequestService = new PrepareLaunchRequestService(
+    this.prepareLaunchRequestService = new PrepareLaunchRequestService<
+      CustomRoles,
+      CustomContextType
+    >(
       platform,
       resourceLinksRepository,
       launchesRepository,

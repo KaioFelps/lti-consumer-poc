@@ -38,7 +38,10 @@ type ErrorKey =
 
 export type LaunchAuthErrorDescriptionsRoutes = { [key in ErrorKey]?: URL };
 
-export type AuthenticateLaunchLoginRequestParams<CustomRoles extends string, CustomContextType> = {
+export type AuthenticateLaunchLoginRequestParams<
+  CustomRoles extends string,
+  CustomContextType = unknown,
+> = {
   nonce: string;
   toolId: LtiTool["id"];
   redirectUri: string;
