@@ -67,6 +67,7 @@ export class DrizzleExternalLtiAssignmentsRepository extends ExternalLtiAssignme
       te.tryCatch(
         () =>
           client.query.ltiAssignmentsT.findFirst({
+            where: eq(ltiAssignmentsT.assignmentId, assignmentId.toString()),
             columns: { assignmentId: false, resourceLinkId: false },
             with: {
               assignmemnt: assignmentsMapper.requiredQueryConfig,
