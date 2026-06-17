@@ -95,8 +95,6 @@ export class LtilibExceptionFilter implements ExceptionFilter {
     const adaptedError = new BaseErrorLtilibAdapter(error);
     const baseException = new BaseException(adaptedError, error.httpStatusCode);
 
-    console.log("externalizando; is ltiliberror", error instanceof LtilibError);
-
     if (error instanceof LtilibError) {
       return await this.baseExceptionFilter.catch(baseException, host);
     }

@@ -45,8 +45,6 @@ const schema = officialSchema.catchall(z.any()).transform((data) => {
     ..._customParameters
   } = data;
 
-  console.log(_customParameters);
-
   const customParameters =
     Object.keys(_customParameters).length > 0
       ? (_customParameters as Record<string, JsonValue>)
