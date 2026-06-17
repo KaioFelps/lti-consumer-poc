@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import {
   ltiToolSupportedMessageRoles,
   ltiToolSupportedMessages,
@@ -25,8 +25,9 @@ import ltiToolsMapper from "../mappers/lti-tools.mapper";
 
 @Injectable()
 export class DrizzleLtiToolsRepository extends LtiToolsRepository {
-  @Inject()
-  private readonly drizzle!: DrizzleClient;
+  public constructor(private readonly drizzle: DrizzleClient) {
+    super();
+  }
 
   public async findManyTools(): Promise<Either<IrrecoverableError, LtiTool[]>> {
     return await pipe(
