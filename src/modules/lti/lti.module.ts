@@ -5,6 +5,7 @@ import { IdentityModule } from "@/modules/identity/identity.module";
 import { OIDCModule } from "@/modules/oidc/oidc.module";
 import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
 import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
+import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
 import { Platform } from "$/core/platform";
 import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
@@ -56,6 +57,12 @@ import { LtiToolsController } from "./tools/tools.controller";
       inject: [PlatformFactory],
     },
     {
+      provide: LtiAgsClaimServices,
+      inject: [Platform, LtiLineItemsRepository],
+      useFactory: (platform: Platform, lineItemsRepo: LtiLineItemsRepository) =>
+        new LtiAgsClaimServices(platform, lineItemsRepo),
+    },
+    {
       provide: LtiLaunchServices,
       useFactory: (
         ltiResourceLinksRepository: LtiResourceLinksRepository,
@@ -63,6 +70,7 @@ import { LtiToolsController } from "./tools/tools.controller";
         launchRepository: LtiLaunchesRepository,
         platform: Platform,
         userIdentitiesRepository: LtiUserIdentitiesRespository,
+        agsClaimServices: LtiAgsClaimServices,
       ) =>
         new LtiLaunchServices(
           ltiResourceLinksRepository,
@@ -70,7 +78,7 @@ import { LtiToolsController } from "./tools/tools.controller";
           launchRepository,
           userIdentitiesRepository,
           platform,
-          undefined,
+          agsClaimServices,
         ),
       inject: [
         LtiResourceLinksRepository,
@@ -78,6 +86,7 @@ import { LtiToolsController } from "./tools/tools.controller";
         LtiLaunchesRepository,
         Platform,
         LtiUserIdentitiesRespository,
+        LtiAgsClaimServices,
       ],
     },
     {
