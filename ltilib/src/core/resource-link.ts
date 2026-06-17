@@ -9,7 +9,8 @@ export interface ILtiResourceLink {
    */
   readonly id?: string | undefined;
   /**
-   * The deployment ID to which this resource link is associated to.
+   * A resource link is attached to a given tool. This identifier identifies the deployment
+   * of this tool under which this resource link has been created.
    */
   deploymentId: string;
   /**
