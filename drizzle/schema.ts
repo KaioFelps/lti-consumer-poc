@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   foreignKey,
+  index,
   jsonb,
   pgEnum,
   pgTable,
@@ -277,15 +278,19 @@ export const externalLtiResourcesT = pgTable("external_lti_resources", {
   externalToolResourceId: varchar("external_tool_resource_id").notNull(),
 });
 
-export const ltiAssignmentsT = pgTable("lti_assignments", {
-  assignmentId: uuid("assignment_id")
-    .notNull()
-    .references(() => assignmentsT.id)
-    .primaryKey(),
-  resourceLinkId: uuid("resource_link_id")
-    .references(() => ltiResourceLinks.id)
-    .notNull(),
-});
+export const ltiAssignmentsT = pgTable(
+  "lti_assignments",
+  {
+    assignmentId: uuid("assignment_id")
+      .notNull()
+      .references(() => assignmentsT.id)
+      .primaryKey(),
+    resourceLinkId: uuid("resource_link_id")
+      .references(() => ltiResourceLinks.id)
+      .notNull(),
+  },
+  (table) => [index("idx_lti_assignments_resource_links_id").on(table.resourceLinkId)],
+);
 
 export const ltiLineItemsT = pgTable(
   "lti_line_items",
