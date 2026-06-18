@@ -1,9 +1,10 @@
-import { Global, Module } from "@nestjs/common";
+import { forwardRef, Global, Module } from "@nestjs/common";
 import { AssignmentsRepository } from "@/modules/assignments-and-grades/repositories/assignments.repository";
 import { CoursesRepository } from "@/modules/assignments-and-grades/repositories/courses.repository";
 import { InstructorsRepository } from "@/modules/courses-and-enrollments/repositories/instructors.repository";
 import { PeopleRepository } from "@/modules/identity/person/people.repository";
 import { UsersRepository } from "@/modules/identity/user/users.repository";
+import { ContextFetchersModule } from "@/modules/lti/advantage/context/fetchers/context-fetchers.module";
 import { LtiContextsRepository } from "@/modules/lti/advantage/repositories/lti-contexts.repository";
 import { ExternalLtiAssignmentsRepository } from "@/modules/lti/ags/repositories/external-lti-assignments.repository";
 import { LtiResourceLinksRepository } from "@/modules/lti/resource-links/resource-links.repository";
@@ -34,6 +35,7 @@ import { RedisLtiLaunchesRepository } from "./redis/repositories/lti-launches.re
 
 @Global()
 @Module({
+  imports: [forwardRef(() => ContextFetchersModule)],
   providers: [
     DrizzleLtiResourceLinksRepository,
     DrizzlePeopleRepository,

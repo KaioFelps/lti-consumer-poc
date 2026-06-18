@@ -1,9 +1,7 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { option, taskEither as te } from "fp-ts";
+import { Injectable } from "@nestjs/common";
+import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
-import { ContextNotFoundError } from "../../errors/context-not-found.error";
-import { unmountContextId } from "..";
-import { CONTEXT_FETCHERS, ContextFetcher } from "../fetchers";
+import { LtiContextsRepository } from "../../repositories/lti-contexts.repository";
 
 type Params = {
   contextComposedId: string;
@@ -11,22 +9,14 @@ type Params = {
 
 @Injectable()
 export class FindContextByIdService {
-  public constructor(
-    @Inject(CONTEXT_FETCHERS) private readonly contextFetchers: ContextFetcher[],
-  ) {}
+  public constructor(private readonly contextsRepo: LtiContextsRepository) {}
 
   public exec({ contextComposedId }: Params) {
     return pipe(
-      unmountContextId(contextComposedId),
-      te.fromEither,
-      te.chainW(({ concreteEntityId, concreteType }) =>
-        pipe(
-          this.contextFetchers.find((fetcher) => fetcher.type === concreteType),
-          option.fromNullable,
-          te.fromOption(() => new ContextNotFoundError(concreteEntityId, concreteType)),
-          te.chainW((fetcher) => () => fetcher.findById(concreteEntityId)),
-        ),
-      ),
+      () => this.contextsRepo.findById(contextComposedId),
+      te.mapError((error) => {
+        return error.cause;
+      }),
     )();
   }
 }
