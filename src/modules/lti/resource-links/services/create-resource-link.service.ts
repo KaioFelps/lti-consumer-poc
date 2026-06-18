@@ -9,7 +9,7 @@ import { LtiResourceLinksRepository } from "../resource-links.repository";
 
 type Params = {
   resourceUrl?: URL;
-  context?: Context;
+  context?: Context<unknown>;
   deployment: LtiToolDeployment;
   title?: string;
   description?: string;
