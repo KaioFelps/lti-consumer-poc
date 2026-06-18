@@ -1,12 +1,4 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpStatus,
-  Injectable,
-  Scope,
-} from "@nestjs/common";
-import { errors as joseErrors } from "jose";
+import { ArgumentsHost, Catch, ExceptionFilter, Injectable, Scope } from "@nestjs/common";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { RenderableError } from "@/core/errors/renderable/renderable-error";
 import { TranslatorService } from "@/message-string/translator.service";
@@ -14,6 +6,7 @@ import { assertNever } from "@/utils/assert-never";
 import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
 import { LtilibError } from "$/core/errors/bases/ltilib.error";
 import { OAuthError } from "$/core/errors/bases/oauth.error";
+import { CouldNotFindContextDueToExternalRepositoryError } from "$/core/errors/could-not-find-context-due-to-external-error";
 import { CouldNotFindToolDueToExternalRepositoryError } from "$/core/errors/could-not-find-tool-due-to-external-error";
 import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
 import { MalformedRequestError } from "$/core/errors/malformed-request.error";
@@ -78,8 +71,8 @@ export class LtilibExceptionFilter implements ExceptionFilter {
       return await this.handleToolRetrievalExternalError(error, host);
     }
 
-    if (error instanceof joseErrors.JOSENotSupported) {
-      return await this.handleJoseNotSupportedError(error, host);
+    if (error instanceof CouldNotFindContextDueToExternalRepositoryError) {
+      return await this.handleContextRetrievalExternalError(error, host);
     }
 
     if (error instanceof OAuthError) {
@@ -136,26 +129,6 @@ export class LtilibExceptionFilter implements ExceptionFilter {
     return await this.renderableExceptionFilter.catch(new RenderableException(renderable), host);
   }
 
-  private async handleJoseNotSupportedError(
-    error: joseErrors.JOSENotSupported,
-    host: ArgumentsHost,
-  ) {
-    const renderable = new RenderableError(
-      {
-        view: "errors/lti-server-error",
-        viewProperties: {
-          title: "Internal Security Error",
-          message: "Could not establish a secure launch connection.",
-          code: "TOKEN_SIGNATURE_FAILED",
-        },
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-      },
-      error.constructor.name,
-    );
-
-    return await this.renderableExceptionFilter.catch(new RenderableException(renderable), host);
-  }
-
   private async handleToolRetrievalExternalError(
     error: CouldNotFindToolDueToExternalRepositoryError,
     host: ArgumentsHost,
@@ -167,6 +140,26 @@ export class LtilibExceptionFilter implements ExceptionFilter {
           title: await this.translator.translate("lti:launch:tool-retrieval-ext-err:title"),
           message: await this.translator.translate("lti:launch:tool-retrieval-ext-err:message"),
           code: "COULD_NOT_RETRIEVE_TOOL_RECORD",
+        },
+        status: error.httpStatusCode,
+      },
+      error.constructor.name,
+    );
+
+    return await this.renderableExceptionFilter.catch(new RenderableException(renderable), host);
+  }
+
+  private async handleContextRetrievalExternalError(
+    error: CouldNotFindContextDueToExternalRepositoryError,
+    host: ArgumentsHost,
+  ) {
+    const renderable = new RenderableError(
+      {
+        view: "errors/lti-server-error",
+        viewProperties: {
+          title: await this.translator.translate("lti:launch:context-retrieval-ext-err:title"),
+          message: await this.translator.translate("lti:launch:context-retrieval-ext-err:message"),
+          code: "COULD_NOT_RETRIEVE_RESOURCE_LINK_CONTEXT",
         },
         status: error.httpStatusCode,
       },

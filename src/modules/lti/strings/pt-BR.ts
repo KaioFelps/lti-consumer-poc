@@ -182,6 +182,11 @@ ptBR["lti:launch:tool-retrieval-ext-err:title"] =
 ptBR["lti:launch:tool-retrieval-ext-err:message"] =
   "Não foi possível iniciar de forma segura a ferramenta externa. Tente novamente mais tarde ou contate o suporte.";
 
+ptBR["lti:launch:context-retrieval-ext-err:title"] =
+  "Falha ao iniciar a ferramenta de aprendizagem externa";
+ptBR["lti:launch:context-retrieval-ext-err:message"] =
+  "Não foi possível localizar o curso ou outro contexto em que o recurso foi registrado. Contate o suporte para mais detalhes.";
+
 ptBR["lti:post-launch:success-title"] = "Lançamento concluído com sucesso";
 ptBR["lti:post-launch:error-title"] = "Lançamento mal-sucedido";
 ptBR["lti:post-launch:default-title"] = "Lançamento concluído";
