@@ -163,6 +163,28 @@ export class LtiLineItem<CustomContextType = unknown> implements ILtiLineItem<Cu
     );
   }
 
+  /**
+   * Recreates a instance of a {@link LtiLineItem `LtiLineItem`} that already existed previously.
+   * This is useful to restore entities persisted in some storage out of memory.
+   *
+   * @note It does not perform any security or conformance check. Make sure your line item is
+   * created by {@link create} at first.
+   */
+  public static createUnchecked<CustomContextType = never>(props: ILtiLineItem<CustomContextType>) {
+    return new LtiLineItem(
+      props.id,
+      props.label,
+      props.scoreMaximum,
+      props.context,
+      props.resourceLink,
+      props.externalResource,
+      props.tag,
+      props.gradesReleased,
+      props.startDateTime,
+      props.endDateTime,
+    );
+  }
+
   public get customParameters(): Readonly<CustomParameters> {
     return this._customParameters;
   }
