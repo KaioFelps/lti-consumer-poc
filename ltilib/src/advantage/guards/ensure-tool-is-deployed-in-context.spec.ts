@@ -18,7 +18,7 @@ describe("[LTI Advantage/GUARDS] Ensure Tool Is Deployed In Context", () => {
   });
 
   it("should allow it when the tool has at least one deployment in the given context", async () => {
-    const context = createContext();
+    const context = createContext<string>();
     const tool = createTool();
     const deployment = createToolDeployment({ context, tool });
     deploymentsRepo.deployments.push(deployment);
@@ -29,7 +29,7 @@ describe("[LTI Advantage/GUARDS] Ensure Tool Is Deployed In Context", () => {
   });
 
   it("should allow it when the tool has a global deployment", async () => {
-    const context = createContext();
+    const context = createContext<string>();
     const tool = createTool();
     const toolGlobalDeployment = createToolGlobalDeployment({ tool });
 
@@ -41,7 +41,7 @@ describe("[LTI Advantage/GUARDS] Ensure Tool Is Deployed In Context", () => {
 
   it("should deny it when no context has been provided", async () => {
     // tool indeed has a deployment in some context, but context ain't being provided to the guard
-    const context = createContext();
+    const context = createContext<string>();
     const tool = createTool();
     const deployment = createToolDeployment({ context, tool });
     deploymentsRepo.deployments.push(deployment);
@@ -54,8 +54,8 @@ describe("[LTI Advantage/GUARDS] Ensure Tool Is Deployed In Context", () => {
   });
 
   it("should deny it when there is no deployment of the tool in the given context", async () => {
-    const context = createContext();
-    const anotherContext = createContext();
+    const context = createContext<string>();
+    const anotherContext = createContext<string>();
 
     // a tool that has a deployment but in another context
     const tool = createTool();
@@ -70,7 +70,7 @@ describe("[LTI Advantage/GUARDS] Ensure Tool Is Deployed In Context", () => {
   });
 
   it("should deny it when the given tool has no deployments", async () => {
-    const context = createContext();
+    const context = createContext<string>();
     const tool = createTool();
 
     const result = await ensureToolIsDeployedInContext(tool, context, deploymentsRepo)();

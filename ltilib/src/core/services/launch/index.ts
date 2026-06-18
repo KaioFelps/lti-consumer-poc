@@ -2,6 +2,7 @@ import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim";
 import { Platform } from "$/core/platform";
+import { LtiContextsRepository } from "$/core/repositories/contexts.repository";
 import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiToolsRepository } from "$/core/repositories/tools.repository";
@@ -21,7 +22,7 @@ type GetLaunchLinksFromContext = GetLaunchLinksParams & {
   contextId: string;
 };
 
-export class LtiLaunchServices<CustomRoles extends string = never, CustomContextType = unknown> {
+export class LtiLaunchServices<CustomRoles extends string = never, CustomContextType = never> {
   private prepareLaunchRequestService: PrepareLaunchRequestService<CustomRoles, CustomContextType>;
   private initiateLaunchService: InitiateLaunchService;
   private getLaunchLinksService: GetLaunchLinksService;
@@ -33,6 +34,7 @@ export class LtiLaunchServices<CustomRoles extends string = never, CustomContext
     userIdentitiesRepository: LtiUserIdentitiesRespository,
     platform: Platform,
     agsClaimServices: LtiAgsClaimServices | undefined,
+    contextsRepository: LtiContextsRepository<CustomContextType>,
   ) {
     this.prepareLaunchRequestService = new PrepareLaunchRequestService<
       CustomRoles,
@@ -44,6 +46,7 @@ export class LtiLaunchServices<CustomRoles extends string = never, CustomContext
       agsClaimServices,
       userIdentitiesRepository,
       ltiToolsRepository,
+      contextsRepository,
     );
 
     this.initiateLaunchService = new InitiateLaunchService(platform, launchesRepository);

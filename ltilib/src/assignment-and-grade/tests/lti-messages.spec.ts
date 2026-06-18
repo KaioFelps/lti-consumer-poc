@@ -11,6 +11,7 @@ import { createPlatform } from "ltilib/tests/common/factories/platform.factory";
 import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
 import toolFactory from "ltilib/tests/common/factories/tool.factory";
 import { createToolDeployment } from "ltilib/tests/common/factories/tool-deployment.factory";
+import { InMemoryLtiContextsRepository } from "ltilib/tests/common/in-memory-repositories/contexts.repository";
 import { InMemoryLaunchesRepository } from "ltilib/tests/common/in-memory-repositories/launches.repository";
 import { InMemoryLtiLineItemsRepository } from "ltilib/tests/common/in-memory-repositories/line-items.repository";
 import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
@@ -35,9 +36,10 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
   let resourceLinksRepo: InMemoryLtiResourceLinksRepository;
   let launchesRepo: InMemoryLaunchesRepository;
   let userIdentitiesRepo: InMemoryUserIdentitiesRepository;
+  let contextsRepository: InMemoryLtiContextsRepository;
 
   let agsClaimServices: LtiAgsClaimServices;
-  let launchServices: LtiLaunchServices;
+  let launchServices: LtiLaunchServices<never, unknown>;
 
   beforeEach(() => {
     lineItemsRepo = new InMemoryLtiLineItemsRepository();
@@ -48,16 +50,18 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
     toolsRepo = new InMemoryToolsRepository(
       resourceLinksRepo as InMemoryLtiResourceLinksRepository,
     );
+    contextsRepository = new InMemoryLtiContextsRepository();
 
     agsClaimServices = new LtiAgsClaimServices(platform, lineItemsRepo);
 
-    launchServices = new LtiLaunchServices(
+    launchServices = new LtiLaunchServices<never, unknown>(
       resourceLinksRepo,
       toolsRepo,
       launchesRepo,
       userIdentitiesRepo,
       platform,
       agsClaimServices,
+      contextsRepository,
     );
   });
 
@@ -105,7 +109,7 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
         redirectUri: toolRedirectUri,
         state: randomBytes(512).toString("base64"),
         toolId: tool.id,
-        context,
+        contextOverride: context,
         prompt: "none",
         response_mode: "form_post",
         response_type: "id_token",
@@ -131,7 +135,7 @@ describe("[AGS] LTI Launch Messages with AGS claim", async () => {
       redirectUri: toolRedirectUri,
       state: randomBytes(512).toString("base64"),
       toolId: tool.id,
-      context,
+      contextOverride: context,
       prompt: "none",
       response_mode: "form_post",
       response_type: "id_token",

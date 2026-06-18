@@ -10,13 +10,13 @@ import { createTool } from "./tool.factory";
 
 type CreateResourceLinkConstructorArgs = Partial<ILtiLineItem<unknown>>;
 
-type CreateFullLineItemExtraArgs = {
-  context?: Context;
+type CreateFullLineItemExtraArgs<CCType = unknown> = {
+  context?: Context<CCType>;
   tool?: LtiTool;
 };
 
-export function createFullLineItem(
-  { context = createContext(), tool = createTool() }: CreateFullLineItemExtraArgs = {},
+export function createFullLineItem<CCType = unknown>(
+  { context = createContext<CCType>(), tool = createTool() }: CreateFullLineItemExtraArgs = {},
   {
     startDateTime = faker.date.soon({ days: 2 }),
     endDateTime = faker.datatype.boolean()
