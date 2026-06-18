@@ -152,7 +152,6 @@ export class PrepareLaunchRequestService<
       ),
       te.map(({ form, launchMessage }) => {
         const headers = { "Content-Type": "text/html" };
-        console.log(form);
         return new HttpResponseWrapper<typeof launchMessage, string>(
           form,
           200,
@@ -192,21 +191,11 @@ export class PrepareLaunchRequestService<
     resourceLink: LtiResourceLink,
     errFactory: RedirectionErrorFactory,
   ): TaskEither<AuthenticationRedirectionError, AssignmentAndGradeServiceClaim | undefined> {
-    console.log(
-      "começando a preparar ags claims; está ativado?",
-      !!this.agsClaimServices,
-      "para o contexto",
-      context,
-    );
     return pipe(
       this.agsClaimServices
         ? () => this.agsClaimServices!.create({ tool, context, resourceLink })
         : te.right(o.none),
       te.map(o.toUndefined),
-      te.tap((result) => {
-        console.log(result);
-        return te.right(undefined);
-      }),
       te.mapLeft((_externalRepositoryError) =>
         errFactory(
           "server_error",
