@@ -4,6 +4,7 @@ import { CoursesRepository } from "@/modules/assignments-and-grades/repositories
 import { InstructorsRepository } from "@/modules/courses-and-enrollments/repositories/instructors.repository";
 import { PeopleRepository } from "@/modules/identity/person/people.repository";
 import { UsersRepository } from "@/modules/identity/user/users.repository";
+import { LtiContextsRepository } from "@/modules/lti/advantage/repositories/lti-contexts.repository";
 import { ExternalLtiAssignmentsRepository } from "@/modules/lti/ags/repositories/external-lti-assignments.repository";
 import { LtiResourceLinksRepository } from "@/modules/lti/resource-links/resource-links.repository";
 import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository";
@@ -20,6 +21,7 @@ import { DrizzleCoursesRepository } from "./drizzle/repositories/courses.reposit
 import { DrizzleExternalLtiAssignmentsRepository } from "./drizzle/repositories/external-lti-assignments.repository";
 import { DrizzleExternalLtiResourcesRepository } from "./drizzle/repositories/external-lti-resources.repository";
 import { DrizzleInstructorsRepository } from "./drizzle/repositories/instructors.repository";
+import { DrizzleLtiContextsRepository } from "./drizzle/repositories/lti-contexts.repository";
 import { DrizzleLtiLineItemsRepository } from "./drizzle/repositories/lti-line-items.repository";
 import { DrizzleLtiToolsRepository } from "./drizzle/repositories/lti-tools.repository";
 import { DrizzleLtiToolsDeploymentsRepository } from "./drizzle/repositories/lti-tools-deployments.repository";
@@ -54,6 +56,7 @@ import { RedisLtiLaunchesRepository } from "./redis/repositories/lti-launches.re
     },
     { provide: LtiLineItemsRepository, useClass: DrizzleLtiLineItemsRepository },
     { provide: ExternalLtiResourcesRepository, useClass: DrizzleExternalLtiResourcesRepository },
+    { provide: LtiContextsRepository, useClass: DrizzleLtiContextsRepository },
   ],
   exports: [
     UsersRepository,
@@ -72,6 +75,7 @@ import { RedisLtiLaunchesRepository } from "./redis/repositories/lti-launches.re
     ExternalLtiAssignmentsRepository,
     LtiLineItemsRepository,
     ExternalLtiResourcesRepository,
+    LtiContextsRepository,
   ],
 })
 export class RepositoriesModule {}

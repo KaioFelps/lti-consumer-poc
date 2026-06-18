@@ -11,20 +11,22 @@ import { Course } from "@/modules/courses-and-enrollments/entities/course.entity
 import { DrizzleClient } from "../client";
 import coursesMapper from "../mappers/courses.mapper";
 import coursesWithInstructorsMapper from "../mappers/courses-with-instructors.mapper";
+import { DrizzleTransactionManager } from "../transaction-manager";
 
 @Injectable()
 export class DrizzleCoursesRepository extends CoursesRepository {
-  public constructor(private readonly drizzle: DrizzleClient) {
+  public constructor(
+    private readonly drizzle: DrizzleClient,
+    private readonly txManager: DrizzleTransactionManager,
+  ) {
     super();
   }
 
   public async findById(courseId: UUID) {
+    const client = this.txManager.getTx() ?? this.drizzle.getClient();
     return pipe(
       te.tryCatch(
-        () =>
-          this.drizzle
-            .getClient()
-            .query.coursesT.findFirst({ where: eq(coursesT.id, courseId.toString()) }),
+        () => client.query.coursesT.findFirst({ where: eq(coursesT.id, courseId.toString()) }),
         (error) =>
           new IrrecoverableError(
             `Unexpected error occurred when trying to find course with id '${courseId.toString()}'.`,
@@ -39,12 +41,12 @@ export class DrizzleCoursesRepository extends CoursesRepository {
   }
 
   public save(course: Course) {
+    const client = this.txManager.getTx() ?? this.drizzle.getClient();
     const payload = coursesMapper.intoRow(course);
     return pipe(
       te.tryCatch(
         () =>
-          this.drizzle
-            .getClient()
+          client
             .insert(coursesT)
             .values(payload)
             .onConflictDoUpdate({
@@ -63,12 +65,10 @@ export class DrizzleCoursesRepository extends CoursesRepository {
   }
 
   public findManyCoursesWithInstructors() {
+    const client = this.txManager.getTx() ?? this.drizzle.getClient();
     return pipe(
       te.tryCatch(
-        () =>
-          this.drizzle
-            .getClient()
-            .query.coursesT.findMany(coursesWithInstructorsMapper.requiredQueryConfig),
+        () => client.query.coursesT.findMany(coursesWithInstructorsMapper.requiredQueryConfig),
         (error) =>
           new IrrecoverableError(
             `Error occurred in ${DrizzleCoursesRepository.name} when trying to fetch courses.`,
@@ -80,10 +80,11 @@ export class DrizzleCoursesRepository extends CoursesRepository {
   }
 
   public findCourseWithInstructorById(courseId: UUID) {
+    const client = this.txManager.getTx() ?? this.drizzle.getClient();
     return pipe(
       te.tryCatch(
         () =>
-          this.drizzle.getClient().query.coursesT.findFirst({
+          client.query.coursesT.findFirst({
             ...coursesWithInstructorsMapper.requiredQueryConfig,
             where: eq(coursesT.id, courseId.toString()),
           }),

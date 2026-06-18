@@ -1,7 +1,10 @@
 import { Body, Controller, Get, Param, Post, Render, Res, Session } from "@nestjs/common";
 import { type UUID } from "common/src/types/uuid";
-import { either as e, taskEither as te } from "fp-ts";
+import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
+import { ErrorBase } from "@/core/errors/error-base";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
+import { TransactionManager } from "@/core/transaction-manager";
 import { AssignmentPresenter } from "@/external/presenters/entities/assignment.presenter";
 import { CourseWithInstructorPresenter } from "@/external/presenters/entities/course-with-instructor.presenter";
 import type { HttpResponse, RequestSession } from "@/lib";
@@ -12,6 +15,7 @@ import { ListAssignmentsFromCourseService } from "../assignments-and-grades/serv
 import { SessionUser } from "../auth/session-user";
 import { Course } from "../courses-and-enrollments/entities/course.entity";
 import { User } from "../identity/user/user.entity";
+import { CreateCourseContextService } from "../lti/ags/services/create-course-context.service";
 import { CreateCourseDTO } from "./dtos/create-course.dto";
 import { CreateCourseService } from "./services/create-course.service";
 import { FetchManyCoursesService } from "./services/fetch-many-courses.service";
@@ -26,6 +30,8 @@ export class CoursesAndEnrollmentsController {
     private readonly findCourseByIdService: FindCourseByIdService,
     private readonly fetchManyCoursesService: FetchManyCoursesService,
     private readonly listAssignmentsFromCourseService: ListAssignmentsFromCourseService,
+    private readonly createCourseContextService: CreateCourseContextService,
+    private readonly txManager: TransactionManager,
   ) {}
 
   @Get("/")
@@ -56,15 +62,43 @@ export class CoursesAndEnrollmentsController {
     @Session() session: RequestSession,
     @SessionUser() user: User,
   ) {
-    const course = pipe(
-      await this.createCourseService.execute({ instructorId: user.getId(), title }),
-      e.getOrElseW((error) => {
+    const createCourseWithContext = () =>
+      this.txManager.runInTransaction(() =>
+        pipe(
+          te.Do,
+          te.bindW(
+            "courseWithInstructor",
+            () => () => this.createCourseService.exec({ instructorId: user.getId(), title }),
+          ),
+          te.chainFirstW(
+            ({ courseWithInstructor }) =>
+              () =>
+                this.createCourseContextService.exec({ course: courseWithInstructor.getCourse() }),
+          ),
+          te.getOrElse((error) => {
+            throw error;
+          }),
+        )(),
+      );
+
+    const { courseWithInstructor } = await pipe(
+      te.tryCatch(createCourseWithContext, (error) => {
+        if (error instanceof IrrecoverableError || error instanceof ErrorBase) {
+          return error;
+        }
+
+        return new IrrecoverableError(
+          `Failed to persist course and course context within a transaction (in ${CoursesAndEnrollmentsController.name}).`,
+          error as Error,
+        );
+      }),
+      te.getOrElse((error) => {
         throw ExceptionsFactory.fromError(error);
       }),
-    );
+    )();
 
     session.flash.success = {
-      message: `Curso ${course.getCourse().getTitle()} criado com sucesso!`,
+      message: `Curso ${courseWithInstructor.getCourse().getTitle()} criado com sucesso!`,
       seeCoursesButtonLabel: "Veja todos os cursos",
     };
 

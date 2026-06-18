@@ -1,13 +1,14 @@
 import { forwardRef, MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import middlewares from "@/lib/middlewares";
 import { AssignmentsAndGradesModule } from "../assignments-and-grades/assignments-and-grades.module";
+import { LtiModule } from "../lti/lti.module";
 import { CoursesAndEnrollmentsController } from "./courses-and-enrollments.controller";
 import { CreateCourseService } from "./services/create-course.service";
 import { FetchManyCoursesService } from "./services/fetch-many-courses.service";
 import { FindCourseByIdService } from "./services/find-course-by-id.service";
 
 @Module({
-  imports: [forwardRef(() => AssignmentsAndGradesModule)],
+  imports: [forwardRef(() => AssignmentsAndGradesModule), forwardRef(() => LtiModule)],
   providers: [CreateCourseService, FetchManyCoursesService, FindCourseByIdService],
   controllers: [CoursesAndEnrollmentsController],
   exports: [FindCourseByIdService],

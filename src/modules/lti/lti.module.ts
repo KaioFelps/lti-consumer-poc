@@ -19,6 +19,7 @@ import { ContextFetchersModule } from "./advantage/context/fetchers/context-fetc
 import { FindContextByIdService } from "./advantage/context/services/find-context-by-id.service";
 import { LtiAssignmentsController } from "./ags/controllers/lti-assignments.controller";
 import { LtiLineItemsController } from "./ags/controllers/lti-line-items.controller";
+import { CreateCourseContextService } from "./ags/services/create-course-context.service";
 import { CreateExternalLtiAssignmentService } from "./ags/services/create-external-lti-assignment.service";
 import { FindExternalLtiAssignmentByIdService } from "./ags/services/find-external-lti-assignment-by-id.service";
 import { LtiDeploymentsController } from "./deployments/deployments.controller";
@@ -132,8 +133,9 @@ import { LtiToolsController } from "./tools/tools.controller";
         LtiToolsDeploymentsRepository,
       ],
     },
+    CreateCourseContextService,
   ],
-  exports: [LtiLaunchServices, Platform],
+  exports: [LtiLaunchServices, Platform, CreateCourseContextService],
   controllers: [
     LtiController,
     LtiToolsController,

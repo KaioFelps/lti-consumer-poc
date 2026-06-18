@@ -17,7 +17,7 @@ export class CreateCourseService {
     private readonly coursesRepository: CoursesRepository,
   ) {}
 
-  public async execute({ instructorId, title }: Params) {
+  public async exec({ instructorId, title }: Params) {
     return await pipe(
       () => this.instructorsRepository.findInstructorById(instructorId.toString()),
       te.map((instructor) => instructor.createCourse({ title })),
