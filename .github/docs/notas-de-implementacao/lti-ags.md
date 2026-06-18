@@ -70,7 +70,49 @@ $\rightarrow$ `platform::Assignment`.
 > necessário acoplar as entidades da _ltilib_ às da plataforma. É o que buscamos, visto que a
 > biblioteca visa ser agnóstica de sistemas e _frameworks_.
 
+### Lançamento
+
+O lançamento com sucesso de uma atividade externa — com sucesso, nos referimos não só ao lançamento,
+mas à capacidade da ferramenta criar line items e enviar notas de volta para a plataforma — depende
+também das configurações da biblioteca _ltilib_ na plataforma. (Vide [Habilitando Os Serviços de Line Items](#habilitando-os-serviços-de-line-items).)
+
+Para conseguirmos passar o contexto para o serviço de lançamento sem termos que criar um endpoint dedicado
+a lançar resource links de atividades externas, é necessário um meio de obter o contexto a partir do
+_resource link_.
+
+A classe `ltilib::LtiResourceLink` possui o campo contexto, de fato. Assim, o primeiro passo é simplesmente
+adicionar o contexto durante a criação do _resource link_ no serviço `CreateExternalLtiAssignmentService`.
+
+> [!WARNING]
+> Pensando por algum tempo, pode parecer lógico e eficiente simplesmente aproveitar o contexto que já está associado
+> ao _deployment_ "do _resource_link_" para associar também a este. Isso, contudo, é um equívoco.
+> O _deployment_ é referente a implantação **da ferramenta a qual o _resource link_ pertence, não ao
+> _resource link_ em si**. A ferramenta pode ter sido implantada em um hipotético contexto
+> $(\text{DACOM}, departamento)$ ao passo que o _resource link_ deva pertencer ao contexto
+> $(\text{Cibersegurança}, curso)$, por exemplo.
+
+Com o contexto disponível no próprio _resource link_, basta um mecanismo de obter esse contexto na fase
+de login durante o lançamento LTI, de modo que possamos passá-lo como parâmetro para o serviço que gera
+o formulário de submissão para efetivar o lançamento. Isso é o suficiente para que o _claim_ do LTI AGS
+seja finalmente apresentado.
+
 ## External Resources
 
 Essa plataforma não implementa o uso de contextos nos links externos. Dessa forma, a propriedade
 `ltilib::ExternalLtiResource.context` é sempre nula e desprezada.
+
+### Habilitando Os Serviços de Line Items
+
+No módulo `LtiModule`, até então, era passado `undefined` explicitamente no parâmetro `LtiAgsClaimServices`.
+Para habilitar o claims de serviços, agora instanciamos a instância de `LtiAgsClaimServices` e passamos
+ela como parâmetro na criação do `LtiLaunchesServices`.
+
+Além disso, para a maioria dos serviços do LTI Advantage, e em particular para o AGS, o contexto é deveras
+importante. Enquanto ele não é critério obrigatório para um lançamento LTI (LTI Core) bem sucedido, ele é
+essencial para os serviços de notas. A biblioteca _ltilib_ ignora silenciosamente vários procedimentos
+do LTI Advantage quando não é fornecido nenhum contexto afim de manter compatibilidade com o LTI Core ao
+desabilitar as funcionalidades que dependem dele.
+
+Nesse caso, o claim dos serviços do LTI AGS não são incluídos mesmo que o serviço tenha sido fornecido,
+a menos que um contexto seja passado na hora de realizar o lançamento. Isso implica mudanças no _endpoint_
+de lançamento de atividades.
