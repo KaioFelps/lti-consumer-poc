@@ -2,10 +2,15 @@ import { Injectable } from "@nestjs/common";
 import type { UUID } from "common/src/types/uuid";
 import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
+import { ErrorBase } from "@/core/errors/error-base";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
 import { TransactionManager } from "@/core/transaction-manager";
 import { CreateAssignmentService } from "@/modules/assignments-and-grades/services/create-assignment.service";
+import { Context } from "$/core/context";
+import { LtilibError } from "$/core/errors/bases/ltilib.error";
 import { unmountContextId } from "../../advantage/context";
+import { FindContextByIdService } from "../../advantage/context/services/find-context-by-id.service";
 import { CreateResourceLinkService } from "../../resource-links/services/create-resource-link.service";
 import { LtiToolDeployment } from "../../tools/entities/lti-tool-deployment.entity";
 import { LtiToolsDeploymentsRepository } from "../../tools/lti-tools-deployments.repository";
@@ -37,15 +42,17 @@ export class CreateExternalLtiAssignmentService {
     private readonly externalAssignmentsRepo: ExternalLtiAssignmentsRepository,
     private readonly createResourceLinkService: CreateResourceLinkService,
     private readonly createAssignmentService: CreateAssignmentService,
+    private readonly findContextService: FindContextByIdService,
   ) {}
 
   public exec(params: Params) {
     const { toolId, contextComposedId } = params;
     return pipe(
       te.Do,
-      te.bindW("deployment", () => this.findToolDeployment(toolId, contextComposedId)),
-      te.chainW(({ deployment }) =>
-        this.persistAssignmentAndResourceLinkAtomically(params, deployment),
+      te.apS("deployment", this.findToolDeployment(toolId, contextComposedId)),
+      te.apS("context", () => this.findContextService.exec({ contextComposedId })),
+      te.chainW(({ deployment, context }) =>
+        this.persistAssignmentAndResourceLinkAtomically(params, deployment, context),
       ),
     )();
   }
@@ -53,9 +60,11 @@ export class CreateExternalLtiAssignmentService {
   private persistAssignmentAndResourceLinkAtomically(
     params: Params,
     deployment: LtiToolDeployment,
+    context: Context<unknown>,
   ) {
     const { assignment, instructorId, resourceLink } = params;
-    return () =>
+
+    const transaction = () =>
       this.transactionManager.runInTransaction(async () => {
         return pipe(
           te.Do,
@@ -64,7 +73,12 @@ export class CreateExternalLtiAssignmentService {
           ),
           te.bindW(
             "resourceLink",
-            () => () => this.createResourceLinkService.exec({ ...resourceLink, deployment }),
+            () => () =>
+              this.createResourceLinkService.exec({
+                ...resourceLink,
+                deployment,
+                context,
+              }),
           ),
           te.chainFirstW(
             ({ assignment, resourceLink }) =>
@@ -72,11 +86,29 @@ export class CreateExternalLtiAssignmentService {
                 this.externalAssignmentsRepo.makeAssignmentExternal(assignment, resourceLink),
           ),
           te.mapLeft((error) => {
-            this.transactionManager.rollback();
-            return error;
+            throw error;
           }),
         )();
       });
+
+    return pipe(
+      te.tryCatch(transaction, (error) => {
+        if (
+          error instanceof IrrecoverableError ||
+          error instanceof ErrorBase ||
+          error instanceof LtilibError
+        ) {
+          return error;
+        }
+
+        return new IrrecoverableError(
+          `Failed to persist assignment and resource link within transaction (in ${CreateExternalLtiAssignmentService.name}).`,
+          error as Error,
+        );
+      }),
+      te.map(te.fromEither),
+      te.flatten,
+    );
   }
 
   private findToolDeployment(toolId: string, contextComposedId: string) {

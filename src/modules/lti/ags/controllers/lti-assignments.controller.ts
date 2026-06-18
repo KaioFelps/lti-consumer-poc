@@ -7,6 +7,7 @@ import { CourseWithInstructorPresenter } from "@/external/presenters/entities/co
 import { LtiToolPreviewPresenter } from "@/external/presenters/entities/lti-tool-preview.presenter";
 import { HttpResponse, RequestSession } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
+import { ExtendedExceptionsFactory } from "@/lib/exceptions/extended-exceptions.factory";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { FindCourseByIdService } from "@/modules/courses-and-enrollments/services/find-course-by-id.service";
@@ -84,7 +85,7 @@ export class LtiAssignmentsController {
           }),
       ),
       te.getOrElse((error) => {
-        throw ExceptionsFactory.fromError(error);
+        throw ExtendedExceptionsFactory.fromError(error);
       }),
     )();
 
