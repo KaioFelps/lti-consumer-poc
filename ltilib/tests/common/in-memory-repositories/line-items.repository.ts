@@ -44,6 +44,7 @@ export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
 
   public async findManyByResourceLink(
     resourceLinkId: LtiResourceLink["id"],
+    _context: Context,
     limit: number,
   ): Promise<Either<LtiRepositoryError, LtiLineItem[]>> {
     const lineitems = this.lineItems

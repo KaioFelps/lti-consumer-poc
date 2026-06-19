@@ -15,8 +15,18 @@ export abstract class LtiLineItemsRepository {
     tag: string | undefined,
   ): Promise<Either<LtiRepositoryError, LtiLineItem>>;
 
+  /**
+   * Finds at most `limit` line items associated to the resource link identified by
+   * `resourceLinkId`.
+   *
+   * @param resourceLinkId - The identifier of the resource link that the line items must be associated to
+   * @param context - The context to which the resource link belongs to — or that has been passed as override
+   * to the service calling this repository. Might be used to restore the line item from the data storage.
+   * @param limit - The maximum amount of tuples that must be returned by this method.
+   */
   public abstract findManyByResourceLink(
     resourceLinkId: LtiResourceLink["id"],
+    context: Context<unknown>,
     limit: number,
   ): Promise<Either<LtiRepositoryError, LtiLineItem[]>>;
 

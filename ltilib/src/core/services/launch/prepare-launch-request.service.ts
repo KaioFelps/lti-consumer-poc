@@ -5,12 +5,15 @@ import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim";
 import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim";
 import { Context } from "$/core/context";
 import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
+import { CouldNotFindContextDueToExternalRepositoryError } from "$/core/errors/could-not-find-context-due-to-external-error";
 import { CouldNotFindToolDueToExternalRepositoryError } from "$/core/errors/could-not-find-tool-due-to-external-error";
 import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
+import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { LtiLaunchData } from "$/core/launch-data";
 import { LTIResourceLinkLaunchRequest } from "$/core/messages/resource-link-launch";
 import { Platform } from "$/core/platform";
+import { LtiContextsRepository } from "$/core/repositories/contexts.repository";
 import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiToolsRepository } from "$/core/repositories/tools.repository";
@@ -55,7 +58,11 @@ export type AuthenticateLaunchLoginRequestParams<
    * If none is provided, the identity of the user who initiated the launch will be fetched and used.
    */
   userIdentity?: UserIdentity;
-  context?: Context<CustomContextType>;
+  /**
+   * When present, overrides the context of the resource being launched.
+   * When not present, the context of the resource will be fetched and used (if it's set and exists).
+   */
+  contextOverride?: Context<CustomContextType>;
   fallbackUserRoles?: UserRoles<CustomRoles>;
   transformLaunchRequest?: (
     request: LTIResourceLinkLaunchRequest<CustomRoles, CustomContextType>,
@@ -70,7 +77,7 @@ export type AuthenticateLaunchLoginRequestParams<
 
 export class PrepareLaunchRequestService<
   CustomRoles extends string = never,
-  CustomContextType = never,
+  CustomContextType = unknown,
 > {
   public constructor(
     private platform: Platform,
@@ -79,6 +86,7 @@ export class PrepareLaunchRequestService<
     private agsClaimServices: LtiAgsClaimServices<CustomContextType> | undefined,
     private userIdentitiesRepository: LtiUserIdentitiesRespository<CustomRoles>,
     private toolsRepository: LtiToolsRepository,
+    private contextsRepository: LtiContextsRepository<CustomContextType>,
   ) {}
 
   public async execute({
@@ -88,7 +96,7 @@ export class PrepareLaunchRequestService<
     redirectUri: unsafeRedirectUri,
     state,
     userIdentity: incominguseridentity,
-    context,
+    contextOverride: context,
     fallbackUserRoles,
     errorDescriptionsRoutes,
     toolId,
@@ -110,24 +118,27 @@ export class PrepareLaunchRequestService<
       te.bindW("resourceLink", ({ launch, failRedirect }) =>
         this.findResourceLink(launch, failRedirect),
       ),
+      te.bindW("resolvedContext", ({ resourceLink }) => this.resolveContext(context, resourceLink)),
       te.bindW("userIdentity", ({ launch, failRedirect }) =>
         this.resolveUserIdentity(launch, incominguseridentity, failRedirect),
       ),
-      te.bindW("agsClaim", ({ tool, resourceLink, failRedirect }) =>
-        this.prepareAgsClaimIfEnabled(tool, context, resourceLink, failRedirect),
+      te.bindW("agsClaim", ({ tool, resourceLink, failRedirect, resolvedContext }) =>
+        this.prepareAgsClaimIfEnabled(tool, resolvedContext, resourceLink, failRedirect),
       ),
-      te.bindW("launchMessage", ({ tool, resourceLink, agsClaim, launch, userIdentity }) =>
-        this.prepareMessage(
-          tool,
-          resourceLink,
-          launch,
-          agsClaim,
-          nonce,
-          state,
-          userIdentity,
-          context,
-          fallbackUserRoles,
-        ),
+      te.bindW(
+        "launchMessage",
+        ({ tool, resourceLink, agsClaim, launch, userIdentity, resolvedContext }) =>
+          this.prepareMessage(
+            tool,
+            resourceLink,
+            launch,
+            agsClaim,
+            nonce,
+            state,
+            userIdentity,
+            resolvedContext,
+            fallbackUserRoles,
+          ),
       ),
       te.chainFirstIOK(({ launchMessage, launch }) => () => {
         if (launch.presentation) launchMessage.setPresentation(launch.presentation);
@@ -149,6 +160,29 @@ export class PrepareLaunchRequestService<
         );
       }),
     )();
+  }
+
+  private resolveContext(
+    overrideContext: Context<CustomContextType> | undefined,
+    resourceLink: LtiResourceLink,
+  ): TaskEither<
+    CouldNotFindContextDueToExternalRepositoryError,
+    Context<CustomContextType> | undefined
+  > {
+    if (overrideContext) return te.right(overrideContext);
+    if (!resourceLink.contextId) return te.right(undefined);
+
+    const contextId = resourceLink.contextId;
+    return pipe(
+      () => this.contextsRepository.findById(contextId),
+      te.orElse((error) => {
+        if (error instanceof LtiRepositoryError && error.type === "NotFound") {
+          return te.right(undefined);
+        }
+
+        return te.left(new CouldNotFindContextDueToExternalRepositoryError(error));
+      }),
+    );
   }
 
   private prepareAgsClaimIfEnabled(

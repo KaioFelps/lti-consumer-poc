@@ -3,6 +3,7 @@ import { either as e } from "fp-ts";
 import { createPlatform } from "ltilib/tests/common/factories/platform.factory";
 import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
 import { createTool } from "ltilib/tests/common/factories/tool.factory";
+import { InMemoryLtiContextsRepository } from "ltilib/tests/common/in-memory-repositories/contexts.repository";
 import { InMemoryLaunchesRepository } from "ltilib/tests/common/in-memory-repositories/launches.repository";
 import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
 import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
@@ -23,6 +24,7 @@ describe("[Core] Initiate Launch Service", async () => {
   let toolsRepo: InMemoryToolsRepository;
   let launchesRepo: InMemoryLaunchesRepository;
   let userIdentitiesRepo: InMemoryUserIdentitiesRepository;
+  let contextsRepository: InMemoryLtiContextsRepository;
 
   let platform: Platform;
   let sut: LtiLaunchServices;
@@ -32,6 +34,7 @@ describe("[Core] Initiate Launch Service", async () => {
     toolsRepo = new InMemoryToolsRepository();
     launchesRepo = new InMemoryLaunchesRepository();
     userIdentitiesRepo = new InMemoryUserIdentitiesRepository();
+    contextsRepository = new InMemoryLtiContextsRepository();
 
     platform = await createPlatform();
 
@@ -42,6 +45,7 @@ describe("[Core] Initiate Launch Service", async () => {
       userIdentitiesRepo,
       platform,
       undefined,
+      contextsRepository,
     );
   });
 

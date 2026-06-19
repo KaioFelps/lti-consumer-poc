@@ -3,10 +3,10 @@ import type { BuildQueryResult, DBQueryConfig, ExtractTablesWithRelations } from
 import { either, option } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { unmountContextId } from "@/modules/lti/advantage/context";
-import { LtiContextAdapter } from "@/modules/lti/advantage/context/adapters";
 import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type";
 import { ExternalLtiResource } from "$/advantage/external-resource";
 import { LtiLineItem } from "$/assignment-and-grade/line-item";
+import { Context } from "$/core/context";
 import ltiToolsMapper from "./lti-tools.mapper";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
@@ -64,11 +64,12 @@ function intoRow(lineitem: LtiLineItem, ltiAssignmentId: string | null) {
   );
 }
 
-function fromRow(row: LtiLineItemLinkRow, contextAdapter: LtiContextAdapter<ContextConcreteType>) {
+function fromRow(row: LtiLineItemLinkRow, context: Context<ContextConcreteType>) {
   const externalResourceRow = row.externalResource;
 
-  return LtiLineItem.create({
-    context: contextAdapter.getContext(),
+  return LtiLineItem.createUnchecked({
+    id: row.id,
+    context,
     label: row.label,
     resourceLink: undefined,
     scoreMaximum: row.scoreMaximum,
@@ -83,7 +84,6 @@ function fromRow(row: LtiLineItemLinkRow, contextAdapter: LtiContextAdapter<Cont
         })
       : undefined,
     gradesReleased: row.gradesReleased ?? undefined,
-    id: row.id,
     tag: row.tag ?? undefined,
   });
 }

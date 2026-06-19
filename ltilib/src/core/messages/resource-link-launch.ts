@@ -223,6 +223,10 @@ export class LTIResourceLinkLaunchRequest<
     return e.right(undefined);
   }
 
+  public hasContext() {
+    return Boolean(this.context);
+  }
+
   public setPresentation(
     presentation: MessageRequests.IPresentation | MessageRequests.Presentation,
   ) {

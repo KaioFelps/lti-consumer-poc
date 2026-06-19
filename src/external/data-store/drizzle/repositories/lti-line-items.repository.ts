@@ -5,7 +5,9 @@ import { taskEither as te } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { type TaskEither } from "fp-ts/lib/TaskEither";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { InvalidComposedContextIdError } from "@/modules/lti/advantage/errors/invalid-composed-context-id.error";
+import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type";
 import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters";
 import { LtiLineItem } from "$/assignment-and-grade/line-item";
 import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
@@ -86,9 +88,36 @@ export class DrizzleLtiLineItemsRepository extends LtiLineItemsRepository {
 
   public findManyByResourceLink(
     resourceLinkId: LtiResourceLink["id"],
+    context: Context<ContextConcreteType>,
     limit: number,
-  ): Promise<Either<LtiRepositoryError, LtiLineItem[]>> {
-    throw new Error("Method not implemented.");
+  ) {
+    const client = this.transactionManager.getTx() ?? this.drizzle.getClient();
+
+    return pipe(
+      this.resolveAssignmentId(resourceLinkId),
+
+      te.chainW((resolvedAssignmentId) => {
+        if (!resolvedAssignmentId) return te.right([]);
+
+        return te.tryCatch(
+          () =>
+            client.query.ltiLineItemsT.findMany({
+              ...ltiLineItemsMapper.requiredQueryConfig,
+              where: eq(ltiLineItemsT.ltiAssignmentId, resolvedAssignmentId),
+              limit: limit,
+            }),
+          (error) =>
+            new LtiRepositoryError({
+              type: "ExternalError",
+              cause: new IrrecoverableError(
+                `Error occurred in ${DrizzleLtiLineItemsRepository.name} when finding line items by resource link from database.`,
+                error as Error,
+              ),
+            }),
+        );
+      }),
+      te.map((rows) => rows.map((row) => ltiLineItemsMapper.fromRow(row, context))),
+    )();
   }
 
   public findById(lineItemId: LtiLineItem["id"]): Promise<Either<LtiRepositoryError, LtiLineItem>> {

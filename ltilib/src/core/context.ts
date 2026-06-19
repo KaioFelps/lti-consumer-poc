@@ -85,10 +85,17 @@ export class Context<CustomContextType = never>
     return new Context({ ...args, id: args.id ?? generateUUID() });
   }
 
+  /**
+   * Prepare the context claim as per LTI specification.
+   *
+   * @note custom types are **not** included in the final claim.
+   */
   intoLtiClaim() {
+    const availableTypes = Object.values(ContextType) as string[];
+    const types = this.type?.filter((type) => availableTypes.includes(type as string));
     return {
       id: this.id,
-      type: this.type,
+      type: types,
       label: this.label,
       title: this.title,
     };

@@ -17,6 +17,7 @@ import { AssignmentsAndGradesModule } from "../assignments-and-grades/assignment
 import { CoursesModule } from "../courses-and-enrollments/courses.module";
 import { ContextFetchersModule } from "./advantage/context/fetchers/context-fetchers.module";
 import { FindContextByIdService } from "./advantage/context/services/find-context-by-id.service";
+import { LtiContextsRepository } from "./advantage/repositories/lti-contexts.repository";
 import { LtiAssignmentsController } from "./ags/controllers/lti-assignments.controller";
 import { LtiLineItemsController } from "./ags/controllers/lti-line-items.controller";
 import { CreateCourseContextService } from "./ags/services/create-course-context.service";
@@ -72,6 +73,7 @@ import { LtiToolsController } from "./tools/tools.controller";
         platform: Platform,
         userIdentitiesRepository: LtiUserIdentitiesRespository,
         agsClaimServices: LtiAgsClaimServices,
+        contextsRepository: LtiContextsRepository,
       ) =>
         new LtiLaunchServices(
           ltiResourceLinksRepository,
@@ -80,6 +82,7 @@ import { LtiToolsController } from "./tools/tools.controller";
           userIdentitiesRepository,
           platform,
           agsClaimServices,
+          contextsRepository,
         ),
       inject: [
         LtiResourceLinksRepository,
@@ -88,6 +91,7 @@ import { LtiToolsController } from "./tools/tools.controller";
         Platform,
         LtiUserIdentitiesRespository,
         LtiAgsClaimServices,
+        LtiContextsRepository,
       ],
     },
     {

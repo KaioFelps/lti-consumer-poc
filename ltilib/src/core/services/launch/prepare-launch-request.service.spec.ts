@@ -12,6 +12,7 @@ import { createContext } from "ltilib/tests/common/factories/context.factory";
 import { createPlatform } from "ltilib/tests/common/factories/platform.factory";
 import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
 import { createTool } from "ltilib/tests/common/factories/tool.factory";
+import { InMemoryLtiContextsRepository } from "ltilib/tests/common/in-memory-repositories/contexts.repository";
 import { InMemoryLaunchesRepository } from "ltilib/tests/common/in-memory-repositories/launches.repository";
 import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
 import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
@@ -48,6 +49,7 @@ describe("[Core] Prepare Launch Request Service", async () => {
   let toolsRepo: InMemoryToolsRepository;
   let launchesRepo: InMemoryLaunchesRepository;
   let userIdentitiesRepo: InMemoryUserIdentitiesRepository;
+  let contextsRepository: InMemoryLtiContextsRepository;
 
   let platform: Platform;
   let sut: LtiLaunchServices;
@@ -57,6 +59,7 @@ describe("[Core] Prepare Launch Request Service", async () => {
     toolsRepo = new InMemoryToolsRepository();
     userIdentitiesRepo = new InMemoryUserIdentitiesRepository();
     launchesRepo = new InMemoryLaunchesRepository();
+    contextsRepository = new InMemoryLtiContextsRepository();
 
     platform = await createPlatform();
 
@@ -67,6 +70,7 @@ describe("[Core] Prepare Launch Request Service", async () => {
       userIdentitiesRepo,
       platform,
       undefined,
+      contextsRepository,
     );
   });
 
@@ -178,6 +182,7 @@ describe("[Core] Prepare Launch Request Service", async () => {
         userIdentitiesRepo,
         platform,
         undefined,
+        contextsRepository,
       );
 
       const launch = await sut.authenticateLaunch(
@@ -318,6 +323,7 @@ describe("[Core] Prepare Launch Request Service", async () => {
       userIdentitiesRepo,
       platform,
       undefined,
+      contextsRepository,
     );
   };
 
@@ -828,5 +834,45 @@ describe("[Core] Prepare Launch Request Service", async () => {
     const dom = getDomWithForm();
     const form = dom.window.document.querySelector("form");
     expect(form, "the response content should be the auto-submission form HTML").not.toBeNull();
+  });
+
+  it("should silently ignore resource link's context when it does not exist in the datastore", async () => {
+    const nonPersistedContext = createContext();
+    const { resourceLink, tool, sessionUserId } = getValidDataForInitiation();
+    resourceLink.contextId = nonPersistedContext.id;
+
+    const initiation = await sut.initiateLaunch({
+      resourceLink,
+      sessionUserId,
+      tool,
+    });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+    const launch = await sut.authenticateLaunch(parameters);
+
+    assert(e.isRight(launch));
+    expect(launch.right.rawContent.hasContext()).toBe(false);
+  });
+
+  it("should consider the resource link's context when a override context ain't provided but the resource link has one", async () => {
+    const { resourceLink, tool, sessionUserId } = getValidDataForInitiation();
+
+    const persistedContext = createContext();
+    contextsRepository.contexts.push(persistedContext);
+    resourceLink.contextId = persistedContext.id;
+
+    const initiation = await sut.initiateLaunch({
+      resourceLink,
+      sessionUserId,
+      tool,
+    });
+
+    const { loginHint, messageHint } = extractParametersFromInitiationMessage(initiation);
+    const parameters = getValidDataForLaunch({ loginHint, messageHint, sessionUserId, tool });
+    const launch = await sut.authenticateLaunch({ ...parameters });
+
+    assert(e.isRight(launch));
+    expect(launch.right.rawContent.hasContext()).toBe(true);
   });
 });

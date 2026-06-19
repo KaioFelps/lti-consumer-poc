@@ -45,7 +45,7 @@ export class CreateService<CustomContextType = never> {
     if (!toolHasAccessToAgs) return e.right(o.none);
 
     return await pipe(
-      this.tryGetLineItem(resourceLink),
+      this.tryGetLineItem(resourceLink, context),
       te.map(o.toUndefined),
       te.chainW((lineItem) => {
         return pipe(
@@ -79,9 +79,9 @@ export class CreateService<CustomContextType = never> {
     )();
   }
 
-  private tryGetLineItem(resourceLink: LtiResourceLink) {
+  private tryGetLineItem(resourceLink: LtiResourceLink, context: Context<unknown>) {
     return pipe(
-      () => this.lineItemsRepo.findManyByResourceLink(resourceLink.id, 2),
+      () => this.lineItemsRepo.findManyByResourceLink(resourceLink.id, context, 2),
       te.map((lineItems) => (lineItems.length === 1 ? o.some(lineItems[0]) : o.none)),
       te.orElse((error) => (error.type === "NotFound" ? te.right(o.none) : te.left(error))),
     );

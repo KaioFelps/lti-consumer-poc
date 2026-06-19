@@ -6,19 +6,15 @@ import { RenderableLtiInvalidLaunchInitiationError } from "@/core/errors/rendera
 import { RenderableError } from "@/core/errors/renderable/renderable-error";
 import { HttpResponse } from "@/lib";
 import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
+import { ExtendedExceptionsFactory } from "@/lib/exceptions/extended-exceptions.factory";
+import { RenderableException } from "@/lib/exceptions/renderable/exception";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { Public } from "@/modules/auth/protected-routes";
 import { SessionUser } from "@/modules/auth/session-user";
 import type { User } from "@/modules/identity/user/user.entity";
 import { Routes } from "@/routes";
-import { assertNever } from "@/utils/assert-never";
-import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
-import { OAuthError } from "$/core/errors/bases/oauth.error";
-import { CouldNotFindToolDueToExternalRepositoryError } from "$/core/errors/could-not-find-tool-due-to-external-error";
 import { InvalidLaunchInitiationError } from "$/core/errors/invalid-launch-initiation.error";
-import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
-import { MalformedRequestError } from "$/core/errors/malformed-request.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { MessageRequests } from "$/core/messages";
 import { Platform } from "$/core/platform";
@@ -105,31 +101,17 @@ export class LtiLaunchesController {
           messageHint: body.lti_message_hint,
           fallbackUserRoles: undefined,
           errorDescriptionsRoutes: undefined,
-          context: undefined,
         }),
       // passing just the method's reference (i.e., `() => launchMessage.intoForm`) causes loss of context,
       // this means the launch won't work since it will lose access to `this` (thus can't access stuff like
       // `this.platform`)
       te.matchW(
         async (error) => {
-          if (error instanceof InvalidRedirectUriError) return handleInvalidRedurectUriError(error);
-
-          if (error instanceof MalformedRequestError) return handleMalformedRequestError(error);
-
-          if (error instanceof AuthenticationRedirectionError) {
-            return res.redirect(error.intoUrl().toString());
-          }
-
-          if (error instanceof OAuthError) return handleOAuthLikeError(error, res);
-
-          if (error instanceof CouldNotFindToolDueToExternalRepositoryError) {
-            return await handleToolRetrievalExternalError(error, this.t);
-          }
-
-          if (error instanceof joseErrors.JOSENotSupported)
+          if (error instanceof joseErrors.JOSENotSupported) {
             return handleJoseNotSupportedError(error);
+          }
 
-          assertNever(error);
+          throw ExtendedExceptionsFactory.fromError(error);
         },
         (response) => {
           res.setHeaders(response.headers).status(response.httpStatusCode).send(response.content);
@@ -137,40 +119,6 @@ export class LtiLaunchesController {
       ),
     )();
   }
-}
-
-function handleInvalidRedurectUriError(error: InvalidRedirectUriError) {
-  const renderable = new RenderableError(
-    {
-      view: "lti-invalid-redirect-uri-error",
-      viewProperties: {
-        title: "LTI Error",
-        message: error.message,
-      },
-      status: error.httpStatusCode,
-    },
-    error.constructor.name,
-  );
-
-  throw ExceptionsFactory.fromError(renderable);
-}
-
-function handleMalformedRequestError(error: MalformedRequestError) {
-  const { message, cause } = error;
-  const renderable = new RenderableError(
-    {
-      view: "lti/errors/malformed-launch-auth-request",
-      viewProperties: {
-        title: "LTI Error",
-        message,
-        cause,
-      },
-      status: error.httpStatusCode,
-    },
-    error.constructor.name,
-  );
-
-  throw ExceptionsFactory.fromError(renderable);
 }
 
 function handleJoseNotSupportedError(error: joseErrors.JOSENotSupported) {
@@ -187,29 +135,5 @@ function handleJoseNotSupportedError(error: joseErrors.JOSENotSupported) {
     error.constructor.name,
   );
 
-  throw ExceptionsFactory.fromError(renderable);
-}
-
-function handleOAuthLikeError<T extends string>(error: OAuthError<T>, res: HttpResponse) {
-  res.setHeaders(error.headers).status(error.httpStatusCode).send(error.present());
-}
-
-async function handleToolRetrievalExternalError(
-  error: CouldNotFindToolDueToExternalRepositoryError,
-  t: TranslatorService,
-) {
-  const renderable = new RenderableError(
-    {
-      view: "errors/lti-server-error",
-      viewProperties: {
-        title: await t.translate("lti:launch:tool-retrieval-ext-err:title"),
-        message: await t.translate("lti:launch:tool-retrieval-ext-err:message"),
-        code: "COULD_NOT_RETRIEVE_TOOL_RECORD",
-      },
-      status: error.httpStatusCode,
-    },
-    error.constructor.name,
-  );
-
-  throw ExceptionsFactory.fromError(renderable);
+  throw new RenderableException(renderable);
 }
