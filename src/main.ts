@@ -9,6 +9,7 @@ import { expand } from "dotenv-expand";
 import { json } from "express";
 import { middleware as ejsLayoutsMiddleware } from "express-ejs-layouts";
 import session from "express-session";
+import { MockAgent, setGlobalDispatcher } from "undici";
 import { AppModule } from "./app.module";
 import { EnvironmentVars } from "./config/environment-vars";
 import { Redis } from "./external/data-store/redis/client";
@@ -19,6 +20,35 @@ import { LtiAdvantageMediaType } from "$/advantage/media-types";
 
 async function bootstrap() {
   expand(config({ override: false }));
+
+  if (process.env.NODE_ENV !== "production") {
+    // allow HTTPS request to untrusted TSL certificated URLs
+    // (e.g.: the moodle container)
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+    // bypasses SSRF protection imposed by node-oidc-provider (for Moodle, specifically)
+    const mockAgent = new MockAgent();
+    const mockPool = mockAgent.get(/localhost|127\.0\.0\.1/);
+
+    mockPool
+      .intercept({
+        path: /.*/,
+        method: /.*/,
+      })
+      .reply(200, async (options) => {
+        const targetUrl = `${options.origin}${options.path}`;
+        const realResponse = await fetch(targetUrl, {
+          method: options.method,
+          headers: options.headers as Record<string, string>,
+          body: options.body as BodyInit,
+        });
+
+        return await realResponse.text();
+      })
+      .persist();
+
+    setGlobalDispatcher(mockAgent);
+  }
 
   await loadMessageStrings();
 
