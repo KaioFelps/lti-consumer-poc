@@ -71,7 +71,6 @@ export async function prepareToolOidcTokenRequest(
 
   const params = new URLSearchParams();
   params.append("grant_type", "client_credentials");
-  params.append("client_id", client.metadata.client_id);
   params.append("scope", client.metadata.scope!);
   params.append("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
   params.append("client_assertion", clientAssertion);
