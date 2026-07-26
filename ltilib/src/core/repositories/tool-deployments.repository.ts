@@ -4,7 +4,7 @@ import { LtiRepositoryError } from "../errors/repository.error";
 import { LtiTool } from "../tool";
 import { LtiToolDeployment } from "../tool-deployment";
 
-export abstract class LtiToolDeploymentsRepository<CustomContextType extends string = never> {
+export abstract class LtiToolDeploymentsRepository {
   /**
    * Tries to find a deployment of an LTI tool in given {@link Context `Context`},
    * in one of the parent contexts of the given `context`, or a global deployment.
@@ -79,6 +79,6 @@ export abstract class LtiToolDeploymentsRepository<CustomContextType extends str
    */
   public abstract findDeploymentInContextTreeOrGlobal(
     toolId: LtiTool["id"],
-    context: Context<CustomContextType>,
+    context: Context<unknown>,
   ): Promise<Either<LtiRepositoryError, LtiToolDeployment>>;
 }

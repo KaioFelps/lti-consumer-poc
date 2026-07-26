@@ -12,10 +12,10 @@ import { LtiTool } from "$/core/tool";
  * 1. there is a context
  * 2. there is at least one deployment of the tool in the given tool OR the tool has a global deployment
  */
-export function ensureToolIsDeployedInContext<CustomContextType extends string = never>(
+export function ensureToolIsDeployedInContext(
   tool: LtiTool,
-  context: Context<CustomContextType> | undefined,
-  deploymentsRepo: LtiToolDeploymentsRepository<CustomContextType>,
+  context: Context<unknown> | undefined,
+  deploymentsRepo: LtiToolDeploymentsRepository,
 ) {
   if (!context) return te.left(new MissingLtiContextError());
 

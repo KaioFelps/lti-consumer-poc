@@ -16,7 +16,7 @@ export type FindLineItemParams = {
   lineItemId: LtiLineItem["id"];
   acceptHeader: string | undefined;
   tool: LtiTool;
-  context: Context;
+  context: Context<unknown>;
 };
 
 const REQUIRED_SCOPES = [
@@ -56,7 +56,7 @@ export class FindService implements ILineItemService {
     )();
   }
 
-  private presentLineItem(lineItem: LtiLineItem, context: Context) {
+  private presentLineItem(lineItem: LtiLineItem, context: Context<unknown>) {
     const headers = { "Content-Type": LtiAdvantageMediaType.LineItem };
 
     return pipe(

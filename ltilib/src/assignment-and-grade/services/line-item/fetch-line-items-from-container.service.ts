@@ -22,9 +22,15 @@ export type FetchLineItemsFromContainerParams = {
    * [section 3.2.4 of LTI AGS specification]: https://www.imsglobal.org/spec/lti-ags/v2p0#container-request-filters
    */
   filters: LineItemsContainerFilters;
+  /**
+   * The default limit to apply when filter contains no explicit limit.
+   */
   defaultLimit: number;
+  /**
+   * The ceil of `filters.limit`.
+   */
   maxLimit?: number;
-  context: Context;
+  context: Context<unknown>;
   tool: LtiTool;
 };
 
@@ -101,7 +107,7 @@ export class FetchFromContainerService implements ILineItemService {
   }
 
   private getLineItems(
-    context: Context,
+    context: Context<unknown>,
     tool: LtiTool,
     { limit: _, page, ...filters }: LineItemsContainerFilters,
     limit: number,
@@ -116,7 +122,7 @@ export class FetchFromContainerService implements ILineItemService {
     );
   }
 
-  private presentLineItems(lineItems: LtiLineItem[], context: Context) {
+  private presentLineItems(lineItems: LtiLineItem[], context: Context<unknown>) {
     return pipe(
       lineItems,
       ARR.traverse(e.Applicative)((lineItem) =>
@@ -150,7 +156,7 @@ export class FetchFromContainerService implements ILineItemService {
     response: HttpResponseWrapper<LtiLineItem[], object[]>;
     paginatedData: LtiRepositoryPaginatedResponse<LtiLineItem>;
     agsConfig: Platform.LtiAssignmentAndGradeServicesConfig;
-    context: Context;
+    context: Context<unknown>;
     resolvedLimit: number;
   }) {
     const containerEndpoint = agsConfig.lineItemsContainerEndpoint(context);

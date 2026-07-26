@@ -66,7 +66,7 @@ export class LtiLineItemServices<CustomContextType extends string = never> {
   }
 
   public async fetchFromContainer(
-    params: FetchLineItemsFromContainerParams & BasicRequestValidationParams,
+    params: FetchLineItemsFromContainerParams & BasicRequestValidationParams<unknown>,
   ) {
     return await this.executeService(this.containerService, params);
   }
@@ -78,7 +78,7 @@ export class LtiLineItemServices<CustomContextType extends string = never> {
     ErrorType = S extends ILineItemService<unknown, unknown, infer TErrors> ? TErrors : never,
   >(
     service: ILineItemService<Params, ReturnType, ErrorType>,
-    params: Params & BasicRequestValidationParams<CustomContextType>,
+    params: Params & BasicRequestValidationParams<unknown>,
   ) {
     return await pipe(
       this.checkScopes(params.tool, service),
