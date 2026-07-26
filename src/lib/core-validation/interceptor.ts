@@ -35,7 +35,11 @@ export class CoreValidationInterceptor implements NestInterceptor {
 
   private getDtoTargets(context: ExecutionContext) {
     const paramTypes =
-      Reflect.getMetadata(PARAMTYPES_METADATA, context.getClass(), context.getHandler().name) || [];
+      Reflect.getMetadata(
+        PARAMTYPES_METADATA,
+        context.getClass().prototype,
+        context.getHandler().name,
+      ) || [];
 
     const dtoTargets = paramTypes.filter((paramType) => {
       return (
