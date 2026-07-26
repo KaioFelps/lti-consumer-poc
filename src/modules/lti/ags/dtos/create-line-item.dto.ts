@@ -3,10 +3,10 @@ import { JsonValue } from "common/src/types/json-value";
 import { either } from "fp-ts";
 import z from "zod";
 import { DTO } from "@/core/interfaces/dto";
+import { ConfigCoreValidation } from "@/lib/core-validation";
 import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
 
-// properties defined by LTI AGS 2.0 specification
-const officialSchema = z.object(
+const schema = z.object(
   {
     scoreMaximum: z
       .number("lti:ags:create-line-item:errors:score-maximum-must-be-number")
@@ -23,45 +23,14 @@ const officialSchema = z.object(
     resourceLinkId: z
       .string("lti:ags:create-line-item:errors:resource-link-id-must-be-string")
       .optional(),
+    customParameters: z.record(z.string(), z.any()).optional(),
   },
   { error: "lti:ags:create-line-item:errors:body-should-be-object" },
 );
 
-// a trick to handle the extensions that the tool may send and group them in `customParameters` field
-// see: https://www.imsglobal.org/spec/lti-ags/v2p0#extensions
-const schema = officialSchema.catchall(z.any()).transform((data) => {
-  const {
-    label,
-    scoreMaximum,
-    endDateTime,
-    resourceId,
-    resourceLinkId,
-    startDateTime,
-    tag,
-    // the @expose below will force it to get injected, but it's not what we expect...
-    // hence we ignore it
-    customParameters: _,
-    // the rest are actually the custom parameters...
-    ..._customParameters
-  } = data;
+const KNOWN_KEYS = new Set(Object.keys(schema.shape));
 
-  const customParameters =
-    Object.keys(_customParameters).length > 0
-      ? (_customParameters as Record<string, JsonValue>)
-      : undefined;
-
-  return {
-    label,
-    scoreMaximum,
-    endDateTime,
-    resourceId,
-    resourceLinkId,
-    startDateTime,
-    tag,
-    customParameters,
-  };
-});
-
+@ConfigCoreValidation({ shallUnflatten: false })
 export class CreateLineItemDTO implements DTO {
   @Expose() public readonly scoreMaximum!: number;
   @Expose() public readonly label!: string;
@@ -72,8 +41,24 @@ export class CreateLineItemDTO implements DTO {
   @Expose() public readonly resourceLinkId?: string;
 
   @Expose()
-  @Transform(({ obj }) => obj.customParameters)
-  public readonly customParameters?: z.infer<typeof schema>["customParameters"];
+  @Transform(({ obj }) => {
+    const source = (obj ?? {}) as Record<string, JsonValue>;
+    const { customParameters: nested, ...rest } = source;
+
+    const extraTopLevel: Record<string, JsonValue> = {};
+
+    for (const [key, val] of Object.entries(rest)) {
+      if (!KNOWN_KEYS.has(key)) extraTopLevel[key] = val;
+    }
+
+    const merged = {
+      ...extraTopLevel,
+      ...(typeof nested === "object" && nested !== null ? nested : {}),
+    };
+
+    return Object.keys(merged).length > 0 ? merged : undefined;
+  })
+  public readonly customParameters?: Record<string, JsonValue>;
 
   validate() {
     const { success, data, error: validationErrors } = schema.safeParse(this);

@@ -76,10 +76,6 @@ describe("[e2e::LTI] Create Line Item", async () => {
     expect(response.status).toBe(415);
   });
 
-  it.skip("should allow custom parameters in the request body as per spec", async () => {});
-
-  it.skip("should support the specified body for creating a line item (as per spec)", async () => {});
-
   it("should create a line item when everything is conformant", async () => {
     const { tool, courseContext } = await getValidItems();
     const { accessToken } = await getToolAndItsOidcAccessToken(app, tool);
@@ -106,6 +102,39 @@ describe("[e2e::LTI] Create Line Item", async () => {
       }),
     );
   });
+
+  it("should allow custom parameters in the request body as per spec", async () => {
+    const { tool, courseContext } = await getValidItems();
+    const { accessToken } = await getToolAndItsOidcAccessToken(app, tool);
+
+    const endpoint = Routes.lti.ags.lineitems.container(courseContext.id);
+
+    const response = await request(app.getHttpServer())
+      .post(endpoint)
+      .set("authorization", `Bearer ${accessToken}`)
+      .set("content-type", VALID_CONTENT_TYPE)
+      .send({
+        scoreMaximum: 100,
+        label: "teste",
+        nonConformantCustomProperty: {
+          canBe: true,
+          anything: 100,
+        },
+        "https://conformant-property.example.com": {
+          canContainAnyJson: true,
+        },
+      });
+
+    expect(response.status).toBe(201);
+
+    const body = response.body;
+    expect(body).not.toHaveProperty("nonConformantCustomProperty");
+    expect(body["https://conformant-property.example.com"]).toEqual({
+      canContainAnyJson: true,
+    });
+  });
+
+  it.skip("should support the specified body for creating a line item (as per spec)", async () => {});
 
   it.skip("should not create another line item when there is already one with given 'resourceId' and 'tag'", async () => {});
 
