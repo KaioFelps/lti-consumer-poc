@@ -43,7 +43,9 @@ export class CoreValidationPipe implements PipeTransform {
 
     if (!isDtoCompliant) return value;
 
-    value = unflatten(value);
+    const config = coreValidation.getConfigsFromRequest(this.request);
+
+    if (config.shallUnflatten !== false) value = unflatten(value);
 
     const valueAsInstanceOfADto: DTO = plainToInstance(metadata.metatype, value, {
       excludeExtraneousValues: true,
@@ -54,8 +56,6 @@ export class CoreValidationPipe implements PipeTransform {
     if (either.isRight(isValid)) return valueAsInstanceOfADto;
 
     const validationErrors = isValid.left;
-
-    const config = coreValidation.getConfigsFromRequest(this.request);
 
     const shouldRender =
       this.request[mvcRoutes.requestKey] &&

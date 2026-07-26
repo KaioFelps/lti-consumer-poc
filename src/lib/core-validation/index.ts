@@ -14,6 +14,13 @@ export type CoreValidationConfig = {
    * When present, this status will be forced into the response.
    */
   status?: HttpStatus;
+  /**
+   * When `false`, `unflatten` won't be called over the value. This means
+   * dot-nested properties won't be expanded.
+   *
+   * @default true
+   */
+  shallUnflatten?: boolean;
 };
 
 export const ConfigCoreValidation = (config: CoreValidationConfig) => {
