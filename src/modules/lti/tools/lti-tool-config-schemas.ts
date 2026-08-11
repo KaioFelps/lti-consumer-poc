@@ -1,6 +1,6 @@
 import z from "zod";
-import { AnyLtiRole, InstitutionRole, MembershipRole, SystemRole } from "$/claims/enums/roles";
-import { MessageType } from "$/claims/serialization";
+import { AnyLtiRole, InstitutionRole, MembershipRole, SystemRole } from "$/core/claims/enums/roles";
+import { MessageType } from "$/core/claims/serialization";
 import { MessagePlacement } from "$/core/tool/message-placement";
 import { GrantType, LTI_TOOL_CONFIGURATION_KEY } from "$/registration/dynamic/tool-configuration";
 

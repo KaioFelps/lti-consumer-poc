@@ -7,7 +7,7 @@ export class LtiRegistrationInitiationRequest implements LtiInitiationMessage {
   /**
    * The full URI to ehe platform's openid configuration.
    */
-  public platformOpenIdConfigurationUri: URL;
+  public platformOpenIdConfigurationUri!: URL;
   /**
    * An optional platform's registration token. This is opaque to
    * the tool and must be sent back to the platform during the registration.
@@ -18,7 +18,7 @@ export class LtiRegistrationInitiationRequest implements LtiInitiationMessage {
    * the tool in a manner unspecified by the LTI Advantage specifications,
    * but that usually involves some UI in the tool that shares this URI.
    */
-  public toolInitiateRegisterUri: URL;
+  public toolInitiateRegisterUri!: URL;
 
   public constructor(args: LtiRegistrationInitiationRequestArgs) {
     Object.assign(this, args);

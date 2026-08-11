@@ -14,7 +14,7 @@ import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
 import { Routes } from "@/routes";
 import { Platform } from "$/core/platform";
-import { LtiRegistrationInitiationRequest } from "$/messages/initiate-register";
+import { LtiRegistrationInitiationRequest } from "$/registration/messages/initiate-registration";
 import { RegisterToolDTO } from "./dtos/register-tool.dto";
 import { FindManyToolsPreviewsService } from "./services/find-many-tools-previews.service";
 import { GetToolRegistrationDetailsService } from "./services/get-tool-registration-details.service";

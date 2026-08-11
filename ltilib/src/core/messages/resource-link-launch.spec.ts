@@ -9,7 +9,7 @@ import { createPlatform } from "ltilib/tests/common/factories/platform.factory";
 import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
 import { createTool } from "ltilib/tests/common/factories/tool.factory";
 import { createMockKeySet } from "ltilib/tests/utils/create-jwks";
-import { MessageType } from "$/claims/serialization";
+import { MessageType } from "$/core/claims/serialization";
 import { Platform } from "../platform";
 import { LtiResourceLink } from "../resource-link";
 import { LtiTool } from "../tool";

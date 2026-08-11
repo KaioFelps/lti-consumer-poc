@@ -1,4 +1,4 @@
-import { IntoLtiClaim } from "$/claims/serialization";
+import { IntoLtiClaim } from "$/core/claims/serialization";
 
 export interface IInstance {
   /**

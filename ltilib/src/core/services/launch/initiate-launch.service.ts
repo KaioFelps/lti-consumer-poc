@@ -1,6 +1,6 @@
 import { either as e } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
-import { MessageType } from "$/claims/serialization";
+import { MessageType } from "$/core/claims/serialization";
 import { InvalidLaunchInitiationError } from "$/core/errors/invalid-launch-initiation.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiLaunchData } from "$/core/launch-data";

@@ -1,5 +1,5 @@
-import { AnyLtiRole } from "$/claims/enums/roles";
-import { MessageType } from "$/claims/serialization";
+import { AnyLtiRole } from "$/core/claims/enums/roles";
+import { MessageType } from "$/core/claims/serialization";
 import { MessagePlacement } from "../../core/tool/message-placement";
 
 /**

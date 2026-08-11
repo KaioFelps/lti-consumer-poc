@@ -8,7 +8,7 @@ import { InMemoryLaunchesRepository } from "ltilib/tests/common/in-memory-reposi
 import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
 import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
 import { InMemoryUserIdentitiesRepository } from "ltilib/tests/common/in-memory-repositories/user-identities.repository";
-import { MessageType } from "$/claims/serialization";
+import { MessageType } from "$/core/claims/serialization";
 import { InvalidLaunchInitiationError } from "$/core/errors/invalid-launch-initiation.error";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { MessageRequests } from "$/core/messages";

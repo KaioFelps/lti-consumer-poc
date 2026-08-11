@@ -1,6 +1,6 @@
 import { Optional } from "common/src/types/optional";
 import { generateUUID } from "common/src/types/uuid";
-import { IntoLtiClaim } from "$/claims/serialization";
+import { IntoLtiClaim } from "$/core/claims/serialization";
 
 /**
  * The types that might describe an LTI context, inherited from 1EdTech LIS v2.0 specification.

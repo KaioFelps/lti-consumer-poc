@@ -3,7 +3,7 @@ import {
   //   InstitutionRole,
   SystemRole as LtiSystemRole,
   //   MembershipRole,
-} from "$/claims/enums/roles";
+} from "$/core/claims/enums/roles";
 
 export function mapRolesToLtiSystemRoles(sysRole: SystemRole) {
   switch (sysRole) {

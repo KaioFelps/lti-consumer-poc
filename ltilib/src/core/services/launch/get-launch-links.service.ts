@@ -1,8 +1,8 @@
 import { either as e } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
-import { AnyLtiRole } from "$/claims/enums/roles";
-import { MessageType } from "$/claims/serialization";
+import { AnyLtiRole } from "$/core/claims/enums/roles";
+import { MessageType } from "$/core/claims/serialization";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { Platform } from "$/core/platform";
 import {

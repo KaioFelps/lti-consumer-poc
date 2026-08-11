@@ -12,15 +12,15 @@ import ejs from "ejs";
 import { either as e, option as o } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
+import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim";
+import { RolesHelper } from "$/core/claims/enums/roles";
 import {
   AvailableLtiVersion,
   IntoLtiClaim,
   LTIClaimKey,
   MessageType,
   resolveClaimKey,
-} from "ltilib/src/claims/serialization";
-import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim";
-import { RolesHelper } from "$/claims/enums/roles";
+} from "$/core/claims/serialization";
 import { Context } from "$/core/context";
 import { LtiResourceLink } from "$/core/resource-link";
 import { UserIdentity, UserRoles } from "$/core/user-identity";

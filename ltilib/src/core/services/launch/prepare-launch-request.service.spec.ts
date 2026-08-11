@@ -17,7 +17,7 @@ import { InMemoryLaunchesRepository } from "ltilib/tests/common/in-memory-reposi
 import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
 import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
 import { InMemoryUserIdentitiesRepository } from "ltilib/tests/common/in-memory-repositories/user-identities.repository";
-import { InstitutionRole, MembershipRole } from "$/claims/enums/roles";
+import { InstitutionRole, MembershipRole } from "$/core/claims/enums/roles";
 import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
 import { CouldNotFindToolDueToExternalRepositoryError } from "$/core/errors/could-not-find-tool-due-to-external-error";
 import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";

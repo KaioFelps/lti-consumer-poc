@@ -4,7 +4,7 @@ import { EnvironmentVars } from "@/config/environment-vars";
 import { AuthJwkSet } from "@/modules/auth/encryption/jwks-set";
 import { AvailableScopes } from "@/modules/oidc/consts";
 import { Routes } from "@/routes";
-import { MessageType } from "$/claims/serialization";
+import { MessageType } from "$/core/claims/serialization";
 import { Platform } from "$/core/platform";
 import { MessagePlacement } from "$/core/tool/message-placement";
 

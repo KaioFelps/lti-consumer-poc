@@ -1,6 +1,6 @@
 import { either as e, option as o } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
-import { IntoLtiClaim } from "$/claims/serialization";
+import { IntoLtiClaim } from "$/core/claims/serialization";
 import { InvalidVendorExtraClaimsPredicate } from "../errors/invalid-vendor-extra-claims-predicate.error";
 
 export namespace MessageRequests {

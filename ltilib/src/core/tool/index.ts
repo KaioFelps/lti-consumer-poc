@@ -1,5 +1,5 @@
 import { either as e } from "fp-ts";
-import { IntoLtiClaim } from "$/claims/serialization";
+import { IntoLtiClaim } from "$/core/claims/serialization";
 import {
   Contact,
   DraftLtiDynamicToolConfiguration,
