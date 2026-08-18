@@ -268,3 +268,18 @@ ptBR["lti:ags:create-line-item:errors:body-should-be-object"] =
 
 ptBR["lti:ags:find-external-resource-by-id:errors:not-found"] = ({ id }) =>
   `Não foi possível encontrar um recurso externo LTI com ID "${id}".`;
+
+ptBR["lti:ags:line-items-container:errors:resource-link-id-must-be-uuid"] =
+  "O ID do link de recurso deve ser um UUID válido.";
+ptBR["lti:ags:line-items-container:errors:resource-id-must-be-uuid"] =
+  "O ID do recurso deve ser um UUID válido.";
+ptBR["lti:ags:line-items-container:errors:tag-must-be-string"] =
+  "A tag precisa ser do tipo string.";
+ptBR["lti:ags:line-items-container:errors:limit-must-be-integer"] =
+  "O limite precisa ser um número inteiro.";
+ptBR["lti:ags:line-items-container:errors:limit-must-be-non-negative"] =
+  "O limite não pode ser um número negativo.";
+ptBR["lti:ags:line-items-container:errors:page-must-be-integer"] =
+  "A página deve ser um número inteiro.";
+ptBR["lti:ags:line-items-container:errors:page-must-be-positive"] =
+  "A página deve ser um número positivo.";
