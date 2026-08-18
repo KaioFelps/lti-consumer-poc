@@ -50,7 +50,7 @@ export class FindService implements ILineItemService {
 
   public async execute({ lineItemId, tool, context }: FindLineItemParams) {
     return await pipe(
-      this.findLineItem(lineItemId),
+      this.findLineItem(lineItemId, context),
       te.chainW((lineItem) => this.ensureToolCanAccessLineItem(lineItem, tool)),
       te.chainW((lineItem) => this.presentLineItem(lineItem, context)),
     )();
@@ -68,9 +68,9 @@ export class FindService implements ILineItemService {
     );
   }
 
-  private findLineItem(lineItemId: LtiLineItem["id"]) {
+  private findLineItem(lineItemId: LtiLineItem["id"], context: Context<unknown>) {
     return pipe(
-      () => this.lineItemsRepo.findById(lineItemId),
+      () => this.lineItemsRepo.findById(lineItemId, context),
       te.mapLeft((error) => {
         if (error.type !== "NotFound") return error;
         return new InaccessibleLineItemError(lineItemId, { cause: error });

@@ -72,7 +72,9 @@ export class CreateService<CustomContextType extends string = never> implements 
 
     return await pipe(
       te.Do,
-      te.bindW("existingLineItem", () => this.findExistingLineItem(args.resourceId, args.tag)),
+      te.bindW("existingLineItem", () =>
+        this.findExistingLineItem(args.resourceId, args.tag, context),
+      ),
       te.bindW("lineItem", ({ existingLineItem }) => {
         if (existingLineItem) return te.right(existingLineItem);
         return this.createNewLineItem(context, tool, agsConfiguration, args);
@@ -97,10 +99,17 @@ export class CreateService<CustomContextType extends string = never> implements 
     return pipe(presentLtiLineItem(lineItem, context, this.platform), te.fromEither);
   }
 
-  private findExistingLineItem(resourceId: string | undefined, tag: RawLineItemsPayload["tag"]) {
+  private findExistingLineItem(
+    resourceId: string | undefined,
+    tag: RawLineItemsPayload["tag"],
+    context: Context<unknown>,
+  ) {
     return pipe(
       o.fromNullable(resourceId),
-      o.map((resourceId) => () => this.lineItemsRepo.findByExternalResourceAndTag(resourceId, tag)),
+      o.map(
+        (resourceId) => () =>
+          this.lineItemsRepo.findByExternalResourceAndTag(resourceId, tag, context),
+      ),
       o.sequence(te.ApplicativePar),
       te.match(
         (error) => {

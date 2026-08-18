@@ -13,6 +13,7 @@ export abstract class LtiLineItemsRepository {
   public abstract findByExternalResourceAndTag(
     resourceId: string,
     tag: string | undefined,
+    context: Context<unknown>,
   ): Promise<Either<LtiRepositoryError, LtiLineItem>>;
 
   /**
@@ -32,6 +33,7 @@ export abstract class LtiLineItemsRepository {
 
   public abstract findById(
     lineItemId: LtiLineItem["id"],
+    context: Context<unknown>,
   ): Promise<Either<LtiRepositoryError, LtiLineItem>>;
 
   /**
