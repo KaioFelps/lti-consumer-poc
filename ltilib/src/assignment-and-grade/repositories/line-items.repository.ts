@@ -41,7 +41,7 @@ export abstract class LtiLineItemsRepository {
    * - every line item belongs to `context` (see {@link LtiLineItem.belongsToContext `LtiLineItem.belongsToContext`}); and
    * - every filter present in `filters` is applied as an AND condition.
    *
-   * @param context - The LTI context to which the line items must reside. (See [section 3.2 of LTI Core].)
+   * @param context - The LTI context in which the line items must reside. (See [section 3.2 of LTI Core].)
    * @param tool - The LTI tool which is querying the line items. (See [section 3.1 of LTI Core].)
    * @param page - The current (1-based indexing) page.
    * @param limit - The maximum amount of line items that must be returned in the current page.

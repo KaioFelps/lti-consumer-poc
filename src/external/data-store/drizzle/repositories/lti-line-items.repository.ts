@@ -1,11 +1,30 @@
 import { Injectable } from "@nestjs/common";
-import { ltiAssignmentsT, ltiLineItemsT } from "drizzle/schema";
-import { eq } from "drizzle-orm";
-import { taskEither as te } from "fp-ts";
+import * as schema from "drizzle/schema";
+import {
+  externalLtiResourcesT,
+  ltiAssignmentsT,
+  ltiLineItemsT,
+  ltiResourceLinks,
+  ltiToolDeployments,
+} from "drizzle/schema";
+import {
+  and,
+  asc,
+  ColumnsSelection,
+  ExtractTablesWithRelations,
+  eq,
+  inArray,
+  isNull,
+  or,
+  sql,
+} from "drizzle-orm";
+import { PgSelectBase } from "drizzle-orm/pg-core";
+import { either as e, taskEither as te } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { type TaskEither } from "fp-ts/lib/TaskEither";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
+import { unmountContextId } from "@/modules/lti/advantage/context";
 import { InvalidComposedContextIdError } from "@/modules/lti/advantage/errors/invalid-composed-context-id.error";
 import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type";
 import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters";
@@ -124,6 +143,52 @@ export class DrizzleLtiLineItemsRepository extends LtiLineItemsRepository {
     throw new Error("Method not implemented.");
   }
 
+  /**
+   * Builds the WHERE clauses to enforce constraints such as `belongsToContext`
+   * and `isAccessibleToTool` are valid. Also applies potential filters.
+   *
+   * @note Depends on {@link containerJoinedFrom}'s joins statements.
+   */
+  private buildContainerAccessConditions(
+    context: Context<unknown>,
+    tool: LtiTool,
+    filters: Omit<LineItemsContainerFilters, "limit" | "page">,
+  ) {
+    return pipe(
+      unmountContextId(context.id),
+      e.mapLeft(
+        (error) =>
+          new LtiRepositoryError({
+            cause: error,
+            type: "ExternalError",
+          }),
+      ),
+      e.map(({ concreteEntityId, concreteType }) => [
+        eq(ltiLineItemsT.concreteContextId, concreteEntityId),
+        eq(ltiLineItemsT.concreteContextType, concreteType),
+        or(isNull(ltiLineItemsT.ltiAssignmentId), eq(ltiToolDeployments.clientId, tool.id)),
+        or(isNull(ltiLineItemsT.externalResourceId), eq(externalLtiResourcesT.toolId, tool.id)),
+      ]),
+      e.map((conditions) => {
+        if (filters.resourceLinkId) {
+          conditions.push(eq(ltiResourceLinks.id, filters.resourceLinkId));
+        }
+
+        if (filters.resourceId) {
+          conditions.push(eq(externalLtiResourcesT.externalToolResourceId, filters.resourceId));
+        }
+
+        if (filters.tag) {
+          conditions.push(eq(ltiLineItemsT.tag, filters.tag));
+        }
+
+        return conditions;
+      }),
+      e.map((conditions) => and(...conditions)),
+      te.fromEither,
+    );
+  }
+
   public fetchWithContainerFilters(
     context: Context<unknown>,
     tool: LtiTool,
@@ -131,6 +196,88 @@ export class DrizzleLtiLineItemsRepository extends LtiLineItemsRepository {
     page: number,
     filters: Omit<LineItemsContainerFilters, "limit" | "page">,
   ): Promise<Either<LtiRepositoryError, LtiRepositoryPaginatedResponse<LtiLineItem>>> {
-    throw new Error("Method not implemented.");
+    const client = this.transactionManager.getTx() ?? this.drizzle.getClient();
+    const offset = (page - 1) * limit;
+
+    type Schema = ExtractTablesWithRelations<typeof schema>;
+
+    const prepareJoinsForLineItemsSelect = <T extends ColumnsSelection>(
+      select: PgSelectBase<
+        Schema["ltiLineItemsT"]["dbName"],
+        T,
+        "partial",
+        Record<"lti_line_items", "not-null">
+      >,
+    ) =>
+      select
+        .leftJoin(ltiAssignmentsT, eq(ltiLineItemsT.ltiAssignmentId, ltiAssignmentsT.assignmentId))
+        .leftJoin(ltiResourceLinks, eq(ltiAssignmentsT.resourceLinkId, ltiResourceLinks.id))
+        .leftJoin(ltiToolDeployments, eq(ltiResourceLinks.deploymentId, ltiToolDeployments.id))
+        .leftJoin(
+          externalLtiResourcesT,
+          eq(ltiLineItemsT.externalResourceId, externalLtiResourcesT.id),
+        );
+
+    return pipe(
+      te.Do,
+      te.bindW("where", () => this.buildContainerAccessConditions(context, tool, filters)),
+      te.bindW("lineItems", ({ where }) =>
+        te.tryCatch(
+          async () =>
+            client.query.ltiLineItemsT.findMany({
+              ...ltiLineItemsMapper.requiredQueryConfig,
+              where: inArray(
+                ltiLineItemsT.id,
+                prepareJoinsForLineItemsSelect(
+                  client.select({ id: ltiLineItemsT.id }).from(ltiLineItemsT),
+                )
+                  .where(where)
+                  .orderBy(asc(ltiLineItemsT.id))
+                  .limit(limit)
+                  .offset(offset),
+              ),
+            }),
+          (error) =>
+            new LtiRepositoryError({
+              type: "ExternalError",
+              cause: new IrrecoverableError(
+                `Error occurred in ${DrizzleLtiLineItemsRepository.name} when resolving line item ids with container filters from database.`,
+                error as Error,
+              ),
+            }),
+        ),
+      ),
+      te.bindW("count", ({ where }) =>
+        te.tryCatch(
+          async () => {
+            const result = await prepareJoinsForLineItemsSelect(
+              client
+                .select({ count: sql<number>`count(distinct ${ltiLineItemsT.id})` })
+                .from(ltiLineItemsT),
+            ).where(where);
+
+            return Number(result[0]?.count ?? 0);
+          },
+          (error) =>
+            new LtiRepositoryError({
+              type: "ExternalError",
+              cause: new IrrecoverableError(
+                `Error occurred in ${DrizzleLtiLineItemsRepository.name} when counting line items with container filters from database.`,
+                error as Error,
+              ),
+            }),
+        ),
+      ),
+      te.map(({ lineItems, count }) => {
+        if (lineItems.length === 0) return { values: [] as LtiLineItem[], count };
+
+        const mappedLineItems = {
+          count,
+          values: lineItems.map((row) => ltiLineItemsMapper.fromRow(row, context as Context)),
+        } satisfies LtiRepositoryPaginatedResponse<LtiLineItem<unknown>>;
+
+        return mappedLineItems;
+      }),
+    )();
   }
 }
