@@ -19,7 +19,9 @@ const schema = z.object(
     endDateTime: z.coerce
       .date("lti:ags:create-line-item:errors:end-date-time-must-be-date")
       .optional(),
-    resourceId: z.string("lti:ags:create-line-item:errors:resource-id-must-be-string").optional(),
+    resourceId: z.coerce
+      .string("lti:ags:create-line-item:errors:resource-id-must-be-string")
+      .optional(),
     resourceLinkId: z
       .string("lti:ags:create-line-item:errors:resource-link-id-must-be-string")
       .optional(),
