@@ -134,7 +134,7 @@ export class CreateService<CustomContextType extends string = never> implements 
         "externalResource",
         pipe(
           o.fromNullable(resourceId),
-          o.map((id) => () => this.externalResourcesRepo.findById(id, tool.id)),
+          o.map((id) => () => this.externalResourcesRepo.findByExternalId(id, tool.id)),
           o.sequence(te.ApplicativeSeq),
           te.map(o.toUndefined),
         ),

@@ -25,7 +25,7 @@ export class DrizzleExternalLtiResourcesRepository extends ExternalLtiResourcesR
   /**
    * @note Does not support including a `Context`. See implementation notes.
    */
-  public findById(
+  public findByExternalId(
     externalResourceId: string,
     toolId: string,
   ): Promise<Either<LtiRepositoryError, ExternalLtiResource>> {
@@ -52,15 +52,16 @@ export class DrizzleExternalLtiResourcesRepository extends ExternalLtiResourcesR
       ),
       te.filterOrElseW(
         (row) => !!row,
-        () =>
-          new LtiRepositoryError({
+        () => {
+          return new LtiRepositoryError({
             type: "NotFound",
             subject: ExternalLtiResource.name,
             cause: new ResourceNotFoundError({
               errorMessageIdentifier: "lti:ags:find-external-resource-by-id:errors:not-found",
               messageParams: { id: externalResourceId },
             }),
-          }),
+          });
+        },
       ),
       te.map(externalLtiResourcesMapper.fromRow),
     )();

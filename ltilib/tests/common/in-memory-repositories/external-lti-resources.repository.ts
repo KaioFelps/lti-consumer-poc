@@ -8,7 +8,7 @@ import { LtiRepositoryError } from "$/core/errors/repository.error";
 export class InMemoryExternalLtiResourcesRepository implements ExternalLtiResourcesRepository {
   public externalLtiResources: ExternalLtiResource[] = [];
 
-  public async findById(
+  public async findByExternalId(
     resourceId: string,
     toolId: string,
   ): Promise<Either<LtiRepositoryError, ExternalLtiResource>> {
