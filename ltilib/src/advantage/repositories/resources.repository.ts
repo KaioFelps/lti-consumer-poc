@@ -7,9 +7,4 @@ export abstract class ExternalLtiResourcesRepository {
     externalResourceId: string,
     toolId: string,
   ): Promise<Either<LtiRepositoryError, ExternalLtiResource>>;
-
-  public abstract findByExternalId(
-    externalResourceId: string,
-    toolId: string,
-  ): Promise<Either<LtiRepositoryError, ExternalLtiResource>>;
 }
