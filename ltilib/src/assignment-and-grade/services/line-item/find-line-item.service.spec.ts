@@ -17,6 +17,7 @@ import { InMemoryExternalLtiResourcesRepository } from "ltilib/tests/common/in-m
 import { InMemoryLtiLineItemsRepository } from "ltilib/tests/common/in-memory-repositories/line-items.repository";
 import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
 import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
+import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
 import { NotAcceptableMediaTypeError } from "$/advantage/errors/not-acceptable-media-type.error";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { InaccessibleLineItemError } from "$/assignment-and-grade/errors/inaccessible-line-item.error";
@@ -30,6 +31,7 @@ describe("[AGS] Create Line Item Service", async () => {
   let platform: Platform;
   let ltiResourceLinksRepo: InMemoryLtiResourceLinksRepository;
   let externalLtiResourcesRepo: InMemoryExternalLtiResourcesRepository;
+  let toolsRepository: InMemoryToolsRepository;
   let lineItemsRepo: InMemoryLtiLineItemsRepository;
   let toolDeploymentsRepo: InMemoryLtiToolDeploymentsRepository;
 
@@ -39,6 +41,7 @@ describe("[AGS] Create Line Item Service", async () => {
     platform = await createPlatform();
     ltiResourceLinksRepo = new InMemoryLtiResourceLinksRepository();
     externalLtiResourcesRepo = new InMemoryExternalLtiResourcesRepository();
+    toolsRepository = externalLtiResourcesRepo.toolsRepository;
     lineItemsRepo = new InMemoryLtiLineItemsRepository();
     toolDeploymentsRepo = new InMemoryLtiToolDeploymentsRepository();
 
@@ -67,6 +70,7 @@ describe("[AGS] Create Line Item Service", async () => {
     const deployment = createToolDeployment({ context, tool });
     const lineItem = createMinimalLineItem();
 
+    toolsRepository.tools.push(tool);
     lineItemsRepo.lineItems.push(lineItem);
     toolDeploymentsRepo.deployments.push(deployment);
     externalLtiResourcesRepo.externalLtiResources.push(resource);

@@ -18,6 +18,7 @@ import { InMemoryExternalLtiResourcesRepository } from "ltilib/tests/common/in-m
 import { InMemoryLtiLineItemsRepository } from "ltilib/tests/common/in-memory-repositories/line-items.repository";
 import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
 import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
+import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
 import { InvalidContentTypeError } from "$/advantage/errors/invalid-content-type.error";
 import { MissingScopeError } from "$/advantage/errors/missing-scope.error";
 import { ExternalLtiResource } from "$/advantage/external-resource";
@@ -29,7 +30,6 @@ import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
 import { Context } from "$/core/context";
 import { InvalidArgumentError } from "$/core/errors/bases/invalid-argument.error";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { Platform } from "$/core/platform";
 import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
@@ -38,6 +38,7 @@ describe("[AGS] Create Line Item Service", async () => {
   let platform: Platform;
   let ltiResourceLinksRepo: InMemoryLtiResourceLinksRepository;
   let externalLtiResourcesRepo: InMemoryExternalLtiResourcesRepository;
+  let toolsRepository: InMemoryToolsRepository;
   let lineItemsRepo: InMemoryLtiLineItemsRepository;
   let toolDeploymentsRepo: InMemoryLtiToolDeploymentsRepository;
 
@@ -46,9 +47,10 @@ describe("[AGS] Create Line Item Service", async () => {
   beforeEach(async () => {
     platform = await createPlatform();
     ltiResourceLinksRepo = new InMemoryLtiResourceLinksRepository();
-    externalLtiResourcesRepo = new InMemoryExternalLtiResourcesRepository();
-    lineItemsRepo = new InMemoryLtiLineItemsRepository();
     toolDeploymentsRepo = new InMemoryLtiToolDeploymentsRepository();
+    externalLtiResourcesRepo = new InMemoryExternalLtiResourcesRepository();
+    toolsRepository = externalLtiResourcesRepo.toolsRepository;
+    lineItemsRepo = new InMemoryLtiLineItemsRepository();
 
     await recreateSutWithPlatform(platform);
   });

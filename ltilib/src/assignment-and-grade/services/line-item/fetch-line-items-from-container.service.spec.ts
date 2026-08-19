@@ -14,6 +14,7 @@ import { InMemoryExternalLtiResourcesRepository } from "ltilib/tests/common/in-m
 import { InMemoryLtiLineItemsRepository } from "ltilib/tests/common/in-memory-repositories/line-items.repository";
 import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
 import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
+import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
 import { getPowerSet } from "ltilib/tests/utils/get-powerset";
 import { MissingScopeError } from "$/advantage/errors/missing-scope.error";
 import { NotAcceptableMediaTypeError } from "$/advantage/errors/not-acceptable-media-type.error";
@@ -34,6 +35,7 @@ import { LtiLineItemServices } from ".";
 describe("[AGS] Fetch Line Items From Container Service", async () => {
   let platform: Platform;
   let resourceLinksRepo: InMemoryLtiResourceLinksRepository;
+  let toolsRepository: InMemoryToolsRepository;
   let externalResourcesRepo: InMemoryExternalLtiResourcesRepository;
   let lineItemsRepo: InMemoryLtiLineItemsRepository;
   let deploymentsRepo: InMemoryLtiToolDeploymentsRepository;
@@ -44,6 +46,7 @@ describe("[AGS] Fetch Line Items From Container Service", async () => {
     platform = await createPlatform();
     resourceLinksRepo = new InMemoryLtiResourceLinksRepository();
     externalResourcesRepo = new InMemoryExternalLtiResourcesRepository();
+    toolsRepository = externalResourcesRepo.toolsRepository;
     lineItemsRepo = new InMemoryLtiLineItemsRepository();
     deploymentsRepo = new InMemoryLtiToolDeploymentsRepository();
 
@@ -63,6 +66,7 @@ describe("[AGS] Fetch Line Items From Container Service", async () => {
     const resourceLink = createResourceLink({ contextId: context.id, tool });
     const resource = createExternalLtiResource({ context, tool });
 
+    toolsRepository.tools.push(tool);
     deploymentsRepo.deployments.push(deployment);
     resourceLinksRepo.resourceLinks.push(resourceLink);
     externalResourcesRepo.externalLtiResources.push(resource);
