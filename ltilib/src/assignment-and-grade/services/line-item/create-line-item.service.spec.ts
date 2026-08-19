@@ -76,6 +76,7 @@ describe("[AGS] Create Line Item Service", async () => {
     });
     const deployment = createToolDeployment({ context, tool });
 
+    toolsRepository.tools.push(tool);
     toolDeploymentsRepo.deployments.push(deployment);
     externalLtiResourcesRepo.externalLtiResources.push(resource);
     ltiResourceLinksRepo.resourceLinks.push(resourceLink);
@@ -546,26 +547,48 @@ describe("[AGS] Create Line Item Service", async () => {
       expect(lineItemsRepo.lineItems[0].resourceLink).toBeUndefined();
     });
 
-    it("should require external resource to belong to the tool trying to create the line item", async () => {
-      const { context, tool, resource } = getValidCompleteLineItemCreationArgs();
+    // removed since now a new external resource must be created if it could not find a resource belonging
+    // to the tool with the given id.
+    // it("should require external resource to belong to the tool trying to create the line item", async () => {
+    //   const { context, tool, resource } = getValidCompleteLineItemCreationArgs();
+    //
+    //   // ensure the resource belongs to another tool
+    //   resource.tool = createTool();
+    //
+    //   externalLtiResourcesRepo.externalLtiResources.push(resource);
+    //   toolDeploymentsRepo.deployments.push(createToolDeployment({ context, tool: resource.tool }));
+    //
+    //   const response = await sut.create(getCreateLineItemParams({ context, tool, resource }));
+    //
+    //   assert(
+    //     e.isLeft(response),
+    //     "response should be an error since resource belongs to a different tool " +
+    //       "than the one trying to create a line item associated with it",
+    //   );
+    //
+    //   expect(response.left).toBeInstanceOf(LtiRepositoryError);
+    //   expect(response.left["subject"]).toBe(ExternalLtiResource.name);
+    // });
 
-      // ensure the resource belongs to another tool
-      resource.tool = createTool();
+    it(
+      "should create a new external resource (in current context and for current tool) if " +
+        "present but yet unexisting",
+      async () => {
+        const { context, tool } = getValidCompleteLineItemCreationArgs();
 
-      externalLtiResourcesRepo.externalLtiResources.push(resource);
-      toolDeploymentsRepo.deployments.push(createToolDeployment({ context, tool: resource.tool }));
+        externalLtiResourcesRepo.externalLtiResources = [];
 
-      const response = await sut.create(getCreateLineItemParams({ context, tool, resource }));
+        const params = getCreateLineItemParams({ context, tool });
+        const response = await sut.create({ ...params, resourceId: "test-resource-id" });
 
-      assert(
-        e.isLeft(response),
-        "response should be an error since resource belongs to a different tool " +
-          "than the one trying to create a line item associated with it",
-      );
-
-      expect(response.left).toBeInstanceOf(LtiRepositoryError);
-      expect(response.left["subject"]).toBe(ExternalLtiResource.name);
-    });
+        assert(e.isRight(response));
+        expect(externalLtiResourcesRepo.externalLtiResources).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ externalToolResourceId: "test-resource-id" }),
+          ]),
+        );
+      },
+    );
   });
 
   it(
