@@ -24,6 +24,7 @@ import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { type TaskEither } from "fp-ts/lib/TaskEither";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
 import { unmountContextId } from "@/modules/lti/advantage/context";
 import { InvalidComposedContextIdError } from "@/modules/lti/advantage/errors/invalid-composed-context-id.error";
 import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type";
@@ -101,8 +102,54 @@ export class DrizzleLtiLineItemsRepository extends LtiLineItemsRepository {
   public findByExternalResourceAndTag(
     resourceId: string,
     tag: string | undefined,
+    context: Context<ContextConcreteType>,
   ): Promise<Either<LtiRepositoryError, LtiLineItem>> {
-    throw new Error("Method not implemented.");
+    const client = this.transactionManager.getTx() ?? this.drizzle.getClient();
+
+    return pipe(
+      te.tryCatch(
+        () =>
+          client.query.ltiLineItemsT.findFirst({
+            ...ltiLineItemsMapper.requiredQueryConfig,
+            where: and(
+              tag ? eq(ltiLineItemsT.tag, tag) : isNull(ltiLineItemsT.tag),
+              inArray(
+                ltiLineItemsT.externalResourceId,
+                client
+                  .select({ id: externalLtiResourcesT.id })
+                  .from(externalLtiResourcesT)
+                  .where(eq(externalLtiResourcesT.toolId, resourceId)),
+              ),
+            ),
+          }),
+        (error) => {
+          const irrecoverableError = new IrrecoverableError(
+            `Error occurred in ${DrizzleLtiLineItemsRepository.name} when trying to find line item by external resource ` +
+              `(of id "${resourceId}) and ${tag ? `tag "${tag}"` : "null tag"}.`,
+            error as Error,
+          );
+
+          return new LtiRepositoryError({ type: "ExternalError", cause: irrecoverableError });
+        },
+      ),
+      te.chainEitherKW((row) => {
+        if (row) return e.right(row);
+
+        const notFoundError = new ResourceNotFoundError({
+          errorMessageIdentifier: "lti:ags:line-items:errors:line-item-not-found",
+          messageParams: {},
+        });
+
+        return e.left(
+          new LtiRepositoryError({
+            type: "NotFound",
+            cause: notFoundError,
+            subject: LtiLineItem.name,
+          }),
+        );
+      }),
+      te.map((row) => ltiLineItemsMapper.fromRow(row, context)),
+    )();
   }
 
   public findManyByResourceLink(
@@ -139,8 +186,46 @@ export class DrizzleLtiLineItemsRepository extends LtiLineItemsRepository {
     )();
   }
 
-  public findById(lineItemId: LtiLineItem["id"]): Promise<Either<LtiRepositoryError, LtiLineItem>> {
-    throw new Error("Method not implemented.");
+  public findById(
+    lineItemId: LtiLineItem["id"],
+    context: Context<ContextConcreteType>,
+  ): Promise<Either<LtiRepositoryError, LtiLineItem<ContextConcreteType>>> {
+    const client = this.transactionManager.getTx() ?? this.drizzle.getClient();
+
+    return pipe(
+      te.tryCatch(
+        () =>
+          client.query.ltiLineItemsT.findFirst({
+            ...ltiLineItemsMapper.requiredQueryConfig,
+            where: eq(ltiLineItemsT.id, lineItemId.toString()),
+          }),
+        (error) => {
+          const irrecoverableError = new IrrecoverableError(
+            `Error occurred in ${DrizzleLtiLineItemsRepository.name} when trying to find line item of id "${lineItemId}".`,
+            error as Error,
+          );
+
+          return new LtiRepositoryError({ type: "ExternalError", cause: irrecoverableError });
+        },
+      ),
+      te.chainEitherKW((row) => {
+        if (row) return e.right(row);
+
+        const notFoundError = new ResourceNotFoundError({
+          errorMessageIdentifier: "lti:ags:line-items:errors:line-item-not-found",
+          messageParams: {},
+        });
+
+        return e.left(
+          new LtiRepositoryError({
+            type: "NotFound",
+            cause: notFoundError,
+            subject: LtiLineItem.name,
+          }),
+        );
+      }),
+      te.map((row) => ltiLineItemsMapper.fromRow(row, context)),
+    )();
   }
 
   /**

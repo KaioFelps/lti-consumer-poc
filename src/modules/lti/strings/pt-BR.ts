@@ -283,3 +283,6 @@ ptBR["lti:ags:line-items-container:errors:page-must-be-integer"] =
   "A página deve ser um número inteiro.";
 ptBR["lti:ags:line-items-container:errors:page-must-be-positive"] =
   "A página deve ser um número positivo.";
+
+ptBR["lti:ags:line-items:errors:line-item-not-found"] =
+  "Não foi possível encontrar esse line item.";
