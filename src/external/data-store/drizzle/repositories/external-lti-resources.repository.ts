@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { generateUUID } from "common/src/types/uuid";
 import { externalLtiResourcesT } from "drizzle/schema";
 import { and, eq } from "drizzle-orm";
 import { taskEither as te } from "fp-ts";
@@ -62,6 +63,52 @@ export class DrizzleExternalLtiResourcesRepository extends ExternalLtiResourcesR
             }),
           });
         },
+      ),
+      te.map(externalLtiResourcesMapper.fromRow),
+    )();
+  }
+
+  /**
+   * @note Does not support including a `Context`. See implementation notes.
+   */
+  public findOrCreateByExternalId(
+    externalResourceId: string,
+    toolId: string,
+  ): Promise<Either<LtiRepositoryError, ExternalLtiResource>> {
+    const client = this.txManager.getTx() ?? this.drizzle.getClient();
+
+    return pipe(
+      te.tryCatch(
+        async () => {
+          const [{ id }] = await client
+            .insert(externalLtiResourcesT)
+            .values({
+              toolId: toolId,
+              externalToolResourceId: externalResourceId,
+              id: generateUUID(),
+            })
+            .onConflictDoUpdate({
+              target: [externalLtiResourcesT.toolId, externalLtiResourcesT.externalToolResourceId],
+              set: { externalToolResourceId: externalResourceId },
+            })
+            .returning({ id: externalLtiResourcesT.id });
+
+          const fullResource = await client.query.externalLtiResourcesT.findFirst({
+            ...externalLtiResourcesMapper.requiredQueryConfig,
+            where: eq(externalLtiResourcesT.id, id),
+          });
+
+          return fullResource!;
+        },
+        (error) =>
+          new LtiRepositoryError({
+            type: "ExternalError",
+            cause: new IrrecoverableError(
+              `Error occurred in ${DrizzleExternalLtiResourcesRepository.name} ` +
+                "when finding or creating external LTI resource.",
+              error as Error,
+            ),
+          }),
       ),
       te.map(externalLtiResourcesMapper.fromRow),
     )();
