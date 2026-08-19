@@ -1,0 +1,1 @@
+ALTER TABLE "external_lti_resources" ADD CONSTRAINT "external_lti_resources_tool_id_external_tool_resource_id_unique" UNIQUE("tool_id","external_tool_resource_id");

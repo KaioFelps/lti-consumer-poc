@@ -9,6 +9,7 @@ import {
   primaryKey,
   smallint,
   timestamp,
+  unique,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -270,13 +271,17 @@ export const gradesT = pgTable(
 
 // #region LTI AGS
 
-export const externalLtiResourcesT = pgTable("external_lti_resources", {
-  id: uuid().primaryKey(),
-  toolId: varchar("tool_id")
-    .references(() => ltiTools.id)
-    .notNull(),
-  externalToolResourceId: varchar("external_tool_resource_id").notNull(),
-});
+export const externalLtiResourcesT = pgTable(
+  "external_lti_resources",
+  {
+    id: uuid().primaryKey(),
+    toolId: varchar("tool_id")
+      .references(() => ltiTools.id)
+      .notNull(),
+    externalToolResourceId: varchar("external_tool_resource_id").notNull(),
+  },
+  (table) => [unique().on(table.toolId, table.externalToolResourceId)],
+);
 
 export const ltiAssignmentsT = pgTable(
   "lti_assignments",
