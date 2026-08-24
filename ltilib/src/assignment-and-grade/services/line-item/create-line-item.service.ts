@@ -108,12 +108,7 @@ export class CreateService<CustomContextType extends string = never> implements 
   ) {
     return pipe(
       () => this.lineItemsRepo.findExisting(tool, context, resourceLinkId, resourceId, tag),
-      te.orElseW(
-        (error) =>
-          error.type === "NotFound"
-            ? te.right(undefined) // Transforma o NotFound em um sucesso (Right) com valor undefined
-            : te.left(error), // Mantém os outros erros no canal de erro (Left)
-      ),
+      te.orElseW((error) => (error.type === "NotFound" ? te.right(undefined) : te.left(error))),
       te.map((lineitem) => lineitem as LtiLineItem<CustomContextType> | undefined),
     );
   }
