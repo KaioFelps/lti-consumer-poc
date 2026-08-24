@@ -127,6 +127,13 @@
       "when": 1787097259900,
       "tag": "0017_make_external_resource_unique_for_tool",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1787589212104,
+      "tag": "0018_add_unique_indexes_and_checks_to_lineitems",
+      "breakpoints": true
     }
   ]
 }
