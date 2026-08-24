@@ -73,7 +73,7 @@ export class CreateService<CustomContextType extends string = never> implements 
     return await pipe(
       te.Do,
       te.bindW("existingLineItem", () =>
-        this.findExistingLineItem(args.resourceId, args.tag, context),
+        this.findExistingLineItem(args.resourceLinkId, args.resourceId, args.tag, context, tool),
       ),
       te.bindW("lineItem", ({ existingLineItem }) => {
         if (existingLineItem) return te.right(existingLineItem);
@@ -100,23 +100,19 @@ export class CreateService<CustomContextType extends string = never> implements 
   }
 
   private findExistingLineItem(
+    resourceLinkId: string | undefined,
     resourceId: string | undefined,
     tag: RawLineItemsPayload["tag"],
     context: Context<unknown>,
+    tool: LtiTool,
   ) {
     return pipe(
-      o.fromNullable(resourceId),
-      o.map(
-        (resourceId) => () =>
-          this.lineItemsRepo.findByExternalResourceAndTag(resourceId, tag, context),
-      ),
-      o.sequence(te.ApplicativePar),
-      te.match(
-        (error) => {
-          if (error.type === "NotFound") return e.right(undefined);
-          return e.left(error);
-        },
-        (lineitem) => e.right(o.toUndefined(lineitem)),
+      () => this.lineItemsRepo.findExisting(tool, context, resourceLinkId, resourceId, tag),
+      te.orElseW(
+        (error) =>
+          error.type === "NotFound"
+            ? te.right(undefined) // Transforma o NotFound em um sucesso (Right) com valor undefined
+            : te.left(error), // Mantém os outros erros no canal de erro (Left)
       ),
       te.map((lineitem) => lineitem as LtiLineItem<CustomContextType> | undefined),
     );
@@ -160,7 +156,7 @@ export class CreateService<CustomContextType extends string = never> implements 
       }),
       te.chainW((lineitem) =>
         pipe(
-          () => this.lineItemsRepo.save(lineitem),
+          () => this.lineItemsRepo.save(lineitem, tool),
           te.map(() => lineitem),
         ),
       ),
