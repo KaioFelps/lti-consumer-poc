@@ -49,14 +49,21 @@ export class DrizzleLtiLineItemsRepository extends LtiLineItemsRepository {
     super();
   }
 
-  public save(lineItem: LtiLineItem): Promise<Either<LtiRepositoryError, void>> {
+  public save(lineItem: LtiLineItem, tool: LtiTool): Promise<Either<LtiRepositoryError, void>> {
     const client = this.transactionManager.getTx() ?? this.drizzle.getClient();
 
     return pipe(
       te.Do,
       te.bind("resolvedAssignmentId", () => this.resolveAssignmentId(lineItem.resourceLink?.id)),
       te.chainEitherKW(({ resolvedAssignmentId }) => {
-        return ltiLineItemsMapper.intoRow(lineItem, resolvedAssignmentId);
+        // resolved assignment exists per resource link id, also we don't even use resource link directly... check the schema
+        const isOrphan = !resolvedAssignmentId && !lineItem.externalResource;
+
+        return ltiLineItemsMapper.intoRow(
+          lineItem,
+          resolvedAssignmentId,
+          isOrphan ? tool.id : null,
+        );
       }),
       te.chainW((row) =>
         te.tryCatch(
@@ -99,38 +106,80 @@ export class DrizzleLtiLineItemsRepository extends LtiLineItemsRepository {
     );
   }
 
-  public findByExternalResourceAndTag(
-    resourceId: string,
-    tag: string | undefined,
+  public findExisting(
+    tool: LtiTool,
     context: Context<ContextConcreteType>,
+    resourceLinkId: string | undefined,
+    resourceId: string | undefined,
+    tag: string | undefined,
   ): Promise<Either<LtiRepositoryError, LtiLineItem>> {
     const client = this.transactionManager.getTx() ?? this.drizzle.getClient();
 
-    return pipe(
-      te.tryCatch(
-        () =>
-          client.query.ltiLineItemsT.findFirst({
-            ...ltiLineItemsMapper.requiredQueryConfig,
-            where: and(
-              tag ? eq(ltiLineItemsT.tag, tag) : isNull(ltiLineItemsT.tag),
-              inArray(
-                ltiLineItemsT.externalResourceId,
-                client
-                  .select({ id: externalLtiResourcesT.id })
-                  .from(externalLtiResourcesT)
-                  .where(eq(externalLtiResourcesT.toolId, resourceId)),
-              ),
-            ),
-          }),
-        (error) => {
-          const irrecoverableError = new IrrecoverableError(
-            `Error occurred in ${DrizzleLtiLineItemsRepository.name} when trying to find line item by external resource ` +
-              `(of id "${resourceId}) and ${tag ? `tag "${tag}"` : "null tag"}.`,
-            error as Error,
-          );
+    console.log("resource id recebido no repositório", resourceId);
 
-          return new LtiRepositoryError({ type: "ExternalError", cause: irrecoverableError });
-        },
+    return pipe(
+      te.fromEither(unmountContextId(context.id)),
+      te.mapLeft((error) => new LtiRepositoryError({ type: "ExternalError", cause: error })),
+      te.chainW(({ concreteEntityId, concreteType }) =>
+        te.tryCatch(
+          () => {
+            const matches = client
+              .select({ id: ltiLineItemsT.id })
+              .from(ltiLineItemsT)
+              .leftJoin(
+                externalLtiResourcesT,
+                eq(ltiLineItemsT.externalResourceId, externalLtiResourcesT.id),
+              )
+              .leftJoin(
+                ltiAssignmentsT,
+                eq(ltiLineItemsT.ltiAssignmentId, ltiAssignmentsT.assignmentId),
+              )
+              .leftJoin(ltiResourceLinks, eq(ltiAssignmentsT.resourceLinkId, ltiResourceLinks.id))
+              .leftJoin(
+                ltiToolDeployments,
+                eq(ltiResourceLinks.deploymentId, ltiToolDeployments.id),
+              )
+              .where(
+                and(
+                  tag ? eq(ltiLineItemsT.tag, tag) : isNull(ltiLineItemsT.tag),
+                  eq(ltiLineItemsT.concreteContextId, concreteEntityId),
+                  eq(ltiLineItemsT.concreteContextType, concreteType),
+                  resourceId
+                    ? eq(externalLtiResourcesT.externalToolResourceId, resourceId)
+                    : isNull(ltiLineItemsT.externalResourceId),
+                  resourceLinkId
+                    ? eq(ltiResourceLinks.id, resourceLinkId)
+                    : isNull(ltiLineItemsT.ltiAssignmentId),
+                  or(
+                    eq(ltiToolDeployments.clientId, tool.id),
+                    and(
+                      isNull(ltiLineItemsT.ltiAssignmentId),
+                      eq(externalLtiResourcesT.toolId, tool.id),
+                    ),
+                    and(
+                      isNull(ltiLineItemsT.ltiAssignmentId),
+                      isNull(ltiLineItemsT.externalResourceId),
+                      eq(ltiLineItemsT.orphanCreatingToolId, tool.id),
+                    ),
+                  ),
+                ),
+              );
+
+            return client.query.ltiLineItemsT.findFirst({
+              ...ltiLineItemsMapper.requiredQueryConfig,
+              where: inArray(ltiLineItemsT.id, matches),
+            });
+          },
+          (error) => {
+            const irrecoverableError = new IrrecoverableError(
+              `Error occurred in ${DrizzleLtiLineItemsRepository.name} when trying to find line item by external resource ` +
+                `(of id "${resourceId}) and ${tag ? `tag "${tag}"` : "null tag"}.`,
+              error as Error,
+            );
+
+            return new LtiRepositoryError({ type: "ExternalError", cause: irrecoverableError });
+          },
+        ),
       ),
       te.chainEitherKW((row) => {
         if (row) return e.right(row);

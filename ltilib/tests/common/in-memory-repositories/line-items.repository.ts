@@ -21,8 +21,11 @@ export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
 
     return e.right(undefined);
   }
-  public async findByExternalResourceAndTag(
-    resourceId: string,
+  public async findExisting(
+    _tool: LtiTool,
+    _context: Context<unknown>,
+    _resourceLinkId: string | undefined,
+    resourceId: string | undefined,
     tag: string | undefined,
   ): Promise<Either<LtiRepositoryError, LtiLineItem>> {
     return pipe(
