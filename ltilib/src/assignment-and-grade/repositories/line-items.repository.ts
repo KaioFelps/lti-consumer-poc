@@ -8,12 +8,45 @@ import { LineItemsContainerFilters } from "../container-filters";
 import { LtiLineItem } from "../line-item";
 
 export abstract class LtiLineItemsRepository {
-  public abstract save(lineItem: LtiLineItem): Promise<Either<LtiRepositoryError, void>>;
+  /**
+   * Saves a new instance of {@link LtiLineItem `LtiLineItem`}.
+   *
+   * @param lineItem The line item to be persisted.
+   * @param tool The tool that owns this line item. A platform may use this to enforce
+   * tool ownership further on. (E.g.: when no `resourceId` nor `resourceLinkId` are
+   * provided, a platform's model specific field might store the tool ID for this purpose.)
+   */
+  public abstract save(
+    lineItem: LtiLineItem,
+    tool: LtiTool,
+  ): Promise<Either<LtiRepositoryError, void>>;
 
-  public abstract findByExternalResourceAndTag(
-    resourceId: string,
-    tag: string | undefined,
+  /**
+   * Finds one or zero line items that matches with `resourceLinkId`, `resourceId`, and `tag`,
+   * belongs to `context` and is accessible to `tool`.
+   *
+   * While the [specification encourages tools to avoid duplicating line items], a platform
+   * MAY decide to use the provided parameters to provide idempotency and reuse an existing
+   * line item that matches the tool's requirements. Note that, in this case, the platform
+   * MUST ensure that the line item belongs/is accessible to the `tool`.
+   *
+   * @param tool The tool to which the returned line item must be accessible to.
+   * (This can be done either through platform-specific persistance models or by using
+   * {@link LtiLineItem.isAccessibleToTool `LtiLineItem.isAccessibleToTool`} if either a
+   * resource or a resource link has been correctly set up to the line item upon creation.)
+   * @param context The context to which the returned line item must belong.
+   * @param resourceLinkId The `resourceLinkId` that the returned line item must be associated to.
+   * @param resourceId The `resourceId` that the returned line item must be associated to.
+   * @param tag The `tag` that the returned line item must have.
+   *
+   * [specification encourages tools to avoid duplicating line items]: https://www.imsglobal.org/spec/lti-ags/v2p0#course-copy-and-export-import
+   */
+  public abstract findExisting(
+    tool: LtiTool,
     context: Context<unknown>,
+    resourceLinkId: string | undefined,
+    resourceId: string | undefined,
+    tag: string | undefined,
   ): Promise<Either<LtiRepositoryError, LtiLineItem>>;
 
   /**
