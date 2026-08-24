@@ -167,7 +167,10 @@ describe("[AGS] Create Line Item Service", async () => {
       assert(e.isRight(response), "Should create line item successfully");
 
       const lineItem = response.right.content;
-      const storedLineItems = await lineItemsRepo.findByExternalResourceAndTag(
+      const storedLineItems = await lineItemsRepo.findExisting(
+        tool,
+        context,
+        resourceLink.id,
         resource.externalToolResourceId,
         "grade",
       );

@@ -1,6 +1,7 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
+  check,
   foreignKey,
   index,
   jsonb,
@@ -10,6 +11,7 @@ import {
   smallint,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -314,16 +316,50 @@ export const ltiLineItemsT = pgTable(
     // grade or not
     gradesReleased: boolean("grades_released"),
     customParameters: jsonb("custom_parameters").$type<Record<string, string>>(),
-    // instead of containing an Id for the resource link, we gonna point to the LTI external assignment.
-    // the assignment already has the reference to the resource link, and this way we ensure
+    // instead of containing an id for the resource link, we gonna point to the LTI external assignment.
+    // the assignment already has the reference to the resource link, thus this way we ensure
     // that the lineitem refers to a resource link that is actually gradable
     ltiAssignmentId: uuid().references(() => ltiAssignmentsT.assignmentId),
+    // line items may have not resourceId nor resourceLinkId, hence this is needed to avoid cross-tool leak, i.e.,
+    // if neither of former properties exists, the ID of the tool (that created this line item) MUST be set here
+    // and checked in the line items repository
+    orphanCreatingToolId: varchar("orphan_creating_tool_id").references(() => ltiTools.id),
   },
   (table) => [
     foreignKey({
       columns: [table.concreteContextId, table.concreteContextType],
       foreignColumns: [ltiContexts.concreteContextId, ltiContexts.concreteContextType],
     }),
+    check(
+      "orphan_creating_tool_id_only_when_no_assignment_or_resource",
+      sql`${table.orphanCreatingToolId} IS NULL OR (${table.ltiAssignmentId} IS NULL AND ${table.externalResourceId} IS NULL)`,
+    ),
+    check(
+      "orphan_lineitem_must_have_creating_tool",
+      sql`${table.ltiAssignmentId} IS NOT NULL OR ${table.externalResourceId} IS NOT NULL OR ${table.orphanCreatingToolId} IS NOT NULL`,
+    ),
+
+    // halts tags like "", hence ensuring the following unique index will work as expected
+    check("tag_not_empty_string", sql`${table.tag} IS NULL OR ${table.tag} <> ''`),
+
+    uniqueIndex("uq_lineitem_external_resource_assignment_tag")
+      .on(
+        table.externalResourceId,
+        sql`coalesce(${table.ltiAssignmentId}::text, '')`,
+        sql`coalesce(${table.tag}, '')`,
+      )
+      .where(sql`${table.externalResourceId} IS NOT NULL`),
+    uniqueIndex("uq_lineitem_assignment_only_tag")
+      .on(table.ltiAssignmentId, sql`coalesce(${table.tag}, '')`)
+      .where(sql`${table.externalResourceId} IS NULL AND ${table.ltiAssignmentId} IS NOT NULL`),
+
+    uniqueIndex("uq_lineitem_orphan_owner_context_tag_present")
+      .on(table.orphanCreatingToolId, table.concreteContextId, table.concreteContextType, table.tag)
+      .where(sql`${table.orphanCreatingToolId} IS NOT NULL AND ${table.tag} IS NOT NULL`),
+
+    uniqueIndex("uq_lineitem_orphan_owner_context_tag_null")
+      .on(table.orphanCreatingToolId, table.concreteContextId, table.concreteContextType)
+      .where(sql`${table.orphanCreatingToolId} IS NOT NULL AND ${table.tag} IS NULL`),
   ],
 );
 
