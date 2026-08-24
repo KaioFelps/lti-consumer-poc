@@ -61,7 +61,7 @@ export class LtiLineItemServices<CustomContextType extends string = never> {
     return await this.executeService(this.createService, params);
   }
 
-  public async find(params: FindLineItemParams & BasicRequestValidationParams) {
+  public async find(params: FindLineItemParams & BasicRequestValidationParams<CustomContextType>) {
     return await this.executeService(this.findService, params);
   }
 
