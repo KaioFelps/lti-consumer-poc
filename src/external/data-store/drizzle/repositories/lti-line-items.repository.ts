@@ -115,8 +115,6 @@ export class DrizzleLtiLineItemsRepository extends LtiLineItemsRepository {
   ): Promise<Either<LtiRepositoryError, LtiLineItem>> {
     const client = this.transactionManager.getTx() ?? this.drizzle.getClient();
 
-    console.log("resource id recebido no repositório", resourceId);
-
     return pipe(
       te.fromEither(unmountContextId(context.id)),
       te.mapLeft((error) => new LtiRepositoryError({ type: "ExternalError", cause: error })),

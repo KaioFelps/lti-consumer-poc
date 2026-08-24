@@ -100,7 +100,6 @@ export class LtiLineItemsController {
           .send(lineItemsResponse.content);
       }),
       te.mapLeft((error) => {
-        console.log("n deu bom em criar o line item em", error);
         throw ExtendedExceptionsFactory.fromError(error);
       }),
     )();

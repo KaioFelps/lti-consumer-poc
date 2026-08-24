@@ -260,7 +260,6 @@ describe("[e2e::LTI] Create Line Item", async () => {
     test.each(testCases!)("$description", async ({ setupFactory }) => {
       const specificConfig = setupFactory(externalResource, resourceLink);
 
-      console.log(specificConfig);
       const lineItem = await ltiLineItemFactory.createAndPersist(drizzle, {
         context: courseContext,
         owningToolId: tool.id,
