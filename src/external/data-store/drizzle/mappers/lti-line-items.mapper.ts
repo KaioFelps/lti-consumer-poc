@@ -30,7 +30,11 @@ const requiredQueryConfig = {
   },
 } as const satisfies LtiLineItemsQueryConfig;
 
-function intoRow(lineitem: LtiLineItem, ltiAssignmentId: string | null) {
+function intoRow(
+  lineitem: LtiLineItem,
+  ltiAssignmentId: string | null,
+  owningToolId: string | null,
+) {
   return pipe(
     option.fromNullable(lineitem.context.id),
     option.traverse(either.Applicative)((contextId) => unmountContextId(contextId)),
@@ -59,6 +63,7 @@ function intoRow(lineitem: LtiLineItem, ltiAssignmentId: string | null) {
                 concreteContextId: null,
                 concreteContextType: null,
               }),
+          orphanCreatingToolId: owningToolId,
         }) satisfies LtiLineItemPlainRow,
     ),
   );
