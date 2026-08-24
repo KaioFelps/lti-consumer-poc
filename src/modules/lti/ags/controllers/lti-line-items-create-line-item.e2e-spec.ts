@@ -300,9 +300,33 @@ describe("[e2e::LTI] Create Line Item", async () => {
     });
   });
 
-  it.skip("should correctly find the course context", async () => {});
+  test("the returned line item 'id' should be the endpoint to access that line item", async () => {
+    const { courseContext, tool } = await getValidItems();
+    const { accessToken } = await getToolAndItsOidcAccessToken(app, tool);
 
-  test.skip("the returned line item 'id' should be the endpoint to access that line item", async () => {});
+    const endpoint = Routes.lti.ags.lineitems.container(courseContext.id);
+
+    const response = await request(app.getHttpServer())
+      .post(endpoint)
+      .set("authorization", `Bearer ${accessToken}`)
+      .set("content-type", VALID_CONTENT_TYPE)
+      .send({
+        scoreMaximum: 90,
+        label: "grade",
+        tag: "grade",
+      });
+
+    expect(response.status).toBe(201);
+
+    const body = response.body;
+    expect(() => new URL(body.id), "it should be a valid URL").not.toThrow();
+
+    const responseLineItemId = new URL(body.id);
+    const idIsInstanceEndpoint = responseLineItemId.pathname.startsWith(
+      Routes.lti.ags.lineitems.instance(courseContext.id, ""),
+    );
+    expect(idIsInstanceEndpoint).toBe(true);
+  });
 
   const getValidItems = async () => {
     const person = await personFactory.createAndPersist(drizzle);
