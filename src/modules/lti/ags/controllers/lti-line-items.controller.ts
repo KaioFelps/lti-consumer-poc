@@ -12,6 +12,7 @@ import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
 import { FindContextByIdService } from "../../advantage/context/services/find-context-by-id.service";
 import { FindToolByIdService } from "../../tools/services/find-tool-by-id.service";
 import { CreateLineItemDTO } from "../dtos/create-line-item.dto";
+import { FindLineItemByIdParamsDto } from "../dtos/find-line-item-by-id.dto";
 import { LineItemsContainerFiltersDto } from "../dtos/line-items-container-filters.dto";
 import { ContextConcreteType } from "../enums/context-concrete-type";
 
@@ -45,7 +46,6 @@ export class LtiLineItemsController {
       te.apS("tool", () => this.findToolByIdService.exec({ id: toolId })),
       te.apS("context", () => this.findContextByIdService.exec({ contextComposedId: contextId })),
       te.chainW(({ context, tool }) => () => {
-        console.log("controller ; filtros", resolvedFilters);
         return this.lineItemsServices.fetchFromContainer({
           acceptHeader,
           contentTypeHeader,
@@ -105,7 +105,39 @@ export class LtiLineItemsController {
     )();
   }
 
-  public lineItemsContainer() {}
-
-  public findLineItem() {}
+  @Get(":lineItemId")
+  @ConfigAuthGuard({ strategy: AuthStrategy.LtiToolsJwt })
+  public async findLineItem(
+    @Headers("accept") acceptHeader: string | undefined,
+    @Headers("content-type") contentTypeHeader: string | undefined,
+    @Param() { lineItemId }: FindLineItemByIdParamsDto,
+    @CurrentTool() { sub: toolId }: LtiToolJwtPayload,
+    @Param("contextId") contextId: string,
+    @Res() response: HttpResponse,
+  ) {
+    return await pipe(
+      te.Do,
+      te.apS("tool", () => this.findToolByIdService.exec({ id: toolId })),
+      te.apS("context", () => this.findContextByIdService.exec({ contextComposedId: contextId })),
+      te.chainW(
+        ({ context, tool }) =>
+          () =>
+            this.lineItemsServices.find({
+              acceptHeader,
+              contentTypeHeader,
+              context,
+              lineItemId,
+              tool: tool.record,
+            }),
+      ),
+      te.match(
+        (error) => {
+          throw ExtendedExceptionsFactory.fromError(error);
+        },
+        (result) => {
+          response.setHeaders(result.headers).status(result.httpStatusCode).send(result.content);
+        },
+      ),
+    )();
+  }
 }

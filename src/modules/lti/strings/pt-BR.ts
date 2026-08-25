@@ -286,3 +286,5 @@ ptBR["lti:ags:line-items-container:errors:page-must-be-positive"] =
 
 ptBR["lti:ags:line-items:errors:line-item-not-found"] =
   "Não foi possível encontrar esse line item.";
+ptBR["lti:ags:line-items:errors:line-item-id-must-be-uuid"] =
+  "O ID do lien item deve ser um UUID válido.";
