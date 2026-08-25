@@ -2,26 +2,17 @@ import { INestApplication } from "@nestjs/common";
 import request from "supertest";
 import { App } from "supertest/types";
 import { getTestingApp } from "test";
-import courseContextFactory from "test/factories/course-context.factory";
-import deploymentFactory from "test/factories/deployment.factory";
-import externalLtiResourceFactory from "test/factories/external-lti-resource.factory";
-import ltiAssignmentFactory from "test/factories/lti-assignment.factory";
 import ltiLineItemFactory from "test/factories/lti-line-item.factory";
-import ltiResourceLinkFactory from "test/factories/lti-resource-link.factory";
-import ltiToolFactory from "test/factories/lti-tool.factory";
-import personFactory from "test/factories/person.factory";
 import { getToolAndItsOidcAccessToken } from "test/fixtures/oidc";
 import { DrizzleClient } from "@/external/data-store/drizzle/client";
 import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity";
-import { AssignmentKind } from "@/modules/assignments-and-grades/enums/assignment-kind";
-import { Instructor } from "@/modules/courses-and-enrollments/entities/instructor.entity";
 import { Routes } from "@/routes";
 import { ExternalLtiResource } from "$/advantage/external-resource";
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { Context } from "$/core/context";
 import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
-import { ContextConcreteType } from "../enums/context-concrete-type";
+import { ContextConcreteType } from "../../enums/context-concrete-type";
+import { EntitiesFactoryGenerator, generateEntitiesFactory } from "./tests";
 
 /**
  * we're not covering points related to the server because the service got its own tests
@@ -35,10 +26,12 @@ describe("[e2e::LTI] Create Line Item", async () => {
 
   let app: INestApplication<App>;
   let drizzle: DrizzleClient;
+  let getValidItems: EntitiesFactoryGenerator;
 
   beforeAll(async () => {
     app = await getTestingApp();
     drizzle = app.get(DrizzleClient);
+    getValidItems = generateEntitiesFactory(drizzle);
     await app.init();
   });
 
@@ -327,46 +320,4 @@ describe("[e2e::LTI] Create Line Item", async () => {
     );
     expect(idIsInstanceEndpoint).toBe(true);
   });
-
-  const getValidItems = async () => {
-    const person = await personFactory.createAndPersist(drizzle);
-    const instructor = Instructor.createUnchecked({ person });
-
-    const { course, courseContext } = await courseContextFactory.createAndPersist(drizzle, {
-      instructor,
-    });
-
-    // lti stuff
-    const tool = await ltiToolFactory.createAndPersist(drizzle, {
-      scopes: [AssignmentAndGradeServiceScopes.Lineitem],
-    });
-
-    const deployment = await deploymentFactory.createAndPersist(drizzle, {
-      context: courseContext,
-      tool,
-    });
-
-    // every assignment connects to lti through a resource link
-    const assignmentsResourceLink = await ltiResourceLinkFactory.createAndPersist(drizzle, {
-      tool,
-      deployment,
-      context: courseContext,
-    });
-
-    // platform specific assignment
-    const assignment = await ltiAssignmentFactory.createAndPersist(drizzle, {
-      course,
-      kind: AssignmentKind.ExternalLti,
-      assignmentsResourceLink,
-    });
-
-    // assignment relating local assignment to tool's resource
-    const resource = await externalLtiResourceFactory.createAndPersist(drizzle, {
-      tool,
-      assignment,
-      context: courseContext,
-    });
-
-    return { assignmentsResourceLink, assignment, courseContext, resource, tool, course };
-  };
 });
