@@ -9,12 +9,12 @@ import { CurrentTool } from "@/modules/auth/protected-routes/decorators/current-
 import { type LtiToolJwtPayload } from "@/modules/auth/protected-routes/lti-tool-jwt-payload";
 import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
-import { FindContextByIdService } from "../../advantage/context/services/find-context-by-id.service";
-import { FindToolByIdService } from "../../tools/services/find-tool-by-id.service";
-import { CreateLineItemDTO } from "../dtos/create-line-item.dto";
-import { FindLineItemByIdParamsDto } from "../dtos/find-line-item-by-id.dto";
-import { LineItemsContainerFiltersDto } from "../dtos/line-items-container-filters.dto";
-import { ContextConcreteType } from "../enums/context-concrete-type";
+import { FindContextByIdService } from "../../../advantage/context/services/find-context-by-id.service";
+import { FindToolByIdService } from "../../../tools/services/find-tool-by-id.service";
+import { CreateLineItemDTO } from "../../dtos/create-line-item.dto";
+import { FindLineItemByIdParamsDto } from "../../dtos/find-line-item-by-id.dto";
+import { LineItemsContainerFiltersDto } from "../../dtos/line-items-container-filters.dto";
+import { ContextConcreteType } from "../../enums/context-concrete-type";
 
 @Rest()
 @Controller("/lti/ags/:contextId/lineitems")
