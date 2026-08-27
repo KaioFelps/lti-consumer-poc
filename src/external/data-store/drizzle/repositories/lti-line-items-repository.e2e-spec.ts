@@ -79,7 +79,8 @@ describe("[Repository] Drizzle LTI Line Items Repository", () => {
   };
 
   it("should associate the line item to the respective activity through ltilib LineItem entity", async () => {
-    const { assignment, assignmentsResourceLink, courseContext, resource } = await getValidItems();
+    const { assignment, assignmentsResourceLink, courseContext, resource, tool } =
+      await getValidItems();
 
     // a lti line item;
     //
@@ -100,7 +101,7 @@ describe("[Repository] Drizzle LTI Line Items Repository", () => {
     const lineItem = lineItemResult.right;
     expect(lineItem.resourceLink).toBeDefined();
 
-    const result = await rut.save(lineItem);
+    const result = await rut.create(lineItem, tool);
     assert(e.isRight(result));
 
     const lineItemRowInDb = await drizzle.getClient().query.ltiLineItemsT.findFirst({

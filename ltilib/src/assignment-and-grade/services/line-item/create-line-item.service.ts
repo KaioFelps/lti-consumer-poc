@@ -151,7 +151,7 @@ export class CreateService<CustomContextType extends string = never> implements 
       }),
       te.chainW((lineitem) =>
         pipe(
-          () => this.lineItemsRepo.save(lineitem, tool),
+          () => this.lineItemsRepo.create(lineitem, tool),
           te.map(() => lineitem),
         ),
       ),

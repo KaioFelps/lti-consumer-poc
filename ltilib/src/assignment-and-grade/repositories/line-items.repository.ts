@@ -16,7 +16,7 @@ export abstract class LtiLineItemsRepository {
    * tool ownership further on. (E.g.: when no `resourceId` nor `resourceLinkId` are
    * provided, a platform's model specific field might store the tool ID for this purpose.)
    */
-  public abstract save(
+  public abstract create(
     lineItem: LtiLineItem,
     tool: LtiTool,
   ): Promise<Either<LtiRepositoryError, void>>;

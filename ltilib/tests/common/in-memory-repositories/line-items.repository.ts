@@ -13,7 +13,7 @@ import { LtiTool } from "$/core/tool";
 export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
   public lineItems: LtiLineItem[] = [];
 
-  public async save(lineItem: LtiLineItem): Promise<Either<LtiRepositoryError, void>> {
+  public async create(lineItem: LtiLineItem): Promise<Either<LtiRepositoryError, void>> {
     const index = this.lineItems.findIndex((li) => li.id === lineItem.id);
 
     if (index !== -1) this.lineItems[index] = lineItem;

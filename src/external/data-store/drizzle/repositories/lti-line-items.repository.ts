@@ -49,7 +49,7 @@ export class DrizzleLtiLineItemsRepository extends LtiLineItemsRepository {
     super();
   }
 
-  public save(lineItem: LtiLineItem, tool: LtiTool): Promise<Either<LtiRepositoryError, void>> {
+  public create(lineItem: LtiLineItem, tool: LtiTool): Promise<Either<LtiRepositoryError, void>> {
     const client = this.transactionManager.getTx() ?? this.drizzle.getClient();
 
     return pipe(
