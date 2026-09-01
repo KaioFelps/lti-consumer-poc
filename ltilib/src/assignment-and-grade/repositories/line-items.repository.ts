@@ -117,5 +117,6 @@ export abstract class LtiLineItemsRepository {
   public abstract update(
     lineItem: LtiLineItem.UpdateRecord,
     tool: LtiTool,
+    context: Context<unknown>,
   ): Promise<Either<LtiRepositoryError, LtiLineItem>>;
 }

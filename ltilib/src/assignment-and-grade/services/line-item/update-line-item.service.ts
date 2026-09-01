@@ -100,7 +100,7 @@ export class UpdateService extends LineItemService {
           startDateTime: resolvedStartDate,
         }),
       ),
-      te.chainW((record) => () => this.lineItemsRepo.update(record, tool)),
+      te.chainW((record) => () => this.lineItemsRepo.update(record, tool, context)),
       te.mapLeft((error) =>
         error instanceof LtiRepositoryError && error.type === "NotFound"
           ? new InaccessibleLineItemError(lineItemId, error)
