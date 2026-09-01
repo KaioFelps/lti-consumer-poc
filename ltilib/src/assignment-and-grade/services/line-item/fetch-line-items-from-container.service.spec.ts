@@ -112,11 +112,14 @@ describe("[AGS] Fetch Line Items From Container Service", async () => {
     tag?: string;
     count: number;
   }) => {
-    const lineItems = new Array<LtiLineItem>(count).fill(
-      lineItemFactory.createMinimal({ context, externalResource, resourceLink, tag }),
-    );
+    const owningTool = createTool();
+    const lineItems = new Array(count).fill({
+      lineItem: lineItemFactory.createMinimal({ context, externalResource, resourceLink, tag }),
+      owningTool,
+    });
 
     lineItemsRepo.lineItems.push(...lineItems);
+    toolsRepository.tools.push(owningTool);
   };
 
   it("should require `lineitems` or `lineitems.readonly` scopes", async () => {

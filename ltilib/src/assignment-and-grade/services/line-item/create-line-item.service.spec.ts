@@ -404,7 +404,7 @@ describe("[AGS] Create Line Item Service", async () => {
       });
 
       assert(e.isRight(response));
-      expect(lineItemsRepo.lineItems[0].resourceLink).toBeUndefined();
+      expect(lineItemsRepo.lineItems[0].lineItem.resourceLink).toBeUndefined();
     });
 
     it("should consider `null` as if the field was omitted", async () => {
@@ -421,7 +421,7 @@ describe("[AGS] Create Line Item Service", async () => {
       });
 
       assert(e.isRight(response));
-      expect(lineItemsRepo.lineItems[0].resourceLink).toBeUndefined();
+      expect(lineItemsRepo.lineItems[0].lineItem.resourceLink).toBeUndefined();
     });
 
     it("should create a line item associated to a resource link if `resourceLinkId` property is present", async () => {
@@ -441,8 +441,8 @@ describe("[AGS] Create Line Item Service", async () => {
 
       assert(e.isRight(response));
       const persistedLineItem = lineItemsRepo.lineItems[0];
-      assert(!!persistedLineItem.resourceLink);
-      expect(persistedLineItem.resourceLink).toEqual(resourceLink);
+      assert(!!persistedLineItem.lineItem.resourceLink);
+      expect(persistedLineItem.lineItem.resourceLink).toEqual(resourceLink);
     });
 
     it("should not create the line item if the mentioned resource link doesn't belong to the same context as the line item itself", async () => {
@@ -530,7 +530,7 @@ describe("[AGS] Create Line Item Service", async () => {
       });
 
       assert(e.isRight(response));
-      expect(lineItemsRepo.lineItems[0].resourceLink).toBeUndefined();
+      expect(lineItemsRepo.lineItems[0].lineItem.resourceLink).toBeUndefined();
     });
 
     it("should consider `null` as if the field was omitted", async () => {
@@ -547,7 +547,7 @@ describe("[AGS] Create Line Item Service", async () => {
       });
 
       assert(e.isRight(response));
-      expect(lineItemsRepo.lineItems[0].resourceLink).toBeUndefined();
+      expect(lineItemsRepo.lineItems[0].lineItem.resourceLink).toBeUndefined();
     });
 
     // removed since now a new external resource must be created if it could not find a resource belonging
@@ -731,7 +731,7 @@ describe("[AGS] Create Line Item Service", async () => {
       assert(e.isRight(response));
       expect(response.right.httpStatusCode).toBe(201);
 
-      const persistedLineItem = lineItemsRepo.lineItems[0];
+      const persistedLineItem = lineItemsRepo.lineItems[0].lineItem;
 
       expect(persistedLineItem.customParameters[customParamKey]).toMatchObject(customParamValue);
     });
@@ -765,7 +765,7 @@ describe("[AGS] Create Line Item Service", async () => {
       assert(e.isRight(response));
       expect(response.right.httpStatusCode).toBe(201);
 
-      const persistedLineItem = lineItemsRepo.lineItems[0];
+      const persistedLineItem = lineItemsRepo.lineItems[0].lineItem;
 
       expect(persistedLineItem.customParameters[INVALID_KEY]).toBeUndefined();
       expect(persistedLineItem.customParameters).toMatchObject(validCustomParameters);

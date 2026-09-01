@@ -71,7 +71,7 @@ describe("[AGS] Create Line Item Service", async () => {
     const lineItem = createMinimalLineItem();
 
     toolsRepository.tools.push(tool);
-    lineItemsRepo.lineItems.push(lineItem);
+    lineItemsRepo.lineItems.push({ lineItem, owningTool: tool });
     toolDeploymentsRepo.deployments.push(deployment);
     externalLtiResourcesRepo.externalLtiResources.push(resource);
     ltiResourceLinksRepo.resourceLinks.push(resourceLink);
@@ -136,7 +136,7 @@ describe("[AGS] Create Line Item Service", async () => {
       const lineItem = createMinimalLineItem();
       const deployment = createToolDeployment({ tool, context });
 
-      lineItemsRepo.lineItems.push(lineItem);
+      lineItemsRepo.lineItems.push({ lineItem, owningTool: tool });
       toolDeploymentsRepo.deployments.push(deployment);
 
       const result = await sut.find({
@@ -202,23 +202,23 @@ describe("[AGS] Create Line Item Service", async () => {
       const tool = createTool();
       const resourceLink = createResourceLink({ contextId: context.id, tool });
       const lineItem = createFullLineItem({ context, tool }, { resourceLink });
-      return { lineItem, context, entity: "resource link" };
+      return { lineItem, context, owningTool: tool, entity: "resource link" };
     })(),
     (() => {
       const context = createContext();
       const tool = createTool();
       const resource = createExternalLtiResource({ context, tool });
       const lineItem = createFullLineItem({ context, tool }, { externalResource: resource });
-      return { lineItem, context, entity: "external resource" };
+      return { lineItem, context, owningTool: tool, entity: "external resource" };
     })(),
   ])(
     "should require the lineitem's $entity to belong to the tool searching for it",
-    async ({ lineItem, context }) => {
+    async ({ lineItem, context, owningTool }) => {
       const otherTool = createTool({ scopes: [AssignmentAndGradeServiceScopes.Lineitem] });
       const otherToolsDeployment = createToolDeployment({ tool: otherTool, context });
 
       toolDeploymentsRepo.deployments.push(otherToolsDeployment);
-      lineItemsRepo.lineItems.push(lineItem);
+      lineItemsRepo.lineItems.push({ lineItem, owningTool });
 
       const result = await sut.find({
         acceptHeader: LtiAdvantageMediaType.LineItem,

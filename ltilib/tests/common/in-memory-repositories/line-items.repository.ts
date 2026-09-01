@@ -1,6 +1,8 @@
+import { generateUUID } from "common/src/types/uuid";
 import { either as e, option as o } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
+import { ExternalLtiResource } from "$/advantage/external-resource";
 import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters";
 import { LtiLineItem } from "$/assignment-and-grade/line-item";
 import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
@@ -10,14 +12,22 @@ import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
 import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
 
+type Record = {
+  lineItem: LtiLineItem;
+  owningTool: LtiTool;
+};
+
 export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
-  public lineItems: LtiLineItem[] = [];
+  public lineItems: Record[] = [];
 
-  public async create(lineItem: LtiLineItem): Promise<Either<LtiRepositoryError, void>> {
-    const index = this.lineItems.findIndex((li) => li.id === lineItem.id);
+  public async create(
+    lineItem: LtiLineItem,
+    owningTool: LtiTool,
+  ): Promise<Either<LtiRepositoryError, void>> {
+    const index = this.lineItems.findIndex((record) => record.lineItem.id === lineItem.id);
 
-    if (index !== -1) this.lineItems[index] = lineItem;
-    else this.lineItems.push(lineItem);
+    if (index !== -1) this.lineItems[index] = { lineItem, owningTool };
+    else this.lineItems.push({ lineItem, owningTool });
 
     return e.right(undefined);
   }
@@ -30,7 +40,7 @@ export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
   ): Promise<Either<LtiRepositoryError, LtiLineItem>> {
     return pipe(
       this.lineItems.find(
-        (lineItem) =>
+        ({ lineItem }) =>
           lineItem.externalResource?.externalToolResourceId === resourceId && lineItem.tag === tag,
       ),
       o.fromNullable,
@@ -42,6 +52,7 @@ export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
             cause: undefined,
           }),
       ),
+      e.map((rec) => rec.lineItem),
     );
   }
 
@@ -51,8 +62,9 @@ export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
     limit: number,
   ): Promise<Either<LtiRepositoryError, LtiLineItem[]>> {
     const lineitems = this.lineItems
-      .filter((lineitem) => lineitem.resourceLink?.id === resourceLinkId)
-      .slice(0, limit);
+      .filter(({ lineItem }) => lineItem.resourceLink?.id === resourceLinkId)
+      .slice(0, limit)
+      .map((r) => r.lineItem);
 
     return e.right(lineitems);
   }
@@ -60,9 +72,9 @@ export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
   public async findById(
     lineItemId: LtiLineItem["id"],
   ): Promise<Either<LtiRepositoryError, LtiLineItem>> {
-    const lineItem = this.lineItems.find((lineItem) => lineItem.id === lineItemId);
+    const record = this.lineItems.find(({ lineItem }) => lineItem.id === lineItemId);
 
-    if (lineItem) return e.right(lineItem);
+    if (record) return e.right(record.lineItem);
 
     return e.left(
       new LtiRepositoryError({ type: "NotFound", subject: LtiLineItem.name, cause: undefined }),
@@ -76,7 +88,7 @@ export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
     page: number,
     { tag, resourceId, resourceLinkId }: Omit<LineItemsContainerFilters, "limit" | "page">,
   ): Promise<Either<LtiRepositoryError, LtiRepositoryPaginatedResponse<LtiLineItem>>> {
-    const filters = (lineItem: LtiLineItem) => {
+    const filters = ({ lineItem }: Record) => {
       const matchesResourceLinkId = !resourceLinkId || lineItem.resourceLink?.id === resourceLinkId;
       const matchesTag = !tag || lineItem.tag === tag;
       const matchesResourceId =
@@ -95,8 +107,64 @@ export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
     const count = filteredLineItems.length;
 
     const offset = (page - 1) * limit;
-    const lineItemsSlice = filteredLineItems.slice(offset, offset + limit);
+    const lineItemsSlice = filteredLineItems
+      .slice(offset, offset + limit)
+      .map((rec) => rec.lineItem);
 
     return e.right({ count, values: lineItemsSlice });
+  }
+
+  public async update(
+    lineItem: LtiLineItem.UpdateRecord,
+    tool: LtiTool,
+  ): Promise<Either<LtiRepositoryError, LtiLineItem>> {
+    const rec = this.lineItems.find(({ lineItem: item }) => item.id === lineItem.id);
+
+    if (!rec || rec.owningTool.id !== tool.id) {
+      return e.left(
+        new LtiRepositoryError({
+          type: "NotFound",
+          subject: LtiLineItem.name,
+          cause: undefined,
+        }),
+      );
+    }
+
+    const existingLineItem = rec.lineItem;
+    let resolvedExternalResource: ExternalLtiResource | undefined;
+
+    if (
+      lineItem.externalResource?.externalToolResourceId ===
+      existingLineItem.externalResource?.externalToolResourceId
+    ) {
+      resolvedExternalResource = existingLineItem.externalResource;
+    } else if (lineItem.externalResource?.externalToolResourceId) {
+      resolvedExternalResource = ExternalLtiResource.create({
+        externalToolResourceId: lineItem.externalResource.externalToolResourceId,
+        tool,
+        localResourceId: generateUUID(),
+      });
+    }
+
+    const newLineItem = LtiLineItem.createUnchecked({
+      id: existingLineItem.id,
+      context: existingLineItem.context,
+      label: lineItem.label,
+      scoreMaximum: lineItem.scoreMaximum,
+      customParameters: lineItem.customParameters,
+      endDateTime: lineItem.endDateTime ?? undefined,
+      startDateTime: lineItem.startDateTime ?? undefined,
+      externalResource: resolvedExternalResource,
+      gradesReleased: lineItem.gradesReleased,
+      resourceLink: existingLineItem.resourceLink,
+      tag: lineItem.tag,
+    });
+
+    this.lineItems = [
+      ...this.lineItems.filter(({ lineItem }) => lineItem.id !== newLineItem.id),
+      { lineItem: newLineItem, owningTool: tool },
+    ];
+
+    return e.right(newLineItem);
   }
 }
