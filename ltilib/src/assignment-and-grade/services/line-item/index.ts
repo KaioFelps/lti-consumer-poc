@@ -10,6 +10,7 @@ import { LtiTool } from "$/core/tool";
 import { LtiLineItemsRepository } from "../../repositories/line-items.repository";
 import { LineItemService } from "./base-service";
 import { CreateLineItemServiceParams, CreateService } from "./create-line-item.service";
+import { DeleteLineItemServiceParams, DeleteService } from "./delete-line-item.service";
 import {
   FetchFromContainerService,
   FetchLineItemsFromContainerParams,
@@ -29,6 +30,7 @@ export class LtiLineItemServices<CustomContextType extends string = never> {
   private readonly findService: FindService;
   private readonly containerService: FetchFromContainerService;
   private readonly updateService: UpdateService;
+  private readonly deleteService: DeleteService;
 
   public constructor(
     platform: Platform,
@@ -39,6 +41,7 @@ export class LtiLineItemServices<CustomContextType extends string = never> {
   ) {
     this.findService = new FindService(platform, lineItemsRepo);
     this.updateService = new UpdateService(platform, lineItemsRepo, externalResourcesRepo);
+    this.deleteService = new DeleteService(lineItemsRepo);
     this.containerService = new FetchFromContainerService(lineItemsRepo, platform);
     this.createService = new CreateService(
       platform,
@@ -67,6 +70,10 @@ export class LtiLineItemServices<CustomContextType extends string = never> {
 
   public async update(params: UpdateLineItemParams & BasicRequestValidationParams<unknown>) {
     return await this.executeService(this.updateService, params);
+  }
+
+  public async delete(params: DeleteLineItemServiceParams & BasicRequestValidationParams<unknown>) {
+    return await this.executeService(this.deleteService, params);
   }
 
   protected async executeService<
