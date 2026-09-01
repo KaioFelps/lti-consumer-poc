@@ -55,6 +55,15 @@ uma atividade do tipo `ExternalLti`.
 A tabela `lti_assignments` possui um segundo campo: o identificador do link de recurso ao qual
 está associando a atividade externa. Esse campo não compõe a chave, mas **deveria** ser um índice.
 
+Em diversos métodos, as interfaces da ltilib exigem que a plataforma-cliente (por exemplo, a PoC)
+assegurem que a ferramenta tem a posse do line item que está tentando ver/editar. É possível
+inferir isso através de relacionamentos com atividades (`lti_assignments` e seus resource links)
+e/ou com os recursos externos (`external_lti_resources`). No entanto, é possível (pela especificação)
+que nenhuma dessas informações sejam enviadas (pela ferramenta) na criação de um line item.
+Nesse caso, a plataforma introduziu um novo campo na tabela de line items — o `orphanCreatingToolId` —
+que é preenchido com o ID da ferramenta que o está criando, e esse campo é utilizado para atestar
+sua autoria quando os dois primeiros campos não são capazes de fazê-lo.
+
 ### Integração
 
 Esse modelo de tabelas tem uma grande vantagem em relação a um simples campo `kind` na tabela
