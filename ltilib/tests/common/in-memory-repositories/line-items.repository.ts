@@ -167,4 +167,15 @@ export class InMemoryLtiLineItemsRepository implements LtiLineItemsRepository {
 
     return e.right(newLineItem);
   }
+
+  public async delete(
+    lineItemId: LtiLineItem["id"],
+    tool: LtiTool,
+  ): Promise<Either<LtiRepositoryError, void>> {
+    this.lineItems = this.lineItems.filter(({ lineItem, owningTool }) => {
+      return !(lineItem.id === lineItemId && owningTool.id === tool.id);
+    });
+
+    return e.right(undefined);
+  }
 }

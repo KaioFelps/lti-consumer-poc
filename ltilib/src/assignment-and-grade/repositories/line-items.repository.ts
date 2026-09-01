@@ -102,7 +102,7 @@ export abstract class LtiLineItemsRepository {
    * - It must unset fields that are undefined (but existed previously).
    * - It must return a {@link LtiRepositoryError `LtiRepositoryError`} of type `NotFound`
    * if there is no line item of id `lineItem.id` stored.
-   * - It must *not* create a new line item.
+   * - It must **not** create a new line item.
    * - It must ensure that `lineItem` is owned by `tool`. (No changes must be applied otherwise,
    * and a `NotFound` {@link LtiRepositoryError `LtiRepositoryError`} must be returned.)
    * - If the platform uses some model for persisting tool's resources, then a new resource
@@ -119,4 +119,18 @@ export abstract class LtiLineItemsRepository {
     tool: LtiTool,
     context: Context<unknown>,
   ): Promise<Either<LtiRepositoryError, LtiLineItem>>;
+
+  /**
+   * Deletes the line item identified by `lineItemId` from the platform's datastore.
+   * - It must ensure that the line item belongs to `tool`. (Otherwise, the line item must not
+   * be deleted, but **no errors must be returned** at all.)
+   * - If there is no line item of id `lineItemId` stored, it must **not** return any error.
+   *
+   * @param lineItemId The ID of the line item to be deleted.
+   * @param tool The tool that owns the line item being deleted.
+   */
+  public abstract delete(
+    lineItemId: LtiLineItem["id"],
+    tool: LtiTool,
+  ): Promise<Either<LtiRepositoryError, void>>;
 }
