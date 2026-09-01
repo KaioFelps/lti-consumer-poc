@@ -13,7 +13,7 @@ import { Platform } from "$/core/platform";
 import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
 import { LtiTool } from "$/core/tool";
 import type { LtiLineItemServices } from ".";
-import { ILineItemService } from ".";
+import { LineItemService } from "./base-service";
 
 export type FetchLineItemsFromContainerParams = {
   /**
@@ -45,11 +45,13 @@ const REQUIRED_SCOPES = [
  *
  * @internal
  */
-export class FetchFromContainerService implements ILineItemService {
+export class FetchFromContainerService extends LineItemService {
   public constructor(
     private readonly lineItemsRepo: LtiLineItemsRepository,
     private readonly platform: Platform,
-  ) {}
+  ) {
+    super();
+  }
 
   getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined {
     return REQUIRED_SCOPES;

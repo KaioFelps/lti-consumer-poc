@@ -14,7 +14,7 @@ import { ILtiLineItem, LtiLineItem } from "../../line-item";
 import { PresentedLtiLineItem, presentLtiLineItem } from "../../presenters/line-item.presenter";
 import { LtiLineItemsRepository } from "../../repositories/line-items.repository";
 import { AssignmentAndGradeServiceScopes } from "../../scopes";
-import { ILineItemService, type LtiLineItemServices } from ".";
+import { LineItemService } from "./base-service";
 
 type RawLineItemsPayload = {
   resourceId?: string;
@@ -43,13 +43,15 @@ const REQUIRED_SCOPES = [AssignmentAndGradeServiceScopes.Lineitem] as const;
  *
  * @internal
  */
-export class CreateService<CustomContextType extends string = never> implements ILineItemService {
+export class CreateService<CustomContextType extends string = never> extends LineItemService {
   public constructor(
     private readonly platform: Platform,
     private readonly resourceLinksRepo: LtiResourceLinksRepository,
     private readonly externalResourcesRepo: ExternalLtiResourcesRepository,
     private readonly lineItemsRepo: LtiLineItemsRepository,
-  ) {}
+  ) {
+    super();
+  }
 
   getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined {
     return REQUIRED_SCOPES;
@@ -66,8 +68,6 @@ export class CreateService<CustomContextType extends string = never> implements 
     if (!this.platform.agsConfiguration) return e.left(new MissingPlatformAgsConfigurationError());
     const { agsConfiguration } = this.platform;
 
-    args.tag = args.tag?.trim() || undefined;
-    args.resourceId = args.resourceId?.trim() || undefined;
     args.resourceLinkId = args.resourceLinkId?.trim() || undefined;
 
     return await pipe(
@@ -156,20 +156,6 @@ export class CreateService<CustomContextType extends string = never> implements 
         ),
       ),
     );
-  }
-
-  private getResolvedDates(
-    config: Platform.LtiAssignmentAndGradeServicesConfig,
-    startDateTime?: Date | null,
-    endDateTime?: Date | null,
-  ) {
-    const resolvedStartDate =
-      startDateTime && config.deadlinesEnabled?.start ? new Date(startDateTime) : undefined;
-
-    const resolvedEndDate =
-      endDateTime && config.deadlinesEnabled?.end ? new Date(endDateTime) : undefined;
-
-    return { resolvedStartDate, resolvedEndDate };
   }
 
   private maybeGetAndValidateResourceLink(

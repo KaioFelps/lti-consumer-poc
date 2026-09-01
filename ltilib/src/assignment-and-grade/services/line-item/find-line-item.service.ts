@@ -10,11 +10,10 @@ import { Context } from "$/core/context";
 import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
 import { LtiTool } from "$/core/tool";
-import { ILineItemService, type LtiLineItemServices } from ".";
+import { LineItemService } from "./base-service";
 
 export type FindLineItemParams = {
   lineItemId: LtiLineItem["id"];
-  acceptHeader: string | undefined;
   tool: LtiTool;
   context: Context<unknown>;
 };
@@ -30,11 +29,13 @@ const REQUIRED_SCOPES = [
  *
  * @internal
  */
-export class FindService implements ILineItemService {
+export class FindService extends LineItemService {
   public constructor(
     private readonly platform: Platform,
     private readonly lineItemsRepo: LtiLineItemsRepository,
-  ) {}
+  ) {
+    super();
+  }
 
   getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined {
     return REQUIRED_SCOPES;

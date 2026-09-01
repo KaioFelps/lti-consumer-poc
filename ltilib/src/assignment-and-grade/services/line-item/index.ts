@@ -1,10 +1,7 @@
 import { taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import guards from "$/advantage/guards";
-import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { Context } from "$/core/context";
 import { Platform } from "$/core/platform";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
@@ -24,13 +21,6 @@ type BasicRequestValidationParams<CustomContextType = never> = {
   acceptHeader: string | undefined;
   contentTypeHeader: string | undefined;
 };
-
-export interface ILineItemService<Params = unknown, ReturnType = unknown, ErrorsType = unknown> {
-  execute(params: Params): Promise<Either<ErrorsType, ReturnType>>;
-  getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined;
-  getRequiredAcceptHeader(): Readonly<LtiAdvantageMediaType> | undefined;
-  getRequiredContentType(): Readonly<LtiAdvantageMediaType> | undefined;
-}
 
 export class LtiLineItemServices<CustomContextType extends string = never> {
   private readonly createService: CreateService<CustomContextType>;
