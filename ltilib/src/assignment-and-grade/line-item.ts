@@ -11,7 +11,32 @@ import { ExternalLtiResource } from "../advantage/external-resource";
 import { CannotAttachResourceLinkError } from "./errors/cannot-attach-resource-link.error";
 import { InvalidLineItemArgumentError } from "./errors/invalid-line-item-argument.error";
 
-type CustomParameters = Record<string, JsonValue>;
+type RawCustomParameters = Record<string, JsonValue>;
+
+class CustomParameters {
+  public constructor(private parameters: Record<string, JsonValue> = {}) {}
+
+  public toValue(): Readonly<Record<string, JsonValue>> {
+    return structuredClone(this.parameters);
+  }
+
+  public add(key: string, value: JsonValue) {
+    return pipe(
+      e.tryCatch(
+        () => new URL(key),
+        (_) =>
+          new InvalidLineItemArgumentError("customParameters", "key_must_be_fully_qualified_url"),
+      ),
+      e.map(() => {
+        this.parameters[key] = value;
+      }),
+    );
+  }
+
+  public remove(key: string) {
+    delete this.parameters[key];
+  }
+}
 
 export interface ILtiLineItem<CustomContextType = never> {
   /**
@@ -93,7 +118,37 @@ export interface ILtiLineItem<CustomContextType = never> {
    *
    * [section 3.1.2 of LTI AGS specification]: https://www.imsglobal.org/spec/lti-ags/v2p0#extensions
    */
-  customParameters?: CustomParameters;
+  customParameters?: RawCustomParameters;
+}
+
+function validateScoreMaximum(scoreMaximum: LtiLineItem["scoreMaximum"]) {
+  if (scoreMaximum === null || scoreMaximum === undefined) {
+    return e.left(new InvalidLineItemArgumentError("scoreMaximum", "required"));
+  }
+
+  if (scoreMaximum <= 0) {
+    return e.left(new InvalidLineItemArgumentError("scoreMaximum", "must_be_greater_than_zero"));
+  }
+
+  return e.right(undefined);
+}
+
+function validateLabel(label: string | undefined) {
+  label = label?.trim();
+  if (!label) return e.left(new InvalidLineItemArgumentError("label", "required"));
+  return e.right(label);
+}
+
+/**
+ * Inserts every custom parameter from `customParameters` into `lineItem`, silently ignoring
+ * invalid properties.
+ */
+function setCustomParameters(params: CustomParameters, entries?: RawCustomParameters) {
+  if (entries) {
+    Object.entries(entries).forEach(([key, value]) => params.add(key, value));
+  }
+
+  return e.right(undefined);
 }
 
 /**
@@ -104,7 +159,7 @@ export interface ILtiLineItem<CustomContextType = never> {
 export class LtiLineItem<CustomContextType = unknown> implements ILtiLineItem<CustomContextType> {
   public startDateTime?: Date | undefined;
   public endDateTime?: Date | undefined;
-  protected _customParameters: CustomParameters = {};
+  protected _customParameters = new CustomParameters();
 
   private constructor(
     public readonly id: number | UUID | string,
@@ -130,36 +185,31 @@ export class LtiLineItem<CustomContextType = unknown> implements ILtiLineItem<Cu
     InvalidLineItemArgumentError,
     LtiLineItem<CustomContextType>
   > {
-    if (args.scoreMaximum === null || args.scoreMaximum === undefined) {
-      return e.left(new InvalidLineItemArgumentError("scoreMaximum", "required"));
-    }
-
-    if (args.scoreMaximum <= 0) {
-      return e.left(new InvalidLineItemArgumentError("scoreMaximum", "must_be_greater_than_zero"));
-    }
-
-    const label = (args.label as string | undefined)?.trim();
-    if (!label) return e.left(new InvalidLineItemArgumentError("label", "required"));
-
-    const lineitem = new LtiLineItem(
-      id,
-      label,
-      args.scoreMaximum,
-      args.context,
-      undefined,
-      args.externalResource,
-      args.tag,
-      args.gradesReleased,
-      args.startDateTime,
-      args.endDateTime,
-    );
-
-    // silently ignore invalid keys
-    Object.entries(customParameters).map(([key, value]) => lineitem.addCustomParameter(key, value));
-
     return pipe(
-      lineitem.setResourceLink(args.resourceLink),
-      e.map(() => lineitem),
+      e.Do,
+      e.chainFirstW(() => validateScoreMaximum(args.scoreMaximum)),
+      e.bindW("label", () => validateLabel(args.label)),
+      e.let(
+        "lineItem",
+        ({ label }) =>
+          new LtiLineItem(
+            id,
+            label,
+            args.scoreMaximum,
+            args.context,
+            undefined,
+            args.externalResource,
+            args.tag,
+            args.gradesReleased,
+            args.startDateTime,
+            args.endDateTime,
+          ),
+      ),
+      e.chainFirstW(({ lineItem }) =>
+        setCustomParameters(lineItem._customParameters, customParameters),
+      ),
+      e.chainFirstW(({ lineItem }) => lineItem.setResourceLink(args.resourceLink)),
+      e.map(({ lineItem }) => lineItem),
     );
   }
 
@@ -171,7 +221,7 @@ export class LtiLineItem<CustomContextType = unknown> implements ILtiLineItem<Cu
    * created by {@link create} at first.
    */
   public static createUnchecked<CustomContextType = never>(props: ILtiLineItem<CustomContextType>) {
-    return new LtiLineItem(
+    const lineItem = new LtiLineItem(
       props.id,
       props.label,
       props.scoreMaximum,
@@ -183,23 +233,16 @@ export class LtiLineItem<CustomContextType = unknown> implements ILtiLineItem<Cu
       props.startDateTime,
       props.endDateTime,
     );
+    lineItem._customParameters = new CustomParameters({ ...props.customParameters });
+    return lineItem;
   }
 
-  public get customParameters(): Readonly<CustomParameters> {
-    return this._customParameters;
+  public get customParameters(): Readonly<RawCustomParameters> {
+    return this._customParameters.toValue();
   }
 
   public addCustomParameter(key: string, value: JsonValue) {
-    return pipe(
-      e.tryCatch(
-        () => new URL(key),
-        (_) =>
-          new InvalidLineItemArgumentError("customParameters", "key_must_be_fully_qualified_url"),
-      ),
-      e.map(() => {
-        this._customParameters[key] = value;
-      }),
-    );
+    return this._customParameters.add(key, value);
   }
 
   public removeCustomParameter(key: string) {
