@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, Param, Post, Query, Res } from "@nestjs/common";
+import { Body, Controller, Get, Headers, Param, Post, Put, Query, Res } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { HttpResponse } from "@/lib";
@@ -14,6 +14,7 @@ import { FindToolByIdService } from "../../../tools/services/find-tool-by-id.ser
 import { CreateLineItemDTO } from "../../dtos/create-line-item.dto";
 import { FindLineItemByIdParamsDto } from "../../dtos/find-line-item-by-id.dto";
 import { LineItemsContainerFiltersDto } from "../../dtos/line-items-container-filters.dto";
+import { UpdateLineItemDTO } from "../../dtos/update-line-item.dto";
 import { ContextConcreteType } from "../../enums/context-concrete-type";
 
 @Rest()
@@ -123,6 +124,44 @@ export class LtiLineItemsController {
         ({ context, tool }) =>
           () =>
             this.lineItemsServices.find({
+              acceptHeader,
+              contentTypeHeader,
+              context,
+              lineItemId,
+              tool: tool.record,
+            }),
+      ),
+      te.match(
+        (error) => {
+          throw ExtendedExceptionsFactory.fromError(error);
+        },
+        (result) => {
+          response.setHeaders(result.headers).status(result.httpStatusCode).send(result.content);
+        },
+      ),
+    )();
+  }
+
+  @Put(":lineItemId")
+  @ConfigAuthGuard({ strategy: AuthStrategy.LtiToolsJwt })
+  public async updateLineItem(
+    @Headers("accept") acceptHeader: string | undefined,
+    @Headers("content-type") contentTypeHeader: string | undefined,
+    @Param("contextId") contextId: string,
+    @Param("lineItemId") lineItemId: string,
+    @CurrentTool() { sub: toolId }: LtiToolJwtPayload,
+    @Body() body: UpdateLineItemDTO,
+    @Res() response: HttpResponse,
+  ) {
+    return await pipe(
+      te.Do,
+      te.apS("tool", () => this.findToolByIdService.exec({ id: toolId })),
+      te.apS("context", () => this.findContextByIdService.exec({ contextComposedId: contextId })),
+      te.chainW(
+        ({ context, tool }) =>
+          () =>
+            this.lineItemsServices.update({
+              ...body,
               acceptHeader,
               contentTypeHeader,
               context,
