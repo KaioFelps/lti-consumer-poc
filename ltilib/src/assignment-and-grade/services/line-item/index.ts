@@ -8,12 +8,14 @@ import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.r
 import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
 import { LtiTool } from "$/core/tool";
 import { LtiLineItemsRepository } from "../../repositories/line-items.repository";
+import { LineItemService } from "./base-service";
 import { CreateLineItemServiceParams, CreateService } from "./create-line-item.service";
 import {
   FetchFromContainerService,
   FetchLineItemsFromContainerParams,
 } from "./fetch-line-items-from-container.service";
 import { FindLineItemParams, FindService } from "./find-line-item.service";
+import { UpdateLineItemParams, UpdateService } from "./update-line-item.service";
 
 type BasicRequestValidationParams<CustomContextType = never> = {
   tool: LtiTool;
@@ -26,6 +28,7 @@ export class LtiLineItemServices<CustomContextType extends string = never> {
   private readonly createService: CreateService<CustomContextType>;
   private readonly findService: FindService;
   private readonly containerService: FetchFromContainerService;
+  private readonly updateService: UpdateService;
 
   public constructor(
     platform: Platform,
@@ -35,6 +38,7 @@ export class LtiLineItemServices<CustomContextType extends string = never> {
     private readonly deploymentsRepo: LtiToolDeploymentsRepository,
   ) {
     this.findService = new FindService(platform, lineItemsRepo);
+    this.updateService = new UpdateService(platform, lineItemsRepo, externalResourcesRepo);
     this.containerService = new FetchFromContainerService(lineItemsRepo, platform);
     this.createService = new CreateService(
       platform,
@@ -61,13 +65,17 @@ export class LtiLineItemServices<CustomContextType extends string = never> {
     return await this.executeService(this.containerService, params);
   }
 
+  public async update(params: UpdateLineItemParams & BasicRequestValidationParams<unknown>) {
+    return await this.executeService(this.updateService, params);
+  }
+
   protected async executeService<
-    S extends ILineItemService,
-    Params = S extends ILineItemService<infer TParams, unknown, unknown> ? TParams : never,
-    ReturnType = S extends ILineItemService<unknown, infer TReturn, unknown> ? TReturn : never,
-    ErrorType = S extends ILineItemService<unknown, unknown, infer TErrors> ? TErrors : never,
+    S extends LineItemService,
+    Params = S extends LineItemService<infer TParams, unknown, unknown> ? TParams : never,
+    ReturnType = S extends LineItemService<unknown, infer TReturn, unknown> ? TReturn : never,
+    ErrorType = S extends LineItemService<unknown, unknown, infer TErrors> ? TErrors : never,
   >(
-    service: ILineItemService<Params, ReturnType, ErrorType>,
+    service: LineItemService<Params, ReturnType, ErrorType>,
     params: Params & BasicRequestValidationParams<unknown>,
   ) {
     return await pipe(
@@ -81,19 +89,19 @@ export class LtiLineItemServices<CustomContextType extends string = never> {
     )();
   }
 
-  private checkScopes(tool: LtiTool, service: ILineItemService) {
+  private checkScopes(tool: LtiTool, service: LineItemService) {
     const scopes = service.getRequiredScopes();
     if (!scopes || scopes.length === 0) return te.right(undefined);
     return guards.ensureHasAnyScope({ tool, requiredScopes: scopes });
   }
 
-  private checkAcceptHeader(acceptHeader: string | undefined, service: ILineItemService) {
+  private checkAcceptHeader(acceptHeader: string | undefined, service: LineItemService) {
     const requiredMediaType = service.getRequiredAcceptHeader();
     if (!requiredMediaType) return te.right(undefined);
     return guards.ensureMediaTypeIsAccepted(acceptHeader, requiredMediaType);
   }
 
-  private checkContentTypeHeader(contentTypeHeader: string | undefined, service: ILineItemService) {
+  private checkContentTypeHeader(contentTypeHeader: string | undefined, service: LineItemService) {
     const requiredContentType = service.getRequiredContentType();
     if (!requiredContentType) return te.right(undefined);
     return guards.ensureContentTypeIsValid(contentTypeHeader, requiredContentType);
