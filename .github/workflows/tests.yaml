@@ -63,7 +63,7 @@ jobs:
               run: docker compose up -d --wait
 
             - name: Run E2E tests
-              run: npm run test:e2e -- --config=./test/e2e/platform/jest.config.ts
+              run: npm run test:e2e
 
             - name: Stop Docker containers
               if: always()
