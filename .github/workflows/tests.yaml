@@ -43,15 +43,24 @@ jobs:
                 
                 sed -i "s|^COMPOSE_PROFILES=.*|COMPOSE_PROFILES=local|" .env
 
-            - name: Install mkcert and generate certificates
+            - name: Cache mkcert binary
+              id: cache-mkcert
+              uses: actions/cache@v4
+              with:
+                path: /usr/local/bin/mkcert
+                key: ${{ runner.os }}-mkcert-binary-v1
+
+            - name: Download mkcert (if not cached)
+              if: steps.cache-mkcert.outputs.cache-hit != 'true'
               run: |
-                # libnss3-tools is required for mckcert on ubuntu
-                sudo apt-get update
-                sudo apt-get install -y libnss3-tools
-                
                 curl -JLO "https://dl.filippo.io/mkcert/latest?for=linux/amd64"
                 chmod +x mkcert-v*-linux-amd64
                 sudo mv mkcert-v*-linux-amd64 /usr/local/bin/mkcert
+
+            - name: Generate certificates
+              run: |
+                sudo apt-get update
+                sudo apt-get install -y libnss3-tools
                 
                 mkdir -p certs
                 cd certs
