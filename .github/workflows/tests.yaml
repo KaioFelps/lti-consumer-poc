@@ -64,9 +64,9 @@ jobs:
                 
                 mkdir -p certs
                 cd certs
-                mkcert 127.0.0.1 ::1 host.docker.internal
+                mkcert -cert-file localhost.pem -key-file localhost-key.pem localhost 127.0.0.1 ::1 host.docker.internal
                 mkcert -install
-                cp "$(mkcert -CAROOT)/rootCA.pem" ./localhost-key.pem
+                cp "$(mkcert -CAROOT)/rootCA.pem" .
 
             - name: Start Docker containers and wait for healthchecks
               run: docker compose up -d --wait
