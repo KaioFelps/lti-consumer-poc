@@ -9,6 +9,9 @@ atividades realizadas em determinados cursos. Para isso, os seguintes serviços/
 - [x] [LTI Dynamic Registration 1.0](https://www.imsglobal.org/spec/lti-dr/v1p0)
 - [x] [LTI Core 1.3 (Resource Links & launch)](https://www.imsglobal.org/spec/lti/v1p3/)
 - [ ] [LTI Assignment and Grade Services 2.0](https://www.imsglobal.org/spec/lti-ags/v2p0)
+    - [x] Line Items services
+    - [ ] Scores service
+    - [ ] Results service
 - [ ] [LTI Deep Linking](https://www.imsglobal.org/spec/lti-dl/v2p0)
 
 Além disso, outros experimentos estão sendo realizados e testados neste repositório:
