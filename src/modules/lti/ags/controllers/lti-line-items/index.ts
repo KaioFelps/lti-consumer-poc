@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Headers, Param, Post, Put, Query, Res } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  Param,
+  Post,
+  Put,
+  Query,
+  Res,
+} from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { HttpResponse } from "@/lib";
@@ -167,6 +178,42 @@ export class LtiLineItemsController {
               context,
               lineItemId,
               tool: tool.record,
+            }),
+      ),
+      te.match(
+        (error) => {
+          throw ExtendedExceptionsFactory.fromError(error);
+        },
+        (result) => {
+          response.setHeaders(result.headers).status(result.httpStatusCode).send(result.content);
+        },
+      ),
+    )();
+  }
+
+  @Delete(":lineItemId")
+  @ConfigAuthGuard({ strategy: AuthStrategy.LtiToolsJwt })
+  public async deleteLineItem(
+    @Headers("accept") acceptHeader: string | undefined,
+    @Headers("content-type") contentTypeHeader: string | undefined,
+    @Param("contextId") contextId: string,
+    @Param("lineItemId") lineItemId: string,
+    @CurrentTool() { sub: toolId }: LtiToolJwtPayload,
+    @Res() response: HttpResponse,
+  ) {
+    return await pipe(
+      te.Do,
+      te.apS("context", () => this.findContextByIdService.exec({ contextComposedId: contextId })),
+      te.apS("tool", () => this.findToolByIdService.exec({ id: toolId })),
+      te.chainW(
+        ({ context, tool }) =>
+          () =>
+            this.lineItemsServices.delete({
+              context,
+              lineItemId,
+              tool: tool.record,
+              acceptHeader,
+              contentTypeHeader,
             }),
       ),
       te.match(
