@@ -17,3 +17,54 @@ jobs:
             
             - run: npm ci
             - run: npm run test
+
+    platform_e2e_tests:
+        name: Run Platform E2E Tests
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            
+            - uses: actions/setup-node@v4
+              with:
+                node-version: 22
+                cache: npm
+            
+            - run: npm ci
+
+            - name: Setup environment variables
+              run: |
+                cp .env.sample .env
+                
+                APP_SECRET=$(head -c 64 /dev/urandom | base64 -w 0)
+                PRIVATE_KEY=$(node scripts/gen-keys.mjs)
+                
+                sed -i "s|^APP_SECRET=.*|APP_SECRET=${APP_SECRET}|" .env
+                sed -i "s|^PRIVATE_KEY_BASE64=.*|PRIVATE_KEY_BASE64=\"${PRIVATE_KEY}\"|" .env
+                
+                sed -i "s|^COMPOSE_PROFILES=.*|COMPOSE_PROFILES=local|" .env
+
+            - name: Install mkcert and generate certificates
+              run: |
+                # libnss3-tools is required for mckcert on ubuntu
+                sudo apt-get update
+                sudo apt-get install -y libnss3-tools
+                
+                curl -JLO "https://dl.filippo.io/mkcert/latest?for=linux/amd64"
+                chmod +x mkcert-v*-linux-amd64
+                sudo mv mkcert-v*-linux-amd64 /usr/local/bin/mkcert
+                
+                mkdir -p certs
+                cd certs
+                mkcert 127.0.0.1 ::1 host.docker.internal
+                mkcert -install
+                cp "$(mkcert -CAROOT)/rootCA.pem" .
+
+            - name: Start Docker containers and wait for healthchecks
+              run: docker compose up -d --wait
+
+            - name: Run E2E tests
+              run: npm run test:e2e -- --config=./test/e2e/platform/jest.config.ts
+
+            - name: Stop Docker containers
+              if: always()
+              run: docker compose down -v
