@@ -18,6 +18,7 @@ import {
   or,
   sql,
 } from "drizzle-orm";
+import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { PgSelectBase } from "drizzle-orm/pg-core";
 import { either as e, taskEither as te } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
@@ -38,7 +39,9 @@ import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
 import { DrizzleClient } from "../client";
 import ltiLineItemsMapper from "../mappers/lti-line-items.mapper";
-import { DrizzleTransactionManager } from "../transaction-manager";
+import { DrizzleTransactionManager, Transaction } from "../transaction-manager";
+
+type Schema = typeof schema;
 
 @Injectable()
 export class DrizzleLtiLineItemsRepository extends LtiLineItemsRepository {
@@ -420,33 +423,8 @@ export class DrizzleLtiLineItemsRepository extends LtiLineItemsRepository {
   ): Promise<Either<LtiRepositoryError, LtiLineItem>> {
     const client = this.transactionManager.getTx() ?? this.drizzle.getClient();
     const id = lineItem.id.toString();
-
     const externalResourceId = lineItem.externalResource?.localResourceId ?? null;
-
-    const ownedMatches = client
-      .select({ id: ltiLineItemsT.id })
-      .from(ltiLineItemsT)
-      .leftJoin(ltiAssignmentsT, eq(ltiLineItemsT.ltiAssignmentId, ltiAssignmentsT.assignmentId))
-      .leftJoin(ltiResourceLinks, eq(ltiAssignmentsT.resourceLinkId, ltiResourceLinks.id))
-      .leftJoin(ltiToolDeployments, eq(ltiResourceLinks.deploymentId, ltiToolDeployments.id))
-      .leftJoin(
-        externalLtiResourcesT,
-        eq(ltiLineItemsT.externalResourceId, externalLtiResourcesT.id),
-      )
-      .where(
-        and(
-          eq(ltiLineItemsT.id, id),
-          or(
-            eq(ltiToolDeployments.clientId, tool.id),
-            and(isNull(ltiLineItemsT.ltiAssignmentId), eq(externalLtiResourcesT.toolId, tool.id)),
-            and(
-              isNull(ltiLineItemsT.ltiAssignmentId),
-              isNull(ltiLineItemsT.externalResourceId),
-              eq(ltiLineItemsT.orphanCreatingToolId, tool.id),
-            ),
-          ),
-        ),
-      );
+    const ownedMatches = this.buildOwningLineItemsMatchesStatement(client, id, tool.id);
 
     return pipe(
       te.tryCatch(
@@ -537,5 +515,63 @@ export class DrizzleLtiLineItemsRepository extends LtiLineItemsRepository {
       }),
       te.map((row) => ltiLineItemsMapper.fromRow(row, context)),
     )();
+  }
+
+  public delete(
+    lineItemId: LtiLineItem["id"],
+    tool: LtiTool,
+  ): Promise<Either<LtiRepositoryError, void>> {
+    const client = this.transactionManager.getTx() ?? this.drizzle.getClient();
+    const ownedMatches = this.buildOwningLineItemsMatchesStatement(
+      client,
+      lineItemId.toString(),
+      tool.id,
+    );
+
+    return pipe(
+      te.tryCatch(
+        () => client.delete(ltiLineItemsT).where(inArray(ltiLineItemsT.id, ownedMatches)).execute(),
+        (error) =>
+          new LtiRepositoryError({
+            type: "ExternalError",
+            cause: new IrrecoverableError(
+              `Error occurred in ${DrizzleLtiLineItemsRepository.name} when deleting line item "${lineItemId}".`,
+              error as Error,
+            ),
+          }),
+      ),
+      te.map(() => {}),
+    )();
+  }
+
+  private buildOwningLineItemsMatchesStatement(
+    client: NodePgDatabase<Schema> | Transaction,
+    lineItemId: string,
+    toolId: string,
+  ) {
+    return client
+      .select({ id: ltiLineItemsT.id })
+      .from(ltiLineItemsT)
+      .leftJoin(ltiAssignmentsT, eq(ltiLineItemsT.ltiAssignmentId, ltiAssignmentsT.assignmentId))
+      .leftJoin(ltiResourceLinks, eq(ltiAssignmentsT.resourceLinkId, ltiResourceLinks.id))
+      .leftJoin(ltiToolDeployments, eq(ltiResourceLinks.deploymentId, ltiToolDeployments.id))
+      .leftJoin(
+        externalLtiResourcesT,
+        eq(ltiLineItemsT.externalResourceId, externalLtiResourcesT.id),
+      )
+      .where(
+        and(
+          eq(ltiLineItemsT.id, lineItemId),
+          or(
+            eq(ltiToolDeployments.clientId, toolId),
+            and(isNull(ltiLineItemsT.ltiAssignmentId), eq(externalLtiResourcesT.toolId, toolId)),
+            and(
+              isNull(ltiLineItemsT.ltiAssignmentId),
+              isNull(ltiLineItemsT.externalResourceId),
+              eq(ltiLineItemsT.orphanCreatingToolId, toolId),
+            ),
+          ),
+        ),
+      );
   }
 }
