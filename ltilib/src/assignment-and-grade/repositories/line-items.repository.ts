@@ -96,4 +96,26 @@ export abstract class LtiLineItemsRepository {
     page: number,
     filters: Omit<LineItemsContainerFilters, "limit" | "page">,
   ): Promise<Either<LtiRepositoryError, LtiRepositoryPaginatedResponse<LtiLineItem>>>;
+
+  /**
+   * Updates every field of line item identified by `lineItem.id`.
+   * - It must unset fields that are undefined (but existed previously).
+   * - It must return a {@link LtiRepositoryError `LtiRepositoryError`} of type `NotFound`
+   * if there is no line item of id `lineItem.id` stored.
+   * - It must *not* create a new line item.
+   * - It must ensure that `lineItem` is owned by `tool`. (No changes must be applied otherwise,
+   * and a `NotFound` {@link LtiRepositoryError `LtiRepositoryError`} must be returned.)
+   * - If the platform uses some model for persisting tool's resources, then a new resource
+   * should be created if the new `resourceId` doesn't exist in the platform. It mustn't be
+   * ignored.
+   *
+   * @param lineItem The payload of changes that must be applied to the line item identified
+   * by `lineItem.id`. Every property must be applied, unless otherwise stated by the docstrings.
+   * `null` or `undefined` values must not be ignored, but unset that value in the datastore.
+   * @param tool The tool that owns line item.
+   */
+  public abstract update(
+    lineItem: LtiLineItem.UpdateRecord,
+    tool: LtiTool,
+  ): Promise<Either<LtiRepositoryError, LtiLineItem>>;
 }
