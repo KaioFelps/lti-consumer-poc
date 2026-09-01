@@ -7,7 +7,7 @@ import { PgTransaction } from "drizzle-orm/pg-core";
 import { TransactionManager } from "@/core/transaction-manager";
 import { DrizzleClient } from "./client";
 
-type Transaction = PgTransaction<
+export type Transaction = PgTransaction<
   NodePgQueryResultHKT,
   typeof schema,
   ExtractTablesWithRelations<typeof schema>
