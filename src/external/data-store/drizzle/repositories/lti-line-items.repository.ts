@@ -412,4 +412,130 @@ export class DrizzleLtiLineItemsRepository extends LtiLineItemsRepository {
       }),
     )();
   }
+
+  public update(
+    lineItem: LtiLineItem.UpdateRecord,
+    tool: LtiTool,
+    context: Context,
+  ): Promise<Either<LtiRepositoryError, LtiLineItem>> {
+    const client = this.transactionManager.getTx() ?? this.drizzle.getClient();
+    const id = lineItem.id.toString();
+
+    const externalResourceId = lineItem.externalResource?.localResourceId ?? null;
+
+    const ownedMatches = client
+      .select({ id: ltiLineItemsT.id })
+      .from(ltiLineItemsT)
+      .leftJoin(ltiAssignmentsT, eq(ltiLineItemsT.ltiAssignmentId, ltiAssignmentsT.assignmentId))
+      .leftJoin(ltiResourceLinks, eq(ltiAssignmentsT.resourceLinkId, ltiResourceLinks.id))
+      .leftJoin(ltiToolDeployments, eq(ltiResourceLinks.deploymentId, ltiToolDeployments.id))
+      .leftJoin(
+        externalLtiResourcesT,
+        eq(ltiLineItemsT.externalResourceId, externalLtiResourcesT.id),
+      )
+      .where(
+        and(
+          eq(ltiLineItemsT.id, id),
+          or(
+            eq(ltiToolDeployments.clientId, tool.id),
+            and(isNull(ltiLineItemsT.ltiAssignmentId), eq(externalLtiResourcesT.toolId, tool.id)),
+            and(
+              isNull(ltiLineItemsT.ltiAssignmentId),
+              isNull(ltiLineItemsT.externalResourceId),
+              eq(ltiLineItemsT.orphanCreatingToolId, tool.id),
+            ),
+          ),
+        ),
+      );
+
+    return pipe(
+      te.tryCatch(
+        () =>
+          client
+            .update(ltiLineItemsT)
+            .set({
+              tag: lineItem.tag ?? null,
+              label: lineItem.label,
+              endDateTime: lineItem.endDateTime ?? null,
+              startDateTime: lineItem.startDateTime ?? null,
+              gradesReleased: lineItem.gradesReleased ?? null,
+              customParameters:
+                Object.keys(lineItem.customParameters).length > 0
+                  ? ({ ...lineItem.customParameters } as Record<string, string>)
+                  : null,
+              externalResourceId,
+              // ltiAssignmentId is intentionally left untouched: UpdateRecord
+              // carries no resourceLink/assignment info to change it.
+              // update record has no resource link nor assignment, so we have no means
+              // to check it previously without making another lookup query.
+              //
+              // hence we derive this info from the existing data (in the database)
+              // using a in-place SQL statement!
+              orphanCreatingToolId: sql`
+                CASE WHEN ${ltiLineItemsT.ltiAssignmentId} IS NULL
+                     AND ${externalResourceId === null ? sql`TRUE` : sql`FALSE`}
+                THEN ${tool.id}
+                ELSE NULL
+                END
+              `,
+            })
+            .where(inArray(ltiLineItemsT.id, ownedMatches))
+            .returning({ id: ltiLineItemsT.id }),
+        (error) =>
+          new LtiRepositoryError({
+            type: "ExternalError",
+            cause: new IrrecoverableError(
+              `Error occurred in ${DrizzleLtiLineItemsRepository.name} when updating line item "${id}".`,
+              error as Error,
+            ),
+          }),
+      ),
+      te.chainEitherKW((updatedRows) => {
+        if (updatedRows.length > 0) return e.right(true as const);
+
+        return e.left(
+          new LtiRepositoryError({
+            type: "NotFound",
+            cause: new ResourceNotFoundError({
+              errorMessageIdentifier: "lti:ags:line-items:errors:line-item-not-found",
+              messageParams: {},
+            }),
+            subject: LtiLineItem.name,
+          }),
+        );
+      }),
+      te.chainW(() =>
+        te.tryCatch(
+          () =>
+            client.query.ltiLineItemsT.findFirst({
+              ...ltiLineItemsMapper.requiredQueryConfig,
+              where: eq(ltiLineItemsT.id, id),
+            }),
+          (error) =>
+            new LtiRepositoryError({
+              type: "ExternalError",
+              cause: new IrrecoverableError(
+                `Error occurred in ${DrizzleLtiLineItemsRepository.name} when reloading line item "${id}" after update.`,
+                error as Error,
+              ),
+            }),
+        ),
+      ),
+      te.chainEitherKW((row) => {
+        if (row) return e.right(row);
+
+        return e.left(
+          new LtiRepositoryError({
+            type: "NotFound",
+            cause: new ResourceNotFoundError({
+              errorMessageIdentifier: "lti:ags:line-items:errors:line-item-not-found",
+              messageParams: {},
+            }),
+            subject: LtiLineItem.name,
+          }),
+        );
+      }),
+      te.map((row) => ltiLineItemsMapper.fromRow(row, context)),
+    )();
+  }
 }
