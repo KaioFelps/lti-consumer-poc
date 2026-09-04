@@ -30,7 +30,7 @@ import { unmountContextId } from "@/modules/lti/advantage/context";
 import { InvalidComposedContextIdError } from "@/modules/lti/advantage/errors/invalid-composed-context-id.error";
 import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type";
 import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters";
-import { LtiLineItem } from "$/assignment-and-grade/line-item";
+import { LtiLineItem } from "$/assignment-and-grade/entities/line-item";
 import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
 import { Context } from "$/core/context";
 import { LtiRepositoryError } from "$/core/errors/repository.error";

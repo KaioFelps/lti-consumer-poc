@@ -22,9 +22,9 @@ import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositor
 import { InvalidContentTypeError } from "$/advantage/errors/invalid-content-type.error";
 import { MissingScopeError } from "$/advantage/errors/missing-scope.error";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
+import { LtiLineItem } from "$/assignment-and-grade/entities/line-item";
 import { InaccessibleLineItemError } from "$/assignment-and-grade/errors/inaccessible-line-item.error";
 import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors/missing-platform-ags-configuration.error";
-import { LtiLineItem } from "$/assignment-and-grade/line-item";
 import { PresentedLtiLineItem } from "$/assignment-and-grade/presenters/line-item.presenter";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";

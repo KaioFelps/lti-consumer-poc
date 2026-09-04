@@ -21,8 +21,8 @@ import { NotAcceptableMediaTypeError } from "$/advantage/errors/not-acceptable-m
 import { ExternalLtiResource } from "$/advantage/external-resource";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters";
+import { LtiLineItem } from "$/assignment-and-grade/entities/line-item";
 import { ToolIsNotDeployedInContextError } from "$/assignment-and-grade/errors/tool-is-not-deployed-in-context.error";
-import { LtiLineItem } from "$/assignment-and-grade/line-item";
 import { PresentedLtiLineItem } from "$/assignment-and-grade/presenters/line-item.presenter";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { Context } from "$/core/context";

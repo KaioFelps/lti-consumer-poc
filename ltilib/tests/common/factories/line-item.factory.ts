@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { either } from "fp-ts";
-import { ILtiLineItem, LtiLineItem } from "$/assignment-and-grade/line-item";
+import { ILtiLineItem, LtiLineItem } from "$/assignment-and-grade/entities/line-item";
 import { Context } from "$/core/context";
 import { LtiTool } from "$/core/tool";
 import { createContext } from "./context.factory";

@@ -14,7 +14,7 @@ import ltiToolFactory from "test/factories/lti-tool.factory";
 import personFactory from "test/factories/person.factory";
 import { AssignmentKind } from "@/modules/assignments-and-grades/enums/assignment-kind";
 import { Instructor } from "@/modules/courses-and-enrollments/entities/instructor.entity";
-import { LtiLineItem } from "$/assignment-and-grade/line-item";
+import { LtiLineItem } from "$/assignment-and-grade/entities/line-item";
 import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { DrizzleClient } from "../client";

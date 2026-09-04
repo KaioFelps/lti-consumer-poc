@@ -2,7 +2,7 @@ import { either as e } from "fp-ts";
 import { IntoLtiClaim } from "$/core/claims/serialization";
 import { Context } from "$/core/context";
 import { Platform } from "$/core/platform";
-import { LtiLineItem } from "./line-item";
+import { LtiLineItem } from "./entities/line-item";
 import { AssignmentAndGradeServiceScopes } from "./scopes";
 
 const AGS_CLAIM_KEY = "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint";

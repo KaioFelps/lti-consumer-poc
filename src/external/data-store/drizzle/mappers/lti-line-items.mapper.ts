@@ -5,7 +5,7 @@ import { pipe } from "fp-ts/lib/function";
 import { unmountContextId } from "@/modules/lti/advantage/context";
 import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type";
 import { ExternalLtiResource } from "$/advantage/external-resource";
-import { LtiLineItem } from "$/assignment-and-grade/line-item";
+import { LtiLineItem } from "$/assignment-and-grade/entities/line-item";
 import { Context } from "$/core/context";
 import ltiToolsMapper from "./lti-tools.mapper";
 

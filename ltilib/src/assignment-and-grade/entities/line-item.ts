@@ -4,12 +4,11 @@ import { generateUUID, UUID } from "common/src/types/uuid";
 import { either as e } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
+import { ExternalLtiResource } from "$/advantage/external-resource";
 import { Context } from "$/core/context";
 import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
-import { ExternalLtiResource } from "../advantage/external-resource";
-import { CannotAttachResourceLinkError } from "./errors/cannot-attach-resource-link.error";
-import { InvalidLineItemArgumentError } from "./errors/invalid-line-item-argument.error";
+import { CannotAttachResourceLinkError, InvalidLineItemArgumentError } from "../errors";
 
 type RawCustomParameters = Record<string, JsonValue>;
 

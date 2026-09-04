@@ -11,7 +11,7 @@ import { EnvironmentVars } from "@/config/environment-vars";
 import { DrizzleClient } from "@/external/data-store/drizzle/client";
 import { Routes } from "@/routes";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import { LtiLineItem } from "$/assignment-and-grade/line-item";
+import { LtiLineItem } from "$/assignment-and-grade/entities/line-item";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
 import { EntitiesFactoryGenerator, generateEntitiesFactory } from "./tests";
 
