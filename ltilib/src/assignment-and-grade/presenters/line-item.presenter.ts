@@ -4,7 +4,7 @@ import { Either } from "fp-ts/lib/Either";
 import { Context } from "$/core/context";
 import { MisconfiguredPlatformError } from "$/core/errors/misconfigured-platform.error";
 import { Platform } from "$/core/platform";
-import { LtiLineItem } from "../entities/line-item";
+import { LtiLineItem } from "../entities";
 import { MissingPlatformAgsConfigurationError } from "../errors";
 
 export type PresentedLtiLineItem = {

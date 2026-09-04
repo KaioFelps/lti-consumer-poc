@@ -1,7 +1,7 @@
 import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import { LtiLineItem } from "$/assignment-and-grade/entities/line-item";
+import { LtiLineItem } from "$/assignment-and-grade/entities";
 import { InaccessibleLineItemError } from "$/assignment-and-grade/errors";
 import { presentLtiLineItem } from "$/assignment-and-grade/presenters/line-item.presenter";
 import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";

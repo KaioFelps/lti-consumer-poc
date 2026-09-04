@@ -22,7 +22,7 @@ import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositor
 import { InvalidContentTypeError } from "$/advantage/errors/invalid-content-type.error";
 import { MissingScopeError } from "$/advantage/errors/missing-scope.error";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import { LtiLineItem } from "$/assignment-and-grade/entities/line-item";
+import { LtiLineItem } from "$/assignment-and-grade/entities";
 import {
   InaccessibleLineItemError,
   MissingPlatformAgsConfigurationError,

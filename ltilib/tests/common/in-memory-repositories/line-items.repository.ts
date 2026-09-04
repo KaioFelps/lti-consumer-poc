@@ -4,7 +4,7 @@ import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { ExternalLtiResource } from "$/advantage/external-resource";
 import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters";
-import { LtiLineItem } from "$/assignment-and-grade/entities/line-item";
+import { LtiLineItem } from "$/assignment-and-grade/entities";
 import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
 import { Context } from "$/core/context";
 import { LtiRepositoryError } from "$/core/errors/repository.error";

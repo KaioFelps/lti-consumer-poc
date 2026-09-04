@@ -9,7 +9,7 @@ import { getToolAndItsOidcAccessToken } from "test/fixtures/oidc";
 import { EnvironmentVars } from "@/config/environment-vars";
 import { DrizzleClient } from "@/external/data-store/drizzle/client";
 import { Routes } from "@/routes";
-import { LtiLineItem } from "$/assignment-and-grade/entities/line-item";
+import { LtiLineItem } from "$/assignment-and-grade/entities";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
 import { EntitiesFactoryGenerator, generateEntitiesFactory } from "./tests";

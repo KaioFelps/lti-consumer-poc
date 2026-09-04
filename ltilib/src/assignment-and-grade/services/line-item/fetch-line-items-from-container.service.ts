@@ -3,7 +3,7 @@ import { pipe } from "fp-ts/lib/function";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import utils from "$/advantage/utils";
 import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters";
-import { LtiLineItem } from "$/assignment-and-grade/entities/line-item";
+import { LtiLineItem } from "$/assignment-and-grade/entities";
 import { presentLtiLineItem } from "$/assignment-and-grade/presenters/line-item.presenter";
 import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";

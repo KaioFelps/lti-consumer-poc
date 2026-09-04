@@ -2,7 +2,7 @@ import { either as e, option, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
-import { ILtiLineItem, LtiLineItem } from "$/assignment-and-grade/entities/line-item";
+import { ILtiLineItem, LtiLineItem } from "$/assignment-and-grade/entities";
 import {
   InaccessibleLineItemError,
   MissingPlatformAgsConfigurationError,

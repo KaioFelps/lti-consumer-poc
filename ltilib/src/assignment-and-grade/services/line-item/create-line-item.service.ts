@@ -2,7 +2,7 @@ import { either as e, option as o, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
-import { ILtiLineItem, LtiLineItem } from "$/assignment-and-grade/entities/line-item";
+import { ILtiLineItem, LtiLineItem } from "$/assignment-and-grade/entities";
 import { CannotAttachResourceLinkError } from "$/assignment-and-grade/errors";
 import { Context } from "$/core/context";
 import { LtiRepositoryError } from "$/core/errors/repository.error";

@@ -5,7 +5,7 @@ import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
 import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
 import { LineItemsContainerFilters } from "../container-filters";
-import { LtiLineItem } from "../entities/line-item";
+import { LtiLineItem } from "../entities";
 
 export abstract class LtiLineItemsRepository {
   /**
