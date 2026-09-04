@@ -6,8 +6,10 @@ import {
   createToolGlobalDeployment,
 } from "ltilib/tests/common/factories/tool-deployment.factory";
 import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
-import { MissingLtiContextError } from "$/assignment-and-grade/errors/missing-lti-context.error";
-import { ToolIsNotDeployedInContextError } from "$/assignment-and-grade/errors/tool-is-not-deployed-in-context.error";
+import {
+  MissingLtiContextError,
+  ToolIsNotDeployedInContextError,
+} from "$/assignment-and-grade/errors";
 import { ensureToolIsDeployedInContext } from "./ensure-tool-is-deployed-in-context";
 
 describe("[LTI Advantage/GUARDS] Ensure Tool Is Deployed In Context", () => {

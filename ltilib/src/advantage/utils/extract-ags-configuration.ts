@@ -1,6 +1,6 @@
 import { either as e, taskEither } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
-import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors/missing-platform-ags-configuration.error";
+import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors";
 import { Platform } from "$/core/platform";
 
 export function extractAgsConfiguration(platform: Platform) {

@@ -5,7 +5,7 @@ import { Context } from "$/core/context";
 import { MisconfiguredPlatformError } from "$/core/errors/misconfigured-platform.error";
 import { Platform } from "$/core/platform";
 import { LtiLineItem } from "../entities/line-item";
-import { MissingPlatformAgsConfigurationError } from "../errors/missing-platform-ags-configuration.error";
+import { MissingPlatformAgsConfigurationError } from "../errors";
 
 export type PresentedLtiLineItem = {
   id: string;

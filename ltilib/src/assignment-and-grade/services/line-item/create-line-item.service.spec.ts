@@ -23,9 +23,11 @@ import { InvalidContentTypeError } from "$/advantage/errors/invalid-content-type
 import { MissingScopeError } from "$/advantage/errors/missing-scope.error";
 import { ExternalLtiResource } from "$/advantage/external-resource";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import { CannotAttachResourceLinkError } from "$/assignment-and-grade/errors/cannot-attach-resource-link.error";
-import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors/missing-platform-ags-configuration.error";
-import { ToolIsNotDeployedInContextError } from "$/assignment-and-grade/errors/tool-is-not-deployed-in-context.error";
+import {
+  CannotAttachResourceLinkError,
+  MissingPlatformAgsConfigurationError,
+  ToolIsNotDeployedInContextError,
+} from "$/assignment-and-grade/errors";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
 import { Context } from "$/core/context";

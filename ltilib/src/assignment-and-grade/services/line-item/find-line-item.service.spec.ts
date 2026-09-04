@@ -20,9 +20,11 @@ import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-mem
 import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
 import { NotAcceptableMediaTypeError } from "$/advantage/errors/not-acceptable-media-type.error";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import { InaccessibleLineItemError } from "$/assignment-and-grade/errors/inaccessible-line-item.error";
-import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors/missing-platform-ags-configuration.error";
-import { ToolIsNotDeployedInContextError } from "$/assignment-and-grade/errors/tool-is-not-deployed-in-context.error";
+import {
+  InaccessibleLineItemError,
+  MissingPlatformAgsConfigurationError,
+  ToolIsNotDeployedInContextError,
+} from "$/assignment-and-grade/errors";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
 import { Platform } from "$/core/platform";
