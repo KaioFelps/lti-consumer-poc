@@ -1,7 +1,7 @@
 import { either as e } from "fp-ts";
-import { InvalidLineItemArgumentError } from "../errors";
-import { LtiLineItem } from "./line-item";
-import { CustomParameters, RawCustomParameters } from "./line-item/custom-parameters";
+import { InvalidLineItemArgumentError } from "../../errors";
+import { LtiLineItem } from ".";
+import { CustomParameters, RawCustomParameters } from "./custom-parameters";
 
 export function validateScoreMaximum(scoreMaximum: LtiLineItem["scoreMaximum"]) {
   if (scoreMaximum === null || scoreMaximum === undefined) {
