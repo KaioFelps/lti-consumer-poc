@@ -14,7 +14,7 @@ import { ILtiLineItem, LtiLineItem } from "../../line-item";
 import { PresentedLtiLineItem, presentLtiLineItem } from "../../presenters/line-item.presenter";
 import { LtiLineItemsRepository } from "../../repositories/line-items.repository";
 import { AssignmentAndGradeServiceScopes } from "../../scopes";
-import { LineItemService } from "./base-service";
+import { AGServiceBase } from "..";
 
 type RawLineItemsPayload = {
   resourceId?: string;
@@ -43,7 +43,7 @@ const REQUIRED_SCOPES = [AssignmentAndGradeServiceScopes.Lineitem] as const;
  *
  * @internal
  */
-export class CreateService<CustomContextType extends string = never> extends LineItemService {
+export class CreateService<CustomContextType extends string = never> extends AGServiceBase {
   public constructor(
     private readonly platform: Platform,
     private readonly resourceLinksRepo: LtiResourceLinksRepository,

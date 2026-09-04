@@ -10,7 +10,7 @@ import { Context } from "$/core/context";
 import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
 import { LtiTool } from "$/core/tool";
-import { LineItemService } from "./base-service";
+import { AGServiceBase } from "..";
 
 export type FindLineItemParams = {
   lineItemId: LtiLineItem["id"];
@@ -29,7 +29,7 @@ const REQUIRED_SCOPES = [
  *
  * @internal
  */
-export class FindService extends LineItemService {
+export class FindService extends AGServiceBase {
   public constructor(
     private readonly platform: Platform,
     private readonly lineItemsRepo: LtiLineItemsRepository,

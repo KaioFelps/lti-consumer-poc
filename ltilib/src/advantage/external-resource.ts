@@ -26,6 +26,8 @@ export interface IExternalLtiResource {
  */
 export class ExternalLtiResource implements IExternalLtiResource {
   public tool: LtiTool;
+  // TODO: likely this context is not needed and shouldn't exist here... could be infered from
+  // deployments of the tool above
   public context?: Context<unknown> | undefined;
   public readonly externalToolResourceId: string;
   public readonly localResourceId: string;

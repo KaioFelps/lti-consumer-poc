@@ -13,7 +13,7 @@ import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
 import { LtiTool } from "$/core/tool";
-import { LineItemService } from "./base-service";
+import { AGServiceBase } from "..";
 
 export type UpdateLineItemParams = {
   // it must NOT change to the id nor resource link id
@@ -39,7 +39,7 @@ const REQUIRED_SCOPES = [AssignmentAndGradeServiceScopes.Lineitem] as const;
  *
  * @internal
  */
-export class UpdateService extends LineItemService {
+export class UpdateService extends AGServiceBase {
   public constructor(
     private readonly platform: Platform,
     private readonly lineItemsRepo: LtiLineItemsRepository,

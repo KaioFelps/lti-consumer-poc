@@ -12,8 +12,8 @@ import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
 import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
 import { LtiTool } from "$/core/tool";
+import { AGServiceBase } from "..";
 import type { LtiLineItemServices } from ".";
-import { LineItemService } from "./base-service";
 
 export type FetchLineItemsFromContainerParams = {
   /**
@@ -45,7 +45,7 @@ const REQUIRED_SCOPES = [
  *
  * @internal
  */
-export class FetchFromContainerService extends LineItemService {
+export class FetchFromContainerService extends AGServiceBase {
   public constructor(
     private readonly lineItemsRepo: LtiLineItemsRepository,
     private readonly platform: Platform,

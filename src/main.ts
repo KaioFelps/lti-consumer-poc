@@ -16,6 +16,7 @@ import { Redis } from "./external/data-store/redis/client";
 import { loadMessageStrings } from "./message-string/loader";
 
 import "@/lib";
+import { HttpResponse } from "@/lib";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 
 async function bootstrap() {
@@ -87,6 +88,26 @@ async function bootstrap() {
   });
 
   app.use(ejsLayoutsMiddleware);
+
+  let _counter = 0;
+
+  app.use((req, _res: HttpResponse, next) => {
+    const counter = _counter++;
+    console.log(`\n========== INCOMING REQUEST (${counter}) ==========`);
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+    console.log("Headers:", JSON.stringify(req.headers, null, 2));
+
+    let rawBody = "";
+    req.on("data", (chunk) => {
+      (rawBody as unknown as number) += chunk;
+    });
+    req.on("end", () => {
+      console.log("Raw body:", rawBody || "(vazio)");
+      console.log("=======================================\n");
+    });
+
+    next();
+  });
 
   // we need to register this otherwise LTI media types will
   // not be parsed as json

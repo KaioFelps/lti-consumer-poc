@@ -13,7 +13,7 @@ import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { LtiTool } from "$/core/tool";
 import { LtiLineItemsRepository } from "../../repositories/line-items.repository";
 import { AssignmentAndGradeServiceScopes } from "../../scopes";
-import { LineItemService } from "./base-service";
+import { AGServiceBase } from "..";
 
 export type DeleteLineItemServiceParams = {
   /**
@@ -34,7 +34,7 @@ const REQUIRED_SCOPES = [AssignmentAndGradeServiceScopes.Lineitem] as const;
  *
  * @internal
  */
-export class DeleteService extends LineItemService {
+export class DeleteService extends AGServiceBase {
   public constructor(private readonly lineItemsRepo: LtiLineItemsRepository) {
     super();
   }

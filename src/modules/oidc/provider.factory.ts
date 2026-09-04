@@ -160,7 +160,30 @@ export class OIDCProviderFactory {
       });
     }
     provider.on("grant.error", (ctx, err) => {
-      console.log("grant error", err, err.error_detail, ctx.url);
+      console.log("=== DEBUG OIDC PROVIDER ===");
+      console.log("Nome do erro", err.name);
+      console.log("Mensagem:", err.message);
+      console.log("Detalhe:", err.error_detail);
+
+      // 1. O PULO DO GATO: Qual foi o erro REAL que a biblioteca de criptografia jogou?
+      console.log("Causa Raiz (Inner Error):", err.cause || err || "Sem causa interna aparente");
+
+      // 2. Como o provedor enxerga o cliente na memória? (Para ver se o jwks_uri não sumiu)
+      if (ctx.oidc?.client) {
+        console.log("Cliente Hidratado na Memória:", {
+          clientId: ctx.oidc.client.clientId,
+          tokenEndpointAuthMethod: ctx.oidc.client.tokenEndpointAuthMethod,
+          jwksUri: ctx.oidc.client.jwksUri,
+        });
+      }
+
+      console.log(
+        ctx.oidc.client?.asymmetricKeyStore,
+        ctx.oidc.client?.asymmetricKeyStore?.["name"],
+        ctx.oidc.client?.asymmetricKeyStore?.["prototype"]?.["name"],
+      );
+
+      console.log("===========================");
     });
 
     return provider;
