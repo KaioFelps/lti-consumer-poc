@@ -1,41 +1,21 @@
 import { JsonValue } from "common/src/types/json-value";
 import { Optional } from "common/src/types/optional";
-import { generateUUID, UUID } from "common/src/types/uuid";
+import { generateUUID, type UUID } from "common/src/types/uuid";
 import { either as e } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import { ExternalLtiResource } from "$/advantage/external-resource";
+import {
+  CannotAttachResourceLinkError,
+  InvalidLineItemArgumentError,
+} from "$/assignment-and-grade/errors";
 import { Context } from "$/core/context";
 import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
-import { CannotAttachResourceLinkError, InvalidLineItemArgumentError } from "../errors";
+import { setCustomParameters, validateLabel, validateScoreMaximum } from "../helpers";
+import { CustomParameters, RawCustomParameters } from "./custom-parameters";
 
-type RawCustomParameters = Record<string, JsonValue>;
-
-class CustomParameters {
-  public constructor(private parameters: Record<string, JsonValue> = {}) {}
-
-  public toValue(): Readonly<Record<string, JsonValue>> {
-    return structuredClone(this.parameters);
-  }
-
-  public add(key: string, value: JsonValue) {
-    return pipe(
-      e.tryCatch(
-        () => new URL(key),
-        (_) =>
-          new InvalidLineItemArgumentError("customParameters", "key_must_be_fully_qualified_url"),
-      ),
-      e.map(() => {
-        this.parameters[key] = value;
-      }),
-    );
-  }
-
-  public remove(key: string) {
-    delete this.parameters[key];
-  }
-}
+import * as updateRecord from "./update-record";
 
 export interface ILtiLineItem<CustomContextType = never> {
   /**
@@ -118,36 +98,6 @@ export interface ILtiLineItem<CustomContextType = never> {
    * [section 3.1.2 of LTI AGS specification]: https://www.imsglobal.org/spec/lti-ags/v2p0#extensions
    */
   customParameters?: RawCustomParameters;
-}
-
-function validateScoreMaximum(scoreMaximum: LtiLineItem["scoreMaximum"]) {
-  if (scoreMaximum === null || scoreMaximum === undefined) {
-    return e.left(new InvalidLineItemArgumentError("scoreMaximum", "required"));
-  }
-
-  if (scoreMaximum <= 0) {
-    return e.left(new InvalidLineItemArgumentError("scoreMaximum", "must_be_greater_than_zero"));
-  }
-
-  return e.right(undefined);
-}
-
-function validateLabel(label: string | undefined) {
-  label = label?.trim();
-  if (!label) return e.left(new InvalidLineItemArgumentError("label", "required"));
-  return e.right(label);
-}
-
-/**
- * Inserts every custom parameter from `customParameters` into `lineItem`, silently ignoring
- * invalid properties.
- */
-function setCustomParameters(params: CustomParameters, entries?: RawCustomParameters) {
-  if (entries) {
-    Object.entries(entries).forEach(([key, value]) => params.add(key, value));
-  }
-
-  return e.right(undefined);
 }
 
 /**
@@ -277,100 +227,6 @@ export class LtiLineItem<CustomContextType = unknown> implements ILtiLineItem<Cu
 }
 
 export namespace LtiLineItem {
-  interface IUpdateRecord {
-    /**
-     * The actual ID of the line item local to the platform.
-     */
-    id: LtiLineItem["id"];
-    /**
-     * The new label of the line item.
-     */
-    label: string;
-    /**
-     * The new score limit of this line item.
-     * The platform may ignore this. If aplied, it's up to the platform to scale the results,
-     * as per [section 3.2.6].
-     *
-     * [section 3.2.6]: https://www.imsglobal.org/spec/lti-ags/v2p0#updating-a-line-item
-     */
-    scoreMaximum: number;
-    /**
-     * The new resource ID to which this line item must be associated.
-     */
-    externalResource?: ExternalLtiResource;
-    /**
-     * The new start date.
-     */
-    startDateTime?: Date | null;
-    /**
-     * The new end date.
-     */
-    endDateTime?: Date | null;
-    /**
-     * The new tag.
-     */
-    tag?: string;
-    /**
-     * Whether the platform should immediately display the grades or not.
-     */
-    gradesReleased?: boolean;
-    /**
-     * The custom parameters as per [section 3.1.2 of LTI AGS specification].
-     *
-     * [section 3.1.2 of LTI AGS specification]: https://www.imsglobal.org/spec/lti-ags/v2p0#extensions
-     */
-    customParameters?: RawCustomParameters;
-  }
-
-  /**
-   * A payload of changes to be applied to the line item identified by `lineItemId`.
-   * Every change must be applied (unless otherwise stated).
-   */
-  export class UpdateRecord implements IUpdateRecord {
-    public constructor(
-      public readonly id: IUpdateRecord["id"],
-      public readonly label: IUpdateRecord["label"],
-      public readonly scoreMaximum: IUpdateRecord["scoreMaximum"],
-      public readonly externalResource?: IUpdateRecord["externalResource"],
-      public readonly startDateTime?: IUpdateRecord["startDateTime"],
-      public readonly endDateTime?: IUpdateRecord["endDateTime"],
-      public readonly tag?: IUpdateRecord["tag"],
-      public readonly gradesReleased?: IUpdateRecord["gradesReleased"],
-    ) {
-      if (startDateTime) this.startDateTime = new Date(startDateTime);
-      if (endDateTime) this.endDateTime = new Date(endDateTime);
-    }
-
-    private parameters: CustomParameters = new CustomParameters();
-
-    public get customParameters() {
-      return this.parameters.toValue();
-    }
-
-    public static create(args: IUpdateRecord) {
-      return pipe(
-        e.Do,
-        e.chainFirstW(() => validateScoreMaximum(args.scoreMaximum)),
-        e.bindW("label", () => validateLabel(args.label)),
-        e.let(
-          "record",
-          ({ label }) =>
-            new UpdateRecord(
-              args.id,
-              label,
-              args.scoreMaximum,
-              args.externalResource,
-              args.startDateTime,
-              args.endDateTime,
-              args.tag,
-              args.gradesReleased,
-            ),
-        ),
-        e.chainFirstW(({ record }) =>
-          setCustomParameters(record.parameters, args.customParameters),
-        ),
-        e.map(({ record }) => record),
-      );
-    }
-  }
+  export const { UpdateRecord } = updateRecord;
+  export type UpdateRecord = updateRecord.UpdateRecord;
 }
