@@ -1,9 +1,9 @@
 import { either as e } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { ExternalLtiResource } from "$/advantage/external-resource";
-import { setCustomParameters, validateLabel, validateScoreMaximum } from "../helpers";
 import { LtiLineItem as LineItem } from ".";
 import { CustomParameters, RawCustomParameters } from "./custom-parameters";
+import { setCustomParameters, validateLabel, validateScoreMaximum } from "./helpers";
 
 interface IUpdateRecord {
   /**
