@@ -25,6 +25,15 @@ export class CustomParameters {
     );
   }
 
+  /**
+   * Inserts every custom parameter from `customParameters` into `lineItem`, silently ignoring
+   * invalid properties.
+   */
+  public mergeSilently(entries?: RawCustomParameters) {
+    if (entries) Object.entries(entries).forEach(([key, value]) => this.add(key, value));
+    return e.right(undefined);
+  }
+
   public remove(key: string) {
     delete this.parameters[key];
   }

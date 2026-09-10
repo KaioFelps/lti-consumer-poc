@@ -13,7 +13,7 @@ import { Context } from "$/core/context";
 import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
 import { CustomParameters, RawCustomParameters } from "../../custom-parameters";
-import { setCustomParameters, validateLabel, validateScoreMaximum } from "./helpers";
+import { validateLabel, validateScoreMaximum } from "./helpers";
 
 import * as updateRecord from "./update-record";
 
@@ -154,9 +154,7 @@ export class LtiLineItem<CustomContextType = unknown> implements ILtiLineItem<Cu
             args.endDateTime,
           ),
       ),
-      e.chainFirstW(({ lineItem }) =>
-        setCustomParameters(lineItem._customParameters, customParameters),
-      ),
+      e.chainFirstW(({ lineItem }) => lineItem._customParameters.mergeSilently(customParameters)),
       e.chainFirstW(({ lineItem }) => lineItem.setResourceLink(args.resourceLink)),
       e.map(({ lineItem }) => lineItem),
     );
