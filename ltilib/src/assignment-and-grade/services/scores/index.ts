@@ -1,11 +1,66 @@
-import { Either } from "fp-ts/lib/Either";
+import { either as e, taskEither as te } from "fp-ts";
+import { pipe } from "fp-ts/lib/function";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
+import { ILtiScore, LtiLineItem, LtiScore } from "$/assignment-and-grade/entities";
+import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors";
+import { LtiScoresRepository } from "$/assignment-and-grade/repositories";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
-import { AGServiceBase, AGServicesExecutor } from "..";
+import { HttpResponseWrapper } from "$/core/http/response-wrapper";
+import { Platform } from "$/core/platform";
+import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
+import { AGSExecutorParams, AGServiceBase, AGServicesExecutor } from "..";
 
-class CreateService extends AGServiceBase {
-  public execute(params: unknown): Promise<Either<unknown, unknown>> {
-    throw new Error("Method not implemented.");
+type PublishScoreServiceParams = {
+  lineItemId: LtiLineItem["id"];
+  scoreGiven: number | undefined;
+  scoreMaximum: number | undefined;
+} & Omit<ILtiScore, "score">;
+
+/**
+ * Do not use this service. It lacks important checks. Use
+ * {@link LtiScoreServices.publish `LtiScoreServices.publish`} instead.
+ *
+ * @internal
+ */
+class PublishService extends AGServiceBase {
+  public constructor(private readonly scoresRepository: LtiScoresRepository) {
+    super();
+  }
+
+  public execute({
+    lineItemId,
+    userId,
+    scoreGiven,
+    scoreMaximum,
+    ...scorePayload
+  }: PublishScoreServiceParams) {
+    return pipe(
+      te.Do,
+      te.bindW("score", () =>
+        pipe(
+          LtiScore.create({
+            ...scorePayload,
+            userId,
+            score: { given: scoreGiven, maximum: scoreMaximum },
+          }),
+          te.fromEither,
+        ),
+      ),
+      te.bindW("existingScore", () => this.findExistingScore(lineItemId, userId)),
+      te.chainEitherKW(({ score, existingScore }) =>
+        existingScore ? existingScore.update(score) : e.right(score),
+      ),
+      te.map(
+        () => new HttpResponseWrapper<undefined, undefined>(undefined, 204, undefined, undefined),
+      ),
+    )();
+  }
+
+  private findExistingScore(lineItemId: LtiLineItem["id"], userId: string) {
+    return pipe(
+      () => this.scoresRepository.findByLineItemIdAndUserId(lineItemId, userId),
+      te.orElse((error) => (error.type === "ExternalError" ? te.left(error) : te.right(undefined))),
+    );
   }
 
   public getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined {
@@ -21,4 +76,20 @@ class CreateService extends AGServiceBase {
   }
 }
 
-export class ScoreServices extends AGServicesExecutor {}
+export class LtiScoreServices extends AGServicesExecutor {
+  private readonly publishService: PublishService;
+
+  public constructor(
+    private readonly platform: Platform,
+    scoresRepository: LtiScoresRepository,
+    deploymentsRepo: LtiToolDeploymentsRepository,
+  ) {
+    super(deploymentsRepo);
+    this.publishService = new PublishService(scoresRepository);
+  }
+
+  public async publish(params: AGSExecutorParams<PublishScoreServiceParams>) {
+    if (!this.platform.agsConfiguration) return e.left(new MissingPlatformAgsConfigurationError());
+    return await this.executeService(this.publishService, params);
+  }
+}
