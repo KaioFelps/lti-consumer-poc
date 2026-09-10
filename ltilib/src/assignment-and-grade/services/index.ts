@@ -16,6 +16,9 @@ type BasicRequestValidationParams<CustomContextType = never> = {
   contentTypeHeader: string | undefined;
 };
 
+export type AGSExecutorParams<T, CustomContextType = never> = T &
+  BasicRequestValidationParams<CustomContextType>;
+
 export abstract class AGServiceBase<Params = unknown, ReturnType = unknown, ErrorsType = unknown> {
   public abstract execute(params: Params): Promise<Either<ErrorsType, ReturnType>>;
   public abstract getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined;

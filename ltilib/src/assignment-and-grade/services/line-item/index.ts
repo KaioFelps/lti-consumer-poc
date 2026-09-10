@@ -1,11 +1,9 @@
 import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
-import { Context } from "$/core/context";
 import { Platform } from "$/core/platform";
 import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
-import { LtiTool } from "$/core/tool";
 import { LtiLineItemsRepository } from "../../repositories/line-items.repository";
-import { AGServicesExecutor } from "..";
+import { AGSExecutorParams, AGServicesExecutor } from "..";
 import { CreateLineItemServiceParams, CreateService } from "./create-line-item.service";
 import { DeleteLineItemServiceParams, DeleteService } from "./delete-line-item.service";
 import {
@@ -14,13 +12,6 @@ import {
 } from "./fetch-line-items-from-container.service";
 import { FindLineItemParams, FindService } from "./find-line-item.service";
 import { UpdateLineItemParams, UpdateService } from "./update-line-item.service";
-
-type BasicRequestValidationParams<CustomContextType = never> = {
-  tool: LtiTool;
-  context: Context<CustomContextType> | undefined;
-  acceptHeader: string | undefined;
-  contentTypeHeader: string | undefined;
-};
 
 export class LtiLineItemServices<
   CustomContextType extends string = never,
@@ -52,27 +43,26 @@ export class LtiLineItemServices<
   }
 
   public async create(
-    params: CreateLineItemServiceParams<CustomContextType> &
-      BasicRequestValidationParams<CustomContextType>,
+    params: AGSExecutorParams<CreateLineItemServiceParams<CustomContextType>, CustomContextType>,
   ) {
     return await this.executeService(this.createService, params);
   }
 
-  public async find(params: FindLineItemParams & BasicRequestValidationParams<CustomContextType>) {
+  public async find(params: AGSExecutorParams<FindLineItemParams, CustomContextType>) {
     return await this.executeService(this.findService, params);
   }
 
   public async fetchFromContainer(
-    params: FetchLineItemsFromContainerParams & BasicRequestValidationParams<unknown>,
+    params: AGSExecutorParams<FetchLineItemsFromContainerParams, unknown>,
   ) {
     return await this.executeService(this.containerService, params);
   }
 
-  public async update(params: UpdateLineItemParams & BasicRequestValidationParams<unknown>) {
+  public async update(params: AGSExecutorParams<UpdateLineItemParams, unknown>) {
     return await this.executeService(this.updateService, params);
   }
 
-  public async delete(params: DeleteLineItemServiceParams & BasicRequestValidationParams<unknown>) {
+  public async delete(params: AGSExecutorParams<DeleteLineItemServiceParams, unknown>) {
     return await this.executeService(this.deleteService, params);
   }
 }
