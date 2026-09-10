@@ -4,7 +4,7 @@ import { pipe } from "fp-ts/lib/function";
 import { InvalidScoreArgumentError } from "$/assignment-and-grade/errors";
 import { validateLtiIso8601AndPreciseTimestamp } from "../../../advantage/utils/validate-lti-iso-8601-precise-timestamp";
 
-interface ILtiScore {
+export interface ILtiScore {
   /**
    * The score the user (identified by `userId`) is being graded with.
    *
@@ -87,6 +87,8 @@ interface ILtiScore {
   };
 }
 
+type ILtiScoreConstructorArgs = Omit<ILtiScore, "score"> & { score: Partial<ILtiScore["score"]> };
+
 export class LtiScore implements ILtiScore {
   public constructor(
     public userId: string,
@@ -99,7 +101,7 @@ export class LtiScore implements ILtiScore {
     public score: ILtiScore["score"] | undefined,
   ) {}
 
-  public static create(props: ILtiScore) {
+  public static create(props: ILtiScoreConstructorArgs) {
     return pipe(
       e.Do,
       e.bindW("timestamp", () => LtiScore.validateTimestamp(props.timestamp, "timestamp")),
@@ -111,8 +113,10 @@ export class LtiScore implements ILtiScore {
       ),
       e.let("comment", () => LtiScore.resolveComment(props.comment)),
       e.bindW("score", () => LtiScore.validateScores(props.score)),
+      e.let("submission", ({ startedAt, submittedAt }) => ({ startedAt, submittedAt })),
+      e.chainFirstW(({ submission }) => LtiScore.validateSubmissionTimestamps(submission)),
       e.map(
-        ({ score, startedAt, submittedAt, timestamp, comment }) =>
+        ({ score, submission, timestamp, comment }) =>
           new LtiScore(
             props.userId,
             props.scoringUserId,
@@ -120,7 +124,7 @@ export class LtiScore implements ILtiScore {
             props.gradingProgress,
             timestamp,
             comment,
-            { startedAt, submittedAt },
+            submission,
             score,
           ),
       ),
@@ -144,47 +148,43 @@ export class LtiScore implements ILtiScore {
    * Updates this score with incoming data as per AGS specification.
    */
   public update(incomingScore: LtiScore) {
+    // most of validations have already been checked in the static `create` constructor, hence
+    // there ain't no need to check it all again
+
     return pipe(
       e.Do,
-      e.bindW("timestamp", () =>
-        pipe(
-          LtiScore.validateTimestamp(incomingScore.timestamp, "timestamp"),
-          e.chain((incomingTimestamp) => {
-            const isOutdated = incomingTimestamp.getTime() < new Date(this.timestamp).getTime();
-            return isOutdated
-              ? e.left(new InvalidScoreArgumentError("timestamp", "outdated"))
-              : e.right(incomingTimestamp);
-          }),
-        ),
-      ),
-      e.bindW("startedAt", () =>
-        LtiScore.validateTimestamp(incomingScore.submission?.startedAt, "submission.startedAt"),
-      ),
-      e.bindW("submittedAt", () =>
-        LtiScore.validateTimestamp(incomingScore.submission?.submittedAt, "submission.submittedAt"),
-      ),
-      e.bindW("submission", ({ startedAt, submittedAt, timestamp }) =>
+      e.let("submission", () =>
         this.resolveSubmission(
-          { startedAt, submittedAt },
+          incomingScore.submission,
           incomingScore.activityProgress,
-          new Date(timestamp),
+          new Date(incomingScore.timestamp),
         ),
       ),
-      e.bindW("score", () => LtiScore.validateScores(incomingScore.score)),
-      e.let("comment", () => LtiScore.resolveComment(incomingScore.comment)),
-      e.map(({ comment, submission, timestamp, score }) => {
-        this.comment = comment;
+      e.bindW("timestamp", () => this.resolveTimestamp(incomingScore.timestamp)),
+      e.chainFirstW(({ submission }) => LtiScore.validateSubmissionTimestamps(submission)),
+      e.map(({ submission, timestamp }) => {
         this.submission = submission;
         this.timestamp = timestamp;
-        this.score = score;
 
+        this.comment = incomingScore.comment;
+        this.score = incomingScore.score;
         this.activityProgress = incomingScore.activityProgress;
         this.gradingProgress = incomingScore.gradingProgress;
         this.userId = incomingScore.userId;
 
         if (incomingScore.scoringUserId) this.scoringUserId = incomingScore.scoringUserId;
+
+        return this;
       }),
     );
+  }
+
+  private resolveTimestamp(incomingTimestamp: Date | string) {
+    const timestampAsDate = new Date(incomingTimestamp);
+    const isOutdated = timestampAsDate.getTime() < new Date(this.timestamp).getTime();
+    return isOutdated
+      ? e.left(new InvalidScoreArgumentError("timestamp", "outdated"))
+      : e.right(timestampAsDate);
   }
 
   /**
@@ -201,6 +201,20 @@ export class LtiScore implements ILtiScore {
       validateLtiIso8601AndPreciseTimestamp(timestamp),
       e.mapLeft((reason) => new InvalidScoreArgumentError(field, reason)),
     );
+  }
+
+  private static validateSubmissionTimestamps(submission: LtiScore["submission"]) {
+    if (
+      submission?.startedAt &&
+      submission?.submittedAt &&
+      new Date(submission.startedAt).getTime() > new Date(submission.submittedAt).getTime()
+    ) {
+      return e.left(
+        new InvalidScoreArgumentError("submission.submittedAt", "must_be_after_started_at"),
+      );
+    }
+
+    return e.right(submission);
   }
 
   /**
@@ -282,37 +296,29 @@ export class LtiScore implements ILtiScore {
       submission.submittedAt = incomingTimestamp;
     }
 
-    if (
-      submission.startedAt &&
-      submission.submittedAt &&
-      submission.startedAt.getTime() > submission.submittedAt.getTime()
-    ) {
-      return e.left(
-        new InvalidScoreArgumentError("submission.submittedAt", "must_be_after_started_at"),
-      );
-    }
-
-    return e.right(submission);
+    return submission;
   }
 
   private static validateScores(
-    scores: LtiScore["score"],
+    scores: Partial<LtiScore["score"]> = {},
   ): Either<InvalidScoreArgumentError<"scoreGiven" | "scoreMaximum">, LtiScore["score"]> {
-    if (!scores || scores.given === undefined || scores.given === null) return e.right(undefined);
+    if (scores.given === undefined || scores.given === null) return e.right(undefined);
 
-    if (scores.given && !scores.maximum) {
+    if (!scores.maximum) {
       return e.left(new InvalidScoreArgumentError("scoreMaximum", "required"));
     }
 
     if (scores.given < 0) {
-      return e.left(new InvalidScoreArgumentError("scoreGiven", "must_be_greater_than_zero"));
+      return e.left(
+        new InvalidScoreArgumentError("scoreGiven", "must_be_equal_or_greater_than_zero"),
+      );
     }
 
-    if (scores.maximum < 0) {
+    if (scores.maximum <= 0) {
       return e.left(new InvalidScoreArgumentError("scoreMaximum", "must_be_greater_than_zero"));
     }
 
-    return e.right(scores);
+    return e.right({ given: scores.given, maximum: scores.maximum });
   }
 
   private static resolveComment(comment: string | null | undefined) {
