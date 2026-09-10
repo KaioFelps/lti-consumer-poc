@@ -91,9 +91,33 @@ describe("[AGS] Publish Score Service", async () => {
     expect(response.right.httpStatusCode).toBe(204);
   });
 
-  it.skip("should update an existing score", async () => {});
+  it("should update an existing score", async () => {
+    const { context, tool, lineItem } = getValidCompleteLineItemUpdateArgs();
+    const userId = generateUUID();
+    const params = getPublishLineItemParams(context, tool, lineItem, userId);
+    const score = LtiScore.create({
+      ...params,
+      score: { given: params.scoreGiven, maximum: params.scoreMaximum },
+    });
+    assert(e.isRight(score));
+    scoresRepo.scores.push({ lineItemId: lineItem.id.toString(), score: score.right });
+    const update = vi.spyOn(score.right, "update");
 
-  it.skip("should refuse to update a score if the incoming timestamp is older than the current", async () => {});
+    const payload = {
+      ...getPublishLineItemParams(context, tool, lineItem, userId),
+      scoreMaximum: 100,
+      scoreGiven: 13,
+      comment: "Foo",
+    };
+    const response = await sut.publish(payload);
+
+    assert(e.isRight(response));
+    expect(update).toHaveBeenCalled();
+
+    const persistedScore = scoresRepo.scores[0].score;
+    expect(persistedScore.comment).toBe("Foo");
+    expect(persistedScore.score).toEqual({ maximum: 100, given: 13 });
+  });
 
   it.skip("should persist valid custom parameters", async () => {
     const { context, tool, lineItem } = getValidCompleteLineItemUpdateArgs();
