@@ -23,7 +23,7 @@ export namespace InvalidScoreArgumentError {
       "invalid_datetime",
       "outdated",
     ],
-    scoreGiven: ["must_be_greater_than_zero"],
+    scoreGiven: ["must_be_equal_or_greater_than_zero"],
     scoreMaximum: ["must_be_greater_than_zero", "required"],
     customParameters: ["key_must_be_fully_qualified_url"],
     resourceLinkId: ["must_belong_to_tool", "must_belong_to_score_context"],
