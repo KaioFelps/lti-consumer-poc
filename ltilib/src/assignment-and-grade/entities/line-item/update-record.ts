@@ -3,7 +3,7 @@ import { pipe } from "fp-ts/lib/function";
 import { ExternalLtiResource } from "$/advantage/external-resource";
 import { CustomParameters, RawCustomParameters } from "../../custom-parameters";
 import { LtiLineItem as LineItem } from ".";
-import { setCustomParameters, validateLabel, validateScoreMaximum } from "./helpers";
+import { validateLabel, validateScoreMaximum } from "./helpers";
 
 interface IUpdateRecord {
   /**
@@ -94,7 +94,7 @@ export class UpdateRecord implements IUpdateRecord {
             args.gradesReleased,
           ),
       ),
-      e.chainFirstW(({ record }) => setCustomParameters(record.parameters, args.customParameters)),
+      e.chainFirstW(({ record }) => record.parameters.mergeSilently(args.customParameters)),
       e.map(({ record }) => record),
     );
   }
