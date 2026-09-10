@@ -1,4 +1,4 @@
 import { LtiLineItemServices } from "./services/line-item";
-import { ScoreServices } from "./services/scores";
+import { LtiScoreServices } from "./services/scores";
 
-export { LtiLineItemServices, ScoreServices };
+export { LtiLineItemServices, LtiScoreServices };
