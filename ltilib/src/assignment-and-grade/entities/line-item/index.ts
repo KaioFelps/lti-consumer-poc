@@ -12,7 +12,7 @@ import {
 import { Context } from "$/core/context";
 import { LtiResourceLink } from "$/core/resource-link";
 import { LtiTool } from "$/core/tool";
-import { CustomParameters, RawCustomParameters } from "./custom-parameters";
+import { CustomParameters, RawCustomParameters } from "../../custom-parameters";
 import { setCustomParameters, validateLabel, validateScoreMaximum } from "./helpers";
 
 import * as updateRecord from "./update-record";
