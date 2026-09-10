@@ -50,6 +50,7 @@ class PublishService extends AGServiceBase {
       te.chainEitherKW(({ score, existingScore }) =>
         existingScore ? existingScore.update(score) : e.right(score),
       ),
+      te.chainW((score) => () => this.scoresRepository.upsert(score, lineItemId)),
       te.map(
         () => new HttpResponseWrapper<undefined, undefined>(undefined, 204, undefined, undefined),
       ),

@@ -1,6 +1,7 @@
 import { either as e } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
+import { CustomParameters, RawCustomParameters } from "$/assignment-and-grade/custom-parameters";
 import { InvalidScoreArgumentError } from "$/assignment-and-grade/errors";
 import { validateLtiIso8601AndPreciseTimestamp } from "../../../advantage/utils/validate-lti-iso-8601-precise-timestamp";
 
@@ -85,11 +86,20 @@ export interface ILtiScore {
      */
     submittedAt?: Date | string;
   };
+
+  /**
+   * Optional custom parameters as per [section 3.1.2 of LTI AGS specification].
+   *
+   * [section 3.1.2 of LTI AGS specification]: https://www.imsglobal.org/spec/lti-ags/v2p0#extensions
+   */
+  customParameters?: RawCustomParameters;
 }
 
 type ILtiScoreConstructorArgs = Omit<ILtiScore, "score"> & { score: Partial<ILtiScore["score"]> };
 
 export class LtiScore implements ILtiScore {
+  private parameters: CustomParameters = new CustomParameters();
+
   public constructor(
     public userId: string,
     public scoringUserId: string | undefined,
@@ -100,6 +110,10 @@ export class LtiScore implements ILtiScore {
     public submission: ILtiScore["submission"] | undefined,
     public score: ILtiScore["score"] | undefined,
   ) {}
+
+  public get customParameters() {
+    return this.parameters.toValue();
+  }
 
   public static create(props: ILtiScoreConstructorArgs) {
     return pipe(
@@ -128,6 +142,7 @@ export class LtiScore implements ILtiScore {
             score,
           ),
       ),
+      e.chainFirstW((score) => score.parameters.mergeSilently(props.customParameters)),
     );
   }
 

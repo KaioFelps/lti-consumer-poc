@@ -89,6 +89,8 @@ describe("[AGS] Publish Score Service", async () => {
     expect(response.right.content).toBeUndefined();
     expect(response.right.rawContent).toBeUndefined();
     expect(response.right.httpStatusCode).toBe(204);
+
+    expect(scoresRepo.scores).toHaveLength(1);
   });
 
   it("should update an existing score", async () => {
@@ -119,7 +121,7 @@ describe("[AGS] Publish Score Service", async () => {
     expect(persistedScore.score).toEqual({ maximum: 100, given: 13 });
   });
 
-  it.skip("should persist valid custom parameters", async () => {
+  it("should persist valid custom parameters", async () => {
     const { context, tool, lineItem } = getValidCompleteLineItemUpdateArgs();
 
     const response = await sut.publish({
@@ -135,9 +137,9 @@ describe("[AGS] Publish Score Service", async () => {
 
     assert(e.isRight(response));
 
-    const score = scoresRepo.scores[0].score;
-    expect(score).not.toHaveProperty("invalid-key");
-    expect(score).toEqual(
+    const parameters = scoresRepo.scores[0].score.customParameters;
+    expect(parameters).not.toHaveProperty("invalid-key");
+    expect(parameters).toEqual(
       expect.objectContaining({
         "https://my-domain.com/valid-key": {
           foo: true,
