@@ -103,6 +103,12 @@ type ILtiScoreConstructorArgs = Omit<ILtiScore, "score" | "comment"> & {
 
 export class LtiScore implements ILtiScore {
   private parameters: CustomParameters = new CustomParameters();
+  /**
+   * When `true`, it means that this score was created with `null` comment.
+   * This kind of scores requires the `comment` to be cleared when they're used
+   * to update another score.
+   */
+  private commentWasNull = false;
 
   public constructor(
     public userId: string,
@@ -129,7 +135,7 @@ export class LtiScore implements ILtiScore {
       e.bindW("submittedAt", () =>
         LtiScore.validateTimestamp(props.submission?.submittedAt, "submission.submittedAt"),
       ),
-      e.let("comment", () => LtiScore.resolveComment(props.comment)),
+      e.let("comment", () => props.comment ?? undefined),
       e.bindW("score", () => LtiScore.validateScores(props.score)),
       e.let("submission", ({ startedAt, submittedAt }) => ({ startedAt, submittedAt })),
       e.chainFirstW(({ submission }) => LtiScore.validateSubmissionTimestamps(submission)),
@@ -146,6 +152,10 @@ export class LtiScore implements ILtiScore {
             score,
           ),
       ),
+      e.tap((score) => {
+        if (props.comment === null) score.commentWasNull = true;
+        return e.right(undefined);
+      }),
       e.chainFirstW((score) => score.parameters.mergeSilently(props.customParameters)),
     );
   }
@@ -186,7 +196,7 @@ export class LtiScore implements ILtiScore {
         this.submission = submission;
         this.timestamp = timestamp;
 
-        this.comment = incomingScore.comment;
+        this.comment = incomingScore.commentWasNull ? this.comment : incomingScore.comment;
         this.score = incomingScore.score;
         this.activityProgress = incomingScore.activityProgress;
         this.gradingProgress = incomingScore.gradingProgress;
@@ -242,8 +252,10 @@ export class LtiScore implements ILtiScore {
   ): Either<InvalidScoreArgumentError<"scoreGiven" | "scoreMaximum">, LtiScore["score"]> {
     if (scores.given === undefined || scores.given === null) return e.right(undefined);
 
-    if (!scores.maximum) {
+    if (scores.maximum === undefined) {
       return e.left(new InvalidScoreArgumentError("scoreMaximum", "required"));
+    } else if (scores.maximum <= 0) {
+      return e.left(new InvalidScoreArgumentError("scoreMaximum", "must_be_greater_than_zero"));
     }
 
     if (scores.given < 0) {
@@ -252,17 +264,7 @@ export class LtiScore implements ILtiScore {
       );
     }
 
-    if (scores.maximum <= 0) {
-      return e.left(new InvalidScoreArgumentError("scoreMaximum", "must_be_greater_than_zero"));
-    }
-
     return e.right({ given: scores.given, maximum: scores.maximum });
-  }
-
-  private static resolveComment(comment: string | null | undefined) {
-    // quote from AGS spec:
-    // a comment, a blank or null, then the comment value MUST be cleared in the platform if the previously recorded comment was also a comment sent from the tool.
-    return comment || undefined;
   }
 }
 
