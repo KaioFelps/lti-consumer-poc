@@ -96,7 +96,10 @@ export interface ILtiScore {
   customParameters?: RawCustomParameters;
 }
 
-type ILtiScoreConstructorArgs = Omit<ILtiScore, "score"> & { score: Partial<ILtiScore["score"]> };
+type ILtiScoreConstructorArgs = Omit<ILtiScore, "score" | "comment"> & {
+  score: Partial<ILtiScore["score"]>;
+  comment: string | undefined | null;
+};
 
 export class LtiScore implements ILtiScore {
   private parameters: CustomParameters = new CustomParameters();

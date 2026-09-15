@@ -42,7 +42,7 @@ export function createScore({
     score: score ?? undefined,
     submission: submission ?? undefined,
     customParameters: customParameters ?? undefined,
-    comment: comment ?? undefined,
+    comment: comment,
   });
 
   assert(either.isRight(scoreResult));
