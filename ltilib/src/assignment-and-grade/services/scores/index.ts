@@ -12,9 +12,10 @@ import { AGSExecutorParams, AGServiceBase, AGServicesExecutor } from "..";
 
 type PublishScoreServiceParams = {
   lineItemId: LtiLineItem["id"];
-  scoreGiven: number | undefined;
-  scoreMaximum: number | undefined;
-} & Omit<ILtiScore, "score">;
+  scoreGiven?: number | undefined;
+  scoreMaximum?: number | undefined;
+  comment?: string | null;
+} & Omit<ILtiScore, "score" | "comment">;
 
 /**
  * Do not use this service. It lacks important checks. Use
@@ -77,7 +78,7 @@ class PublishService extends AGServiceBase {
   }
 }
 
-export class LtiScoreServices extends AGServicesExecutor {
+export class LtiScoreServices<CustomContextType extends string = never> extends AGServicesExecutor {
   private readonly publishService: PublishService;
 
   public constructor(
@@ -89,7 +90,7 @@ export class LtiScoreServices extends AGServicesExecutor {
     this.publishService = new PublishService(scoresRepository);
   }
 
-  public async publish(params: AGSExecutorParams<PublishScoreServiceParams>) {
+  public async publish(params: AGSExecutorParams<PublishScoreServiceParams, CustomContextType>) {
     if (!this.platform.agsConfiguration) return e.left(new MissingPlatformAgsConfigurationError());
     return await this.executeService(this.publishService, params);
   }
