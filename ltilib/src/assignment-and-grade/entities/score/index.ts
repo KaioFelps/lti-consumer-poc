@@ -33,7 +33,7 @@ export interface ILtiScore {
    *
    * @note If the platform doesn't support or need this info, it may be ignored.
    */
-  scoringUserId: string | undefined;
+  scoringUserId?: string | undefined;
 
   /**
    * Indicates what kind of update this score is performing to the line item.
@@ -98,7 +98,7 @@ export interface ILtiScore {
 
 type ILtiScoreConstructorArgs = Omit<ILtiScore, "score" | "comment"> & {
   score: Partial<ILtiScore["score"]>;
-  comment: string | undefined | null;
+  comment?: string | undefined | null;
 };
 
 export class LtiScore implements ILtiScore {
