@@ -20,14 +20,17 @@ export abstract class LtiScoresRepository {
   /**
    * Saves or updates `score` in the datastore.
    *
-   * - It must override every field. Fields that became `undefined` or `null` must be set as
+   * - It **must** override every field. Fields that became `undefined` or `null` must be set as
    * is in the datastore.
-   *
-   * @note ltilib manages the lifecycle of `Score`s as per by AGS specs, so fields that must
-   * be erased or updated due to incoming scores have already been at this point.
+   * - It **may** not to save `score` if {@link LtiScore.gradingProgress `score.gradingProgress`} is not
+   * {@link LtiScore.GradingProgress.FullyGraded `FullyGraded`}.
    *
    * @param score - The `score` being created or updated in the datastore.
    * @param lineItemId - The ID of the line item to which `score` is associated.
+   *
+   * @note ltilib manages the lifecycle of `Score`s as per by AGS specs, so fields that must
+   * be erased or updated due to incoming scores have already been at this point. Therefore, fields
+   * set to `undefined` must be unset in the underlying datastore.
    */
   public abstract upsert(
     score: LtiScore,
