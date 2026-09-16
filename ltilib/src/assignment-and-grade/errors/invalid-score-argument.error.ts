@@ -18,7 +18,7 @@ export namespace InvalidScoreArgumentError {
 
   const codes = {
     timestamp: [
-      "missing_sub_second_precision",
+      "missing_subsecond_precision",
       "missing_timezone_designator",
       "invalid_datetime",
       "outdated",
@@ -28,12 +28,12 @@ export namespace InvalidScoreArgumentError {
     customParameters: ["key_must_be_fully_qualified_url"],
     resourceLinkId: ["must_belong_to_tool", "must_belong_to_score_context"],
     "submission.startedAt": [
-      "missing_sub_second_precision",
+      "missing_subsecond_precision",
       "missing_timezone_designator",
       "invalid_datetime",
     ],
     "submission.submittedAt": [
-      "missing_sub_second_precision",
+      "missing_subsecond_precision",
       "missing_timezone_designator",
       "invalid_datetime",
       "must_be_after_started_at",

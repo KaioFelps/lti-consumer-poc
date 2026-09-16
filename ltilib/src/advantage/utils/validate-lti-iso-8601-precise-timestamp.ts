@@ -1,7 +1,7 @@
 import { either as e } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 
-type Reason = "invalid_datetime" | "missing_sub_second_precision" | "missing_timezone_designator";
+type Reason = "invalid_datetime" | "missing_subsecond_precision" | "missing_timezone_designator";
 
 /**
  * Validates `timestamp` is conformant with ISO 8601 and AGS specs that require
@@ -25,7 +25,7 @@ export function validateLtiIso8601AndPreciseTimestamp(
   if (Number.isNaN(asDate.getTime())) return e.left("invalid_datetime");
 
   const hasSubSecondPrecision = /\.\d+/.test(timestamp);
-  if (!hasSubSecondPrecision) return e.left("missing_sub_second_precision");
+  if (!hasSubSecondPrecision) return e.left("missing_subsecond_precision");
 
   const hasTimeZoneDesignator = /(Z|[+-]\d{2}(:?\d{2})?)$/i.test(timestamp);
   return hasTimeZoneDesignator ? e.right(asDate) : e.left("missing_timezone_designator");

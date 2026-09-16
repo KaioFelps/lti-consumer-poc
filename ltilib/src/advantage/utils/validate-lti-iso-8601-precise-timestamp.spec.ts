@@ -18,7 +18,7 @@ describe("[AGS] Score timestamps validateIso8601 helper", () => {
     // lacking .xyz sub-seconds
     const input = "2024-05-10T12:00:00Z";
     const result = validateLtiIso8601AndPreciseTimestamp(input);
-    expect(result).toEqual(e.left("missing_sub_second_precision"));
+    expect(result).toEqual(e.left("missing_subsecond_precision"));
   });
 
   it("should reject datetimes that has sub-seconds precision but not timezone designator", () => {
