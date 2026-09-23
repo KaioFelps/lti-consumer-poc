@@ -72,7 +72,7 @@ describe("[e2e::LTI] Delete Line Item", async () => {
     const { tool, courseContext, lineItem } = await getValidItems();
     const { accessToken } = await getToolAndItsOidcAccessToken(app, tool);
 
-    const response = await request(app.getHttpServer())
+    let response = await request(app.getHttpServer())
       .get(Routes.lti.ags.lineitems.instance(courseContext.id, lineItem.id.toString()))
       .set("authorization", `Bearer ${accessToken}`)
       .expect(200);
@@ -82,7 +82,7 @@ describe("[e2e::LTI] Delete Line Item", async () => {
     expect(lineItemId.startsWith(env.app.url)).toBeTruthy();
 
     const lineItemEndpoint = new URL(lineItemId).pathname;
-    await request(app.getHttpServer())
+    response = await request(app.getHttpServer())
       .delete(lineItemEndpoint)
       .set("authorization", `Bearer ${accessToken}`);
 
