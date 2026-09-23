@@ -125,6 +125,28 @@ export class LtiScore implements ILtiScore {
     return this.parameters.toValue();
   }
 
+  /**
+   * Recreates a instance of a {@link LtiScore `LtiScore`} that already existed previously.
+   * This is useful to restore entities persisted in some storage out of memory.
+   *
+   * @note It does not perform any security or conformance check. Make sure your score has
+   * been previously created with {@link create}.
+   */
+  public static createUnchecked(props: ILtiScore) {
+    const lineItem = new LtiScore(
+      props.userId,
+      props.scoringUserId,
+      props.activityProgress,
+      props.gradingProgress,
+      props.timestamp,
+      props.comment,
+      props.submission,
+      props.score,
+    );
+    lineItem.parameters = new CustomParameters({ ...props.customParameters });
+    return lineItem;
+  }
+
   public static create(props: ILtiScoreConstructorArgs) {
     return pipe(
       e.Do,
