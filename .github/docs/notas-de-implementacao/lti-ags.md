@@ -125,3 +125,9 @@ desabilitar as funcionalidades que dependem dele.
 Nesse caso, o claim dos serviços do LTI AGS não são incluídos mesmo que o serviço tenha sido fornecido,
 a menos que um contexto seja passado na hora de realizar o lançamento. Isso implica mudanças no _endpoint_
 de lançamento de atividades.
+
+## Implementando Scores
+Scores são armazenados como modelos simples no banco de dados. Não foi implementado nenhuma espécie de histórico, e
+todos os scores recebidos substituem o anterior — diferente
+da possibilidade de persistir somente os scores finais, como
+sugerido pela especificação.
