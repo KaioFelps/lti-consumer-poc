@@ -64,6 +64,11 @@ export const Routes = {
         instance: (contextComposedId: string, lineItemId: string) =>
           `/lti/ags/${contextComposedId}/lineitems/${lineItemId}`,
       },
+
+      scores: {
+        publish: (contextComposedId: string, lineItemId: string) =>
+          `${Routes.lti.ags.lineitems.instance(contextComposedId, lineItemId)}/scores`,
+      },
     },
   },
   courses: {

@@ -170,7 +170,7 @@ ptBR["lti:launch-login:message-hint-must-be-string"] =
 ptBR["lti:launch-login:message-hint-must-not-be-empty"] =
   "O campo 'message-hint' não pode estar vazio.";
 ptBR["lti:launch-login:prompt-must-be-within-enum"] =
-  "O campo 'prompt' precisa assumir um dos valores: 'none', 'login', çonsent' ou 'select_account'.";
+  "O campo 'prompt' precisa assumir um dos valores: 'none', 'login', 'consent' ou 'select_account'.";
 
 ptBR["lti:launch:repository:launch-not-found"] = ({ launchId }) =>
   `Não foi possível encontrar nenhum registro de lançamento LTI com id "${launchId}"`;
@@ -288,5 +288,52 @@ ptBR["lti:ags:line-items:errors:line-item-not-found"] =
   "Não foi possível encontrar esse line item.";
 ptBR["lti:ags:line-items:errors:line-item-id-must-be-uuid"] =
   "O ID do lien item deve ser um UUID válido.";
+
+ptBR["lti:ags:publish-score:errors:score-given-must-be-number"] =
+  "A pontuação precisa ser um número.";
+ptBR["lti:ags:publish-score:errors:score-given-must-be-non-negative"] =
+  "A pontuação atribuída não pode ser menor que 0.";
+ptBR["lti:ags:publish-score:errors:score-maximum-must-be-number"] =
+  "A pontuação-limite precisa ser um número.";
+ptBR["lti:ags:publish-score:errors:score-maximum-must-be-positive"] =
+  "A pontuação-limite precisa ser um número positivo maior que 0.";
+ptBR["lti:ags:publish-score:errors:user-id-must-be-string"] = "O ID do aluno é obrigatório.";
+ptBR["lti:ags:publish-score:errors:scoring-user-id-must-be-string"] =
+  "O ID do instrutor deve ser um texto.";
+ptBR["lti:ags:publish-score:errors:activity-progress-out-of-set"] = (args) => {
+  const values = args.values as string[];
+  const stringifiedValues = values.map((v) => `'${v}'`).join(", ");
+  return `O progresso de atividade fornecido é inválido, e deveria ser um dos valores: ${stringifiedValues}.`;
+};
+ptBR["lti:ags:publish-score:errors:grading-progress-out-of-set"] = (args) => {
+  const values = args.values as string[];
+  const stringifiedValues = values.map((v) => `'${v}'`).join(", ");
+  return `O progresso da pontuação fornecido é inválido, e deveria ser um dos valores: ${stringifiedValues}.`;
+};
+ptBR["lti:ags:publish-score:errors:timestamp-must-be-datestring"] =
+  "O campo timestamp deveria ser uma data representada conforme a ISO 8601.";
+ptBR["lti:ags:publish-score:errors:startedAt-must-be-datestring"] =
+  "O campo startedAt deveria ser uma data representada conforme a ISO 8601.";
+ptBR["lti:ags:publish-score:errors:submittedAt-must-be-datestring"] =
+  "O campo submittedAt deveria ser uma data representada conforme a ISO 8601.";
+ptBR["lti:ags:publish-score:errors:submission-must-be-object"] =
+  "O campo submission deveria ser um objeto.";
+ptBR["lti:ags:publish-score:errors:comment-must-be-null-or-string"] =
+  "O comentário, quando presente, deve ser ou nulo ou uma string.";
+ptBR["lti:ags:publish-score:errors:custom-parameters-should-be-records"] =
+  "Parâmetros customizados inválidos.";
+ptBR["lti:ags:publish-score:errors:body-should-be-object"] =
+  "O corpo da requisição deveria ser um objeto.";
+
+ptBR["lti:ags:publish-score:submission-timestamps-must-be-iso8601"] =
+  "As datas de submissão precisam ser conformantes com a ISO 8601.";
+ptBR["lti:ags:publish-score:submission-timestamps-must-have-subsecond-precision"] =
+  "As datas de submissão precisam ter precisão de subsegundos.";
+ptBR["lti:ags:publish-score:submission-timestamps-must-have-timezone-designator"] =
+  "As datas de submissão devem ter um fuso horário explícito.";
+ptBR["lti:ags:publish-score:submission-submitted-at-must-be-after-started-at"] =
+  "A data de submissão deve ser posterior à data de início da resolução da atividade.";
+ptBR["lti:ags:publish-score:submission-timestamp-is-outdated"] =
+  "Essa pontuação está desatualizada.";
 
 ptBR["lti:ags:score-not-found"] = "Não foi possível encontrar a pontuação solicitada.";

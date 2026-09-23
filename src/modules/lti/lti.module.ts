@@ -4,6 +4,8 @@ import { AuthModule } from "@/modules/auth/auth.module";
 import { IdentityModule } from "@/modules/identity/identity.module";
 import { OIDCModule } from "@/modules/oidc/oidc.module";
 import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
+import { LtiScoreServices } from "$/assignment-and-grade";
+import { LtiScoresRepository } from "$/assignment-and-grade/repositories";
 import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
 import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim";
 import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
@@ -20,6 +22,7 @@ import { FindContextByIdService } from "./advantage/context/services/find-contex
 import { LtiContextsRepository } from "./advantage/repositories/lti-contexts.repository";
 import { LtiAssignmentsController } from "./ags/controllers/lti-assignments.controller";
 import { LtiLineItemsController } from "./ags/controllers/lti-line-items";
+import { LtiScoresController } from "./ags/controllers/lti-scores.controller";
 import { CreateCourseContextService } from "./ags/services/create-course-context.service";
 import { CreateExternalLtiAssignmentService } from "./ags/services/create-external-lti-assignment.service";
 import { FindExternalLtiAssignmentByIdService } from "./ags/services/find-external-lti-assignment-by-id.service";
@@ -63,6 +66,15 @@ import { LtiToolsController } from "./tools/tools.controller";
       inject: [Platform, LtiLineItemsRepository],
       useFactory: (platform: Platform, lineItemsRepo: LtiLineItemsRepository) =>
         new LtiAgsClaimServices(platform, lineItemsRepo),
+    },
+    {
+      provide: LtiScoreServices,
+      inject: [Platform, LtiScoresRepository, LtiToolsDeploymentsRepository],
+      useFactory: (
+        platform: Platform,
+        scoresRepository: LtiScoresRepository,
+        deploymentsRepository: LtiToolsDeploymentsRepository,
+      ) => new LtiScoreServices(platform, scoresRepository, deploymentsRepository),
     },
     {
       provide: LtiLaunchServices,
@@ -148,6 +160,7 @@ import { LtiToolsController } from "./tools/tools.controller";
     LtiLaunchesController,
     LtiAssignmentsController,
     LtiLineItemsController,
+    LtiScoresController,
   ],
 })
 export class LtiModule implements NestModule {
