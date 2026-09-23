@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   check,
+  doublePrecision,
   foreignKey,
   index,
   jsonb,
@@ -17,6 +18,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { PersonGender } from "@/modules/identity/person/enums/gender";
 import { SystemRole } from "@/modules/identity/user/enums/system-role";
+import { LtiScore } from "$/assignment-and-grade/entities";
 
 export const systemRoleEnum = pgEnum("system_role", [SystemRole.Admin, SystemRole.User]);
 
@@ -29,6 +31,22 @@ export const personGenderEnum = pgEnum("person_gender", [
 export const concreteContextTypeEnum = pgEnum("concrete_context_type_e", ["course"]);
 
 export const assignmentKindEnum = pgEnum("assignment_kind_e", ["local", "external_lti"]);
+
+export const ltiScoreActivityProgress = pgEnum("lti_score_activity_progress_e", [
+  LtiScore.ActivityProgress.Initialized,
+  LtiScore.ActivityProgress.Started,
+  LtiScore.ActivityProgress.InProgress,
+  LtiScore.ActivityProgress.Submitted,
+  LtiScore.ActivityProgress.Completed,
+]);
+
+export const ltiScoreGradingProgress = pgEnum("lti_score_grading_progress_e", [
+  LtiScore.GradingProgress.Failed,
+  LtiScore.GradingProgress.FullyGraded,
+  LtiScore.GradingProgress.NotReady,
+  LtiScore.GradingProgress.Pending,
+  LtiScore.GradingProgress.PendingManual,
+]);
 
 export const usersTable = pgTable("users", {
   // user fields
@@ -363,6 +381,29 @@ export const ltiLineItemsT = pgTable(
   ],
 );
 
+export const ltiScoresT = pgTable(
+  "lti_scores",
+  {
+    lineItemId: uuid("line_item_id")
+      .references(() => ltiLineItemsT.id)
+      .notNull(),
+    userId: uuid("user_id")
+      .references(() => usersTable.id)
+      .notNull(),
+    scoringUserId: uuid("scoring_user_id").references(() => usersTable.id),
+    activityProgress: ltiScoreActivityProgress("activity_progress").notNull(),
+    gradingProgress: ltiScoreGradingProgress("grading_progress").notNull(),
+    timestamp: timestamp({ precision: 3, withTimezone: true }).notNull(),
+    comment: varchar({ length: 600 }),
+    startedAt: timestamp("started_at", { precision: 6, withTimezone: true }),
+    submittedAt: timestamp("submitted_at", { precision: 6, withTimezone: true }),
+    scoreGiven: doublePrecision("score_given"),
+    scoreMaximum: doublePrecision("score_maximum"),
+    customParameters: jsonb("custom_parameters").$type<Record<string, string>>(),
+  },
+  (table) => [primaryKey({ name: "lti_scores_pk", columns: [table.userId, table.lineItemId] })],
+);
+
 // #endregion
 
 /***************************************
@@ -527,7 +568,7 @@ export const ltiAssignmentsRelations = relations(ltiAssignmentsT, ({ one, many }
   lineItems: many(ltiLineItemsT),
 }));
 
-export const ltiLineItemsRelations = relations(ltiLineItemsT, ({ one }) => ({
+export const ltiLineItemsRelations = relations(ltiLineItemsT, ({ one, many }) => ({
   ltiAssignment: one(ltiAssignmentsT, {
     fields: [ltiLineItemsT.ltiAssignmentId],
     references: [ltiAssignmentsT.assignmentId],
@@ -540,6 +581,7 @@ export const ltiLineItemsRelations = relations(ltiLineItemsT, ({ one }) => ({
     fields: [ltiLineItemsT.concreteContextId, ltiLineItemsT.concreteContextType],
     references: [ltiContexts.concreteContextId, ltiContexts.concreteContextType],
   }),
+  scores: many(ltiScoresT),
 }));
 
 export const externalLtiResourcesRelations = relations(externalLtiResourcesT, ({ one }) => ({
@@ -549,10 +591,29 @@ export const externalLtiResourcesRelations = relations(externalLtiResourcesT, ({
   }),
 }));
 
+export const ltiScoresRelations = relations(ltiScoresT, ({ one }) => ({
+  lineItem: one(ltiLineItemsT, {
+    fields: [ltiScoresT.lineItemId],
+    references: [ltiLineItemsT.id],
+  }),
+  student: one(usersTable, {
+    fields: [ltiScoresT.userId],
+    references: [usersTable.id],
+  }),
+  instructor: one(usersTable, {
+    fields: [ltiScoresT.scoringUserId],
+    references: [usersTable.id],
+  }),
+}));
+
 // #endregion
 
 export const usersRelations = relations(usersTable, ({ many }) => ({
   coursesTaught: many(coursesT),
   enrollments: many(enrollmentsT),
   specificAssignments: many(studentsAssignmentsT),
+  // scores assigned to this user
+  scoresGiven: many(ltiScoresT),
+  // scores that this user has assigned
+  scoresGraded: many(ltiScoresT),
 }));
