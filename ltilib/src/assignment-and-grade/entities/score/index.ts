@@ -223,11 +223,13 @@ export class LtiScore implements ILtiScore {
         this.activityProgress = incomingScore.activityProgress;
         this.gradingProgress = incomingScore.gradingProgress;
         this.userId = incomingScore.userId;
+        this.scoringUserId = incomingScore.scoringUserId;
 
-        if (incomingScore.scoringUserId) this.scoringUserId = incomingScore.scoringUserId;
-
+        // resets and keeps only those that has been sent again during update
+        this.parameters = new CustomParameters();
         return this;
       }),
+      e.chainFirstW((score) => score.parameters.mergeSilently(incomingScore.customParameters)),
     );
   }
 
