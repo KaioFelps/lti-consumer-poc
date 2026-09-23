@@ -62,6 +62,7 @@ export async function getTestingApp() {
     json({
       type: [
         "application/json",
+        LtiAdvantageMediaType.Score,
         LtiAdvantageMediaType.LineItem,
         LtiAdvantageMediaType.LineItemContainer,
       ],

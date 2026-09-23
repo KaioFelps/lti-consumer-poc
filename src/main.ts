@@ -115,6 +115,7 @@ async function bootstrap() {
     json({
       type: [
         "application/json",
+        LtiAdvantageMediaType.Score,
         LtiAdvantageMediaType.LineItem,
         LtiAdvantageMediaType.LineItemContainer,
       ],
