@@ -39,7 +39,9 @@ export class CoreValidationPipe implements PipeTransform {
 
     const isDtoCompliant =
       "validate" in metadata.metatype.prototype &&
-      typeof metadata.metatype.prototype.validate === "function";
+      typeof metadata.metatype.prototype.validate === "function" &&
+      // avoid undefined bodies that should be validated
+      value !== undefined;
 
     if (!isDtoCompliant) return value;
 
