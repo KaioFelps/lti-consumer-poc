@@ -17,6 +17,19 @@ interface ILtiAssignmentAndGradeServicesConfig {
    */
   lineItemsContainerEndpoint: (context: Context<unknown>) => URL;
   /**
+   * A resolver to a results container, i.e., a collection of results grouped by a line item
+   * and the context to which the line item belongs.
+   */
+  resultsContainerEndpoint: (context: Context<unknown>, lineItemId: string | UUID | number) => URL;
+  /**
+   * A resolver to the result of a specific user within a specific line item.
+   */
+  resultEndpoint: (
+    context: Context<unknown>,
+    lineItemId: string | UUID | number,
+    userId: string,
+  ) => URL;
+  /**
    * Defines the platform's capability to handle submission deadlines.
    * According to LTI AGS spec:
    * - If a property is `false` or undefined, the corresponding field MUST be
@@ -80,7 +93,11 @@ interface ILtiAssignmentAndGradeServicesConfig {
 export class LtiAssignmentAndGradeServicesConfig implements ILtiAssignmentAndGradeServicesConfig {
   public readonly lineItemsContainerEndpoint!: ILtiAssignmentAndGradeServicesConfig["lineItemsContainerEndpoint"];
 
+  public readonly resultsContainerEndpoint!: ILtiAssignmentAndGradeServicesConfig["resultsContainerEndpoint"];
+
   public readonly lineItemEndpoint!: ILtiAssignmentAndGradeServicesConfig["lineItemEndpoint"];
+
+  public readonly resultEndpoint!: ILtiAssignmentAndGradeServicesConfig["resultEndpoint"];
 
   public readonly deadlinesEnabled: Exclude<
     ILtiAssignmentAndGradeServicesConfig["deadlinesEnabled"],
