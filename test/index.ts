@@ -65,6 +65,7 @@ export async function getTestingApp() {
         LtiAdvantageMediaType.Score,
         LtiAdvantageMediaType.LineItem,
         LtiAdvantageMediaType.LineItemContainer,
+        LtiAdvantageMediaType.ResultContainer,
       ],
     }),
   );

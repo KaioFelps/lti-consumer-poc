@@ -118,6 +118,7 @@ async function bootstrap() {
         LtiAdvantageMediaType.Score,
         LtiAdvantageMediaType.LineItem,
         LtiAdvantageMediaType.LineItemContainer,
+        LtiAdvantageMediaType.ResultContainer,
       ],
     }),
   );
