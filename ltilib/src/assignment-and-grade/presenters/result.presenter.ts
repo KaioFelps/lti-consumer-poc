@@ -57,7 +57,7 @@ export function presentLtiResult<
   const presentedLineItem = {
     ...(score.customParameters as CustomParameters),
     comment: score.comment,
-    id: platform.agsConfiguration.resultEndpoint(context, lineItemId, score.userId),
+    id: platform.agsConfiguration.prepareResultId(context, lineItemId, score.userId),
     scoreOf: platform.agsConfiguration.lineItemEndpoint(context, lineItemId),
     userId: score.userId,
     resultMaximum: score.score?.maximum ?? 1,

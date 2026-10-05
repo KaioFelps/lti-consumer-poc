@@ -37,7 +37,7 @@ export function createPlatformAgsConfiguration({
   deadlinesEnabled,
   lineItemEndpoint,
   lineItemsContainerEndpoint,
-  resultEndpoint,
+  prepareResultId,
   resultsContainerEndpoint,
   authorizeServicesClaim,
   pickAllowedScopes,
@@ -50,7 +50,7 @@ export function createPlatformAgsConfiguration({
 
   lineItemsContainerEndpoint ??= (context) => new URL(`/context/${context.id}/lineitems`, baseUrl);
 
-  resultEndpoint ??= (context, lineItemId, userId) =>
+  prepareResultId ??= (context, lineItemId, userId) =>
     new URL(`/context/${context.id}/lineitems/${lineItemId}/results/${userId}`, baseUrl);
 
   resultsContainerEndpoint ??= (context, lineItemId) =>
@@ -59,7 +59,7 @@ export function createPlatformAgsConfiguration({
   const params = {
     lineItemEndpoint,
     lineItemsContainerEndpoint,
-    resultEndpoint,
+    prepareResultId,
     resultsContainerEndpoint,
   } as Parameters<typeof Platform.LtiAssignmentAndGradeServicesConfig.create>[0];
 

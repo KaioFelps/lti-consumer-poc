@@ -23,8 +23,10 @@ interface ILtiAssignmentAndGradeServicesConfig {
   resultsContainerEndpoint: (context: Context<unknown>, lineItemId: string | UUID | number) => URL;
   /**
    * A resolver to the result of a specific user within a specific line item.
+   * It must be a fully qualified URL, but this URL doesn't need to be an existing endpoint
+   * at all.
    */
-  resultEndpoint: (
+  prepareResultId: (
     context: Context<unknown>,
     lineItemId: string | UUID | number,
     userId: string,
@@ -97,7 +99,7 @@ export class LtiAssignmentAndGradeServicesConfig implements ILtiAssignmentAndGra
 
   public readonly lineItemEndpoint!: ILtiAssignmentAndGradeServicesConfig["lineItemEndpoint"];
 
-  public readonly resultEndpoint!: ILtiAssignmentAndGradeServicesConfig["resultEndpoint"];
+  public readonly prepareResultId!: ILtiAssignmentAndGradeServicesConfig["prepareResultId"];
 
   public readonly deadlinesEnabled: Exclude<
     ILtiAssignmentAndGradeServicesConfig["deadlinesEnabled"],
