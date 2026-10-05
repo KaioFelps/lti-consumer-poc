@@ -10,7 +10,7 @@ import {
   PresentedLtiResult,
   presentLtiResult,
 } from "$/assignment-and-grade/presenters/result.presenter";
-import { LtiScoresRepository } from "$/assignment-and-grade/repositories";
+import { LtiLineItemsRepository, LtiScoresRepository } from "$/assignment-and-grade/repositories";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { Context } from "$/core/context";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
@@ -18,6 +18,7 @@ import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
 import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
 import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
+import { LtiTool } from "$/core/tool";
 import { AGSExecutorParams, AGServiceBase, AGServicesExecutor } from "..";
 
 type FetchResultsServiceParams = {
@@ -29,6 +30,10 @@ type FetchResultsServiceParams = {
    * The context to which the line item (referred by `lineItemId`) belongs.
    */
   context: Context<unknown>;
+  /**
+   * The LTI tool that is requesting the results.
+   */
+  tool: LtiTool;
   /**
    * The default limit to apply when filter contains no explicit limit.
    */
@@ -50,8 +55,9 @@ class FetchResultsService extends AGServiceBase {
   public constructor(
     private readonly platform: Platform,
     private readonly scoresRepository: LtiScoresRepository,
+    lineItemsRepository: LtiLineItemsRepository,
   ) {
-    super();
+    super(lineItemsRepository);
   }
 
   public execute({
@@ -60,12 +66,14 @@ class FetchResultsService extends AGServiceBase {
     maxLimit,
     filters,
     context,
+    tool,
   }: FetchResultsServiceParams) {
     lineItemId = lineItemId.toString();
     const resolvedLimit = this.resolveLimit(defaultLimit, maxLimit, filters.limit);
 
     return pipe(
       te.Do,
+      te.chainFirstW(() => this.ensureToolHasAccessToLineItem(lineItemId, tool, context)),
       te.bindW("scores", () => this.findScoresCollection(lineItemId, resolvedLimit, filters)),
       te.let("resolvedScoresData", ({ scores }) =>
         this.ensureNoUnscoredRecords(scores.values, scores.count),
@@ -219,9 +227,10 @@ export class LtiResultServices<
     private readonly platform: Platform,
     scoresRepository: LtiScoresRepository,
     deploymentsRepo: LtiToolDeploymentsRepository,
+    lineItemsRepository: LtiLineItemsRepository,
   ) {
     super(deploymentsRepo);
-    this.fetchService = new FetchResultsService(platform, scoresRepository);
+    this.fetchService = new FetchResultsService(platform, scoresRepository, lineItemsRepository);
   }
 
   public async fetchResults(

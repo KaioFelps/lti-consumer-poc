@@ -165,12 +165,24 @@ import { LtiToolsController } from "./tools/tools.controller";
     CreateCourseContextService,
     {
       provide: LtiResultServices,
-      inject: [Platform, LtiScoresRepository, LtiToolsDeploymentsRepository],
+      inject: [
+        Platform,
+        LtiScoresRepository,
+        LtiToolsDeploymentsRepository,
+        LtiLineItemsRepository,
+      ],
       useFactory: (
         platform: Platform,
         scoresRepository: LtiScoresRepository,
         deploymentsRepository: LtiToolsDeploymentsRepository,
-      ) => new LtiResultServices(platform, scoresRepository, deploymentsRepository),
+        lineItemsRepository: LtiLineItemsRepository,
+      ) =>
+        new LtiResultServices(
+          platform,
+          scoresRepository,
+          deploymentsRepository,
+          lineItemsRepository,
+        ),
     },
   ],
   exports: [LtiLaunchServices, Platform, CreateCourseContextService],

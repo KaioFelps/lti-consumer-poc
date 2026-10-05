@@ -275,8 +275,8 @@ describe("[e2e::LTI] Fetch Results", async () => {
     const { accessToken } = await getToolAndItsOidcAccessToken(app, tool);
 
     await request(app.getHttpServer())
-      .get(Routes.lti.ags.lineitems.instance(courseContext.id, lineItem.id.toString()))
+      .get(Routes.lti.ags.results.container(courseContext.id, lineItem.id.toString()))
       .set("authorization", `Bearer ${accessToken}`)
-      .expect(403);
+      .expect(404);
   });
 });

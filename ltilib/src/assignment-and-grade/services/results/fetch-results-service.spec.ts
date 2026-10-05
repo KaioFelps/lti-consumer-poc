@@ -16,6 +16,7 @@ import { createPlatform } from "ltilib/tests/common/factories/platform.factory";
 import { createScore } from "ltilib/tests/common/factories/score.factory";
 import { createTool } from "ltilib/tests/common/factories/tool.factory";
 import { createToolDeployment } from "ltilib/tests/common/factories/tool-deployment.factory";
+import { InMemoryLtiLineItemsRepository } from "ltilib/tests/common/in-memory-repositories/line-items.repository";
 import { InMemoryLtiScoresRepository } from "ltilib/tests/common/in-memory-repositories/scores-repository";
 import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
 import { MissingScopeError } from "$/advantage/errors/missing-scope.error";
@@ -32,6 +33,7 @@ describe("[AGS] Fetch Results Service", async () => {
   let platform: Platform;
   let scoresRepo: InMemoryLtiScoresRepository;
   let deploymentsRepo: InMemoryLtiToolDeploymentsRepository;
+  let lineItemsRepo: InMemoryLtiLineItemsRepository;
 
   let sut: LtiResultServices;
 
@@ -39,7 +41,8 @@ describe("[AGS] Fetch Results Service", async () => {
     platform = await createPlatform();
     scoresRepo = new InMemoryLtiScoresRepository();
     deploymentsRepo = new InMemoryLtiToolDeploymentsRepository();
-    sut = new LtiResultServices(platform, scoresRepo, deploymentsRepo);
+    lineItemsRepo = new InMemoryLtiLineItemsRepository();
+    sut = new LtiResultServices(platform, scoresRepo, deploymentsRepo, lineItemsRepo);
   });
 
   function getEntities({
@@ -52,6 +55,7 @@ describe("[AGS] Fetch Results Service", async () => {
     const deployment = createToolDeployment({ context, tool });
     const lineItem = createMinimalLineItem({ context });
 
+    lineItemsRepo.lineItems.push({ owningTool: tool, lineItem });
     deploymentsRepo.deployments.push(deployment);
 
     return { context, tool, lineItem };
