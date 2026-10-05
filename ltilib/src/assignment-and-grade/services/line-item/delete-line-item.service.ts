@@ -11,7 +11,6 @@ import { pipe } from "fp-ts/lib/function";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { LtiTool } from "$/core/tool";
-import { LtiLineItemsRepository } from "../../repositories/line-items.repository";
 import { AssignmentAndGradeServiceScopes } from "../../scopes";
 import { AGServiceBase } from "..";
 
@@ -35,10 +34,6 @@ const REQUIRED_SCOPES = [AssignmentAndGradeServiceScopes.Lineitem] as const;
  * @internal
  */
 export class DeleteService extends AGServiceBase {
-  public constructor(private readonly lineItemsRepo: LtiLineItemsRepository) {
-    super();
-  }
-
   getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined {
     return REQUIRED_SCOPES;
   }
@@ -52,7 +47,7 @@ export class DeleteService extends AGServiceBase {
 
   public async execute({ tool, lineItemId }: DeleteLineItemServiceParams) {
     return await pipe(
-      () => this.lineItemsRepo.delete(lineItemId, tool),
+      () => this.lineItemsRepository.delete(lineItemId, tool),
       te.map(() => new HttpResponseWrapper<undefined, undefined>(undefined, 200, undefined, {})),
     )();
   }

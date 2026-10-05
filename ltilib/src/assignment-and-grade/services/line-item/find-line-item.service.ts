@@ -32,9 +32,9 @@ const REQUIRED_SCOPES = [
 export class FindService extends AGServiceBase {
   public constructor(
     private readonly platform: Platform,
-    private readonly lineItemsRepo: LtiLineItemsRepository,
+    lineItemsRepo: LtiLineItemsRepository,
   ) {
-    super();
+    super(lineItemsRepo);
   }
 
   getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined {
@@ -71,7 +71,7 @@ export class FindService extends AGServiceBase {
 
   private findLineItem(lineItemId: LtiLineItem["id"], context: Context<unknown>) {
     return pipe(
-      () => this.lineItemsRepo.findById(lineItemId, context),
+      () => this.lineItemsRepository.findById(lineItemId, context),
       te.mapLeft((error) => {
         if (error.type !== "NotFound") return error;
         return new InaccessibleLineItemError(lineItemId, { cause: error });

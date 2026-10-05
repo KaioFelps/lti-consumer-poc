@@ -47,10 +47,10 @@ const REQUIRED_SCOPES = [
  */
 export class FetchFromContainerService extends AGServiceBase {
   public constructor(
-    private readonly lineItemsRepo: LtiLineItemsRepository,
+    lineItemsRepo: LtiLineItemsRepository,
     private readonly platform: Platform,
   ) {
-    super();
+    super(lineItemsRepo);
   }
 
   getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined {
@@ -115,7 +115,7 @@ export class FetchFromContainerService extends AGServiceBase {
     limit: number,
   ) {
     return pipe(
-      () => this.lineItemsRepo.fetchWithContainerFilters(context, tool, limit, page, filters),
+      () => this.lineItemsRepository.fetchWithContainerFilters(context, tool, limit, page, filters),
       te.orElseW((error) => {
         return error.type === "NotFound"
           ? te.right({ values: [], count: 0 } satisfies LtiRepositoryPaginatedResponse<LtiLineItem>)

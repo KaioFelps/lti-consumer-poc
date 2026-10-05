@@ -48,9 +48,9 @@ export class CreateService<CustomContextType extends string = never> extends AGS
     private readonly platform: Platform,
     private readonly resourceLinksRepo: LtiResourceLinksRepository,
     private readonly externalResourcesRepo: ExternalLtiResourcesRepository,
-    private readonly lineItemsRepo: LtiLineItemsRepository,
+    lineItemsRepo: LtiLineItemsRepository,
   ) {
-    super();
+    super(lineItemsRepo);
   }
 
   getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined {
@@ -107,7 +107,7 @@ export class CreateService<CustomContextType extends string = never> extends AGS
     tool: LtiTool,
   ) {
     return pipe(
-      () => this.lineItemsRepo.findExisting(tool, context, resourceLinkId, resourceId, tag),
+      () => this.lineItemsRepository.findExisting(tool, context, resourceLinkId, resourceId, tag),
       te.orElseW((error) => (error.type === "NotFound" ? te.right(undefined) : te.left(error))),
       te.map((lineitem) => lineitem as LtiLineItem<CustomContextType> | undefined),
     );
@@ -151,7 +151,7 @@ export class CreateService<CustomContextType extends string = never> extends AGS
       }),
       te.chainW((lineitem) =>
         pipe(
-          () => this.lineItemsRepo.create(lineitem, tool),
+          () => this.lineItemsRepository.create(lineitem, tool),
           te.map(() => lineitem),
         ),
       ),

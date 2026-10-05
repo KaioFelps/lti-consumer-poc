@@ -44,10 +44,10 @@ const REQUIRED_SCOPES = [AssignmentAndGradeServiceScopes.Lineitem] as const;
 export class UpdateService extends AGServiceBase {
   public constructor(
     private readonly platform: Platform,
-    private readonly lineItemsRepo: LtiLineItemsRepository,
+    lineItemsRepo: LtiLineItemsRepository,
     private readonly externalResourcesRepo: ExternalLtiResourcesRepository,
   ) {
-    super();
+    super(lineItemsRepo);
   }
 
   getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined {
@@ -102,7 +102,7 @@ export class UpdateService extends AGServiceBase {
           startDateTime: resolvedStartDate,
         }),
       ),
-      te.chainW((record) => () => this.lineItemsRepo.update(record, tool, context)),
+      te.chainW((record) => () => this.lineItemsRepository.update(record, tool, context)),
       te.mapLeft((error) =>
         error instanceof LtiRepositoryError && error.type === "NotFound"
           ? new InaccessibleLineItemError(lineItemId, error)
