@@ -61,6 +61,18 @@ export class PlatformFactory {
         lineItemsContainerEndpoint: (context) =>
           new URL(Routes.lti.ags.lineitems.container(context.id), this.envVars.app.url),
 
+        prepareResultId: (ctx, lineItemId, userId) =>
+          new URL(
+            `${Routes.lti.ags.results.container(ctx.id, lineItemId.toString())}/${userId}`,
+            this.envVars.app.url,
+          ),
+
+        resultsContainerEndpoint: (ctx, lineItemId) =>
+          new URL(
+            Routes.lti.ags.results.container(ctx.id, lineItemId.toString()),
+            this.envVars.app.url,
+          ),
+
         deadlinesEnabled: { end: true, start: true },
       }),
     });
