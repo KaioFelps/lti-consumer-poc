@@ -7,7 +7,7 @@ type Options = {
 
 export class MissingScopeError extends OAuthBearerError {
   public constructor(
-    public readonly missingScopes: string | readonly string[],
+    public readonly missingScopes: readonly string[],
     public readonly which: "any" | "every",
     message: string,
     options?: Options,
@@ -35,7 +35,7 @@ export class MissingScopeError extends OAuthBearerError {
 export class MissingAnyScopeError extends MissingScopeError {
   public constructor(scopes: string | readonly string[], options?: Options) {
     super(
-      scopes,
+      typeof scopes === "string" ? [scopes] : scopes,
       "any",
       `At least one of the following scopes must be present: ${listScopes(scopes)}.`,
       options,
@@ -46,7 +46,7 @@ export class MissingAnyScopeError extends MissingScopeError {
 export class MissingEveryScopesError extends MissingScopeError {
   public constructor(scopes: string | string[], options?: Options) {
     super(
-      scopes,
+      typeof scopes === "string" ? [scopes] : scopes,
       "every",
       `All of the following scopes are required: ${listScopes(scopes)}.`,
       options,

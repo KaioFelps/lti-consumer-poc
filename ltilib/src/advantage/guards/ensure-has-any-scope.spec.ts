@@ -31,7 +31,7 @@ describe("[LTI Advantage/Guards] Ensure Has Any Scope", () => {
   });
 
   it.each([
-    ["tool lacks the single required string scope", "scope:read", ["scope:write"]],
+    ["tool lacks the single required string scope", ["scope:read"], ["scope:write"]],
     ["tool lacks all required array scopes", ["scope:read", "scope:write"], ["scope:other"]],
     ["tool has no scopes at all", ["scope:read"], []],
     ["required scopes array is empty (edge case)", [], ["scope:read"]],
