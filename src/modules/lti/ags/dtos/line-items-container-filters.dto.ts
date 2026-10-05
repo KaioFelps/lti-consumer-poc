@@ -12,14 +12,14 @@ const schema = z.object({
   resourceId: z.uuid("lti:ags:line-items-container:errors:resource-id-must-be-uuid").optional(),
   tag: z.string("lti:ags:line-items-container:errors:tag-must-be-string").optional(),
   limit: z.coerce
-    .number("lti:ags:line-items-container:errors:limit-must-be-integer")
-    .int("lti:ags:line-items-container:errors:limit-must-be-integer")
-    .nonnegative("lti:ags:line-items-container:errors:limit-must-be-non-negative")
+    .number("lti:ags:container:errors:limit-must-be-integer")
+    .int("lti:ags:container:errors:limit-must-be-integer")
+    .nonnegative("lti:ags:container:errors:limit-must-be-non-negative")
     .optional(),
   page: z.coerce
-    .number("lti:ags:line-items-container:errors:limit-must-be-integer")
-    .int("lti:ags:line-items-container:errors:limit-must-be-integer")
-    .positive("lti:ags:line-items-container:errors:page-must-be-positive")
+    .number("lti:ags:container:errors:page-must-be-integer")
+    .int("lti:ags:container:errors:page-must-be-integer")
+    .positive("lti:ags:container:errors:page-must-be-positive")
     .optional(),
 });
 

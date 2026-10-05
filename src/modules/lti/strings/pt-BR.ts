@@ -275,19 +275,16 @@ ptBR["lti:ags:line-items-container:errors:resource-id-must-be-uuid"] =
   "O ID do recurso deve ser um UUID válido.";
 ptBR["lti:ags:line-items-container:errors:tag-must-be-string"] =
   "A tag precisa ser do tipo string.";
-ptBR["lti:ags:line-items-container:errors:limit-must-be-integer"] =
-  "O limite precisa ser um número inteiro.";
-ptBR["lti:ags:line-items-container:errors:limit-must-be-non-negative"] =
+ptBR["lti:ags:container:errors:limit-must-be-integer"] = "O limite precisa ser um número inteiro.";
+ptBR["lti:ags:container:errors:limit-must-be-non-negative"] =
   "O limite não pode ser um número negativo.";
-ptBR["lti:ags:line-items-container:errors:page-must-be-integer"] =
-  "A página deve ser um número inteiro.";
-ptBR["lti:ags:line-items-container:errors:page-must-be-positive"] =
-  "A página deve ser um número positivo.";
+ptBR["lti:ags:container:errors:page-must-be-integer"] = "A página deve ser um número inteiro.";
+ptBR["lti:ags:container:errors:page-must-be-positive"] = "A página deve ser um número positivo.";
 
 ptBR["lti:ags:line-items:errors:line-item-not-found"] =
   "Não foi possível encontrar esse line item.";
 ptBR["lti:ags:line-items:errors:line-item-id-must-be-uuid"] =
-  "O ID do lien item deve ser um UUID válido.";
+  "O ID do line item deve ser um UUID válido.";
 
 ptBR["lti:ags:publish-score:errors:score-given-must-be-number"] =
   "A pontuação precisa ser um número.";
@@ -337,3 +334,6 @@ ptBR["lti:ags:publish-score:submission-timestamp-is-outdated"] =
   "Essa pontuação está desatualizada.";
 
 ptBR["lti:ags:score-not-found"] = "Não foi possível encontrar a pontuação solicitada.";
+
+ptBR["lti:ags:results-container:errors:user-id-must-be-uuid"] =
+  "O ID do usuário precisa ser um UUID válido.";
