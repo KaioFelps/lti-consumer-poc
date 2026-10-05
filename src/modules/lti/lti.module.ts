@@ -69,12 +69,24 @@ import { LtiToolsController } from "./tools/tools.controller";
     },
     {
       provide: LtiScoreServices,
-      inject: [Platform, LtiScoresRepository, LtiToolsDeploymentsRepository],
+      inject: [
+        Platform,
+        LtiScoresRepository,
+        LtiToolsDeploymentsRepository,
+        LtiLineItemsRepository,
+      ],
       useFactory: (
         platform: Platform,
         scoresRepository: LtiScoresRepository,
         deploymentsRepository: LtiToolsDeploymentsRepository,
-      ) => new LtiScoreServices(platform, scoresRepository, deploymentsRepository),
+        lineItemsRepository: LtiLineItemsRepository,
+      ) =>
+        new LtiScoreServices(
+          platform,
+          scoresRepository,
+          deploymentsRepository,
+          lineItemsRepository,
+        ),
     },
     {
       provide: LtiLaunchServices,

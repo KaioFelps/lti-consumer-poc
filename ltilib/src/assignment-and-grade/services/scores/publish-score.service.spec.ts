@@ -9,6 +9,7 @@ import { createMinimalLineItem } from "ltilib/tests/common/factories/line-item.f
 import { createPlatform } from "ltilib/tests/common/factories/platform.factory";
 import { createTool } from "ltilib/tests/common/factories/tool.factory";
 import { createToolDeployment } from "ltilib/tests/common/factories/tool-deployment.factory";
+import { InMemoryLtiLineItemsRepository } from "ltilib/tests/common/in-memory-repositories/line-items.repository";
 import { InMemoryLtiScoresRepository } from "ltilib/tests/common/in-memory-repositories/scores-repository";
 import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
 import { InvalidContentTypeError } from "$/advantage/errors/invalid-content-type.error";
@@ -31,19 +32,21 @@ describe("[AGS] Publish Score Service", async () => {
 
   let scoresRepo: InMemoryLtiScoresRepository;
   let deploymentsRepo: InMemoryLtiToolDeploymentsRepository;
+  let lineItemsRepo: InMemoryLtiLineItemsRepository;
 
   let sut: LtiScoreServices;
 
   beforeEach(async () => {
     platform = await createPlatform();
     deploymentsRepo = new InMemoryLtiToolDeploymentsRepository();
+    lineItemsRepo = new InMemoryLtiLineItemsRepository();
     scoresRepo = new InMemoryLtiScoresRepository();
 
     await recreateSutWithPlatform(platform);
   });
 
   async function recreateSutWithPlatform(platform: Platform) {
-    sut = new LtiScoreServices(platform, scoresRepo, deploymentsRepo);
+    sut = new LtiScoreServices(platform, scoresRepo, deploymentsRepo, lineItemsRepo);
   }
 
   const getValidCompleteLineItemUpdateArgs = () => {
@@ -52,6 +55,7 @@ describe("[AGS] Publish Score Service", async () => {
     const deployment = createToolDeployment({ context, tool });
     const lineItem = createMinimalLineItem();
 
+    lineItemsRepo.lineItems.push({ owningTool: tool, lineItem });
     deploymentsRepo.deployments.push(deployment);
 
     return { tool, context, deployment, lineItem };

@@ -52,11 +52,11 @@ export class LtiScoresController {
               lineItemId,
             }),
       ),
-      te.map((lineItemsResponse) => {
+      te.map((scoresResponse) => {
         response
-          .setHeaders(lineItemsResponse.headers)
-          .status(lineItemsResponse.httpStatusCode)
-          .send(lineItemsResponse.content);
+          .setHeaders(scoresResponse.headers)
+          .status(scoresResponse.httpStatusCode)
+          .send(scoresResponse.content);
       }),
       te.mapLeft((error) => {
         throw ExtendedExceptionsFactory.fromError(resolveTimestampsErrors(error));

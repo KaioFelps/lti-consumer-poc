@@ -2,12 +2,17 @@ import { either as e, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { ILtiScore, LtiLineItem, LtiScore } from "$/assignment-and-grade/entities";
-import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors";
-import { LtiScoresRepository } from "$/assignment-and-grade/repositories";
+import {
+  InaccessibleLineItemError,
+  MissingPlatformAgsConfigurationError,
+} from "$/assignment-and-grade/errors";
+import { LtiLineItemsRepository, LtiScoresRepository } from "$/assignment-and-grade/repositories";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
+import { Context } from "$/core/context";
 import { HttpResponseWrapper } from "$/core/http/response-wrapper";
 import { Platform } from "$/core/platform";
 import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
+import { LtiTool } from "$/core/tool";
 import { AGSExecutorParams, AGServiceBase, AGServicesExecutor } from "..";
 
 type PublishScoreServiceParams = {
@@ -15,6 +20,8 @@ type PublishScoreServiceParams = {
   scoreGiven?: number | undefined;
   scoreMaximum?: number | undefined;
   comment?: string | null;
+  context: Context<unknown>;
+  tool: LtiTool;
 } & Omit<ILtiScore, "score" | "comment">;
 
 /**
@@ -24,11 +31,16 @@ type PublishScoreServiceParams = {
  * @internal
  */
 class PublishService extends AGServiceBase {
-  public constructor(private readonly scoresRepository: LtiScoresRepository) {
+  public constructor(
+    private readonly scoresRepository: LtiScoresRepository,
+    private readonly lineItemsRepository: LtiLineItemsRepository,
+  ) {
     super();
   }
 
   public execute({
+    tool,
+    context,
     lineItemId,
     userId,
     scoreGiven,
@@ -37,6 +49,7 @@ class PublishService extends AGServiceBase {
   }: PublishScoreServiceParams) {
     return pipe(
       te.Do,
+      te.chainFirstW(() => this.ensureToolCanPublishToLineItem(tool, lineItemId, context)),
       te.bindW("score", () =>
         pipe(
           LtiScore.create({
@@ -56,6 +69,23 @@ class PublishService extends AGServiceBase {
         () => new HttpResponseWrapper<undefined, undefined>(undefined, 204, undefined, undefined),
       ),
     )();
+  }
+
+  private ensureToolCanPublishToLineItem(
+    tool: LtiTool,
+    lineItemId: LtiLineItem["id"],
+    context: Context<unknown>,
+  ) {
+    return pipe(
+      () => this.lineItemsRepository.findById(lineItemId, context),
+      te.mapLeft((error) =>
+        error.type === "ExternalError" ? error : new InaccessibleLineItemError(lineItemId),
+      ),
+      te.chainEitherKW((lineItem) => {
+        if (lineItem.isAccessibleToTool(tool)) return e.right(lineItem);
+        return e.left(new InaccessibleLineItemError(lineItem.id));
+      }),
+    );
   }
 
   private findExistingScore(lineItemId: LtiLineItem["id"], userId: string) {
@@ -85,9 +115,10 @@ export class LtiScoreServices<CustomContextType extends string = never> extends 
     private readonly platform: Platform,
     scoresRepository: LtiScoresRepository,
     deploymentsRepo: LtiToolDeploymentsRepository,
+    lineItemsRepository: LtiLineItemsRepository,
   ) {
     super(deploymentsRepo);
-    this.publishService = new PublishService(scoresRepository);
+    this.publishService = new PublishService(scoresRepository, lineItemsRepository);
   }
 
   public async publish(params: AGSExecutorParams<PublishScoreServiceParams, CustomContextType>) {

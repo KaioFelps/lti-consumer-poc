@@ -19,7 +19,7 @@ import { Instructor } from "@/modules/courses-and-enrollments/entities/instructo
 import { Routes } from "@/routes";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { LtiScoreServices } from "$/assignment-and-grade";
-import { LtiLineItem, LtiScore } from "$/assignment-and-grade/entities";
+import { LtiScore } from "$/assignment-and-grade/entities";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { ScoreDTO } from "../dtos/score.dto";
 
@@ -436,36 +436,32 @@ describe("[e2e::LTI] Publish Score", async () => {
   );
 
   it("should not let a tool publish a score to a line item that doesn't belong to it", async () => {
-    const lineItemsToDelete: LtiLineItem[] = [];
-
-    const { courseContext, lineItem, tool } = await getValidItems();
-    lineItemsToDelete.push(lineItem);
-    lineItemsToDelete.push(
-      await ltiLineItemFactory.createAndPersist(drizzle, {
-        owningToolId: tool.id,
-        context: courseContext,
-      }),
-    );
-
-    const differentTool = await ltiToolFactory.createAndPersist(drizzle, {
-      scopes: [AssignmentAndGradeServiceScopes.Lineitem],
+    const { courseContext, lineItem, student } = await getValidItems();
+    const tool = await ltiToolFactory.createAndPersist(drizzle, {
+      scopes: [AssignmentAndGradeServiceScopes.Score, AssignmentAndGradeServiceScopes.Lineitem],
     });
-
     await deploymentFactory.createAndPersist(drizzle, {
-      tool: differentTool,
       context: courseContext,
+      tool,
     });
+    const { accessToken } = await getToolAndItsOidcAccessToken(app, tool);
+    const timestamp = new Date();
 
-    const { accessToken } = await getToolAndItsOidcAccessToken(app, differentTool);
+    const response = await request(app.getHttpServer())
+      .post(Routes.lti.ags.scores.publish(courseContext.id, lineItem.id.toString()))
+      .set("content-type", LtiAdvantageMediaType.Score)
+      .set("authorization", `Bearer ${accessToken}`)
+      .send({
+        activityProgress: LtiScore.ActivityProgress.Initialized,
+        gradingProgress: LtiScore.GradingProgress.NotReady,
+        userId: student.getUser().getId().toString(),
+        timestamp: timestamp.toISOString(),
+      } satisfies ClassProperties<ScoreDTO>)
+      .expect(404);
 
-    for (const lineItem of lineItemsToDelete) {
-      await request(app.getHttpServer())
-        .delete(Routes.lti.ags.lineitems.instance(courseContext.id, lineItem.id.toString()))
-        .set("authorization", `Bearer ${accessToken}`)
-        .expect(200);
-    }
+    console.log(response.body);
 
-    const existingLineItems = await drizzle.getClient().query.ltiLineItemsT.findMany();
-    expect(existingLineItems.length, "it should not have deleted the line item").toBe(2);
+    const scoresInDb = await drizzle.getClient().query.ltiScoresT.findMany();
+    expect(scoresInDb).toHaveLength(0);
   });
 });
