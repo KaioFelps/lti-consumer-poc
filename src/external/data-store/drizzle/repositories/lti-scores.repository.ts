@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ltiScoresT } from "drizzle/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNotNull, sql } from "drizzle-orm";
 import { either as e, taskEither as te } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
@@ -9,6 +9,7 @@ import { ScoreNotFoundError } from "@/modules/lti/ags/errors/score-not-found.err
 import { LtiLineItem, LtiScore } from "$/assignment-and-grade/entities";
 import { LtiScoresRepository } from "$/assignment-and-grade/repositories";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
+import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
 import { DrizzleClient } from "../client";
 import scoresMapper from "../mappers/scores.mapper";
 import { DrizzleTransactionManager } from "../transaction-manager";
@@ -90,6 +91,68 @@ export class DrizzleLtiScoresRepository extends LtiScoresRepository {
           }),
       ),
       te.map(() => undefined),
+    )();
+  }
+
+  public fetchManyByLineItemId(
+    lineItemId: LtiLineItem["id"],
+    limit: number,
+    page: number,
+  ): Promise<Either<LtiRepositoryError, LtiRepositoryPaginatedResponse<LtiScore>>> {
+    const client = this.transactionManager.getTx() ?? this.drizzle.getClient();
+    const offset = (page - 1) * limit;
+    lineItemId = lineItemId.toString();
+
+    // unscored records (scoreGiven being `undefined` or `null`) are excluded from
+    // both the page's records and the count, so pagination stays consistent once callers
+    // apply their own security filter against unscored results downstream.
+    //
+    // this is stated in the method's docstring
+    const where = and(eq(ltiScoresT.lineItemId, lineItemId), isNotNull(ltiScoresT.scoreGiven));
+
+    return pipe(
+      te.Do,
+      te.bindW("scores", () =>
+        te.tryCatch(
+          () =>
+            client.query.ltiScoresT.findMany({
+              ...scoresMapper.requiredQueryConfig,
+              where,
+              limit,
+              offset,
+            }),
+          (error) =>
+            new LtiRepositoryError({
+              type: "ExternalError",
+              cause: new IrrecoverableError(
+                `Error occurred in ${DrizzleLtiScoresRepository.name} when fetching scores for line item "${lineItemId}".`,
+                error as Error,
+              ),
+            }),
+        ),
+      ),
+      te.bindW("count", () =>
+        te.tryCatch(
+          async () => {
+            const result = await client
+              .select({ count: sql<number>`count(*)` })
+              .from(ltiScoresT)
+              .where(where);
+
+            return Number(result[0]?.count ?? 0);
+          },
+          (error) =>
+            new LtiRepositoryError({
+              type: "ExternalError",
+              cause: new IrrecoverableError(
+                `Error occurred in ${DrizzleLtiScoresRepository.name} when counting scores for line item "${lineItemId}".`,
+                error as Error,
+              ),
+            }),
+        ),
+      ),
+      te.let("mappedScores", ({ scores }) => scores.map((row) => scoresMapper.fromRow(row))),
+      te.map(({ mappedScores, count }) => ({ values: mappedScores, count })),
     )();
   }
 }
