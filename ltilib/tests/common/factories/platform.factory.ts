@@ -37,6 +37,10 @@ export function createPlatformAgsConfiguration({
   deadlinesEnabled,
   lineItemEndpoint,
   lineItemsContainerEndpoint,
+  resultEndpoint,
+  resultsContainerEndpoint,
+  authorizeServicesClaim,
+  pickAllowedScopes,
   baseUrl,
 }: CreatePlatformAgsConfigurationConstructorArgs = {}) {
   baseUrl ??= new URL(faker.internet.url({ protocol: "https" }));
@@ -46,11 +50,24 @@ export function createPlatformAgsConfiguration({
 
   lineItemsContainerEndpoint ??= (context) => new URL(`/context/${context.id}/lineitems`, baseUrl);
 
-  return Platform.LtiAssignmentAndGradeServicesConfig.create({
+  resultEndpoint ??= (context, lineItemId, userId) =>
+    new URL(`/context/${context.id}/lineitems/${lineItemId}/results/${userId}`, baseUrl);
+
+  resultsContainerEndpoint ??= (context, lineItemId) =>
+    new URL(`/context/${context.id}/lineitems/${lineItemId}/results`, baseUrl);
+
+  const params = {
     lineItemEndpoint,
     lineItemsContainerEndpoint,
-    deadlinesEnabled,
-  });
+    resultEndpoint,
+    resultsContainerEndpoint,
+  } as Parameters<typeof Platform.LtiAssignmentAndGradeServicesConfig.create>[0];
+
+  if (deadlinesEnabled !== undefined) params.deadlinesEnabled = deadlinesEnabled;
+  if (authorizeServicesClaim !== undefined) params.authorizeServicesClaim = authorizeServicesClaim;
+  if (pickAllowedScopes !== undefined) params.pickAllowedScopes = pickAllowedScopes;
+
+  return Platform.LtiAssignmentAndGradeServicesConfig.create(params);
 }
 
 type CreatePlatformConstructorArgs = Partial<NullifyUndefined<IPlatform>>;
