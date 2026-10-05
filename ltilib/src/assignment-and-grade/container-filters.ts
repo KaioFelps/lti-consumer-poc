@@ -35,3 +35,25 @@ export type LineItemsContainerFilters = {
    */
   page: number;
 };
+
+export type ResultsContainerFilters = {
+  /**
+   * Restricts the results to be returned to the one that belongs to
+   * the user identified by `userId`.
+   *
+   * @note Must be extracted from query parameters under `user_id` key.
+   */
+  userId: string | undefined;
+  /**
+   * Restricts the amount of scores returned to `limit`.
+   *
+   * @note Must be extracted from query parameters under `limit` key.
+   */
+  limit: number | undefined;
+  /**
+   * The current (1-based indexing) page of the result container with given `filters`.
+   *
+   * @note Must be extracted from query parameters under the `page` key.
+   */
+  page: number;
+};
