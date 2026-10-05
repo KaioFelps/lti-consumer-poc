@@ -4,7 +4,7 @@ import { AuthModule } from "@/modules/auth/auth.module";
 import { IdentityModule } from "@/modules/identity/identity.module";
 import { OIDCModule } from "@/modules/oidc/oidc.module";
 import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
-import { LtiScoreServices } from "$/assignment-and-grade";
+import { LtiResultServices, LtiScoreServices } from "$/assignment-and-grade";
 import { LtiScoresRepository } from "$/assignment-and-grade/repositories";
 import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
 import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim";
@@ -22,6 +22,7 @@ import { FindContextByIdService } from "./advantage/context/services/find-contex
 import { LtiContextsRepository } from "./advantage/repositories/lti-contexts.repository";
 import { LtiAssignmentsController } from "./ags/controllers/lti-assignments.controller";
 import { LtiLineItemsController } from "./ags/controllers/lti-line-items";
+import { LtiResultsController } from "./ags/controllers/lti-results.controller";
 import { LtiScoresController } from "./ags/controllers/lti-scores.controller";
 import { CreateCourseContextService } from "./ags/services/create-course-context.service";
 import { CreateExternalLtiAssignmentService } from "./ags/services/create-external-lti-assignment.service";
@@ -162,6 +163,15 @@ import { LtiToolsController } from "./tools/tools.controller";
       ],
     },
     CreateCourseContextService,
+    {
+      provide: LtiResultServices,
+      inject: [Platform, LtiScoresRepository, LtiToolsDeploymentsRepository],
+      useFactory: (
+        platform: Platform,
+        scoresRepository: LtiScoresRepository,
+        deploymentsRepository: LtiToolsDeploymentsRepository,
+      ) => new LtiResultServices(platform, scoresRepository, deploymentsRepository),
+    },
   ],
   exports: [LtiLaunchServices, Platform, CreateCourseContextService],
   controllers: [
@@ -173,6 +183,7 @@ import { LtiToolsController } from "./tools/tools.controller";
     LtiAssignmentsController,
     LtiLineItemsController,
     LtiScoresController,
+    LtiResultsController,
   ],
 })
 export class LtiModule implements NestModule {
