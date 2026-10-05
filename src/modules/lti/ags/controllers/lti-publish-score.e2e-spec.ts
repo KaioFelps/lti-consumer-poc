@@ -447,7 +447,7 @@ describe("[e2e::LTI] Publish Score", async () => {
     const { accessToken } = await getToolAndItsOidcAccessToken(app, tool);
     const timestamp = new Date();
 
-    const response = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .post(Routes.lti.ags.scores.publish(courseContext.id, lineItem.id.toString()))
       .set("content-type", LtiAdvantageMediaType.Score)
       .set("authorization", `Bearer ${accessToken}`)
@@ -458,8 +458,6 @@ describe("[e2e::LTI] Publish Score", async () => {
         timestamp: timestamp.toISOString(),
       } satisfies ClassProperties<ScoreDTO>)
       .expect(404);
-
-    console.log(response.body);
 
     const scoresInDb = await drizzle.getClient().query.ltiScoresT.findMany();
     expect(scoresInDb).toHaveLength(0);

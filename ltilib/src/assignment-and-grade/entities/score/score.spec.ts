@@ -126,7 +126,6 @@ describe("[AGS] Scores domain's rules", () => {
       it("should be kept it if it's null", () => {
         const currentScore = scoreFactory.createScore({ comment: "bar" });
         const newScore = scoreFactory.createScore({ comment: null });
-        console.log(newScore);
         assert(e.isRight(currentScore.update(newScore)));
         expect(currentScore.comment).toBe("bar");
       });
