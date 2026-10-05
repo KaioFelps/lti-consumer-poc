@@ -1,4 +1,4 @@
-import { taskEither as te } from "fp-ts";
+import { either as e, taskEither as te } from "fp-ts";
 import { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import guards from "$/advantage/guards";
@@ -8,6 +8,9 @@ import { Context } from "$/core/context";
 import { Platform } from "$/core/platform";
 import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
 import { LtiTool } from "$/core/tool";
+import { LtiLineItem } from "../entities";
+import { InaccessibleLineItemError } from "../errors";
+import { LtiLineItemsRepository } from "../repositories";
 
 type BasicRequestValidationParams<CustomContextType = never> = {
   tool: LtiTool;
@@ -20,10 +23,29 @@ export type AGSExecutorParams<T, CustomContextType = never> = T &
   BasicRequestValidationParams<CustomContextType>;
 
 export abstract class AGServiceBase<Params = unknown, ReturnType = unknown, ErrorsType = unknown> {
+  public constructor(protected lineItemsRepository: LtiLineItemsRepository) {}
+
   public abstract execute(params: Params): Promise<Either<ErrorsType, ReturnType>>;
   public abstract getRequiredScopes(): readonly AssignmentAndGradeServiceScopes[] | undefined;
   public abstract getRequiredAcceptHeader(): Readonly<LtiAdvantageMediaType> | undefined;
   public abstract getRequiredContentType(): Readonly<LtiAdvantageMediaType> | undefined;
+
+  protected ensureToolHasAccessToLineItem(
+    lineItemId: LtiLineItem["id"],
+    tool: LtiTool,
+    context: Context<unknown>,
+  ) {
+    return pipe(
+      () => this.lineItemsRepository.findById(lineItemId, context),
+      te.mapLeft((error) =>
+        error.type === "ExternalError" ? error : new InaccessibleLineItemError(lineItemId),
+      ),
+      te.chainEitherKW((lineItem) => {
+        if (lineItem.isAccessibleToTool(tool)) return e.right(lineItem);
+        return e.left(new InaccessibleLineItemError(lineItem.id));
+      }),
+    );
+  }
 
   protected getResolvedDates(
     config: Platform.LtiAssignmentAndGradeServicesConfig,

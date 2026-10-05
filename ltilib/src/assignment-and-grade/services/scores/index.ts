@@ -2,10 +2,7 @@ import { either as e, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { LtiAdvantageMediaType } from "$/advantage/media-types";
 import { ILtiScore, LtiLineItem, LtiScore } from "$/assignment-and-grade/entities";
-import {
-  InaccessibleLineItemError,
-  MissingPlatformAgsConfigurationError,
-} from "$/assignment-and-grade/errors";
+import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors";
 import { LtiLineItemsRepository, LtiScoresRepository } from "$/assignment-and-grade/repositories";
 import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { Context } from "$/core/context";
@@ -33,9 +30,9 @@ type PublishScoreServiceParams = {
 class PublishService extends AGServiceBase {
   public constructor(
     private readonly scoresRepository: LtiScoresRepository,
-    private readonly lineItemsRepository: LtiLineItemsRepository,
+    lineItemsRepository: LtiLineItemsRepository,
   ) {
-    super();
+    super(lineItemsRepository);
   }
 
   public execute({
@@ -49,7 +46,7 @@ class PublishService extends AGServiceBase {
   }: PublishScoreServiceParams) {
     return pipe(
       te.Do,
-      te.chainFirstW(() => this.ensureToolCanPublishToLineItem(tool, lineItemId, context)),
+      te.chainFirstW(() => this.ensureToolHasAccessToLineItem(lineItemId, tool, context)),
       te.bindW("score", () =>
         pipe(
           LtiScore.create({
@@ -69,23 +66,6 @@ class PublishService extends AGServiceBase {
         () => new HttpResponseWrapper<undefined, undefined>(undefined, 204, undefined, undefined),
       ),
     )();
-  }
-
-  private ensureToolCanPublishToLineItem(
-    tool: LtiTool,
-    lineItemId: LtiLineItem["id"],
-    context: Context<unknown>,
-  ) {
-    return pipe(
-      () => this.lineItemsRepository.findById(lineItemId, context),
-      te.mapLeft((error) =>
-        error.type === "ExternalError" ? error : new InaccessibleLineItemError(lineItemId),
-      ),
-      te.chainEitherKW((lineItem) => {
-        if (lineItem.isAccessibleToTool(tool)) return e.right(lineItem);
-        return e.left(new InaccessibleLineItemError(lineItem.id));
-      }),
-    );
   }
 
   private findExistingScore(lineItemId: LtiLineItem["id"], userId: string) {
