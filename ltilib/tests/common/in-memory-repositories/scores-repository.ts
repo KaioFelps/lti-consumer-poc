@@ -3,6 +3,7 @@ import { Either } from "fp-ts/lib/Either";
 import { LtiLineItem, LtiScore } from "$/assignment-and-grade/entities";
 import { LtiScoresRepository } from "$/assignment-and-grade/repositories";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
+import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
 
 export class InMemoryLtiScoresRepository extends LtiScoresRepository {
   public scores: Array<{ score: LtiScore; lineItemId: string }> = [];
@@ -38,5 +39,16 @@ export class InMemoryLtiScoresRepository extends LtiScoresRepository {
 
     this.scores = [...newRows, { score, lineItemId: lineItemId.toString() }];
     return e.right(undefined);
+  }
+
+  public async fetchManyByLineItemId(
+    lineItemId: LtiLineItem["id"],
+    limit: number,
+    page: number,
+  ): Promise<Either<LtiRepositoryError, LtiRepositoryPaginatedResponse<LtiScore>>> {
+    const offset = (page - 1) * limit;
+    const scoresFound = this.scores.filter((score) => score.lineItemId === lineItemId.toString());
+    const scores = scoresFound.map(({ score }) => score).slice(offset, offset + limit);
+    return e.right({ values: scores, count: scoresFound.length });
   }
 }
