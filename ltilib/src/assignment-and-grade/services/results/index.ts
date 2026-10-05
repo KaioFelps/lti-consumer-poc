@@ -42,7 +42,7 @@ type FetchResultsServiceParams = {
 
 /**
  * Do not use this service. It lacks important checks. Use
- * {@link LtiResultsServices.fetchResults `LtiScoreServices.fetchResults`} instead.
+ * {@link LtiResultServices.fetchResults `LtiScoreServices.fetchResults`} instead.
  *
  * @internal
  */
@@ -210,7 +210,7 @@ class FetchResultsService extends AGServiceBase {
   }
 }
 
-export class LtiResultsServices<
+export class LtiResultServices<
   CustomContextType extends string = never,
 > extends AGServicesExecutor {
   private readonly fetchService: FetchResultsService;

@@ -26,20 +26,20 @@ import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
 import { Context } from "$/core/context";
 import { Platform } from "$/core/platform";
 import { LtiTool } from "$/core/tool";
-import { LtiResultsServices } from ".";
+import { LtiResultServices } from ".";
 
 describe("[AGS] Fetch Results Service", async () => {
   let platform: Platform;
   let scoresRepo: InMemoryLtiScoresRepository;
   let deploymentsRepo: InMemoryLtiToolDeploymentsRepository;
 
-  let sut: LtiResultsServices;
+  let sut: LtiResultServices;
 
   beforeEach(async () => {
     platform = await createPlatform();
     scoresRepo = new InMemoryLtiScoresRepository();
     deploymentsRepo = new InMemoryLtiToolDeploymentsRepository();
-    sut = new LtiResultsServices(platform, scoresRepo, deploymentsRepo);
+    sut = new LtiResultServices(platform, scoresRepo, deploymentsRepo);
   });
 
   function getEntities({
