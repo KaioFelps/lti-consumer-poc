@@ -127,7 +127,11 @@ a menos que um contexto seja passado na hora de realizar o lançamento. Isso imp
 de lançamento de atividades.
 
 ## Implementando Scores
-Scores são armazenados como modelos simples no banco de dados. Não foi implementado nenhuma espécie de histórico, e
-todos os scores recebidos substituem o anterior — diferente
-da possibilidade de persistir somente os scores finais, como
-sugerido pela especificação.
+Scores são armazenados como modelos simples no banco de dados. Não foi implementado nenhuma espécie de
+histórico, e todos os scores (válidos) recebidos substituem o anterior — diferente da possibilidade de
+persistir somente os scores finais, como sugerido pela especificação.
+
+## Implementando Results
+Os resultados são extraídos dos próprios scores. Nada houve de ser feito senão implementar o método do
+repositório de scores utilizado pelo serviço de resultados — e a integração com os controllers do Nest.js,
+claro.
