@@ -80,10 +80,14 @@ export class LtilibExceptionFilter implements ExceptionFilter {
       return;
     }
 
-    assert(
-      error instanceof LtilibError,
-      "Tried to wrap a non-ltilib error with `LtilibException`. Watch out.",
-    );
+    if (!(error instanceof LtilibError)) {
+      throw new IrrecoverableException(
+        new IrrecoverableError(
+          "Tried to wrap a non-ltilib error with `LtilibException`. Watch out.",
+          error as unknown as Error,
+        ),
+      );
+    }
 
     const adaptedError = new BaseErrorLtilibAdapter(error);
     const baseException = new BaseException(adaptedError, error.httpStatusCode);
