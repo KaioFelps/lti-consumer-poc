@@ -8,7 +8,7 @@ import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-
 
 const schema = z.object(
   {
-    scoreMaximum: z
+    scoreMaximum: z.coerce
       .number("lti:ags:create-line-item:errors:score-maximum-must-be-number")
       .positive("lti:ags:create-line-item:errors:score-maximum-must-be-positive"),
     label: z.string("lti:ags:create-line-item:errors:label-is-required").nonempty(),

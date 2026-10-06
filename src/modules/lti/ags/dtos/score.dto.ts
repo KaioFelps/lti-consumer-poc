@@ -9,11 +9,11 @@ import { LtiScore } from "$/assignment-and-grade/entities";
 
 const schema = z.object(
   {
-    scoreGiven: z
+    scoreGiven: z.coerce
       .number("lti:ags:publish-score:errors:score-given-must-be-number")
       .nonnegative("lti:ags:publish-score:errors:score-given-must-be-non-negative")
       .optional(),
-    scoreMaximum: z
+    scoreMaximum: z.coerce
       .number("lti:ags:publish-score:errors:score-maximum-must-be-number")
       .positive("lti:ags:publish-score:errors:score-maximum-must-be-positive")
       .optional(),
