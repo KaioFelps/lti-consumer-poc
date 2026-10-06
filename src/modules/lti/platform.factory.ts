@@ -74,6 +74,7 @@ export class PlatformFactory {
           ),
 
         deadlinesEnabled: { end: true, start: true },
+        strictTimestampValidation: false,
       }),
     });
   }
