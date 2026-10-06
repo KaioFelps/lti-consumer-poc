@@ -35,4 +35,11 @@ describe("[AGS] Score timestamps validateIso8601 helper", () => {
       expect(result).toEqual(e.left("invalid_datetime"));
     },
   );
+
+  it("should skip sub-second precision validation when strictMode is false", () => {
+    // valid ISO 8601 but lacks sub-second precision
+    const input = "2024-05-10T12:00:00Z";
+    const result = validateLtiIso8601AndPreciseTimestamp(input, { strictMode: false });
+    expect(result).toEqual(e.right(new Date(input)));
+  });
 });

@@ -29,6 +29,7 @@ type PublishScoreServiceParams = {
  */
 class PublishService extends AGServiceBase {
   public constructor(
+    private readonly platform: Platform,
     private readonly scoresRepository: LtiScoresRepository,
     lineItemsRepository: LtiLineItemsRepository,
   ) {
@@ -44,16 +45,20 @@ class PublishService extends AGServiceBase {
     scoreMaximum,
     ...scorePayload
   }: PublishScoreServiceParams) {
+    const strictTimestampValidation = this.platform.agsConfiguration?.strictTimestampValidation;
     return pipe(
       te.Do,
       te.chainFirstW(() => this.ensureToolHasAccessToLineItem(lineItemId, tool, context)),
       te.bindW("score", () =>
         pipe(
-          LtiScore.create({
-            ...scorePayload,
-            userId,
-            score: { given: scoreGiven, maximum: scoreMaximum },
-          }),
+          LtiScore.create(
+            {
+              ...scorePayload,
+              userId,
+              score: { given: scoreGiven, maximum: scoreMaximum },
+            },
+            { strictTimestampValidation },
+          ),
           te.fromEither,
         ),
       ),
@@ -98,7 +103,7 @@ export class LtiScoreServices<CustomContextType extends string = never> extends 
     lineItemsRepository: LtiLineItemsRepository,
   ) {
     super(deploymentsRepo);
-    this.publishService = new PublishService(scoresRepository, lineItemsRepository);
+    this.publishService = new PublishService(platform, scoresRepository, lineItemsRepository);
   }
 
   public async publish(params: AGSExecutorParams<PublishScoreServiceParams, CustomContextType>) {

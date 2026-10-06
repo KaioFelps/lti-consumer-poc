@@ -101,6 +101,10 @@ type ILtiScoreConstructorArgs = Omit<ILtiScore, "score" | "comment"> & {
   comment?: string | undefined | null;
 };
 
+type Options = {
+  strictTimestampValidation?: boolean;
+};
+
 export class LtiScore implements ILtiScore {
   private parameters: CustomParameters = new CustomParameters();
   /**
@@ -147,15 +151,28 @@ export class LtiScore implements ILtiScore {
     return lineItem;
   }
 
-  public static create(props: ILtiScoreConstructorArgs) {
+  public static create(
+    props: ILtiScoreConstructorArgs,
+    { strictTimestampValidation }: Options = {},
+  ) {
     return pipe(
       e.Do,
-      e.bindW("timestamp", () => LtiScore.validateTimestamp(props.timestamp, "timestamp")),
+      e.bindW("timestamp", () =>
+        LtiScore.validateTimestamp(props.timestamp, "timestamp", strictTimestampValidation),
+      ),
       e.bindW("startedAt", () =>
-        LtiScore.validateTimestamp(props.submission?.startedAt, "submission.startedAt"),
+        LtiScore.validateTimestamp(
+          props.submission?.startedAt,
+          "submission.startedAt",
+          strictTimestampValidation,
+        ),
       ),
       e.bindW("submittedAt", () =>
-        LtiScore.validateTimestamp(props.submission?.submittedAt, "submission.submittedAt"),
+        LtiScore.validateTimestamp(
+          props.submission?.submittedAt,
+          "submission.submittedAt",
+          strictTimestampValidation,
+        ),
       ),
       e.let("comment", () => props.comment ?? undefined),
       e.bindW("score", () => LtiScore.validateScores(props.score)),
@@ -247,12 +264,13 @@ export class LtiScore implements ILtiScore {
   private static validateTimestamp<T extends Date | string | undefined>(
     timestamp: T,
     field: InvalidScoreArgumentError.Fields,
+    strictMode: boolean | undefined,
   ): Either<InvalidScoreArgumentError, T extends undefined ? Date | undefined : Date> {
     if (timestamp === undefined)
       return e.right(undefined as T extends undefined ? undefined : Date);
 
     return pipe(
-      validateLtiIso8601AndPreciseTimestamp(timestamp),
+      validateLtiIso8601AndPreciseTimestamp(timestamp, { strictMode }),
       e.mapLeft((reason) => new InvalidScoreArgumentError(field, reason)),
     );
   }

@@ -85,6 +85,14 @@ interface ILtiAssignmentAndGradeServicesConfig {
     context: Context<unknown>;
     deploymentId: LtiToolDeployment["id"];
   }) => Promise<AssignmentAndGradeServiceScopes[]>;
+  /**
+   * Whether timestamp fields should have strict validation per LTI AGS specs.
+   * When `false`, it performs a relaxed validation and allows datetime strings
+   * that doesn't have sub-second precision.
+   *
+   * @default true
+   */
+  strictTimestampValidation?: boolean;
 }
 
 /**
@@ -119,6 +127,8 @@ export class LtiAssignmentAndGradeServicesConfig implements ILtiAssignmentAndGra
       ASSIGNMENT_AND_GRADE_SERVICES_SCOPES.includes(scope as AssignmentAndGradeServiceScopes),
     ) as AssignmentAndGradeServiceScopes[];
   };
+
+  public readonly strictTimestampValidation: boolean = true;
 
   private constructor(args: ILtiAssignmentAndGradeServicesConfig) {
     Object.assign(this, args);

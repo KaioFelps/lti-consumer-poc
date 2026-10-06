@@ -135,3 +135,15 @@ persistir somente os scores finais, como sugerido pela especificação.
 Os resultados são extraídos dos próprios scores. Nada houve de ser feito senão implementar o método do
 repositório de scores utilizado pelo serviço de resultados — e a integração com os controllers do Nest.js,
 claro.
+
+## Validações de timestamp
+A validação de campos de data e hora foram feitas seguindo estritamente o que especifica o LTI AGS:
+- deve ter um designador de fuso horário;
+- deve ter precisão de sub-segundos;
+- deve ser conformante com o ISO 8601.
+
+No entanto, como o Moodle não envia valores de data e hora conformantes com a especificação — embora
+seja certificado pela 1EdTech Consortium —, uma opção de `strictMode` teve que ser introduzida nas
+configurações da classe `Platform` e direcionada até chegar na função validadora de timestamps,
+permitindo que essa validação mais rigorosa seja desabilitada se a plataforma cliente desejar — por
+exemplo, se ela precisar suportar o Moodle.

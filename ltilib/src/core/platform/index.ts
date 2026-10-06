@@ -46,10 +46,10 @@ export class Platform implements IPlatform {
    */
   public readonly resolvedOpenIdConfiguration: object;
 
-  public readonly jsonWebKey: JWK;
-  public readonly initiateLaunchEndpoint: IPlatform["initiateLaunchEndpoint"];
+  public readonly jsonWebKey!: JWK;
+  public readonly initiateLaunchEndpoint!: IPlatform["initiateLaunchEndpoint"];
   public readonly instance?: Platform.Instance | undefined;
-  public readonly openIdConfiguration: Platform.OpenIdConfiguration;
+  public readonly openIdConfiguration!: Platform.OpenIdConfiguration;
   public readonly agsConfiguration?: Platform.LtiAssignmentAndGradeServicesConfig;
 
   protected constructor(args: IPlatform) {
