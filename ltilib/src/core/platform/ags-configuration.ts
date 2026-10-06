@@ -88,7 +88,7 @@ interface ILtiAssignmentAndGradeServicesConfig {
   /**
    * Whether timestamp fields should have strict validation per LTI AGS specs.
    * When `false`, it performs a relaxed validation and allows datetime strings
-   * that doesn't have sub-second precision.
+   * that don't have sub-second precision.
    *
    * @default true
    */
