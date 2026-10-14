@@ -1,4 +1,5 @@
-import type * as schema from "drizzle/schema";
+import { type UUID } from "common/src/types/uuid";
+import * as schema from "drizzle/schema";
 import {
   type BuildQueryResult,
   type DBQueryConfig,
@@ -33,8 +34,38 @@ function fromRow(row: GradeRow): Grade {
   return pipe(row, trimNullProperties, Grade.createUnchecked);
 }
 
+type ScoresQueryConfig = DBQueryConfig<"many", boolean, Schema, Schema["ltiScoresT"]>;
+
+type ScoreRow = BuildQueryResult<Schema, Schema["ltiScoresT"], typeof ltiScoreRequiredQueryConfig>;
+
+const ltiScoreRequiredQueryConfig = {
+  with: {
+    student: { columns: { id: true } },
+    lineItem: {
+      with: { ltiAssignment: { columns: { assignmentId: true } } },
+      columns: { gradesReleased: true, id: true },
+    },
+  },
+} as const satisfies ScoresQueryConfig;
+
+function fromLtiScoreRow(assignmentId: UUID, courseId: UUID, row: ScoreRow): Grade {
+  return Grade.createUnchecked({
+    assignmentId,
+    courseId,
+    gradedAt: new Date(row.submittedAt ?? row.timestamp),
+    score: row.scoreGiven!,
+    maxScore: row.scoreMaximum ?? 1,
+    released: row.lineItem.gradesReleased ?? true,
+    studentId: row.userId,
+    lastUpdatedAt:
+      (row.submittedAt ?? row.timestamp) !== row.timestamp ? new Date(row.timestamp) : undefined,
+  });
+}
+
 export default {
   intoRow,
   fromRow,
+  fromLtiScoreRow,
   requiredQueryConfig,
+  ltiScoreRequiredQueryConfig,
 };
