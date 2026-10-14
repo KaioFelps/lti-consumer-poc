@@ -125,7 +125,7 @@ export class LtiAssignmentsController {
             this.findScoreDetailsService.exec({
               assignmentId: externalAssignmentRecord.assignment.getId(),
               courseId: externalAssignmentRecord.assignment.getCourseId()!,
-              studentId: user.getId(),
+              studentUser: user,
             }),
       ),
       te.chainTaskK(

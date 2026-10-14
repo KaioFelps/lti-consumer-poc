@@ -118,13 +118,13 @@ const dateFormattingOptions = {
                     %>
                     <span><%= ASSIGNMENT_GRADING_STATUS %></span>
                 </div>
-                <% if (studentAssignmentsDetails.details.gradedAt) { %>
+                <% if (studentAssignmentsDetails.details?.gradedAt) { %>
                     <div class="item">
                         <header>Primeira avaliação</header>
                         <span><%= studentAssignmentsDetails.details.gradedAt.toLocaleString("pt-BR", dateFormattingOptions) %></span>
                     </div>
                 <% } %>
-                <% if (studentAssignmentsDetails.details.lastUpdatedAt) { %>
+                <% if (studentAssignmentsDetails.details?.lastUpdatedAt) { %>
                     <div class="item">
                         <header>Último lançamento de nota</header>
                         <span><%= studentAssignmentsDetails.details.lastUpdatedAt.toLocaleString("pt-BR", dateFormattingOptions) %></span>

@@ -1,14 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import { type UUID } from "common/src/types/uuid";
-import { taskEither as te } from "fp-ts";
+import { either, taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function";
 import { GradeNotFoundError } from "@/modules/assignments-and-grades/errors/grade-not-found.error";
+import { SystemRole } from "@/modules/identity/user/enums/system-role";
+import { User } from "@/modules/identity/user/user.entity";
 import { LtiScoresRepository } from "../repositories/lti-scores.repository";
 
 type Params = {
   assignmentId: UUID;
-  studentId: UUID;
   courseId: UUID;
+  studentUser: User;
 };
 
 type Response = {
@@ -26,8 +28,11 @@ type Response = {
 export class FindStudentScoreDetailsByExternalAssignmentIdService {
   public constructor(private readonly scoresRepo: LtiScoresRepository) {}
 
-  public exec({ assignmentId, studentId, courseId }: Params) {
-    return pipe(
+  public async exec({ assignmentId, studentUser, courseId }: Params) {
+    if (studentUser.getSystemRole() !== SystemRole.User) return either.right(null);
+    const studentId = studentUser.getId();
+
+    return await pipe(
       () => this.scoresRepo.findUserScoreOnAssignment(studentId, assignmentId, courseId),
       te.map(
         (score) =>
