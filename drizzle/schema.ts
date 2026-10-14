@@ -342,6 +342,8 @@ export const ltiLineItemsT = pgTable(
     // if neither of former properties exists, the ID of the tool (that created this line item) MUST be set here
     // and checked in the line items repository
     orphanCreatingToolId: varchar("orphan_creating_tool_id").references(() => ltiTools.id),
+    // Whether an instructor has chosen this line item to represent the grades of the external LTI activity it represents.
+    manuallyChosenByInstructor: boolean("manually_chosen_by_instructor").notNull().default(false),
   },
   (table) => [
     foreignKey({

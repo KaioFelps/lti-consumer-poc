@@ -1,0 +1,1 @@
+ALTER TABLE "lti_line_items" ADD COLUMN "manually_chosen_by_instructor" boolean DEFAULT false NOT NULL;

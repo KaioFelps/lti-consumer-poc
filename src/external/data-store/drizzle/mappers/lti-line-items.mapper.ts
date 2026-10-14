@@ -64,6 +64,7 @@ function intoRow(
                 concreteContextType: null,
               }),
           orphanCreatingToolId: owningToolId,
+          manuallyChosenByInstructor: false,
         }) satisfies LtiLineItemPlainRow,
     ),
   );
