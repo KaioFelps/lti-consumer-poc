@@ -10,7 +10,9 @@ import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
 import { ExtendedExceptionsFactory } from "@/lib/exceptions/extended-exceptions.factory";
 import { Mvc } from "@/lib/mvc-routes";
 import { TranslatorService } from "@/message-string/translator.service";
+import { SessionUser } from "@/modules/auth/session-user";
 import { FindCourseByIdService } from "@/modules/courses-and-enrollments/services/find-course-by-id.service";
+import { User } from "@/modules/identity/user/user.entity";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { Platform } from "$/core/platform";
 import { presentLtiResourceLink } from "$/core/presenters/resource-link.presenter";
@@ -21,6 +23,7 @@ import { CreateExternalLtiAssignmentDto } from "../dtos/create-external-lti-assi
 import { ContextConcreteType } from "../enums/context-concrete-type";
 import { CreateExternalLtiAssignmentService } from "../services/create-external-lti-assignment.service";
 import { FindExternalLtiAssignmentByIdService } from "../services/find-external-lti-assignment-by-id.service";
+import { FindStudentScoreDetailsByExternalAssignmentIdService } from "../services/find-student-score-details-by-assignment-id.service";
 
 @Mvc()
 @Controller("lti/ags")
@@ -32,6 +35,7 @@ export class LtiAssignmentsController {
     private readonly findCourseByIdService: FindCourseByIdService,
     private readonly createExternalLtiAssignmentService: CreateExternalLtiAssignmentService,
     private readonly findExternalLtiAssignmentService: FindExternalLtiAssignmentByIdService,
+    private readonly findScoreDetailsService: FindStudentScoreDetailsByExternalAssignmentIdService,
   ) {}
 
   @Get("courses/:courseId/assignments/new")
@@ -101,7 +105,10 @@ export class LtiAssignmentsController {
 
   @Render("lti/assignments/details")
   @Get("/assignments/:assignmentId")
-  public showAssignmentDetails(@Param() { assignmentId }: ShowAssignmentsDetailsDto) {
+  public showAssignmentDetails(
+    @SessionUser() user: User,
+    @Param() { assignmentId }: ShowAssignmentsDetailsDto,
+  ) {
     return pipe(
       te.Do,
       te.apS("externalAssignmentRecord", () =>
@@ -111,18 +118,32 @@ export class LtiAssignmentsController {
         const courseId = externalAssignmentRecord.assignment.getCourseId();
         return courseId ? () => this.findCourseByIdService.exec({ courseId }) : te.right(undefined);
       }),
-      te.chainTaskK(({ course, externalAssignmentRecord }) => async () => ({
-        title: await this.t.translate("assignments:details:title", {
-          courseTitle: course?.getCourse().getTitle(),
-          assignmentTitle: externalAssignmentRecord.assignment.getTitle(),
-        }),
-        course: course ? CourseWithInstructorPresenter.present(course) : undefined,
-        assignment: AssignmentPresenter.present(externalAssignmentRecord.assignment),
-        ltiResourceLink: presentLtiResourceLink(
-          externalAssignmentRecord.resourceLink,
-          this.platform,
-        ),
-      })),
+      te.bindW(
+        "studentAssignmentsDetails",
+        ({ externalAssignmentRecord }) =>
+          () =>
+            this.findScoreDetailsService.exec({
+              assignmentId: externalAssignmentRecord.assignment.getId(),
+              courseId: externalAssignmentRecord.assignment.getCourseId()!,
+              studentId: user.getId(),
+            }),
+      ),
+      te.chainTaskK(
+        ({ course, externalAssignmentRecord, studentAssignmentsDetails }) =>
+          async () => ({
+            title: await this.t.translate("assignments:details:title", {
+              courseTitle: course?.getCourse().getTitle(),
+              assignmentTitle: externalAssignmentRecord.assignment.getTitle(),
+            }),
+            course: course ? CourseWithInstructorPresenter.present(course) : undefined,
+            assignment: AssignmentPresenter.present(externalAssignmentRecord.assignment),
+            studentAssignmentsDetails,
+            ltiResourceLink: presentLtiResourceLink(
+              externalAssignmentRecord.resourceLink,
+              this.platform,
+            ),
+          }),
+      ),
       te.getOrElse((error) => {
         const actualError = error instanceof LtiRepositoryError ? error.cause : error;
         throw ExceptionsFactory.fromError(actualError);

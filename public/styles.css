@@ -190,3 +190,22 @@ label.checkbox-item > span {
         margin-bottom: 1rem;
     }
 }
+
+.chip {
+    padding: 4px 8px;
+    font-weight: bold;
+    font-size: 14px;
+    display: inline-block;
+
+    &.success {
+        background: color-mix(in oklab, green 20%, transparent);
+    }
+
+    &.warning {
+        background: color-mix(in oklab, rgb(255, 208, 0) 30%, transparent);
+    }
+
+    &.error {
+        background: color-mix(in oklab, red 20%, transparent);
+    }
+}

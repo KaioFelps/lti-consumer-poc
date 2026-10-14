@@ -10,11 +10,26 @@ const dateFormattingOptions = {
 };
 %>
 
+<% console.log(studentAssignmentsDetails)  %>
+
 <main class="main">
     <h1><%= title %></h1>
     <a href="<%= routes.courses.view(course.id) %>"><%= await t.translate("assignments:details:buttons:back-to-course", { courseTitle: course.title }) %></a>
     <br>
 
+    <% if (studentAssignmentsDetails) { %>
+        <br>
+        <% if (studentAssignmentsDetails.hasGrade) { %>
+            <span class="chip success">✅ Atividade realizada e avaliada</span>
+        <% } else if (studentAssignmentsDetails.hasSubmitted) { %>
+            <span class="chip warning">🚧 Atividade realizada</span>
+        <% } else { %>
+            <span class="chip error">❗️ Atividade pendente</span>
+        <% } %>
+        <br>
+    <% } %>
+
+    <br>
     <div id="alerts-container">
         <% if (flash.successMessage) { %>
             <div class="success-alert">
@@ -78,9 +93,50 @@ const dateFormattingOptions = {
             </div>
         </div>
     </section>
-
+    
     <br>
     <hr>
+    <br>
+    <% if(studentAssignmentsDetails) { %>
+        <section>
+            <h2>Status da atividade</h2>
+            <div class="vertical-table">
+                <div class="item">
+                    <header>Nota atribuída</header>
+                    <% if (studentAssignmentsDetails.details) { %>
+                        <span><%= studentAssignmentsDetails.details.grade %> de <%= studentAssignmentsDetails.details.maxGrade %></span>
+                    <% } else { %>
+                        <span>Nota ainda não atribuída</span>
+                    <% } %>
+                </div>
+                <div class="item">
+                    <header>Status da avaliação</header>
+                    <%
+                        let ASSIGNMENT_GRADING_STATUS = "Atividade com envio pendente";
+                        if (studentAssignmentsDetails.hasGrade) ASSIGNMENT_GRADING_STATUS = "Atividade avaliada pelo professor";
+                        else if (studentAssignmentsDetails.hasSubmitted) ASSIGNMENT_GRADING_STATUS = "Aguardando aprovação do professor";
+                    %>
+                    <span><%= ASSIGNMENT_GRADING_STATUS %></span>
+                </div>
+                <% if (studentAssignmentsDetails.details.gradedAt) { %>
+                    <div class="item">
+                        <header>Primeira avaliação</header>
+                        <span><%= studentAssignmentsDetails.details.gradedAt.toLocaleString("pt-BR", dateFormattingOptions) %></span>
+                    </div>
+                <% } %>
+                <% if (studentAssignmentsDetails.details.lastUpdatedAt) { %>
+                    <div class="item">
+                        <header>Último lançamento de nota</header>
+                        <span><%= studentAssignmentsDetails.details.lastUpdatedAt.toLocaleString("pt-BR", dateFormattingOptions) %></span>
+                    </div>
+                <% } %>
+            </div> 
+
+            <br>
+            <p class="warning-alert">⚠️ Atenção! As notas podem demorar mais de 1 minuto para serem lançadas.</p>
+        </section>
+    <% } %>
+
     <br>
     <button id="launch-btn" type="button"><%= await t.translate("lti:launch:buttons:launch") %></button>
 
