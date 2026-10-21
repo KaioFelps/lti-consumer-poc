@@ -10,7 +10,10 @@ import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
 import { Grade } from "@/modules/assignments-and-grades/entities/grade.entity";
 import { GradeNotFoundError } from "@/modules/assignments-and-grades/errors/grade-not-found.error";
 import { ScoreNotFoundError } from "@/modules/lti/ags/errors/score-not-found.error";
-import { LtiScoresRepository } from "@/modules/lti/ags/repositories/lti-scores.repository";
+import {
+  LineItemStudentScore,
+  LtiScoresRepository,
+} from "@/modules/lti/ags/repositories/lti-scores.repository";
 import { LtiLineItem, LtiScore } from "$/assignment-and-grade/entities";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
@@ -248,6 +251,62 @@ export class DrizzleLtiScoresRepository extends LtiScoresRepository {
       te.map((rows) => rows.filter((row) => row.scoreGiven !== null)),
       te.map((rows) =>
         rows.map((row) => gradesMapper.fromLtiScoreRow(assignmentId, courseId, row)),
+      ),
+    )();
+  }
+
+  public findScoresOfStudentsOnLineItems(
+    lineItemsIds: UUID[],
+    studentsIds: UUID[],
+  ): Promise<Either<IrrecoverableError, LineItemStudentScore[]>> {
+    if (lineItemsIds.length === 0 || studentsIds.length === 0) return Promise.resolve(e.right([]));
+
+    const client = this.transactionManager.getTx() ?? this.drizzle.getClient();
+
+    return pipe(
+      te.tryCatch(
+        () =>
+          client
+            .select({
+              lineItemId: ltiScoresT.lineItemId,
+              userId: ltiScoresT.userId,
+              scoreGiven: ltiScoresT.scoreGiven,
+              scoreMaximum: ltiScoresT.scoreMaximum,
+              timestamp: ltiScoresT.timestamp,
+            })
+            .from(ltiScoresT)
+            .where(
+              and(
+                inArray(
+                  ltiScoresT.lineItemId,
+                  lineItemsIds.map((id) => id.toString()),
+                ),
+                inArray(
+                  ltiScoresT.userId,
+                  studentsIds.map((id) => id.toString()),
+                ),
+                // avoid returning records not scored (i.e., that doesn't have `scoreGiven` defined)
+                isNotNull(ltiScoresT.scoreGiven),
+              ),
+            ),
+        (error) =>
+          new IrrecoverableError(
+            `Error occurred in ${DrizzleLtiScoresRepository.name} when fetching the scores of ` +
+              `${studentsIds.length} students on ${lineItemsIds.length} line items.`,
+            error as Error,
+          ),
+      ),
+      te.map((rows) =>
+        rows.map(
+          (row) =>
+            ({
+              lineItemId: row.lineItemId as UUID,
+              studentId: row.userId as UUID,
+              scoreGiven: row.scoreGiven as number,
+              scoreMaximum: row.scoreMaximum,
+              timestamp: row.timestamp,
+            }) satisfies LineItemStudentScore,
+        ),
       ),
     )();
   }
