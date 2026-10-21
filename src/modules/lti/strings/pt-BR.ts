@@ -337,3 +337,23 @@ ptBR["lti:ags:score-not-found"] = "Não foi possível encontrar a pontuação so
 
 ptBR["lti:ags:results-container:errors:user-id-must-be-uuid"] =
   "O ID do usuário precisa ser um UUID válido.";
+
+ptBR["lti:ags:assignment-grades:errors:line-item-not-found"] = ({ lineItemId }) =>
+  `O line item "${lineItemId}" não foi encontrado.`;
+ptBR["lti:ags:assignment-grades:section:title"] = "Notas dos alunos";
+ptBR["lti:ags:assignment-grades:empty"] =
+  "Nenhuma ferramenta LTI lançou notas para esta atividade ainda.";
+ptBR["lti:ags:assignment-grades:no-students"] = "Não há alunos matriculados neste curso.";
+ptBR["lti:ags:assignment-grades:single:description"] =
+  "Essa atividade foi pontuada por uma ferramenta LTI.";
+ptBR["lti:ags:assignment-grades:multiple:needs-selection"] =
+  "Essa atividade tem mais de uma pontuação. É necessário selecionar uma.";
+ptBR["lti:ags:assignment-grades:multiple:has-selection"] =
+  "Essa atividade tem mais de uma pontuação. A pontuação principal está identificada abaixo.";
+ptBR["lti:ags:assignment-grades:line-item:label"] = "Line item";
+ptBR["lti:ags:assignment-grades:chip:main"] = "Principal";
+ptBR["lti:ags:assignment-grades:thead:student"] = "Aluno";
+ptBR["lti:ags:assignment-grades:thead:grade"] = "Nota";
+ptBR["lti:ags:assignment-grades:cell:no-score"] = "–";
+ptBR["lti:ags:assignment-grades:base-score"] = "Nota base do line item";
+ptBR["lti:ags:assignment-grades:buttons:choose-main"] = "Selecionar como principal";

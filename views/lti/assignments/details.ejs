@@ -93,7 +93,75 @@ const dateFormattingOptions = {
             </div>
         </div>
     </section>
-    
+
+    <% if (gradingDetails) { %>
+        <br>
+        <section id="line-items-grades">
+            <h2><%= await t.translate("lti:ags:assignment-grades:section:title") %></h2>
+
+            <% if (gradingDetails.lineItems.length === 0) { %>
+                <p><%= await t.translate("lti:ags:assignment-grades:empty") %></p>
+            <% } else { %>
+                <% if (gradingDetails.hasMoreThanOneLineItem) { %>
+                    <p class="<%= gradingDetails.needsSelection ? 'warning-alert' : '' %>">
+                        <%= await t.translate(gradingDetails.needsSelection
+                            ? "lti:ags:assignment-grades:multiple:needs-selection"
+                            : "lti:ags:assignment-grades:multiple:has-selection") %>
+                    </p>
+                <% } else { %>
+                    <p><%= await t.translate("lti:ags:assignment-grades:single:description") %></p>
+                <% } %>
+
+                <% for (const lineItem of gradingDetails.lineItems) { %>
+                    <br>
+                    <h3 style="margin-bottom: 8px;">
+                        <%= await t.translate("lti:ags:assignment-grades:line-item:label") %>
+                        "<%= lineItem.tag ?? lineItem.label %>"
+                        <% if (gradingDetails.hasMoreThanOneLineItem && lineItem.isMain) { %>
+                            <span class="chip success"><%= await t.translate("lti:ags:assignment-grades:chip:main") %></span>
+                        <% } %>
+                    </h3>
+
+                    <% if (gradingDetails.students.length === 0) { %>
+                        <p><%= await t.translate("lti:ags:assignment-grades:no-students") %></p>
+                    <% } else { %>
+                        <div style="overflow-x: auto;">
+                            <table class="base-table">
+                                <thead>
+                                    <tr>
+                                        <th><%= await t.translate("lti:ags:assignment-grades:thead:student") %></th>
+                                        <% for (const student of gradingDetails.students) { %>
+                                            <th><%= student.name %></th>
+                                        <% } %>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong><%= await t.translate("lti:ags:assignment-grades:thead:grade") %></strong></td>
+                                        <% for (const cell of lineItem.cells) { %>
+                                            <td><%= cell ? cell.given : await t.translate("lti:ags:assignment-grades:cell:no-score") %></td>
+                                        <% } %>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } %>
+
+                    <p style="margin-top: 8px;">
+                        <%= await t.translate("lti:ags:assignment-grades:base-score") %>: <%= lineItem.maxScore %>
+                    </p>
+
+                    <% if (gradingDetails.hasMoreThanOneLineItem && !lineItem.isMain) { %>
+                        <form method="POST" action="/lti/ags/assignments/<%= assignment.id %>/main-line-item">
+                            <input type="hidden" name="lineItemId" value="<%= lineItem.id %>">
+                            <button type="submit"><%= await t.translate("lti:ags:assignment-grades:buttons:choose-main") %></button>
+                        </form>
+                    <% } %>
+                <% } %>
+            <% } %>
+        </section>
+    <% } %>
+
     <br>
     <hr>
     <br>
@@ -130,7 +198,7 @@ const dateFormattingOptions = {
                         <span><%= studentAssignmentsDetails.details.lastUpdatedAt.toLocaleString("pt-BR", dateFormattingOptions) %></span>
                     </div>
                 <% } %>
-            </div> 
+            </div>
 
             <br>
             <p class="warning-alert">⚠️ Atenção! As notas podem demorar mais de 1 minuto para serem lançadas.</p>
