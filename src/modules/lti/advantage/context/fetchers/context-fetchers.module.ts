@@ -11,6 +11,6 @@ import { CourseContextFetcher } from "./course-context-fetcher";
       inject: [CourseContextFetcher],
     },
   ],
-  exports: [CONTEXT_FETCHERS],
+  exports: [CONTEXT_FETCHERS, CourseContextFetcher],
 })
 export class ContextFetchersModule {}
