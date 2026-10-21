@@ -7,6 +7,7 @@ import { UsersRepository } from "@/modules/identity/user/users.repository";
 import { ContextFetchersModule } from "@/modules/lti/advantage/context/fetchers/context-fetchers.module";
 import { LtiContextsRepository } from "@/modules/lti/advantage/repositories/lti-contexts.repository";
 import { ExternalLtiAssignmentsRepository } from "@/modules/lti/ags/repositories/external-lti-assignments.repository";
+import { LtiLineItemsRepository } from "@/modules/lti/ags/repositories/lti-line-items.repository";
 import { LtiScoresRepository } from "@/modules/lti/ags/repositories/lti-scores.repository";
 import { LtiResourceLinksRepository } from "@/modules/lti/resource-links/resource-links.repository";
 import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository";
@@ -15,7 +16,7 @@ import { OIDCAccountsRepository } from "@/modules/oidc/repositories/accounts.rep
 import { OIDCClientsRepository } from "@/modules/oidc/repositories/clients.repository";
 import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
 import { LtiScoresRepository as BaseLtiScoresRepository } from "$/assignment-and-grade/repositories";
-import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
+import { LtiLineItemsRepository as BaseLtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
 import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
 import { LtiResourceLinksRepository as BaseLtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
 import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identities.repository";
@@ -59,6 +60,8 @@ import { RedisLtiLaunchesRepository } from "./redis/repositories/lti-launches.re
       provide: ExternalLtiAssignmentsRepository,
       useClass: DrizzleExternalLtiAssignmentsRepository,
     },
+    DrizzleLtiLineItemsRepository,
+    { provide: BaseLtiLineItemsRepository, useClass: DrizzleLtiLineItemsRepository },
     { provide: LtiLineItemsRepository, useClass: DrizzleLtiLineItemsRepository },
     { provide: ExternalLtiResourcesRepository, useClass: DrizzleExternalLtiResourcesRepository },
     { provide: LtiContextsRepository, useClass: DrizzleLtiContextsRepository },
@@ -81,6 +84,7 @@ import { RedisLtiLaunchesRepository } from "./redis/repositories/lti-launches.re
     AssignmentsRepository,
     InstructorsRepository,
     ExternalLtiAssignmentsRepository,
+    BaseLtiLineItemsRepository,
     LtiLineItemsRepository,
     ExternalLtiResourcesRepository,
     LtiContextsRepository,

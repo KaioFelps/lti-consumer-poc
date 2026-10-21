@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { UUID } from "common/src/types/uuid";
 import * as schema from "drizzle/schema";
 import {
   externalLtiResourcesT,
@@ -13,6 +14,7 @@ import {
   ColumnsSelection,
   ExtractTablesWithRelations,
   eq,
+  exists,
   inArray,
   isNull,
   or,
@@ -29,9 +31,10 @@ import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
 import { unmountContextId } from "@/modules/lti/advantage/context";
 import { InvalidComposedContextIdError } from "@/modules/lti/advantage/errors/invalid-composed-context-id.error";
 import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type";
+import { LineItemNotFoundError } from "@/modules/lti/ags/errors/line-item-not-found.error";
+import { LtiLineItemsRepository } from "@/modules/lti/ags/repositories/lti-line-items.repository";
 import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters";
 import { LtiLineItem } from "$/assignment-and-grade/entities";
-import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories";
 import { Context } from "$/core/context";
 import { LtiRepositoryError } from "$/core/errors/repository.error";
 import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
@@ -573,5 +576,87 @@ export class DrizzleLtiLineItemsRepository extends LtiLineItemsRepository {
           ),
         ),
       );
+  }
+
+  public getLineItemsOfAssignment(assignmentId: UUID, context: Context<ContextConcreteType>) {
+    const client = this.transactionManager.getTx() ?? this.drizzle.getClient();
+    let manuallyChosenLineItemId: UUID;
+
+    return pipe(
+      te.tryCatch(
+        () =>
+          client.query.ltiLineItemsT.findMany({
+            ...ltiLineItemsMapper.requiredQueryConfig,
+            where: eq(ltiLineItemsT.ltiAssignmentId, assignmentId.toString()),
+            orderBy: [ltiLineItemsT.id],
+          }),
+        (error) =>
+          new IrrecoverableError(
+            `Error occurred in ${DrizzleLtiLineItemsRepository.name} when finding line items of assignment "${assignmentId}".`,
+            error as Error,
+          ),
+      ),
+      te.map((rows) =>
+        rows.map((row) => {
+          if (row.manuallyChosenByInstructor) manuallyChosenLineItemId ??= row.id;
+          return ltiLineItemsMapper.fromRow(row, context);
+        }),
+      ),
+      te.map((lineItems) => ({ lineItems, manuallyChosenLineItemId })),
+    )();
+  }
+
+  public chooseMainLineItemOfAssignment(
+    assignmentId: UUID,
+    lineItemId: UUID,
+  ): Promise<Either<LineItemNotFoundError | IrrecoverableError, void>> {
+    const client = this.transactionManager.getTx() ?? this.drizzle.getClient();
+    const assignmentIdStr = assignmentId.toString();
+    const lineItemIdStr = lineItemId.toString();
+
+    // A single UPDATE statement is atomic in PostgreSQL, so there is no need for an explicit
+    // transaction: it flips the flag of every line item of the assignment at once
+    // (`true` only for the chosen one, `false` for the others), and only runs when the
+    // chosen line item actually belongs to the assignment (the EXISTS guard). Otherwise,
+    // no row is touched and a `LineItemNotFoundError` is returned.
+    //
+    // Choosing the line item that is already chosen results in the same values being
+    // written back, i.e., it is a no-op.
+    return pipe(
+      te.tryCatch(
+        () =>
+          client
+            .update(ltiLineItemsT)
+            .set({ manuallyChosenByInstructor: sql`(${ltiLineItemsT.id} = ${lineItemIdStr})` })
+            .where(
+              and(
+                eq(ltiLineItemsT.ltiAssignmentId, assignmentIdStr),
+                exists(
+                  client
+                    .select({ one: sql`1` })
+                    .from(ltiLineItemsT)
+                    .where(
+                      and(
+                        eq(ltiLineItemsT.id, lineItemIdStr),
+                        eq(ltiLineItemsT.ltiAssignmentId, assignmentIdStr),
+                      ),
+                    ),
+                ),
+              ),
+            )
+            .returning({ id: ltiLineItemsT.id }),
+        (error) =>
+          new IrrecoverableError(
+            `Error occurred in ${DrizzleLtiLineItemsRepository.name} when choosing line item "${lineItemId}" ` +
+              `as the main line item of assignment "${assignmentId}".`,
+            error as Error,
+          ),
+      ),
+      te.chainEitherKW((updatedRows) =>
+        updatedRows.some((row) => row.id === lineItemIdStr)
+          ? e.right(undefined)
+          : e.left(new LineItemNotFoundError(lineItemId)),
+      ),
+    )();
   }
 }
