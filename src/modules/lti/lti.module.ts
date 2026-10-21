@@ -27,6 +27,7 @@ import { LtiScoresController } from "./ags/controllers/lti-scores.controller";
 import { ChooseMainLineItemService } from "./ags/services/choose-main-line-item.service";
 import { CreateCourseContextService } from "./ags/services/create-course-context.service";
 import { CreateExternalLtiAssignmentService } from "./ags/services/create-external-lti-assignment.service";
+import { FindAssignmentGradingDetailsService } from "./ags/services/find-assignment-grading-details.service";
 import { FindExternalLtiAssignmentByIdService } from "./ags/services/find-external-lti-assignment-by-id.service";
 import { FindStudentScoreDetailsByExternalAssignmentIdService } from "./ags/services/find-student-score-details-by-assignment-id.service";
 import { LtiDeploymentsController } from "./deployments/deployments.controller";
@@ -188,6 +189,7 @@ import { LtiToolsController } from "./tools/tools.controller";
     },
     FindStudentScoreDetailsByExternalAssignmentIdService,
     ChooseMainLineItemService,
+    FindAssignmentGradingDetailsService,
   ],
   exports: [LtiLaunchServices, Platform, CreateCourseContextService],
   controllers: [
