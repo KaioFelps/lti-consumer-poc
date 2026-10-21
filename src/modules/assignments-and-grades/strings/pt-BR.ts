@@ -24,8 +24,12 @@ ptBR["grading:assignments-repository:errors:grade-not-found"] = ({
   const studentExcerpt = studentName ? `do aluno ${studentName}` : `do aluno de ID '${studentId}'`;
   return `Não foi possível encontrar uma nota ${studentExcerpt} ${assignmentExcerpt}.`;
 };
-ptBR["grading:errors:instructor-unauthorized-in-course"] = ({ instructorName, courseTitle }) =>
-  `${instructorName} não é instrutor do curso ${courseTitle}, portanto não está autorizado.`;
+ptBR["grading:errors:instructor-unauthorized-in-course"] = ({
+  instructorName,
+  instructorId,
+  courseTitle,
+}) =>
+  `${instructorName ?? `O usuário de ID "${instructorId}"`} não é instrutor do curso ${courseTitle}, portanto não está autorizado.`;
 ptBR["grading:courses-repository:errors:not-found"] = ({ courseId }) =>
   `Não foi encontrado nenhum curso com ID '${courseId}'.`;
 
