@@ -136,7 +136,7 @@ Os resultados são extraídos dos próprios scores. Nada houve de ser feito sen�
 repositório de scores utilizado pelo serviço de resultados — e a integração com os controllers do Nest.js,
 claro.
 
-## Validações de timestamp
+## Validação de Timestamp
 A validação de campos de data e hora foram feitas seguindo estritamente o que especifica o LTI AGS:
 - deve ter um designador de fuso horário;
 - deve ter precisão de sub-segundos;
@@ -145,5 +145,40 @@ A validação de campos de data e hora foram feitas seguindo estritamente o que 
 No entanto, como o Moodle não envia valores de data e hora conformantes com a especificação — embora
 seja certificado pela 1EdTech Consortium —, uma opção de `strictMode` teve que ser introduzida nas
 configurações da classe `Platform` e direcionada até chegar na função validadora de timestamps,
-permitindo que essa validação mais rigorosa seja desabilitada se a plataforma cliente desejar — por
+permitindo que essa validação mais rigorosa seja desabilitada se a plataforma-cliente desejar — por
 exemplo, se ela precisar suportar o Moodle.
+
+## Conectando `score`s às Notas da Plataforma
+Nativamente, a plataforma PoC suporta atribuição de notas às atividades dos usuários. Para suportar o LTI AGS,
+no entanto, foi adicionado um modelo separado dedicado aos `score`s.
+
+Existem dois tipos de atividades: locais e externas. Assim, serão reservadas as notas nativas às atividades
+locais, ao passo que as atividades externas LTI utilizarão os `score`s e _line items_ como notas. (Algumas
+plataformas-cliente podem manter histórico de `score`s, e precisariam de uma heurística para decidir quando
+e qual `score` transferir para suas notas nativas. Não é o caso da PoC.)
+
+Para lidar com notas que necessitam de aprovação manual de um professor, também será criada uma tela dedicada
+ao professor do curso para visualizar todos os `score`s com progresso de nota `PendingManual` (de acordo com
+a especificação do LTI AGS 2.0).
+
+(Para essas telas, a biblioteca ltilib não fornece nenhuma facilidade: o armazenamento desses dados é inerente
+à plataforma-cliente.)
+
+Quanto aos _line items_, é especificado que um link de recurso pode ter vários _line items_. Isso implica que,
+na PoC, uma atividade externa LTI pode também possuir vários line items. Para lidar com isso, adotamos a seguinte
+política:
+1. **Quando não há nenhum _line item_ para a atividade externa LTI**: o aluno é notificado, na interface, que a
+atividade ainda não está configurada para receber notas.
+2. **Quando há um _line item_ para a atividade**: as notas atuais são mostradas pro aluno, independente da vontade
+da ferramenta LTI (sinalizada via campos como `gradesReleased`; o que é permitido pela especificação).
+3. **Quando há mais de um _line item_ para a atividade**: o aluno é notificado, na interface da atividade, que
+esta não está configurada para exibir notas. Um professor, ao visualizar os detalhes da atividade, é notificado que
+ele deve selecionar um dos _line items_ existentes para representar as notas daquela atividade.
+
+    (Isso implica uma nova tela onde o professor/administrador pode visualizar todos os _line items_ de uma atividade
+    e decidir qual vai ser a escolhida para representar as notas da atividade através de um _radio group input_.)
+
+- [x] Fazer a página de visualizar notas das ativida.des externas
+- [ ] Fazer a página de visualizar `score`s manuais.
+- [x] Fazer a página de visualização de _line items_ de uma atividade.
+- [x] Viabilizar seleção do _line item_ principal manualmente.
