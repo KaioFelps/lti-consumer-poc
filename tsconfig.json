@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolvePackageJsonExports": true,
+    "target": "ES2023",
     "esModuleInterop": true,
     "isolatedModules": true,
     "declaration": true,
@@ -8,10 +11,9 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
+    "rootDir": ".",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
@@ -19,10 +21,27 @@
     "noImplicitAny": false,
     "strictBindCallApply": true,
     "noFallthroughCasesInSwitch": false,
+    "strictPropertyInitialization": false,
     "paths": {
-      "@/*": ["src/*"],
-      "$/*": ["ltilib/src/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "$/*": [
+        "./ltilib/src/*"
+      ],
+      "test/*": [
+        "./test/*"
+      ],
+      "$/tests/*": [
+        "./ltilib/tests/*"
+      ],
+      "drizzle/*": [
+        "./drizzle/*"
+      ]
     },
-    "types": ["vitest/globals"]
+    "types": [
+      "vitest/globals",
+      "node"
+    ]
   }
 }
