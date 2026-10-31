@@ -1,5 +1,5 @@
 import { JWK } from "jose";
-import * as platformNamespace from "./namespace";
+import * as platformNamespace from "./platform/namespace.js";
 
 export interface IPlatform {
   /**

@@ -1,26 +1,26 @@
 import { Injectable } from "@nestjs/common";
-import { UUID } from "common/src/types/uuid";
-import { ltiLineItemsT, ltiScoresT } from "drizzle/schema";
+import type { UUID } from "common/src/types/uuid.js";
+import { ltiLineItemsT, ltiScoresT } from "drizzle/schema.js";
 import { and, eq, exists, inArray, isNotNull, or, sql } from "drizzle-orm";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { either as e, taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { Grade } from "@/modules/assignments-and-grades/entities/grade.entity";
-import { GradeNotFoundError } from "@/modules/assignments-and-grades/errors/grade-not-found.error";
-import { ScoreNotFoundError } from "@/modules/lti/ags/errors/score-not-found.error";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { Grade } from "@/modules/assignments-and-grades/entities/grade.entity.js";
+import { GradeNotFoundError } from "@/modules/assignments-and-grades/errors/grade-not-found.error.js";
+import { ScoreNotFoundError } from "@/modules/lti/ags/errors/score-not-found.error.js";
 import {
   LineItemStudentScore,
   LtiScoresRepository,
-} from "@/modules/lti/ags/repositories/lti-scores.repository";
-import { LtiLineItem, LtiScore } from "$/assignment-and-grade/entities";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
-import { DrizzleClient } from "../client";
-import gradesMapper from "../mappers/grades.mapper";
-import scoresMapper from "../mappers/scores.mapper";
-import { DrizzleTransactionManager, Transaction } from "../transaction-manager";
+} from "@/modules/lti/ags/repositories/lti-scores.repository.js";
+import { LtiLineItem, LtiScore } from "$/assignment-and-grade/entities/index.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiRepositoryPaginatedResponse } from "$/core/repositories.js";
+import { DrizzleClient } from "../client.js";
+import gradesMapper from "../mappers/grades.mapper.js";
+import scoresMapper from "../mappers/scores.mapper.js";
+import { DrizzleTransactionManager, Transaction } from "../transaction-manager.js";
 
 @Injectable()
 export class DrizzleLtiScoresRepository extends LtiScoresRepository {

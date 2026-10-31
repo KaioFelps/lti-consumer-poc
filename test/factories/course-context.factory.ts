@@ -1,8 +1,8 @@
-import { ltiContexts } from "drizzle/schema";
-import { DrizzleClient } from "@/external/data-store/drizzle/client";
-import { CourseContextAdapter } from "@/modules/lti/advantage/context/adapters/course-context.adapter";
-import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type";
-import courseFactory from "./course.factory";
+import { ltiContexts } from "drizzle/schema.js";
+import { DrizzleClient } from "@/external/data-store/drizzle/client.js";
+import { CourseContextAdapter } from "@/modules/lti/advantage/context/adapters/course-context.adapter.js";
+import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type.js";
+import courseFactory from "./course.factory.js";
 
 type Params = Parameters<typeof courseFactory.create>[0];
 

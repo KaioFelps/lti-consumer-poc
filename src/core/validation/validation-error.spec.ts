@@ -1,5 +1,5 @@
-import { InvalidArgumentError } from "../errors/invalid-argument.error";
-import { ValidationErrors } from "./validation-errors";
+import { InvalidArgumentError } from "../errors/invalid-argument.error.js";
+import { ValidationErrors } from "./validation-errors.js";
 
 describe("ValidationErrors", () => {
   it("should correctly append validation errors", () => {

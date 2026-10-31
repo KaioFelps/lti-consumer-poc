@@ -1,9 +1,9 @@
 import { either as e } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { ExternalLtiResource } from "$/advantage/external-resource";
-import { CustomParameters, RawCustomParameters } from "../../custom-parameters";
-import { LtiLineItem as LineItem } from ".";
-import { validateLabel, validateScoreMaximum } from "./helpers";
+import { pipe } from "fp-ts/lib/function.js";
+import { ExternalLtiResource } from "$/advantage/external-resource.js";
+import { CustomParameters, RawCustomParameters } from "../../custom-parameters.js";
+import { LtiLineItem as LineItem } from "../../entities.js";
+import { validateLabel, validateScoreMaximum } from "./helpers.js";
 
 interface IUpdateRecord {
   /**

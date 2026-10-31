@@ -1,4 +1,4 @@
-import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity";
+import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity.js";
 
 type PresentedAssignment = {
   id: string;

@@ -1,10 +1,10 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { either as e } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { ResourceLinkNotFoundError } from "../errors/resource-link-not-found.error";
-import { LtiResourceLinksRepository } from "../resource-links.repository";
+import { pipe } from "fp-ts/lib/function.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { ResourceLinkNotFoundError } from "../errors/resource-link-not-found.error.js";
+import { LtiResourceLinksRepository } from "../resource-links.repository.js";
 
 type Params = {
   resourceLinkId: string;

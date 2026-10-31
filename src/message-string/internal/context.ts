@@ -1,4 +1,4 @@
-import { MessageStringTranslationMap } from ".";
+import { MessageStringTranslationMap } from "./index.js";
 
 export class MessageStringTranslationContext {
   public constructor(

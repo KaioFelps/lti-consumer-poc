@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import { EnvironmentVars } from "@/config/environment-vars";
-import { DrizzleOIDCClientAdapter } from "@/external/data-store/drizzle/oidc-adpaters/client-adapter";
-import { Redis } from "@/external/data-store/redis/client";
-import { OIDCRedisAdapter } from "@/external/data-store/redis/oidc-adapter";
-import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository";
-import { OIDCClientsRepository } from "../repositories/clients.repository";
-import { UnsafeOIDCClientsInjectionContainer } from "../unsafe-clients-injection-container";
+import { EnvironmentVars } from "@/config/environment-vars.js";
+import { DrizzleOIDCClientAdapter } from "@/external/data-store/drizzle/oidc-adpaters/client-adapter.js";
+import { Redis } from "@/external/data-store/redis/client.js";
+import { OIDCRedisAdapter } from "@/external/data-store/redis/oidc-adapter.js";
+import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository.js";
+import { OIDCClientsRepository } from "../repositories/clients.repository.js";
+import { UnsafeOIDCClientsInjectionContainer } from "../unsafe-clients-injection-container.js";
 
 export type ModelName =
   | "Grant"

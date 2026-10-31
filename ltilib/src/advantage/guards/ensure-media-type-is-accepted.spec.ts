@@ -1,7 +1,7 @@
 import { either as e } from "fp-ts";
-import { NotAcceptableMediaTypeError } from "../errors/not-acceptable-media-type.error";
-import { LtiAdvantageMediaType } from "../media-types";
-import { ensureMediaTypeIsAccepted } from "./ensure-media-type-is-accepted";
+import { NotAcceptableMediaTypeError } from "../errors/not-acceptable-media-type.error.js";
+import { LtiAdvantageMediaType } from "../media-types.js";
+import { ensureMediaTypeIsAccepted } from "./ensure-media-type-is-accepted.js";
 
 describe("[LTI Advantage/GUARDS] Ensure Media Type Is Accepted", () => {
   const availableMediaType = LtiAdvantageMediaType.LineItemContainer;

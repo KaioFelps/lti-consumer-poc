@@ -1,9 +1,9 @@
-import { LtiInitiationMessage } from "$/security/lti-message";
+import { LtiInitiationMessage } from "$/security/lti-message.js";
 import {
   CreateInitiateThirdPartyLoginRequestArgs,
   LtiInitiateThirdPartyLoginRequest,
-} from "$/security/messages/initiate-third-party-login";
-import type { LTIResourceLinkLaunchRequest } from "./resource-link-launch";
+} from "$/security/messages/initiate-third-party-login.js";
+import type { LTIResourceLinkLaunchRequest } from "./resource-link-launch.js";
 
 type CreateInitiateLaunchRequestArgs = CreateInitiateThirdPartyLoginRequestArgs & {
   /**

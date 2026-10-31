@@ -1,20 +1,20 @@
 import { either as e, option as o, taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
-import { ILtiLineItem, LtiLineItem } from "$/assignment-and-grade/entities";
-import { CannotAttachResourceLinkError } from "$/assignment-and-grade/errors";
-import { Context } from "$/core/context";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { HttpResponseWrapper } from "$/core/http/response-wrapper";
-import { Platform } from "$/core/platform";
-import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
-import { LtiTool } from "$/core/tool";
-import { MissingPlatformAgsConfigurationError } from "../../errors";
-import { PresentedLtiLineItem, presentLtiLineItem } from "../../presenters/line-item.presenter";
-import { LtiLineItemsRepository } from "../../repositories/line-items.repository";
-import { AssignmentAndGradeServiceScopes } from "../../scopes";
-import { AGServiceBase } from "..";
+import { pipe } from "fp-ts/lib/function.js";
+import { LtiAdvantageMediaType } from "$/advantage/media-types.js";
+import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository.js";
+import { ILtiLineItem, LtiLineItem } from "$/assignment-and-grade/entities/index.js";
+import { CannotAttachResourceLinkError } from "$/assignment-and-grade/errors.js";
+import { Context } from "$/core/context.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { HttpResponseWrapper } from "$/core/http/response-wrapper.js";
+import { Platform } from "$/core/platform.js";
+import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository.js";
+import { LtiTool } from "$/core/tool.js";
+import { MissingPlatformAgsConfigurationError } from "../../errors.js";
+import { PresentedLtiLineItem, presentLtiLineItem } from "../../presenters/line-item.presenter.js";
+import { LtiLineItemsRepository } from "../../repositories/line-items.repository.js";
+import { AssignmentAndGradeServiceScopes } from "../../scopes.js";
+import { AGServiceBase } from "../index.js";
 
 type RawLineItemsPayload = {
   resourceId?: string;

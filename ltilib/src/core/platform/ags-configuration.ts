@@ -1,11 +1,11 @@
-import { UUID } from "common/src/types/uuid";
+import type { UUID } from "common/src/types/uuid.js";
 import {
   ASSIGNMENT_AND_GRADE_SERVICES_SCOPES,
   AssignmentAndGradeServiceScopes,
-} from "$/assignment-and-grade/scopes";
-import { Context } from "../context";
-import { LtiTool } from "../tool";
-import { LtiToolDeployment } from "../tool-deployment";
+} from "$/assignment-and-grade/scopes.js";
+import { Context } from "../context.js";
+import { LtiTool } from "../tool.js";
+import { LtiToolDeployment } from "../tool-deployment.js";
 
 interface ILtiAssignmentAndGradeServicesConfig {
   /**

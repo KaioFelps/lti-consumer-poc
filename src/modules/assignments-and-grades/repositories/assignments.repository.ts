@@ -1,10 +1,10 @@
-import { type UUID } from "common/src/types/uuid";
-import { type Either } from "fp-ts/lib/Either";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { GradeOfAssignment } from "../aggregates/grade-of-assignment.aggregate";
-import { Assignment } from "../entities/assignment.entity";
-import { AssignmentNotFoundError } from "../errors/assignment-not-found.error";
-import { GradeNotFoundError } from "../errors/grade-not-found.error";
+import { type UUID } from "common/src/types/uuid.js";
+import { type Either } from "fp-ts/lib/Either.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { GradeOfAssignment } from "../aggregates/grade-of-assignment.aggregate.js";
+import { Assignment } from "../entities/assignment.entity.js";
+import { AssignmentNotFoundError } from "../errors/assignment-not-found.error.js";
+import { GradeNotFoundError } from "../errors/grade-not-found.error.js";
 
 export abstract class AssignmentsRepository {
   public abstract findById(

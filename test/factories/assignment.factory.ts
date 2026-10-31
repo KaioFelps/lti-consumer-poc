@@ -1,11 +1,11 @@
 import { faker } from "@faker-js/faker";
-import { assignmentsT } from "drizzle/schema";
-import { DrizzleClient } from "@/external/data-store/drizzle/client";
-import assignmentsMapper from "@/external/data-store/drizzle/mappers/assignments.mapper"; // Ajuste o caminho se necessário
-import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity";
-import { AssignmentKind } from "@/modules/assignments-and-grades/enums/assignment-kind";
-import { Course } from "@/modules/courses-and-enrollments/entities/course.entity";
-import courseFactory from "./course.factory";
+import { assignmentsT } from "drizzle/schema.js";
+import { DrizzleClient } from "@/external/data-store/drizzle/client.js";
+import assignmentsMapper from "@/external/data-store/drizzle/mappers/assignments.mapper.js"; // Ajuste o caminho se necessário
+import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity.js";
+import { AssignmentKind } from "@/modules/assignments-and-grades/enums/assignment-kind.js";
+import { Course } from "@/modules/courses-and-enrollments/entities/course.entity.js";
+import courseFactory from "./course.factory.js";
 
 type AssignmentProps = Assignment["props"];
 

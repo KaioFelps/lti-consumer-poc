@@ -1,14 +1,14 @@
 import { HttpException } from "@nestjs/common";
-import { type IErrorBase } from "@/core/errors/error-base";
-import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { RenderableError } from "@/core/errors/renderable/renderable-error";
-import { ValidationErrors } from "@/core/validation/validation-errors";
-import { resolveStatus } from ".";
-import { BaseException } from "./base/exception";
-import { DTOValidationException } from "./dto-validation/exception";
-import { IrrecoverableException } from "./irrecoverable/exception";
-import { RenderableException } from "./renderable/exception";
+import { type IErrorBase } from "@/core/errors/error-base.js";
+import { InvalidArgumentError } from "@/core/errors/invalid-argument.error.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { RenderableError } from "@/core/errors/renderable/renderable-error.js";
+import { ValidationErrors } from "@/core/validation/validation-errors.js";
+import { resolveStatus } from "../exceptions.js";
+import { BaseException } from "./base/exception.js";
+import { DTOValidationException } from "./dto-validation/exception.js";
+import { IrrecoverableException } from "./irrecoverable/exception.js";
+import { RenderableException } from "./renderable/exception.js";
 
 /**
  * Directly maps an core error to its exception decorated error.

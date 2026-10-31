@@ -1,4 +1,4 @@
-import { ptBR } from "@/message-string/internal/translations/pt-BR";
+import { ptBR } from "@/message-string/internal/translations/pt-BR.js";
 
 ptBR["grading:errors:assignment-not-gradable"] = ({ title }) =>
   `A atividade '${title}' não está apta a ser pontuada.`;

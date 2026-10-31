@@ -1,6 +1,6 @@
-import type * as schema from "drizzle/schema";
+import type * as schema from "drizzle/schema.js";
 import type { BuildQueryResult, DBQueryConfig, ExtractTablesWithRelations } from "drizzle-orm";
-import { LtiScore } from "$/assignment-and-grade/entities";
+import { LtiScore } from "$/assignment-and-grade/entities/index.js";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 

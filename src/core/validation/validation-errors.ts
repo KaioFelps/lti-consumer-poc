@@ -1,7 +1,7 @@
 import { option } from "fp-ts";
-import { Option } from "fp-ts/lib/Option";
-import { ErrorClassProperties } from "../errors/error-base";
-import { InvalidArgumentError } from "../errors/invalid-argument.error";
+import { Option } from "fp-ts/lib/Option.js";
+import { ErrorClassProperties } from "../errors/error-base.js";
+import { InvalidArgumentError } from "../errors/invalid-argument.error.js";
 
 export class ValidationError extends InvalidArgumentError {
   public readonly argumentName: string;

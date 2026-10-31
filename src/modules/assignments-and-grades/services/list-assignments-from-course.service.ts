@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { type UUID } from "common/src/types/uuid";
-import { AssignmentsRepository } from "../repositories/assignments.repository";
+import { type UUID } from "common/src/types/uuid.js";
+import { AssignmentsRepository } from "../repositories/assignments.repository.js";
 
 // ain't worry about filters rn
 type Params = {

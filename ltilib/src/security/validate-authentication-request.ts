@@ -1,7 +1,7 @@
 import { either as e } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { MalformedRequestError } from "$/core/errors/malformed-request.error";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { MalformedRequestError } from "$/core/errors/malformed-request.error.js";
 
 export type ValidateAuthenticationRequestArgs = {
   response_mode: unknown;

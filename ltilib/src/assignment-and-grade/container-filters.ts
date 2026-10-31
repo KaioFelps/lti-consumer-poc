@@ -1,5 +1,5 @@
-import { ExternalLtiResource } from "$/advantage/external-resource";
-import { LtiResourceLink } from "$/core/resource-link";
+import { ExternalLtiResource } from "$/advantage/external-resource.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
 
 export type LineItemsContainerFilters = {
   /**

@@ -1,12 +1,12 @@
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
+import { pipe } from "fp-ts/lib/function.js";
 import {
   MissingLtiContextError,
   ToolIsNotDeployedInContextError,
-} from "$/assignment-and-grade/errors";
-import { Context } from "$/core/context";
-import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
-import { LtiTool } from "$/core/tool";
+} from "$/assignment-and-grade/errors.js";
+import { Context } from "$/core/context.js";
+import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository.js";
+import { LtiTool } from "$/core/tool.js";
 
 /**
  * Checks whether the tool is deployed in the given LTI context.

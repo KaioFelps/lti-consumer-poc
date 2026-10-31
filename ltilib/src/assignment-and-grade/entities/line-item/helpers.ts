@@ -1,6 +1,6 @@
 import { either as e } from "fp-ts";
-import { InvalidLineItemArgumentError } from "../../errors";
-import { LtiLineItem } from ".";
+import { InvalidLineItemArgumentError } from "$/assignment-and-grade/errors.js";
+import { LtiLineItem } from "../../entities.js";
 
 export function validateScoreMaximum(scoreMaximum: LtiLineItem["scoreMaximum"]) {
   if (scoreMaximum === null || scoreMaximum === undefined) {

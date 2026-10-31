@@ -1,6 +1,6 @@
 import { option as opt } from "fp-ts";
-import { LtiLaunchData } from "$/core/launch-data";
-import { MessageRequests } from "$/core/messages";
+import { LtiLaunchData } from "$/core/launch-data.js";
+import { MessageRequests } from "$/core/messages.js";
 
 type Payload = {
   launchId: string;

@@ -2,7 +2,7 @@
  * TODO: add unit tests to test generated header is conformant with RFC 6750 specifications.
  */
 
-import { OAuthError } from "./bases/oauth.error";
+import { OAuthError } from "./bases/oauth.error.js";
 
 export interface IOAuthBearerError extends OAuthBearerError.IWWWAuthenticate {
   error: OAuthBearerError.Code;

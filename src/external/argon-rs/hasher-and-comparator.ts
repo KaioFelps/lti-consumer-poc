@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { hash, verify } from "@node-rs/argon2";
-import { PasswordComparator } from "@/modules/auth/password/comparator";
-import { PasswordHasher } from "@/modules/auth/password/hasher";
+import { PasswordComparator } from "@/modules/auth/password/comparator.js";
+import { PasswordHasher } from "@/modules/auth/password/hasher.js";
 
 @Injectable()
 export class ArgonRSPasswordHasherAndComparator implements PasswordComparator, PasswordHasher {

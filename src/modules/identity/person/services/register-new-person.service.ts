@@ -1,12 +1,12 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { Either } from "fp-ts/lib/Either";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { PasswordHasher } from "@/modules/auth/password/hasher";
-import { SystemRole } from "@/modules/identity/user/enums/system-role";
-import { PersonGender } from "../enums/gender";
-import { PeopleRepository } from "../people.repository";
-import { Person } from "../person.entity";
-import { CPF } from "../value-objects/cpf";
+import { Either } from "fp-ts/lib/Either.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { PasswordHasher } from "@/modules/auth/password/hasher.js";
+import { SystemRole } from "@/modules/identity/user/enums/system-role.js";
+import { PersonGender } from "../enums/gender.js";
+import { PeopleRepository } from "../people.repository.js";
+import { Person } from "../person.entity.js";
+import { CPF } from "../value-objects/cpf.js";
 
 type RegisterNewPersonParams = {
   email: string;

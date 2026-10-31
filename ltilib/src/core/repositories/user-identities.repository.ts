@@ -1,6 +1,6 @@
-import { Either } from "fp-ts/lib/Either";
-import { LtiRepositoryError } from "../errors/repository.error";
-import { UserIdentity } from "../user-identity";
+import { Either } from "fp-ts/lib/Either.js";
+import { LtiRepositoryError } from "../errors/repository.error.js";
+import { UserIdentity } from "../user-identity.js";
 
 export abstract class LtiUserIdentitiesRespository<CustomRoles = never> {
   public abstract findUserIdentityById(

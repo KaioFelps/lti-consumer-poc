@@ -18,7 +18,7 @@ object:
 
 ```typescript
 // my-module/strings/en-US.ts
-import { enUS } from "@/message-string/internal/translations/en-US";
+import { enUS } from "@/message-string/internal/translations/en-US.js";
 
 enUS["my-module:message:identifier"] = "This is a simple string message",
 enUS["my-module:message:another-id"] = (args, identifier) => {

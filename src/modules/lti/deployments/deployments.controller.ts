@@ -1,14 +1,14 @@
 import { Body, Controller, Delete, Param, Post, Res, Session } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { HttpResponse, RequestSession } from "@/lib";
-import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { Mvc, Rest } from "@/lib/mvc-routes";
-import { TranslatorService } from "@/message-string/translator.service";
-import { FindToolByIdService } from "../tools/services/find-tool-by-id.service";
-import { DeployToolDto } from "./dtos/deploy-tool.dto";
-import { DeployToolService } from "./services/deploy-tool.service";
-import { RemoveToolDeploymentService } from "./services/remove-tool-deployment.service";
+import { pipe } from "fp-ts/lib/function.js";
+import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory.js";
+import { Mvc, Rest } from "@/lib/mvc-routes.js";
+import type { HttpResponse, RequestSession } from "@/lib.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { FindToolByIdService } from "../tools/services/find-tool-by-id.service.js";
+import { DeployToolDto } from "./dtos/deploy-tool.dto.js";
+import { DeployToolService } from "./services/deploy-tool.service.js";
+import { RemoveToolDeploymentService } from "./services/remove-tool-deployment.service.js";
 
 @Mvc()
 @Controller("/lti/deployments")

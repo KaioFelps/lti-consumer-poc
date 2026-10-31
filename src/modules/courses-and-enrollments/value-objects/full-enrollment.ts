@@ -1,6 +1,6 @@
-import { Person } from "@/modules/identity/person/person.entity";
-import { CourseWithInstructor } from "../aggregates/course-with-instructor.aggregate";
-import { Enrollment } from "../entities/enrollment.entity";
+import { Person } from "@/modules/identity/person/person.entity.js";
+import { CourseWithInstructor } from "../aggregates/course-with-instructor.aggregate.js";
+import { Enrollment } from "../entities/enrollment.entity.js";
 
 interface IFullEnrollment {
   enrollment: Enrollment;

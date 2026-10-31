@@ -1,5 +1,5 @@
-import { type UUID } from "common/src/types/uuid";
-import { EntityBase } from "@/core/entity-base";
+import { type UUID } from "common/src/types/uuid.js";
+import { EntityBase } from "@/core/entity-base.js";
 
 type Props = {
   assignmentId: UUID;

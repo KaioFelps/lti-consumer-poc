@@ -1,4 +1,4 @@
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error.js";
 
 export class NoValidLaunchFoundError extends ResourceNotFoundError {
   public constructor(launchId: string) {

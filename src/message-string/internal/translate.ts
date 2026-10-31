@@ -1,5 +1,5 @@
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { MessageStringFormatterArg, MessageStringTranslationMap } from ".";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { MessageStringFormatterArg, MessageStringTranslationMap } from "./index.js";
 
 /**
  * Obtain a message string from some language by indexing the message from `strings`

@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { HttpArgumentsHost } from "@nestjs/common/interfaces";
-import { HttpRequest, HttpResponse, RequestSession } from "@/lib";
-import { ExceptionFilterResponderFactory } from "../../exception-responders/factory";
-import { ExceptionFilterResponder } from "../../exception-responders/responder";
-import { flashRequestBody } from "..";
-import { SerializedValidationError, SerializedValidationErrorsMap } from ".";
+import type { HttpArgumentsHost } from "@nestjs/common/interfaces/index.js";
+import type { HttpRequest, HttpResponse, RequestSession } from "@/lib.js";
+import { ExceptionFilterResponderFactory } from "../../exception-responders/factory.js";
+import { ExceptionFilterResponder } from "../../exception-responders/responder.js";
+import { flashRequestBody } from "../../exceptions.js";
+import { SerializedValidationError, SerializedValidationErrorsMap } from "../dto-validation.js";
 
 type Body = SerializedValidationErrorsMap | SerializedValidationError[];
 type Output = void;

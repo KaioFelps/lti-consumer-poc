@@ -1,7 +1,7 @@
-import { Either } from "fp-ts/lib/Either";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
-import { User } from "./user.entity";
+import { Either } from "fp-ts/lib/Either.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error.js";
+import { User } from "./user.entity.js";
 
 export abstract class UsersRepository {
   /**

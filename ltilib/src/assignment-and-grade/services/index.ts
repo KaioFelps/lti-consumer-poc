@@ -1,16 +1,16 @@
 import { either as e, taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import guards from "$/advantage/guards";
-import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
-import { Context } from "$/core/context";
-import { Platform } from "$/core/platform";
-import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
-import { LtiTool } from "$/core/tool";
-import { LtiLineItem } from "../entities";
-import { InaccessibleLineItemError } from "../errors";
-import { LtiLineItemsRepository } from "../repositories";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import guards from "$/advantage/guards.js";
+import { LtiAdvantageMediaType } from "$/advantage/media-types.js";
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes.js";
+import { Context } from "$/core/context.js";
+import { Platform } from "$/core/platform.js";
+import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository.js";
+import { LtiTool } from "$/core/tool.js";
+import { LtiLineItem } from "../entities/index.js";
+import { InaccessibleLineItemError } from "../errors.js";
+import { LtiLineItemsRepository } from "../repositories.js";
 
 type BasicRequestValidationParams<CustomContextType = never> = {
   tool: LtiTool;

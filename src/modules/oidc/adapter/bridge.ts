@@ -1,6 +1,6 @@
 import { Adapter, AdapterPayload } from "oidc-provider";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ModelName, OIDCAdapterFactory } from "./factory";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { ModelName, OIDCAdapterFactory } from "./factory.js";
 
 export class OIDCAdapterBridge implements Adapter {
   private static internalAdapterFactory: OIDCAdapterFactory;

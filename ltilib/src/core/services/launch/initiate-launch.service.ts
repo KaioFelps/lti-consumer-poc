@@ -1,15 +1,15 @@
 import { either as e } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { MessageType } from "$/core/claims/serialization";
-import { InvalidLaunchInitiationError } from "$/core/errors/invalid-launch-initiation.error";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiLaunchData } from "$/core/launch-data";
-import { MessageRequests } from "$/core/messages";
-import { InitiateLaunchRequest } from "$/core/messages/initiate-launch";
-import { Platform } from "$/core/platform";
-import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiTool } from "$/core/tool";
+import { Either } from "fp-ts/lib/Either.js";
+import { MessageType } from "$/core/claims/serialization.js";
+import { InvalidLaunchInitiationError } from "$/core/errors/invalid-launch-initiation.error.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiLaunchData } from "$/core/launch-data.js";
+import { InitiateLaunchRequest } from "$/core/messages/initiate-launch.js";
+import { MessageRequests } from "$/core/messages.js";
+import { Platform } from "$/core/platform.js";
+import { LtiLaunchesRepository } from "$/core/repositories/launches.repository.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiTool } from "$/core/tool.js";
 
 export type InitiateLaunchParams = {
   /**

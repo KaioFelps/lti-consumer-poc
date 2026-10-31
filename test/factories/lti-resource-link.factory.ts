@@ -1,11 +1,11 @@
-import { ltiResourceLinks } from "drizzle/schema";
+import { ltiResourceLinks } from "drizzle/schema.js";
 import { either } from "fp-ts";
-import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
-import { DrizzleClient } from "@/external/data-store/drizzle/client";
-import ltiResourceLinksMapper from "@/external/data-store/drizzle/mappers/lti-resource-links.mapper";
-import { LtiToolDeployment } from "@/modules/lti/tools/entities/lti-tool-deployment.entity";
-import { Context } from "$/core/context";
-import { LtiToolDeployment as LtilibToolDeployment } from "$/core/tool-deployment";
+import { DrizzleClient } from "@/external/data-store/drizzle/client.js";
+import ltiResourceLinksMapper from "@/external/data-store/drizzle/mappers/lti-resource-links.mapper.js";
+import { LtiToolDeployment } from "@/modules/lti/tools/entities/lti-tool-deployment.entity.js";
+import { Context } from "$/core/context.js";
+import { LtiToolDeployment as LtilibToolDeployment } from "$/core/tool-deployment.js";
+import { createResourceLink } from "$/tests/common/factories/resource-link.factory.js";
 
 type OriginalFactoryParams = Exclude<Parameters<typeof createResourceLink>[0], undefined>;
 type FactoryParams = Partial<

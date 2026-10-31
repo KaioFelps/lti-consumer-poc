@@ -1,6 +1,6 @@
 import { Inject, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { createClient, RedisClientType } from "redis";
-import { EnvironmentVars } from "@/config/environment-vars";
+import { EnvironmentVars } from "@/config/environment-vars.js";
 
 export class Redis implements OnModuleInit, OnModuleDestroy {
   public readonly client: RedisClientType;

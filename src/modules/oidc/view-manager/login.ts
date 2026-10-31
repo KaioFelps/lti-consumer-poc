@@ -1,5 +1,5 @@
-import { TranslatorService } from "@/message-string/translator.service";
-import { ViewManager } from ".";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { ViewManager } from "../view-manager.js";
 
 type LoginViewData = {
   loginEndpoint: string;

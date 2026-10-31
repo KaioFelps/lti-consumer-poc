@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import {
   prepareContainerFullLinkHeader,
   prepareContainerLinkHeader,
-} from "./prepare-container-link-header";
+} from "./prepare-container-link-header.js";
 
 describe("LTI Containers Link Header Values Generators", () => {
   const endpointUrl = new URL("ctx/59", faker.internet.url({ protocol: "https" }));

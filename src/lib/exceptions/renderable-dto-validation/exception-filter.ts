@@ -1,10 +1,10 @@
 import { ArgumentsHost, Catch, ExceptionFilter, Inject, Injectable, Scope } from "@nestjs/common";
-import { RenderableError } from "@/core/errors/renderable/renderable-error";
-import { TranslatorService } from "@/message-string/translator.service";
-import { serializeValidationError } from "../dto-validation";
-import { RenderableException } from "../renderable/exception";
-import { RenderableExceptionFilter } from "../renderable/exception-filter";
-import { RenderableDtoValidationException } from "./exception";
+import { RenderableError } from "@/core/errors/renderable/renderable-error.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { serializeValidationError } from "../dto-validation.js";
+import { RenderableException } from "../renderable/exception.js";
+import { RenderableExceptionFilter } from "../renderable/exception-filter.js";
+import { RenderableDtoValidationException } from "./exception.js";
 
 @Injectable({ scope: Scope.REQUEST })
 @Catch(RenderableDtoValidationException)

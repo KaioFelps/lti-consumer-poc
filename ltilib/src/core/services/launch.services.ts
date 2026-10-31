@@ -1,22 +1,22 @@
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim";
-import { Platform } from "$/core/platform";
-import { LtiContextsRepository } from "$/core/repositories/contexts.repository";
-import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
-import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
-import { LtiToolsRepository } from "$/core/repositories/tools.repository";
-import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identities.repository";
+import { pipe } from "fp-ts/lib/function.js";
+import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim.services.js";
+import { Platform } from "$/core/platform.js";
+import { LtiContextsRepository } from "$/core/repositories/contexts.repository.js";
+import { LtiLaunchesRepository } from "$/core/repositories/launches.repository.js";
+import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository.js";
+import { LtiToolsRepository } from "$/core/repositories/tools.repository.js";
+import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identities.repository.js";
 import {
   GetLaunchLinksFromResourceLinksParams,
   GetLaunchLinksParams,
   GetLaunchLinksService,
-} from "./get-launch-links.service";
-import { InitiateLaunchParams, InitiateLaunchService } from "./initiate-launch.service";
+} from "./launch/get-launch-links.service.js";
+import { InitiateLaunchParams, InitiateLaunchService } from "./launch/initiate-launch.service.js";
 import {
   AuthenticateLaunchLoginRequestParams,
   PrepareLaunchRequestService,
-} from "./prepare-launch-request.service";
+} from "./launch/prepare-launch-request.service.js";
 
 type GetLaunchLinksFromContext = GetLaunchLinksParams & {
   contextId: string;

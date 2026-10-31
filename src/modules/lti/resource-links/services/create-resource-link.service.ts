@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import { generateUUID } from "common/src/types/uuid";
+import { generateUUID } from "common/src/types/uuid.js";
 import { either as e } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { LtiToolDeployment } from "@/modules/lti/tools/entities/lti-tool-deployment.entity";
-import { Context } from "$/core/context";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiResourceLinksRepository } from "../resource-links.repository";
+import { pipe } from "fp-ts/lib/function.js";
+import { LtiToolDeployment } from "@/modules/lti/tools/entities/lti-tool-deployment.entity.js";
+import { Context } from "$/core/context.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiResourceLinksRepository } from "../resource-links.repository.js";
 
 type Params = {
   resourceUrl?: URL;

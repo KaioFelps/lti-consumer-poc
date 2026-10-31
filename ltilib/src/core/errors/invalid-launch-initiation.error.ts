@@ -1,4 +1,4 @@
-import { LtilibError } from "./bases/ltilib.error";
+import { LtilibError } from "./bases/ltilib.error.js";
 
 type Reason = "resource_link_does_not_belong_to_tool" | "resource_link_is_not_in_tools_deployments";
 

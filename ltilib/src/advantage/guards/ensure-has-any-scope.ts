@@ -1,7 +1,7 @@
 import { taskEither as te } from "fp-ts";
-import { TaskEither } from "fp-ts/lib/TaskEither";
-import { LtiTool } from "$/core/tool";
-import { MissingAnyScopeError, MissingScopeError } from "../errors/missing-scope.error";
+import { TaskEither } from "fp-ts/lib/TaskEither.js";
+import { LtiTool } from "$/core/tool.js";
+import { MissingAnyScopeError, MissingScopeError } from "../errors/missing-scope.error.js";
 
 type Params = {
   requiredScopes: string | readonly string[];

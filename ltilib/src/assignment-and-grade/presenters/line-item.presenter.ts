@@ -1,11 +1,11 @@
-import { JsonValue } from "common/src/types/json-value";
+import { JsonValue } from "common/src/types/json-value.js";
 import { either } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { Context } from "$/core/context";
-import { MisconfiguredPlatformError } from "$/core/errors/misconfigured-platform.error";
-import { Platform } from "$/core/platform";
-import { LtiLineItem } from "../entities";
-import { MissingPlatformAgsConfigurationError } from "../errors";
+import { Either } from "fp-ts/lib/Either.js";
+import { Context } from "$/core/context.js";
+import { MisconfiguredPlatformError } from "$/core/errors/misconfigured-platform.error.js";
+import { Platform } from "$/core/platform.js";
+import { LtiLineItem } from "../entities/index.js";
+import { MissingPlatformAgsConfigurationError } from "../errors.js";
 
 export type PresentedLtiLineItem = {
   id: string;

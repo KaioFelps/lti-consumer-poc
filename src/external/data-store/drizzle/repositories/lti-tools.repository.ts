@@ -6,22 +6,22 @@ import {
   oauthClients,
   oauthContacts,
   oauthRedirectUris,
-} from "drizzle/schema";
+} from "drizzle/schema.js";
 import { eq, inArray } from "drizzle-orm";
 import { option, taskEither } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity";
-import { LtiToolPreview } from "@/modules/lti/tools/entities/lti-tool-preview.entity";
-import { ToolNotFoundError } from "@/modules/lti/tools/errors/tool-not-found.error";
-import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiTool as BaseLtiTool } from "$/core/tool";
-import { DrizzleClient } from "../client";
-import ltiToolPreviewsMapper from "../mappers/lti-tool-previews.mapper";
-import ltiToolsMapper from "../mappers/lti-tools.mapper";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity.js";
+import { LtiToolPreview } from "@/modules/lti/tools/entities/lti-tool-preview.entity.js";
+import { ToolNotFoundError } from "@/modules/lti/tools/errors/tool-not-found.error.js";
+import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiTool as BaseLtiTool } from "$/core/tool.js";
+import { DrizzleClient } from "../client.js";
+import ltiToolPreviewsMapper from "../mappers/lti-tool-previews.mapper.js";
+import ltiToolsMapper from "../mappers/lti-tools.mapper.js";
 
 @Injectable()
 export class DrizzleLtiToolsRepository extends LtiToolsRepository {

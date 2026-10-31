@@ -1,5 +1,5 @@
-import { LtiTool } from "../lti-tool.entity";
-import { LtiToolDeployment } from "../lti-tool-deployment.entity";
+import { LtiTool } from "../lti-tool.entity.js";
+import { LtiToolDeployment } from "../lti-tool-deployment.entity.js";
 
 type ToolDetailsProps = {
   readonly tool: LtiTool;

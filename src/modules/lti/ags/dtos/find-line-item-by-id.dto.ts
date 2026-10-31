@@ -1,9 +1,9 @@
 import { Expose } from "class-transformer";
-import { type UUID } from "common/src/types/uuid";
+import { type UUID } from "common/src/types/uuid.js";
 import { either } from "fp-ts";
 import z from "zod";
-import { DTO } from "@/core/interfaces/dto";
-import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
+import { DTO } from "@/core/interfaces/dto.js";
+import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error.js";
 
 const schema = z.object({
   lineItemId: z

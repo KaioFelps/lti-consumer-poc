@@ -1,7 +1,7 @@
-import { MessagePlacement } from "$/core/tool/message-placement";
-import { Platform } from "../platform";
-import { LtiResourceLink } from "../resource-link";
-import { LtiTool } from "../tool";
+import { MessagePlacement } from "$/core/tool/message-placement.js";
+import { Platform } from "../platform.js";
+import { LtiResourceLink } from "../resource-link.js";
+import { LtiTool } from "../tool.js";
 
 export type PresentedLtiResourceLink = {
   id: string;

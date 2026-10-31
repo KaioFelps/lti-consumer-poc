@@ -1,10 +1,10 @@
 import { either as e } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { Context } from "$/core/context";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
-import { LtiTool } from "$/core/tool";
-import { LtiToolDeployment } from "$/core/tool-deployment";
+import { Either } from "fp-ts/lib/Either.js";
+import { Context } from "$/core/context.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository.js";
+import { LtiTool } from "$/core/tool.js";
+import { LtiToolDeployment } from "$/core/tool-deployment.js";
 
 export class InMemoryLtiToolDeploymentsRepository implements LtiToolDeploymentsRepository {
   public deployments: LtiToolDeployment[] = [];

@@ -21,8 +21,7 @@ export type MessageStringFormatterArg = {
  * but a string. In case there is a undefined parameter, it should
  * log a warn, but still render the message string.
  */
-export type MessageString =
-  | string
-  | ((args: MessageStringFormatterArg, identifier: string) => string);
+// biome-ignore lint/suspicious/noExplicitAny: easier for writing the translations
+export type MessageString = string | ((args: any, identifier: string) => string);
 
 export type MessageStringTranslationMap = Record<string, MessageString>;

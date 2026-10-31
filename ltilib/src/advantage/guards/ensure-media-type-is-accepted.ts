@@ -1,7 +1,7 @@
 import { taskEither as te } from "fp-ts";
-import { TaskEither } from "fp-ts/lib/TaskEither";
-import { NotAcceptableMediaTypeError } from "../errors/not-acceptable-media-type.error";
-import { LtiAdvantageMediaType } from "../media-types";
+import { TaskEither } from "fp-ts/lib/TaskEither.js";
+import { NotAcceptableMediaTypeError } from "../errors/not-acceptable-media-type.error.js";
+import { LtiAdvantageMediaType } from "../media-types.js";
 
 /**
  * Checks whether `availableMediaType` is accepted by `acceptHeader`

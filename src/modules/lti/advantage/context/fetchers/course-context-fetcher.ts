@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { CourseNotFoundError } from "@/modules/assignments-and-grades/errors/course-not-found.error";
-import { CoursesRepository } from "@/modules/assignments-and-grades/repositories/courses.repository";
-import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type";
-import { ContextNotFoundError } from "../../errors/context-not-found.error";
-import { CourseContextAdapter } from "../adapters/course-context.adapter";
-import { ContextFetcher } from ".";
+import { pipe } from "fp-ts/lib/function.js";
+import { CourseNotFoundError } from "@/modules/assignments-and-grades/errors/course-not-found.error.js";
+import { CoursesRepository } from "@/modules/assignments-and-grades/repositories/courses.repository.js";
+import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type.js";
+import { ContextNotFoundError } from "../../errors/context-not-found.error.js";
+import { CourseContextAdapter } from "../adapters/course-context.adapter.js";
+import { ContextFetcher } from "./index.js";
 
 @Injectable()
 export class CourseContextFetcher extends ContextFetcher {

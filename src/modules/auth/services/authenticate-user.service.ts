@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
-import { UnauthorizedError } from "@/core/errors/unauthorized.error";
-import { User } from "@/modules/identity/user/user.entity";
-import { UsersRepository } from "@/modules/identity/user/users.repository";
-import { PasswordComparator } from "../password/comparator";
+import { pipe } from "fp-ts/lib/function.js";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error.js";
+import { UnauthorizedError } from "@/core/errors/unauthorized.error.js";
+import { User } from "@/modules/identity/user/user.entity.js";
+import { UsersRepository } from "@/modules/identity/user/users.repository.js";
+import { PasswordComparator } from "../password/comparator.js";
 
 type AuthenticateUserParams = {
   username: string;

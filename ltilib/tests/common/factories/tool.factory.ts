@@ -1,10 +1,10 @@
 import { faker } from "@faker-js/faker";
-import { generateUUID } from "common/src/types/uuid";
+import { generateUUID } from "common/src/types/uuid.js";
 import { either, option as o } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { resolveFactoryOptional } from "ltilib/tests/utils/resolve-nullified-optional";
-import { type ILtiTool, LtiTool } from "$/core/tool";
-import { NullifyUndefined } from "../types/nullify";
+import { pipe } from "fp-ts/lib/function.js";
+import { type ILtiTool, LtiTool } from "$/core/tool.js";
+import { resolveFactoryOptional } from "$/tests/utils/resolve-nullified-optional.js";
+import { NullifyUndefined } from "../types/nullify.js";
 
 type ToolURIs = {
   targetLinkUri: URL;

@@ -1,6 +1,6 @@
-import { Either } from "fp-ts/lib/Either";
-import { Context } from "$/core/context";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
+import { Either } from "fp-ts/lib/Either.js";
+import { Context } from "$/core/context.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
 
 export abstract class LtiContextsRepository<CustomContextType = never> {
   /**

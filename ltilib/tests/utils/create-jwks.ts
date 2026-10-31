@@ -1,4 +1,4 @@
-import { generateUUID } from "common/src/types/uuid";
+import { generateUUID } from "common/src/types/uuid.js";
 import * as jose from "jose";
 
 /**

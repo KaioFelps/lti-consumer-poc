@@ -1,5 +1,5 @@
 import { HttpStatus } from "@nestjs/common";
-import { ErrorClassProperties } from "../error-base";
+import { ErrorClassProperties } from "../error-base.js";
 
 type Args = ErrorClassProperties<RenderableError>;
 

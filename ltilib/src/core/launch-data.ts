@@ -1,7 +1,7 @@
-import { ClassProperties } from "common/src/types/class-properties";
-import { Optional } from "common/src/types/optional";
-import { generateUUID, UUID } from "common/src/types/uuid";
-import { MessageRequests } from "./messages";
+import { ClassProperties } from "common/src/types/class-properties.js";
+import { Optional } from "common/src/types/optional.js";
+import { generateUUID, UUID } from "common/src/types/uuid.js";
+import { MessageRequests } from "./messages.js";
 
 type Args = Optional<ClassProperties<LtiLaunchData>, "id">;
 

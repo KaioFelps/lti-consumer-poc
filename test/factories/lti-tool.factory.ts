@@ -1,7 +1,7 @@
-import { createTool } from "ltilib/tests/common/factories/tool.factory";
-import { DrizzleClient } from "@/external/data-store/drizzle/client";
-import { DrizzleLtiToolsRepository } from "@/external/data-store/drizzle/repositories/lti-tools.repository";
-import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity";
+import { DrizzleClient } from "@/external/data-store/drizzle/client.js";
+import { DrizzleLtiToolsRepository } from "@/external/data-store/drizzle/repositories/lti-tools.repository.js";
+import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity.js";
+import { createTool } from "$/tests/common/factories/tool.factory.js";
 
 type FactoryParams = Parameters<typeof createTool>[0];
 

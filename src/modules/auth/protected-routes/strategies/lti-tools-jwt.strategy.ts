@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import Provider from "oidc-provider";
 import { Strategy } from "passport-custom";
-import { HttpRequest } from "@/lib";
+import type { HttpRequest } from "@/lib.js";
 
 const strategyName = "lti-tool-jwt";
 export default strategyName;

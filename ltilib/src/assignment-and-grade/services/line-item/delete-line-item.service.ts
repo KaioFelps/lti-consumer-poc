@@ -7,12 +7,12 @@
  */
 
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import { HttpResponseWrapper } from "$/core/http/response-wrapper";
-import { LtiTool } from "$/core/tool";
-import { AssignmentAndGradeServiceScopes } from "../../scopes";
-import { AGServiceBase } from "..";
+import { pipe } from "fp-ts/lib/function.js";
+import { LtiAdvantageMediaType } from "$/advantage/media-types.js";
+import { HttpResponseWrapper } from "$/core/http/response-wrapper.js";
+import { LtiTool } from "$/core/tool.js";
+import { AssignmentAndGradeServiceScopes } from "../../scopes.js";
+import { AGServiceBase } from "../index.js";
 
 export type DeleteLineItemServiceParams = {
   /**

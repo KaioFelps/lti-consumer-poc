@@ -1,11 +1,11 @@
-import { type UUID } from "common/src/types/uuid";
-import { Either } from "fp-ts/lib/Either";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { LtiLineItem } from "$/assignment-and-grade/entities";
-import { LtiLineItemsRepository as BaseLtiLineItemsRepository } from "$/assignment-and-grade/repositories";
-import { Context } from "$/core/context";
-import { ContextConcreteType } from "../enums/context-concrete-type";
-import { LineItemNotFoundError } from "../errors/line-item-not-found.error";
+import { type UUID } from "common/src/types/uuid.js";
+import { Either } from "fp-ts/lib/Either.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { LtiLineItem } from "$/assignment-and-grade/entities/index.js";
+import { LtiLineItemsRepository as BaseLtiLineItemsRepository } from "$/assignment-and-grade/repositories.js";
+import { Context } from "$/core/context.js";
+import { ContextConcreteType } from "../enums/context-concrete-type.js";
+import { LineItemNotFoundError } from "../errors/line-item-not-found.error.js";
 
 type LineItemsOfAssignmentResponse = {
   lineItems: LtiLineItem[];

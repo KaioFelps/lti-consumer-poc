@@ -8,26 +8,26 @@
  * constructor. (Unless the client platform has bypassed these validations, of course...)
  */
 
-import { generateUUID } from "common/src/types/uuid";
+import { generateUUID } from "common/src/types/uuid.js";
 import { either as e } from "fp-ts";
-import { createContext } from "ltilib/tests/common/factories/context.factory";
-import { createMinimalLineItem } from "ltilib/tests/common/factories/line-item.factory";
-import { createPlatform } from "ltilib/tests/common/factories/platform.factory";
-import { createScore } from "ltilib/tests/common/factories/score.factory";
-import { createTool } from "ltilib/tests/common/factories/tool.factory";
-import { createToolDeployment } from "ltilib/tests/common/factories/tool-deployment.factory";
-import { InMemoryLtiLineItemsRepository } from "ltilib/tests/common/in-memory-repositories/line-items.repository";
-import { InMemoryLtiScoresRepository } from "ltilib/tests/common/in-memory-repositories/scores-repository";
-import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
-import { MissingScopeError } from "$/advantage/errors/missing-scope.error";
-import { NotAcceptableMediaTypeError } from "$/advantage/errors/not-acceptable-media-type.error";
-import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import { LtiLineItem, LtiScore } from "$/assignment-and-grade/entities";
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
-import { Context } from "$/core/context";
-import { Platform } from "$/core/platform";
-import { LtiTool } from "$/core/tool";
-import { LtiResultServices } from ".";
+import { MissingScopeError } from "$/advantage/errors/missing-scope.error.js";
+import { NotAcceptableMediaTypeError } from "$/advantage/errors/not-acceptable-media-type.error.js";
+import { LtiAdvantageMediaType } from "$/advantage/media-types.js";
+import { LtiLineItem, LtiScore } from "$/assignment-and-grade/entities/index.js";
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes.js";
+import { Context } from "$/core/context.js";
+import { Platform } from "$/core/platform.js";
+import { LtiTool } from "$/core/tool.js";
+import { createContext } from "$/tests/common/factories/context.factory.js";
+import { createMinimalLineItem } from "$/tests/common/factories/line-item.factory.js";
+import { createPlatform } from "$/tests/common/factories/platform.factory.js";
+import { createScore } from "$/tests/common/factories/score.factory.js";
+import { createTool } from "$/tests/common/factories/tool.factory.js";
+import { createToolDeployment } from "$/tests/common/factories/tool-deployment.factory.js";
+import { InMemoryLtiLineItemsRepository } from "$/tests/common/in-memory-repositories/line-items.repository.js";
+import { InMemoryLtiScoresRepository } from "$/tests/common/in-memory-repositories/scores-repository.js";
+import { InMemoryLtiToolDeploymentsRepository } from "$/tests/common/in-memory-repositories/tool-deployments.repository.js";
+import { LtiResultServices } from "../results.services.js";
 
 describe("[AGS] Fetch Results Service", async () => {
   let platform: Platform;

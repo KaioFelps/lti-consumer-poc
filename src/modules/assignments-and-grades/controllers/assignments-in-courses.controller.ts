@@ -1,17 +1,17 @@
 import { Body, Controller, Get, Param, Post, Render, Res, Session } from "@nestjs/common";
-import { type UUID } from "common/src/types/uuid";
+import { type UUID } from "common/src/types/uuid.js";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { CourseWithInstructorPresenter } from "@/external/presenters/entities/course-with-instructor.presenter";
-import { HttpResponse, RequestSession } from "@/lib";
-import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { Mvc } from "@/lib/mvc-routes";
-import { TranslatorService } from "@/message-string/translator.service";
-import { SessionUser } from "../../auth/session-user";
-import { FindCourseByIdService } from "../../courses-and-enrollments/services/find-course-by-id.service";
-import { User } from "../../identity/user/user.entity";
-import { CreateAssignmentDTO } from "../dtos/create-assignment.dto";
-import { CreateAssignmentService } from "../services/create-assignment.service";
+import { pipe } from "fp-ts/lib/function.js";
+import { CourseWithInstructorPresenter } from "@/external/presenters/entities/course-with-instructor.presenter.js";
+import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory.js";
+import { Mvc } from "@/lib/mvc-routes.js";
+import type { HttpResponse, RequestSession } from "@/lib.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { SessionUser } from "../../auth/session-user.js";
+import { FindCourseByIdService } from "../../courses-and-enrollments/services/find-course-by-id.service.js";
+import { User } from "../../identity/user/user.entity.js";
+import { CreateAssignmentDTO } from "../dtos/create-assignment.dto.js";
+import { CreateAssignmentService } from "../services/create-assignment.service.js";
 
 @Mvc()
 @Controller("/courses/:courseId/assignments")

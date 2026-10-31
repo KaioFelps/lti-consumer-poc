@@ -1,6 +1,6 @@
-import { ClassProperties } from "common/src/types/class-properties";
-import { OptionalizeUndefined } from "common/src/types/optional";
-import { MessageStringFormatterArg } from "@/message-string/internal";
+import { ClassProperties } from "common/src/types/class-properties.js";
+import { OptionalizeUndefined } from "common/src/types/optional.js";
+import { MessageStringFormatterArg } from "@/message-string/internal/index.js";
 
 export type ErrorClassProperties<Class> = OptionalizeUndefined<
   Omit<ClassProperties<Class>, "errorType">

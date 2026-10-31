@@ -1,5 +1,5 @@
 import { either as e } from "fp-ts";
-import { IntoLtiClaim } from "$/core/claims/serialization";
+import { IntoLtiClaim } from "$/core/claims/serialization.js";
 import {
   Contact,
   DraftLtiDynamicToolConfiguration,
@@ -7,9 +7,9 @@ import {
   LTI_TOOL_CONFIGURATION_KEY,
   LtiDynamicToolConfiguration,
   ResponseType,
-} from "$/registration/dynamic/tool-configuration";
-import { InvalidToolConfigurationError } from "$/registration/errors/invalid-tool-configuration.error";
-import * as toolNamespace from "./namespace";
+} from "$/registration/dynamic/tool-configuration.js";
+import { InvalidToolConfigurationError } from "$/registration/errors/invalid-tool-configuration.error.js";
+import * as toolNamespace from "./tool/namespace.js";
 
 export interface ILtiTool {
   readonly id?: string;

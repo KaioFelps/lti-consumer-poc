@@ -1,10 +1,10 @@
 import { either, taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
 import * as jose from "jose";
 import { errors as jerr } from "jose";
-import { Platform } from "$/core/platform";
-import { JoseJwtClaimValidationFailureReason } from "$/lib/jose";
+import { Platform } from "$/core/platform.js";
+import { JoseJwtClaimValidationFailureReason } from "$/lib/jose.js";
 
 type ToolData = {
   clientId: string;

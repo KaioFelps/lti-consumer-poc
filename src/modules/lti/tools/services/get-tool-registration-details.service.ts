@@ -1,10 +1,10 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { LtiToolDetails } from "../entities/aggregations/tool-details";
-import { LtiTool } from "../entities/lti-tool.entity";
-import { LtiToolsRepository } from "../lti-tools.repository";
-import { LtiToolsDeploymentsRepository } from "../lti-tools-deployments.repository";
+import { pipe } from "fp-ts/lib/function.js";
+import { LtiToolDetails } from "../entities/aggregations/tool-details.js";
+import { LtiTool } from "../entities/lti-tool.entity.js";
+import { LtiToolsRepository } from "../lti-tools.repository.js";
+import { LtiToolsDeploymentsRepository } from "../lti-tools-deployments.repository.js";
 
 type Params = {
   toolId: string;

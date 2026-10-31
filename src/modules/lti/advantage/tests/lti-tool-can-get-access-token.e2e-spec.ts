@@ -1,11 +1,11 @@
 import { INestApplication } from "@nestjs/common";
 import supertest from "supertest";
-import { App } from "supertest/types";
-import { getTestingApp } from "test";
-import { injectMockedLtiToolRecord, prepareToolOidcTokenRequest } from "test/fixtures/oidc";
-import { UnsafeOIDCClientsInjectionContainer } from "@/modules/oidc/unsafe-clients-injection-container";
-import { Routes } from "@/routes";
-import { Platform } from "$/core/platform";
+import { App } from "supertest/types.js";
+import { injectMockedLtiToolRecord, prepareToolOidcTokenRequest } from "test/fixtures/oidc.js";
+import { getTestingApp } from "test/index.js";
+import { UnsafeOIDCClientsInjectionContainer } from "@/modules/oidc/unsafe-clients-injection-container.js";
+import { Routes } from "@/routes.js";
+import { Platform } from "$/core/platform.js";
 
 describe("[e2e::LTI] LTI Tools should be able to get an access token", async () => {
   const tokenEndpoint = Routes.oidc.token();

@@ -1,8 +1,8 @@
 import { taskEither } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
+import { pipe } from "fp-ts/lib/function.js";
 import * as jose from "jose";
-import { Platform } from "$/core/platform";
-import { LtiTool } from "$/core/tool";
+import { Platform } from "$/core/platform.js";
+import { LtiTool } from "$/core/tool.js";
 
 type PrepareIdTokenArgs = {
   platform: Platform;

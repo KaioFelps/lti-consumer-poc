@@ -1,5 +1,5 @@
-import { Context } from "$/core/context";
-import { LtiTool } from "$/core/tool";
+import { Context } from "$/core/context.js";
+import { LtiTool } from "$/core/tool.js";
 
 export interface IExternalLtiResource {
   /**

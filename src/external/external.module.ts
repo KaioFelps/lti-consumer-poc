@@ -1,6 +1,6 @@
 import { Global, Module } from "@nestjs/common";
-import { DataStoreModule } from "@/external/data-store/datastore.module";
-import { ArgonRSModule } from "./argon-rs/argon-rs.module";
+import { DataStoreModule } from "@/external/data-store/datastore.module.js";
+import { ArgonRSModule } from "./argon-rs/argon-rs.module.js";
 
 @Global()
 @Module({

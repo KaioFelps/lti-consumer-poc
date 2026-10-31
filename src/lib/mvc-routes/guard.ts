@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Inject, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { Observable } from "rxjs";
-import mvc from ".";
+import mvc from "../mvc-routes.js";
 
 /**
  * This guard attaches handler and controller data to the request object

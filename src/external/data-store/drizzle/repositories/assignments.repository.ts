@@ -1,20 +1,20 @@
 import { Injectable } from "@nestjs/common";
-import { UUID } from "common/src/types/uuid";
-import { assignmentsT, gradesT } from "drizzle/schema";
+import type { UUID } from "common/src/types/uuid.js";
+import { assignmentsT, gradesT } from "drizzle/schema.js";
 import { and, eq } from "drizzle-orm";
 import { either as e, option as opt, taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { GradeOfAssignment } from "@/modules/assignments-and-grades/aggregates/grade-of-assignment.aggregate";
-import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity";
-import { AssignmentNotFoundError } from "@/modules/assignments-and-grades/errors/assignment-not-found.error";
-import { GradeNotFoundError } from "@/modules/assignments-and-grades/errors/grade-not-found.error";
-import { AssignmentsRepository } from "@/modules/assignments-and-grades/repositories/assignments.repository";
-import { DrizzleClient } from "../client";
-import assignmentsMapper from "../mappers/assignments.mapper";
-import gradesMapper from "../mappers/grades.mapper";
-import { DrizzleTransactionManager } from "../transaction-manager";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { GradeOfAssignment } from "@/modules/assignments-and-grades/aggregates/grade-of-assignment.aggregate.js";
+import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity.js";
+import { AssignmentNotFoundError } from "@/modules/assignments-and-grades/errors/assignment-not-found.error.js";
+import { GradeNotFoundError } from "@/modules/assignments-and-grades/errors/grade-not-found.error.js";
+import { AssignmentsRepository } from "@/modules/assignments-and-grades/repositories/assignments.repository.js";
+import { DrizzleClient } from "../client.js";
+import assignmentsMapper from "../mappers/assignments.mapper.js";
+import gradesMapper from "../mappers/grades.mapper.js";
+import { DrizzleTransactionManager } from "../transaction-manager.js";
 
 @Injectable()
 export class DrizzleAssignmentsRepository extends AssignmentsRepository {

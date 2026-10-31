@@ -1,10 +1,10 @@
 import { faker } from "@faker-js/faker";
-import { coursesT } from "drizzle/schema";
-import { DrizzleClient } from "@/external/data-store/drizzle/client";
-import coursesMapper from "@/external/data-store/drizzle/mappers/courses.mapper";
-import { Course } from "@/modules/courses-and-enrollments/entities/course.entity";
-import { Instructor } from "@/modules/courses-and-enrollments/entities/instructor.entity";
-import personFactory from "./person.factory";
+import { coursesT } from "drizzle/schema.js";
+import { DrizzleClient } from "@/external/data-store/drizzle/client.js";
+import coursesMapper from "@/external/data-store/drizzle/mappers/courses.mapper.js";
+import { Course } from "@/modules/courses-and-enrollments/entities/course.entity.js";
+import { Instructor } from "@/modules/courses-and-enrollments/entities/instructor.entity.js";
+import personFactory from "./person.factory.js";
 
 type CreateCourseParams = Course.ConstructorProps;
 

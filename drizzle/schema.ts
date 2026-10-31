@@ -16,9 +16,9 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { PersonGender } from "@/modules/identity/person/enums/gender";
-import { SystemRole } from "@/modules/identity/user/enums/system-role";
-import { LtiScore } from "$/assignment-and-grade/entities";
+import { PersonGender } from "@/modules/identity/person/enums/gender.js";
+import { SystemRole } from "@/modules/identity/user/enums/system-role.js";
+import { LtiScore } from "$/assignment-and-grade/entities/index.js";
 
 export const systemRoleEnum = pgEnum("system_role", [SystemRole.Admin, SystemRole.User]);
 

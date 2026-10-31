@@ -1,6 +1,6 @@
-import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
-import { Platform } from "$/core/platform";
-import { CreateClaimParams, CreateService } from "./create-ags-claim.service";
+import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository.js";
+import { Platform } from "$/core/platform.js";
+import { CreateClaimParams, CreateService } from "./ags-claim/create-ags-claim.service.js";
 
 export class LtiAgsClaimServices<CustomContextType = never> {
   private createService: CreateService<CustomContextType>;

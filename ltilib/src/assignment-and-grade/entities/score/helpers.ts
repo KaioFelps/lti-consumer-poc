@@ -1,4 +1,4 @@
-import { LtiScore } from ".";
+import { LtiScore } from "./index.js";
 
 /**
  * Resolves submission timestamps (startedAt and submittedAt).

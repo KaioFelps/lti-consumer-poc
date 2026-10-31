@@ -1,4 +1,4 @@
-import { ForbiddenError } from "@/core/errors/forbidden.error";
+import { ForbiddenError } from "@/core/errors/forbidden.error.js";
 
 export class ToolNotDeployedError extends ForbiddenError {
   public constructor(toolId: string) {

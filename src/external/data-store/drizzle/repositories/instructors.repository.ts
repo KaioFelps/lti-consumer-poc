@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { UUID } from "common/src/types/uuid";
+import type { UUID } from "common/src/types/uuid.js";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { Instructor } from "@/modules/courses-and-enrollments/entities/instructor.entity";
-import { InstructorsRepository } from "@/modules/courses-and-enrollments/repositories/instructors.repository";
-import { PeopleRepository } from "@/modules/identity/person/people.repository";
+import { pipe } from "fp-ts/lib/function.js";
+import { Instructor } from "@/modules/courses-and-enrollments/entities/instructor.entity.js";
+import { InstructorsRepository } from "@/modules/courses-and-enrollments/repositories/instructors.repository.js";
+import { PeopleRepository } from "@/modules/identity/person/people.repository.js";
 
 @Injectable()
 export class DrizzleInstructorsRepository extends InstructorsRepository {

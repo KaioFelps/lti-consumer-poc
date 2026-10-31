@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import { type UUID } from "common/src/types/uuid";
+import { type UUID } from "common/src/types/uuid.js";
 import { either, taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { GradeNotFoundError } from "@/modules/assignments-and-grades/errors/grade-not-found.error";
-import { SystemRole } from "@/modules/identity/user/enums/system-role";
-import { User } from "@/modules/identity/user/user.entity";
-import { LtiScoresRepository } from "../repositories/lti-scores.repository";
+import { pipe } from "fp-ts/lib/function.js";
+import { GradeNotFoundError } from "@/modules/assignments-and-grades/errors/grade-not-found.error.js";
+import { SystemRole } from "@/modules/identity/user/enums/system-role.js";
+import { User } from "@/modules/identity/user/user.entity.js";
+import { LtiScoresRepository } from "../repositories/lti-scores.repository.js";
 
 type Params = {
   assignmentId: UUID;

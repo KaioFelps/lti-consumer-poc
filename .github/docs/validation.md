@@ -30,12 +30,12 @@ so that it is correctly displayed when the error be exposed as a JSON.
 ```ts
 import { Expose } from "class-transformer";
 import { either } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
+import { Either } from "fp-ts/lib/Either.js";
 import z from "zod";
-import { DTO } from "@/core/dto";
-import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
-import { ValidationErrors } from "@/core/validation/validation-errors";
-import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
+import { DTO } from "@/core/dto.js";
+import { InvalidArgumentError } from "@/core/errors/invalid-argument.error.js";
+import { ValidationErrors } from "@/core/validation/validation-errors.js";
+import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error.js";
 
 export class BazDTO implements DTO {
   protected static fooSchema = z.object({

@@ -1,6 +1,6 @@
-import { JsonPrimitive } from "common/src/types/json-value";
-import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
-import { calculateLastPageFromPaginatedData } from "./calculate-last-page-from-paginated-data";
+import { JsonPrimitive } from "common/src/types/json-value.js";
+import { LtiRepositoryPaginatedResponse } from "$/core/repositories.js";
+import { calculateLastPageFromPaginatedData } from "./calculate-last-page-from-paginated-data.js";
 
 const nonNullables = <T>(entry: [string, T]): entry is [string, NonNullable<T>] => {
   return typeof entry[1] !== "undefined" && entry[1] !== null && entry[1] !== "";

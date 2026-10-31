@@ -1,7 +1,7 @@
-import { Optional } from "common/src/types/optional";
-import { UUID } from "common/src/types/uuid";
-import { EntityBase } from "@/core/entity-base";
-import { SystemRole } from "./enums/system-role";
+import { Optional } from "common/src/types/optional.js";
+import type { UUID } from "common/src/types/uuid.js";
+import { EntityBase } from "@/core/entity-base.js";
+import { SystemRole } from "./enums/system-role.js";
 
 export type UserProps = {
   id: UUID;

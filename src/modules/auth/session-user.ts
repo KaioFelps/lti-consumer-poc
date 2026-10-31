@@ -1,8 +1,8 @@
-import { HttpRequest, RequestSession } from "@/lib";
-import { User, UserUncheckedProps } from "@/modules/identity/user/user.entity";
+import type { HttpRequest, RequestSession } from "@/lib.js";
+import { User, UserUncheckedProps } from "@/modules/identity/user/user.entity.js";
 
-export { SessionUser } from "./extractor";
-export { SessionUserMiddleware } from "./middleware";
+export { SessionUser } from "./session-user/extractor.js";
+export { SessionUserMiddleware } from "./session-user/middleware.js";
 
 const RAW_USER_PROPS_KEY = "__raw_user_props__";
 

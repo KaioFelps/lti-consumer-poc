@@ -10,12 +10,12 @@ import { REQUEST } from "@nestjs/core";
 import { plainToInstance } from "class-transformer";
 import { unflatten } from "flat";
 import { either } from "fp-ts";
-import type { DTO } from "@/core/interfaces/dto";
-import { DTOValidationException } from "@/lib/exceptions/dto-validation/exception";
-import { HttpRequest } from "..";
-import { RenderableDtoValidationException } from "../exceptions/renderable-dto-validation/exception";
-import mvcRoutes from "../mvc-routes";
-import coreValidation from ".";
+import type { DTO } from "@/core/interfaces/dto.js";
+import { DTOValidationException } from "@/lib/exceptions/dto-validation/exception.js";
+import type { HttpRequest } from "@/lib.js";
+import coreValidation from "../core-validation.js";
+import { RenderableDtoValidationException } from "../exceptions/renderable-dto-validation/exception.js";
+import mvcRoutes from "../mvc-routes.js";
 
 /**
  * Validates the body parameter (decorated with `@Body()`).

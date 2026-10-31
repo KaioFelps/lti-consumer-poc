@@ -1,11 +1,11 @@
-import { Nullable } from "common/src/types/nullable";
-import type { Optional } from "common/src/types/optional";
+import { Nullable } from "common/src/types/nullable.js";
+import type { Optional } from "common/src/types/optional.js";
 import { option } from "fp-ts";
-import { Option } from "fp-ts/lib/Option";
-import { EntityBase } from "@/core/entity-base";
-import { User, type UserProps, UserUncheckedProps } from "../user/user.entity";
-import type { PersonGender } from "./enums/gender";
-import { CPF } from "./value-objects/cpf";
+import { Option } from "fp-ts/lib/Option.js";
+import { EntityBase } from "@/core/entity-base.js";
+import { User, type UserProps, UserUncheckedProps } from "../user/user.entity.js";
+import type { PersonGender } from "./enums/gender.js";
+import { CPF } from "./value-objects/cpf.js";
 
 export type PersonProps = {
   user: User;

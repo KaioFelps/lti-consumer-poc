@@ -1,7 +1,7 @@
-import { TranslatorService } from "@/message-string/translator.service";
-import { InvalidLaunchInitiationError } from "$/core/errors/invalid-launch-initiation.error";
-import { ErrorClassProperties } from "../error-base";
-import { RenderableError } from "./renderable-error";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { InvalidLaunchInitiationError } from "$/core/errors/invalid-launch-initiation.error.js";
+import { ErrorClassProperties } from "../error-base.js";
+import { RenderableError } from "./renderable-error.js";
 
 type Args = ErrorClassProperties<RenderableLtiInvalidLaunchInitiationError>;
 

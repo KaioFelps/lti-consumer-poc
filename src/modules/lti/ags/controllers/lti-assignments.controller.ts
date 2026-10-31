@@ -1,37 +1,37 @@
 import { Body, Controller, Get, Param, Post, Render, Res, Session } from "@nestjs/common";
-import type { UUID } from "common/src/types/uuid";
+import type { UUID } from "common/src/types/uuid.js";
 import { either as e, taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { AssignmentPresenter } from "@/external/presenters/entities/assignment.presenter";
-import { CourseWithInstructorPresenter } from "@/external/presenters/entities/course-with-instructor.presenter";
-import { LtiToolPreviewPresenter } from "@/external/presenters/entities/lti-tool-preview.presenter";
-import { HttpResponse, RequestSession } from "@/lib";
-import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { ExtendedExceptionsFactory } from "@/lib/exceptions/extended-exceptions.factory";
-import { Mvc } from "@/lib/mvc-routes";
-import { TranslatorService } from "@/message-string/translator.service";
-import { CourseInstructorMismatch } from "@/modules/assignments-and-grades/errors/course-instructor-mismatch.error";
-import { CourseNotFoundError } from "@/modules/assignments-and-grades/errors/course-not-found.error";
-import { SessionUser } from "@/modules/auth/session-user";
-import { FindCourseByIdService } from "@/modules/courses-and-enrollments/services/find-course-by-id.service";
-import { User } from "@/modules/identity/user/user.entity";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { Platform } from "$/core/platform";
-import { presentLtiResourceLink } from "$/core/presenters/resource-link.presenter";
-import { ShowAssignmentsDetailsDto } from "../../../assignments-and-grades/dtos/show-assignments-details-params.dto";
-import { mountContextId } from "../../advantage/context";
-import { FindManyToolsPreviewsService } from "../../tools/services/find-many-tools-previews.service";
-import { ChooseMainLineItemDto } from "../dtos/choose-main-line-item.dto";
-import { CreateExternalLtiAssignmentDto } from "../dtos/create-external-lti-assignment.dto";
-import { ContextConcreteType } from "../enums/context-concrete-type";
-import { ChooseMainLineItemService } from "../services/choose-main-line-item.service";
-import { CreateExternalLtiAssignmentService } from "../services/create-external-lti-assignment.service";
+import { pipe } from "fp-ts/lib/function.js";
+import { AssignmentPresenter } from "@/external/presenters/entities/assignment.presenter.js";
+import { CourseWithInstructorPresenter } from "@/external/presenters/entities/course-with-instructor.presenter.js";
+import { LtiToolPreviewPresenter } from "@/external/presenters/entities/lti-tool-preview.presenter.js";
+import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory.js";
+import { ExtendedExceptionsFactory } from "@/lib/exceptions/extended-exceptions.factory.js";
+import { Mvc } from "@/lib/mvc-routes.js";
+import type { HttpResponse, RequestSession } from "@/lib.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { CourseInstructorMismatch } from "@/modules/assignments-and-grades/errors/course-instructor-mismatch.error.js";
+import { CourseNotFoundError } from "@/modules/assignments-and-grades/errors/course-not-found.error.js";
+import { SessionUser } from "@/modules/auth/session-user.js";
+import { FindCourseByIdService } from "@/modules/courses-and-enrollments/services/find-course-by-id.service.js";
+import { User } from "@/modules/identity/user/user.entity.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { Platform } from "$/core/platform.js";
+import { presentLtiResourceLink } from "$/core/presenters/resource-link.presenter.js";
+import { ShowAssignmentsDetailsDto } from "../../../assignments-and-grades/dtos/show-assignments-details-params.dto.js";
+import { mountContextId } from "../../advantage/context.js";
+import { FindManyToolsPreviewsService } from "../../tools/services/find-many-tools-previews.service.js";
+import { ChooseMainLineItemDto } from "../dtos/choose-main-line-item.dto.js";
+import { CreateExternalLtiAssignmentDto } from "../dtos/create-external-lti-assignment.dto.js";
+import { ContextConcreteType } from "../enums/context-concrete-type.js";
+import { ChooseMainLineItemService } from "../services/choose-main-line-item.service.js";
+import { CreateExternalLtiAssignmentService } from "../services/create-external-lti-assignment.service.js";
 import {
   AssignmentGradingDetails,
   FindAssignmentGradingDetailsService,
-} from "../services/find-assignment-grading-details.service";
-import { FindExternalLtiAssignmentByIdService } from "../services/find-external-lti-assignment-by-id.service";
-import { FindStudentScoreDetailsByExternalAssignmentIdService } from "../services/find-student-score-details-by-assignment-id.service";
+} from "../services/find-assignment-grading-details.service.js";
+import { FindExternalLtiAssignmentByIdService } from "../services/find-external-lti-assignment-by-id.service.js";
+import { FindStudentScoreDetailsByExternalAssignmentIdService } from "../services/find-student-score-details-by-assignment-id.service.js";
 
 @Mvc()
 @Controller("lti/ags")

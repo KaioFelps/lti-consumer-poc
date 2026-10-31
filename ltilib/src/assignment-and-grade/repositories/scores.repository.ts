@@ -1,7 +1,7 @@
-import { Either } from "fp-ts/lib/Either";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
-import { LtiLineItem, LtiScore } from "../entities";
+import { Either } from "fp-ts/lib/Either.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiRepositoryPaginatedResponse } from "$/core/repositories.js";
+import { LtiLineItem, LtiScore } from "../entities/index.js";
 
 export abstract class LtiScoresRepository {
   /**

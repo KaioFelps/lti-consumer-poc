@@ -1,10 +1,10 @@
 import { either as e } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiToolsRepository } from "$/core/repositories/tools.repository";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiTool } from "$/core/tool";
-import { InMemoryLtiResourceLinksRepository } from "./resource-links.repository";
+import { Either } from "fp-ts/lib/Either.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiToolsRepository } from "$/core/repositories/tools.repository.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiTool } from "$/core/tool.js";
+import { InMemoryLtiResourceLinksRepository } from "./resource-links.repository.js";
 
 export class InMemoryToolsRepository implements LtiToolsRepository {
   public tools: LtiTool[] = [];

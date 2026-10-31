@@ -3,31 +3,31 @@
  */
 
 import { either as e } from "fp-ts";
-import { createContext } from "ltilib/tests/common/factories/context.factory";
-import { createExternalLtiResource } from "ltilib/tests/common/factories/external-lti-resource.factory";
-import {
-  createFullLineItem,
-  createMinimalLineItem,
-} from "ltilib/tests/common/factories/line-item.factory";
-import { createPlatform } from "ltilib/tests/common/factories/platform.factory";
-import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
-import { createTool } from "ltilib/tests/common/factories/tool.factory";
-import { createToolDeployment } from "ltilib/tests/common/factories/tool-deployment.factory";
-import { InMemoryExternalLtiResourcesRepository } from "ltilib/tests/common/in-memory-repositories/external-lti-resources.repository";
-import { InMemoryLtiLineItemsRepository } from "ltilib/tests/common/in-memory-repositories/line-items.repository";
-import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
-import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
-import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
-import { NotAcceptableMediaTypeError } from "$/advantage/errors/not-acceptable-media-type.error";
-import { LtiAdvantageMediaType } from "$/advantage/media-types";
+import { NotAcceptableMediaTypeError } from "$/advantage/errors/not-acceptable-media-type.error.js";
+import { LtiAdvantageMediaType } from "$/advantage/media-types.js";
 import {
   InaccessibleLineItemError,
   MissingPlatformAgsConfigurationError,
   ToolIsNotDeployedInContextError,
-} from "$/assignment-and-grade/errors";
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
-import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
-import { Platform } from "$/core/platform";
+} from "$/assignment-and-grade/errors.js";
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes.js";
+import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item.services.js";
+import { Platform } from "$/core/platform.js";
+import { createContext } from "$/tests/common/factories/context.factory.js";
+import { createExternalLtiResource } from "$/tests/common/factories/external-lti-resource.factory.js";
+import {
+  createFullLineItem,
+  createMinimalLineItem,
+} from "$/tests/common/factories/line-item.factory.js";
+import { createPlatform } from "$/tests/common/factories/platform.factory.js";
+import { createResourceLink } from "$/tests/common/factories/resource-link.factory.js";
+import { createTool } from "$/tests/common/factories/tool.factory.js";
+import { createToolDeployment } from "$/tests/common/factories/tool-deployment.factory.js";
+import { InMemoryExternalLtiResourcesRepository } from "$/tests/common/in-memory-repositories/external-lti-resources.repository.js";
+import { InMemoryLtiLineItemsRepository } from "$/tests/common/in-memory-repositories/line-items.repository.js";
+import { InMemoryLtiResourceLinksRepository } from "$/tests/common/in-memory-repositories/resource-links.repository.js";
+import { InMemoryLtiToolDeploymentsRepository } from "$/tests/common/in-memory-repositories/tool-deployments.repository.js";
+import { InMemoryToolsRepository } from "$/tests/common/in-memory-repositories/tools.repository.js";
 
 describe("[AGS] Create Line Item Service", async () => {
   let platform: Platform;

@@ -1,10 +1,10 @@
-import { type UUID } from "common/src/types/uuid";
+import { type UUID } from "common/src/types/uuid.js";
 import { either as e } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { EntityBase } from "@/core/entity-base";
-import { Person } from "@/modules/identity/person/person.entity";
-import { InvalidGradeError } from "../errors/invalid-grade.error";
-import { Assignment } from "./assignment.entity";
+import { pipe } from "fp-ts/lib/function.js";
+import { EntityBase } from "@/core/entity-base.js";
+import { Person } from "@/modules/identity/person/person.entity.js";
+import { InvalidGradeError } from "../errors/invalid-grade.error.js";
+import { Assignment } from "./assignment.entity.js";
 
 type Props = {
   studentId: UUID;

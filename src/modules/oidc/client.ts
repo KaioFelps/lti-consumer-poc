@@ -1,13 +1,13 @@
-import { ClassProperties } from "common/src/types/class-properties";
-import { generateUUID } from "common/src/types/uuid";
+import { ClassProperties } from "common/src/types/class-properties.js";
+import { generateUUID } from "common/src/types/uuid.js";
 import { either } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
+import { pipe } from "fp-ts/lib/function.js";
 import type { AllClientMetadata, ClientMetadata } from "oidc-provider";
 import type { ZodError } from "zod";
-import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
-import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
-import { ODICClientIdPrefix } from ".";
-import { clientConfigurationSchema } from "./schemas";
+import { InvalidArgumentError } from "@/core/errors/invalid-argument.error.js";
+import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error.js";
+import { ODICClientIdPrefix } from "../oidc.js";
+import { clientConfigurationSchema } from "./schemas.js";
 
 type OIDCClientArgs = ClassProperties<OIDCClient>;
 

@@ -1,11 +1,11 @@
 import { forwardRef, MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
-import middlewares from "@/lib/middlewares";
-import { AssignmentsAndGradesModule } from "../assignments-and-grades/assignments-and-grades.module";
-import { LtiModule } from "../lti/lti.module";
-import { CoursesAndEnrollmentsController } from "./courses-and-enrollments.controller";
-import { CreateCourseService } from "./services/create-course.service";
-import { FetchManyCoursesService } from "./services/fetch-many-courses.service";
-import { FindCourseByIdService } from "./services/find-course-by-id.service";
+import middlewares from "@/lib/middlewares.js";
+import { AssignmentsAndGradesModule } from "../assignments-and-grades/assignments-and-grades.module.js";
+import { LtiModule } from "../lti/lti.module.js";
+import { CoursesAndEnrollmentsController } from "./courses-and-enrollments.controller.js";
+import { CreateCourseService } from "./services/create-course.service.js";
+import { FetchManyCoursesService } from "./services/fetch-many-courses.service.js";
+import { FindCourseByIdService } from "./services/find-course-by-id.service.js";
 
 @Module({
   imports: [forwardRef(() => AssignmentsAndGradesModule), forwardRef(() => LtiModule)],

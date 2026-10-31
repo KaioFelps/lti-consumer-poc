@@ -1,18 +1,18 @@
 import { INestApplication } from "@nestjs/common";
 import request from "supertest";
-import { App } from "supertest/types";
-import { getTestingApp } from "test";
-import deploymentFactory from "test/factories/deployment.factory";
-import ltiLineItemFactory from "test/factories/lti-line-item.factory";
-import ltiToolFactory from "test/factories/lti-tool.factory";
-import { getToolAndItsOidcAccessToken } from "test/fixtures/oidc";
-import { EnvironmentVars } from "@/config/environment-vars";
-import { DrizzleClient } from "@/external/data-store/drizzle/client";
-import { Routes } from "@/routes";
-import { LtiLineItem } from "$/assignment-and-grade/entities";
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
-import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
-import { EntitiesFactoryGenerator, generateEntitiesFactory } from "./tests";
+import { App } from "supertest/types.js";
+import deploymentFactory from "test/factories/deployment.factory.js";
+import ltiLineItemFactory from "test/factories/lti-line-item.factory.js";
+import ltiToolFactory from "test/factories/lti-tool.factory.js";
+import { getToolAndItsOidcAccessToken } from "test/fixtures/oidc.js";
+import { getTestingApp } from "test/index.js";
+import { EnvironmentVars } from "@/config/environment-vars.js";
+import { DrizzleClient } from "@/external/data-store/drizzle/client.js";
+import { Routes } from "@/routes.js";
+import { LtiLineItem } from "$/assignment-and-grade/entities/index.js";
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes.js";
+import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item.services.js";
+import { EntitiesFactoryGenerator, generateEntitiesFactory } from "./tests.js";
 
 describe("[e2e::LTI] Delete Line Item", async () => {
   let app: INestApplication<App>;

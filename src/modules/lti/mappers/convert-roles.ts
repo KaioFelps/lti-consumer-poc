@@ -1,9 +1,9 @@
-import { SystemRole } from "@/modules/identity/user/enums/system-role";
+import { SystemRole } from "@/modules/identity/user/enums/system-role.js";
 import {
   //   InstitutionRole,
   SystemRole as LtiSystemRole,
   //   MembershipRole,
-} from "$/core/claims/enums/roles";
+} from "$/core/claims/enums/roles.js";
 
 export function mapRolesToLtiSystemRoles(sysRole: SystemRole) {
   switch (sysRole) {

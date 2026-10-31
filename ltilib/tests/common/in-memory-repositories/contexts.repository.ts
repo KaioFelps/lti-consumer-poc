@@ -1,7 +1,7 @@
 import { either } from "fp-ts";
-import { Context } from "$/core/context";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiContextsRepository } from "$/core/repositories/contexts.repository";
+import { Context } from "$/core/context.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiContextsRepository } from "$/core/repositories/contexts.repository.js";
 
 export class InMemoryLtiContextsRepository<CCtype = never>
   implements LtiContextsRepository<CCtype>

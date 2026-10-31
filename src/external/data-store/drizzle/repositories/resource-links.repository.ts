@@ -1,19 +1,19 @@
 import { Injectable } from "@nestjs/common";
-import { UUID } from "common/src/types/uuid";
-import { ltiResourceLinks, ltiToolDeployments } from "drizzle/schema";
+import type { UUID } from "common/src/types/uuid.js";
+import { ltiResourceLinks, ltiToolDeployments } from "drizzle/schema.js";
 import { and, eq, inArray, SQLWrapper } from "drizzle-orm";
 import { taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ResourceLinkNotFoundError } from "@/modules/lti/resource-links/errors/resource-link-not-found.error";
-import { LtiResourceLinksRepository } from "@/modules/lti/resource-links/resource-links.repository";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { FindManyParams } from "$/core/repositories/resource-links.repository";
-import { LtiResourceLink } from "$/core/resource-link";
-import { DrizzleClient } from "../client";
-import ltiResourceLinksMapper from "../mappers/lti-resource-links.mapper";
-import { DrizzleTransactionManager } from "../transaction-manager";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { ResourceLinkNotFoundError } from "@/modules/lti/resource-links/errors/resource-link-not-found.error.js";
+import { LtiResourceLinksRepository } from "@/modules/lti/resource-links/resource-links.repository.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { FindManyParams } from "$/core/repositories/resource-links.repository.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { DrizzleClient } from "../client.js";
+import ltiResourceLinksMapper from "../mappers/lti-resource-links.mapper.js";
+import { DrizzleTransactionManager } from "../transaction-manager.js";
 
 @Injectable()
 export class DrizzleLtiResourceLinksRepository extends LtiResourceLinksRepository {

@@ -1,6 +1,6 @@
-import { Context } from "$/core/context";
-import { LtilibError } from "$/core/errors/bases/ltilib.error";
-import { LtiTool } from "$/core/tool";
+import { Context } from "$/core/context.js";
+import { LtilibError } from "$/core/errors/bases/ltilib.error.js";
+import { LtiTool } from "$/core/tool.js";
 
 export class ToolIsNotDeployedInContextError extends LtilibError {
   public constructor(tool: LtiTool, context: Context<unknown>) {

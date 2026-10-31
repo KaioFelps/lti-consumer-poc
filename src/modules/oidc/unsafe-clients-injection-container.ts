@@ -6,9 +6,9 @@
 
 import { Injectable } from "@nestjs/common";
 import { ClientMetadata } from "oidc-provider";
-import { EnvironmentVars } from "@/config/environment-vars";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
+import { EnvironmentVars } from "@/config/environment-vars.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory.js";
 
 /**
  * A container of mocked, unsafe, and unregisted OIDC clients metadatas.

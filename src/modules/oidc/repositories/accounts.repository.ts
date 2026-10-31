@@ -1,4 +1,4 @@
-import { OIDCAccount } from "../account";
+import { OIDCAccount } from "../account.js";
 
 export abstract class OIDCAccountsRepository {
   public abstract findAccountById(id: string): Promise<OIDCAccount | undefined>;

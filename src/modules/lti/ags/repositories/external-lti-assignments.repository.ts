@@ -1,9 +1,9 @@
-import { type UUID } from "common/src/types/uuid";
-import type { Either } from "fp-ts/lib/Either";
-import type { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import type { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity";
-import type { LtiResourceLink } from "$/core/resource-link";
-import { ExternalAssignmentNotFoundError } from "../errors/external-assignment-not-found.error";
+import { type UUID } from "common/src/types/uuid.js";
+import type { Either } from "fp-ts/lib/Either.js";
+import type { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import type { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity.js";
+import type { LtiResourceLink } from "$/core/resource-link.js";
+import { ExternalAssignmentNotFoundError } from "../errors/external-assignment-not-found.error.js";
 
 export abstract class ExternalLtiAssignmentsRepository {
   public abstract makeAssignmentExternal(

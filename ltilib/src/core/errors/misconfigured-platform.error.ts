@@ -1,4 +1,4 @@
-import { LtilibError } from "./bases/ltilib.error";
+import { LtilibError } from "./bases/ltilib.error.js";
 
 export class MisconfiguredPlatformError extends LtilibError {
   public constructor(message: string) {

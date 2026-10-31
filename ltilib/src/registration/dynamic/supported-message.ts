@@ -1,6 +1,6 @@
-import { AnyLtiRole } from "$/core/claims/enums/roles";
-import { MessageType } from "$/core/claims/serialization";
-import { MessagePlacement } from "../../core/tool/message-placement";
+import { AnyLtiRole } from "$/core/claims/enums/roles.js";
+import { MessageType } from "$/core/claims/serialization.js";
+import { MessagePlacement } from "../../core/tool/message-placement.js";
 
 /**
  * An interface of the raw payload of a tool supported message

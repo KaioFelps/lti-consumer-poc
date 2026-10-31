@@ -1,13 +1,13 @@
-import { type UUID } from "common/src/types/uuid";
-import * as schema from "drizzle/schema";
+import { type UUID } from "common/src/types/uuid.js";
+import * as schema from "drizzle/schema.js";
 import {
   type BuildQueryResult,
   type DBQueryConfig,
   type ExtractTablesWithRelations,
 } from "drizzle-orm";
-import { pipe } from "fp-ts/lib/function";
-import { Grade } from "@/modules/assignments-and-grades/entities/grade.entity";
-import { trimNullProperties } from "@/utils/trim-null-properties";
+import { pipe } from "fp-ts/lib/function.js";
+import { Grade } from "@/modules/assignments-and-grades/entities/grade.entity.js";
+import { trimNullProperties } from "@/utils/trim-null-properties.js";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 

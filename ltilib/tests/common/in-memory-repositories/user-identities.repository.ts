@@ -1,8 +1,8 @@
 import { either as e } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identities.repository";
-import { UserIdentity } from "$/core/user-identity";
+import { Either } from "fp-ts/lib/Either.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identities.repository.js";
+import { UserIdentity } from "$/core/user-identity.js";
 
 export class InMemoryUserIdentitiesRepository<CR = never>
   implements LtiUserIdentitiesRespository<CR>

@@ -1,4 +1,4 @@
-import { IOAuthBearerError, OAuthBearerError } from "$/core/errors/oauth-bearer.error";
+import { IOAuthBearerError, OAuthBearerError } from "$/core/errors/oauth-bearer.error.js";
 
 type Options = {
   errorUri?: IOAuthBearerError["errorUri"];

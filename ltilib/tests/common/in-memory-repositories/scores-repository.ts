@@ -1,9 +1,9 @@
 import { either as e } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { LtiLineItem, LtiScore } from "$/assignment-and-grade/entities";
-import { LtiScoresRepository } from "$/assignment-and-grade/repositories";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
+import { Either } from "fp-ts/lib/Either.js";
+import { LtiLineItem, LtiScore } from "$/assignment-and-grade/entities/index.js";
+import { LtiScoresRepository } from "$/assignment-and-grade/repositories.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiRepositoryPaginatedResponse } from "$/core/repositories.js";
 
 export class InMemoryLtiScoresRepository extends LtiScoresRepository {
   public scores: Array<{ score: LtiScore; lineItemId: string }> = [];

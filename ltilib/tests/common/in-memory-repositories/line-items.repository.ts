@@ -1,16 +1,16 @@
-import { generateUUID } from "common/src/types/uuid";
+import { generateUUID } from "common/src/types/uuid.js";
 import { either as e, option as o } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { ExternalLtiResource } from "$/advantage/external-resource";
-import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters";
-import { LtiLineItem } from "$/assignment-and-grade/entities";
-import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
-import { Context } from "$/core/context";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiTool } from "$/core/tool";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { ExternalLtiResource } from "$/advantage/external-resource.js";
+import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters.js";
+import { LtiLineItem } from "$/assignment-and-grade/entities/index.js";
+import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository.js";
+import { Context } from "$/core/context.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiRepositoryPaginatedResponse } from "$/core/repositories.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiTool } from "$/core/tool.js";
 
 type Record = {
   lineItem: LtiLineItem;

@@ -1,16 +1,16 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { usersTable } from "drizzle/schema";
+import { usersTable } from "drizzle/schema.js";
 import { and, eq, SQLWrapper, sql } from "drizzle-orm";
 import { either, option, taskEither } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { tryCatch } from "fp-ts/lib/TaskEither";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { Person, PersonUncheckedProps } from "@/modules/identity/person/person.entity";
-import { OIDCAccount } from "@/modules/oidc/account";
-import { OIDCAccountsRepository } from "@/modules/oidc/repositories/accounts.repository";
-import { trimNullProperties } from "@/utils/trim-null-properties";
-import { DrizzleClient } from "../client";
+import { pipe } from "fp-ts/lib/function.js";
+import { tryCatch } from "fp-ts/lib/TaskEither.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory.js";
+import { Person, PersonUncheckedProps } from "@/modules/identity/person/person.entity.js";
+import { OIDCAccount } from "@/modules/oidc/account.js";
+import { OIDCAccountsRepository } from "@/modules/oidc/repositories/accounts.repository.js";
+import { trimNullProperties } from "@/utils/trim-null-properties.js";
+import { DrizzleClient } from "../client.js";
 
 /**
  * This is a repository whose interface is not defined by the application domain.
@@ -52,11 +52,11 @@ export class DrizzleODICAccountsRepository extends OIDCAccountsRepository {
                 condition,
               ),
             ),
-        (error: Error) => {
+        (error) => {
           return new IrrecoverableError(
             "An error occurred in DrizzleODICAccountsRepository on " +
               "finding an OIDC account by ID.",
-            error,
+            error as Error,
           );
         },
       ),

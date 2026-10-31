@@ -1,12 +1,12 @@
 import { faker } from "@faker-js/faker";
 import { either } from "fp-ts";
-import { ILtiLineItem, LtiLineItem } from "$/assignment-and-grade/entities";
-import { Context } from "$/core/context";
-import { LtiTool } from "$/core/tool";
-import { createContext } from "./context.factory";
-import { createExternalLtiResource } from "./external-lti-resource.factory";
-import { createResourceLink } from "./resource-link.factory";
-import { createTool } from "./tool.factory";
+import { ILtiLineItem, LtiLineItem } from "$/assignment-and-grade/entities/index.js";
+import { Context } from "$/core/context.js";
+import { LtiTool } from "$/core/tool.js";
+import { createContext } from "./context.factory.js";
+import { createExternalLtiResource } from "./external-lti-resource.factory.js";
+import { createResourceLink } from "./resource-link.factory.js";
+import { createTool } from "./tool.factory.js";
 
 type CreateResourceLinkConstructorArgs = Partial<ILtiLineItem<unknown>>;
 

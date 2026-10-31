@@ -1,8 +1,8 @@
 import { faker } from "@faker-js/faker";
-import { createMockKeySet } from "ltilib/tests/utils/create-jwks";
-import { resolveFactoryOptional } from "ltilib/tests/utils/resolve-nullified-optional";
-import { IPlatform, Platform } from "$/core/platform";
-import { NullifyUndefined } from "../types/nullify";
+import { IPlatform, Platform } from "$/core/platform.js";
+import { createMockKeySet } from "$/tests/utils/create-jwks.js";
+import { resolveFactoryOptional } from "$/tests/utils/resolve-nullified-optional.js";
+import { NullifyUndefined } from "../types/nullify.js";
 
 export async function createPlatformOpenIdConfiguration({
   issuer = faker.internet.url({ appendSlash: false, protocol: "https" }),

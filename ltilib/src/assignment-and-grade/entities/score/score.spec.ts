@@ -4,10 +4,10 @@
  */
 
 import { either as e } from "fp-ts";
-import scoreFactory from "ltilib/tests/common/factories/score.factory";
-import * as validatorMod from "$/advantage/utils/validate-lti-iso-8601-precise-timestamp";
-import { InvalidScoreArgumentError } from "$/assignment-and-grade/errors";
-import { LtiScore } from ".";
+import * as validatorMod from "$/advantage/utils/validate-lti-iso-8601-precise-timestamp.js";
+import { InvalidScoreArgumentError } from "$/assignment-and-grade/errors.js";
+import scoreFactory from "$/tests/common/factories/score.factory.js";
+import { LtiScore } from "./index.js";
 
 describe("[AGS] Scores domain's rules", () => {
   test("timestamps are validated using validateLtiIso8601AndPreciseTimestamp helper", () => {

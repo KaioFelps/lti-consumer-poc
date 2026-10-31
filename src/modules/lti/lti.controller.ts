@@ -1,6 +1,6 @@
 import { All, Controller, Inject } from "@nestjs/common";
-import { Public } from "@/modules/auth/protected-routes";
-import { Platform } from "$/core/platform";
+import { Public } from "@/modules/auth/protected-routes.js";
+import { Platform } from "$/core/platform.js";
 
 @Public()
 @Controller("lti")

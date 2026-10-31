@@ -1,18 +1,18 @@
 import { INestApplication } from "@nestjs/common";
 import request from "supertest";
-import { App } from "supertest/types";
-import { getTestingApp } from "test";
-import ltiLineItemFactory from "test/factories/lti-line-item.factory";
-import { getToolAndItsOidcAccessToken } from "test/fixtures/oidc";
-import { DrizzleClient } from "@/external/data-store/drizzle/client";
-import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity";
-import { Routes } from "@/routes";
-import { ExternalLtiResource } from "$/advantage/external-resource";
-import { Context } from "$/core/context";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiTool } from "$/core/tool";
-import { ContextConcreteType } from "../../enums/context-concrete-type";
-import { EntitiesFactoryGenerator, generateEntitiesFactory } from "./tests";
+import { App } from "supertest/types.js";
+import ltiLineItemFactory from "test/factories/lti-line-item.factory.js";
+import { getToolAndItsOidcAccessToken } from "test/fixtures/oidc.js";
+import { getTestingApp } from "test/index.js";
+import { DrizzleClient } from "@/external/data-store/drizzle/client.js";
+import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity.js";
+import { Routes } from "@/routes.js";
+import { ExternalLtiResource } from "$/advantage/external-resource.js";
+import { Context } from "$/core/context.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiTool } from "$/core/tool.js";
+import { ContextConcreteType } from "../../enums/context-concrete-type.js";
+import { EntitiesFactoryGenerator, generateEntitiesFactory } from "./tests.js";
 
 /**
  * we're not covering points related to the server because the service got its own tests

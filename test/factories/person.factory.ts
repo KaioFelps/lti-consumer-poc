@@ -1,10 +1,10 @@
 import { faker } from "@faker-js/faker";
-import { usersTable } from "drizzle/schema";
-import { DrizzleClient } from "@/external/data-store/drizzle/client";
-import peopleMapper from "@/external/data-store/drizzle/mappers/people.mapper";
-import { Person } from "@/modules/identity/person/person.entity";
-import { CPF } from "@/modules/identity/person/value-objects/cpf";
-import { SystemRole } from "@/modules/identity/user/enums/system-role";
+import { usersTable } from "drizzle/schema.js";
+import { DrizzleClient } from "@/external/data-store/drizzle/client.js";
+import peopleMapper from "@/external/data-store/drizzle/mappers/people.mapper.js";
+import { Person } from "@/modules/identity/person/person.entity.js";
+import { CPF } from "@/modules/identity/person/value-objects/cpf.js";
+import { SystemRole } from "@/modules/identity/user/enums/system-role.js";
 
 type CreatePersonParams = Parameters<typeof Person.create>[0];
 

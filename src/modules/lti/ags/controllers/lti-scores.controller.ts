@@ -1,20 +1,20 @@
 import { Body, Controller, Headers, Param, Post, Res } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { HttpResponse } from "@/lib";
-import { ExtendedExceptionsFactory } from "@/lib/exceptions/extended-exceptions.factory";
-import { Rest } from "@/lib/mvc-routes";
-import { AuthStrategy, ConfigAuthGuard } from "@/modules/auth/protected-routes";
-import { CurrentTool } from "@/modules/auth/protected-routes/decorators/current-tool";
-import { type LtiToolJwtPayload } from "@/modules/auth/protected-routes/lti-tool-jwt-payload";
-import { LtiScoreServices } from "$/assignment-and-grade";
-import { InvalidScoreArgumentError } from "$/assignment-and-grade/errors";
-import { FindContextByIdService } from "../../advantage/context/services/find-context-by-id.service";
-import { FindToolByIdService } from "../../tools/services/find-tool-by-id.service";
-import { ScoreDTO } from "../dtos/score.dto";
-import { ContextConcreteType } from "../enums/context-concrete-type";
+import { pipe } from "fp-ts/lib/function.js";
+import { InvalidArgumentError } from "@/core/errors/invalid-argument.error.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { ExtendedExceptionsFactory } from "@/lib/exceptions/extended-exceptions.factory.js";
+import { Rest } from "@/lib/mvc-routes.js";
+import type { HttpResponse } from "@/lib.js";
+import { CurrentTool } from "@/modules/auth/protected-routes/decorators/current-tool.js";
+import { type LtiToolJwtPayload } from "@/modules/auth/protected-routes/lti-tool-jwt-payload.js";
+import { AuthStrategy, ConfigAuthGuard } from "@/modules/auth/protected-routes.js";
+import { InvalidScoreArgumentError } from "$/assignment-and-grade/errors.js";
+import { LtiScoreServices } from "$/assignment-and-grade.js";
+import { FindContextByIdService } from "../../advantage/context/services/find-context-by-id.service.js";
+import { FindToolByIdService } from "../../tools/services/find-tool-by-id.service.js";
+import { ScoreDTO } from "../dtos/score.dto.js";
+import { ContextConcreteType } from "../enums/context-concrete-type.js";
 
 @Rest()
 @Controller("/lti/ags/:contextId/lineitems")

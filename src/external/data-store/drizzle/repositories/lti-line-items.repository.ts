@@ -1,13 +1,13 @@
 import { Injectable } from "@nestjs/common";
-import { UUID } from "common/src/types/uuid";
-import * as schema from "drizzle/schema";
+import type { UUID } from "common/src/types/uuid.js";
+import * as schema from "drizzle/schema.js";
 import {
   externalLtiResourcesT,
   ltiAssignmentsT,
   ltiLineItemsT,
   ltiResourceLinks,
   ltiToolDeployments,
-} from "drizzle/schema";
+} from "drizzle/schema.js";
 import {
   and,
   asc,
@@ -23,26 +23,26 @@ import {
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { PgSelectBase } from "drizzle-orm/pg-core";
 import { either as e, taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { type TaskEither } from "fp-ts/lib/TaskEither";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
-import { unmountContextId } from "@/modules/lti/advantage/context";
-import { InvalidComposedContextIdError } from "@/modules/lti/advantage/errors/invalid-composed-context-id.error";
-import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type";
-import { LineItemNotFoundError } from "@/modules/lti/ags/errors/line-item-not-found.error";
-import { LtiLineItemsRepository } from "@/modules/lti/ags/repositories/lti-line-items.repository";
-import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters";
-import { LtiLineItem } from "$/assignment-and-grade/entities";
-import { Context } from "$/core/context";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiTool } from "$/core/tool";
-import { DrizzleClient } from "../client";
-import ltiLineItemsMapper from "../mappers/lti-line-items.mapper";
-import { DrizzleTransactionManager, Transaction } from "../transaction-manager";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { type TaskEither } from "fp-ts/lib/TaskEither.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error.js";
+import { unmountContextId } from "@/modules/lti/advantage/context.js";
+import { InvalidComposedContextIdError } from "@/modules/lti/advantage/errors/invalid-composed-context-id.error.js";
+import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type.js";
+import { LineItemNotFoundError } from "@/modules/lti/ags/errors/line-item-not-found.error.js";
+import { LtiLineItemsRepository } from "@/modules/lti/ags/repositories/lti-line-items.repository.js";
+import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters.js";
+import { LtiLineItem } from "$/assignment-and-grade/entities/index.js";
+import { Context } from "$/core/context.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiRepositoryPaginatedResponse } from "$/core/repositories.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiTool } from "$/core/tool.js";
+import { DrizzleClient } from "../client.js";
+import ltiLineItemsMapper from "../mappers/lti-line-items.mapper.js";
+import { DrizzleTransactionManager, Transaction } from "../transaction-manager.js";
 
 type Schema = typeof schema;
 

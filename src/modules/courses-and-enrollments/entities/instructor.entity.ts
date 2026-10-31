@@ -1,10 +1,10 @@
 import { either as e } from "fp-ts";
-import { EntityBase } from "@/core/entity-base";
-import { Person } from "@/modules/identity/person/person.entity";
-import { SystemRole } from "@/modules/identity/user/enums/system-role";
-import { CourseWithInstructor } from "../aggregates/course-with-instructor.aggregate";
-import { NotAnInstructorError } from "../errors/not-an-instructor";
-import { Course } from "./course.entity";
+import { EntityBase } from "@/core/entity-base.js";
+import { Person } from "@/modules/identity/person/person.entity.js";
+import { SystemRole } from "@/modules/identity/user/enums/system-role.js";
+import { CourseWithInstructor } from "../aggregates/course-with-instructor.aggregate.js";
+import { NotAnInstructorError } from "../errors/not-an-instructor.js";
+import { Course } from "./course.entity.js";
 
 type Props = {
   person: Person;

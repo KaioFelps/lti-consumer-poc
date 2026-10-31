@@ -1,21 +1,21 @@
 import { either as e, option, taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
-import { ILtiLineItem, LtiLineItem } from "$/assignment-and-grade/entities";
+import { pipe } from "fp-ts/lib/function.js";
+import { LtiAdvantageMediaType } from "$/advantage/media-types.js";
+import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository.js";
+import { ILtiLineItem, LtiLineItem } from "$/assignment-and-grade/entities/index.js";
 import {
   InaccessibleLineItemError,
   MissingPlatformAgsConfigurationError,
-} from "$/assignment-and-grade/errors";
-import { presentLtiLineItem } from "$/assignment-and-grade/presenters/line-item.presenter";
-import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
-import { Context } from "$/core/context";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { HttpResponseWrapper } from "$/core/http/response-wrapper";
-import { Platform } from "$/core/platform";
-import { LtiTool } from "$/core/tool";
-import { AGServiceBase } from "..";
+} from "$/assignment-and-grade/errors.js";
+import { presentLtiLineItem } from "$/assignment-and-grade/presenters/line-item.presenter.js";
+import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository.js";
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes.js";
+import { Context } from "$/core/context.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { HttpResponseWrapper } from "$/core/http/response-wrapper.js";
+import { Platform } from "$/core/platform.js";
+import { LtiTool } from "$/core/tool.js";
+import { AGServiceBase } from "../index.js";
 
 export type UpdateLineItemParams = {
   // it must NOT change to the id nor resource link id

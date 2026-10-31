@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { LtiContextsRepository } from "../../repositories/lti-contexts.repository";
+import { pipe } from "fp-ts/lib/function.js";
+import { LtiContextsRepository } from "../../repositories/lti-contexts.repository.js";
 
 type Params = {
   contextComposedId: string;
@@ -14,9 +14,7 @@ export class FindContextByIdService {
   public exec({ contextComposedId }: Params) {
     return pipe(
       () => this.contextsRepo.findById(contextComposedId),
-      te.mapError((error) => {
-        return error.cause;
-      }),
+      te.mapError((error) => error.cause),
     )();
   }
 }

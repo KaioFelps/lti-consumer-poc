@@ -1,5 +1,5 @@
 import { option } from "fp-ts";
-import { Option } from "fp-ts/lib/Option";
+import { Option } from "fp-ts/lib/Option.js";
 
 export type AnyLtiRole = InstitutionRole | MembershipRole | SystemRole;
 

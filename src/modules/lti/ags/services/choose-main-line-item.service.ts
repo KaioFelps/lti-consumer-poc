@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { type UUID } from "common/src/types/uuid";
-import { LtiLineItemsRepository } from "../repositories/lti-line-items.repository";
+import { type UUID } from "common/src/types/uuid.js";
+import { LtiLineItemsRepository } from "../repositories/lti-line-items.repository.js";
 
 type Params = {
   assignmentId: UUID;

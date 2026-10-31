@@ -1,23 +1,23 @@
 import { Body, Controller, Get, Param, Post, Render, Res, Session } from "@nestjs/common";
 import { either, taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { ErrorBase } from "@/core/errors/error-base";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ErrorBaseRenderableError } from "@/core/errors/renderable/error-base.error";
-import { LtiToolPresenter } from "@/external/presenters/entities/lti-tool.presenter";
-import { LtiToolDeploymentPresenter } from "@/external/presenters/entities/lti-tool-deployment.presenter";
-import { LtiToolPreviewPresenter } from "@/external/presenters/entities/lti-tool-preview.presenter";
-import { HttpResponse, RequestSession } from "@/lib";
-import { RenderAsync } from "@/lib/async-render";
-import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { Mvc } from "@/lib/mvc-routes";
-import { TranslatorService } from "@/message-string/translator.service";
-import { Routes } from "@/routes";
-import { Platform } from "$/core/platform";
-import { LtiRegistrationInitiationRequest } from "$/registration/messages/initiate-registration";
-import { RegisterToolDTO } from "./dtos/register-tool.dto";
-import { FindManyToolsPreviewsService } from "./services/find-many-tools-previews.service";
-import { GetToolRegistrationDetailsService } from "./services/get-tool-registration-details.service";
+import { pipe } from "fp-ts/lib/function.js";
+import { ErrorBase } from "@/core/errors/error-base.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { ErrorBaseRenderableError } from "@/core/errors/renderable/error-base.error.js";
+import { LtiToolPresenter } from "@/external/presenters/entities/lti-tool.presenter.js";
+import { LtiToolDeploymentPresenter } from "@/external/presenters/entities/lti-tool-deployment.presenter.js";
+import { LtiToolPreviewPresenter } from "@/external/presenters/entities/lti-tool-preview.presenter.js";
+import { RenderAsync } from "@/lib/async-render/index.js";
+import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory.js";
+import { Mvc } from "@/lib/mvc-routes.js";
+import type { HttpResponse, RequestSession } from "@/lib.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { Routes } from "@/routes.js";
+import { Platform } from "$/core/platform.js";
+import { LtiRegistrationInitiationRequest } from "$/registration/messages/initiate-registration.js";
+import { RegisterToolDTO } from "./dtos/register-tool.dto.js";
+import { FindManyToolsPreviewsService } from "./services/find-many-tools-previews.service.js";
+import { GetToolRegistrationDetailsService } from "./services/get-tool-registration-details.service.js";
 
 @Mvc()
 @Controller("/lti/tools")

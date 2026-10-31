@@ -1,5 +1,5 @@
 import { Global, Module } from "@nestjs/common";
-import { TranslatorService } from "./translator.service";
+import { TranslatorService } from "./translator.service.js";
 
 @Global()
 @Module({

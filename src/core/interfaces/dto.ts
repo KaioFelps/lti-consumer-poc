@@ -1,5 +1,5 @@
-import { Either } from "fp-ts/lib/Either";
-import { ValidationErrors } from "../validation/validation-errors";
+import { Either } from "fp-ts/lib/Either.js";
+import { ValidationErrors } from "../validation/validation-errors.js";
 
 export interface DTO {
   /**

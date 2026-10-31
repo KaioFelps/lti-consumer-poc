@@ -1,4 +1,4 @@
-import { LtilibError } from "./ltilib.error";
+import { LtilibError } from "./ltilib.error.js";
 
 export abstract class InvalidArgumentError<
   Field extends string,

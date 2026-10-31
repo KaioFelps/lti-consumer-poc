@@ -1,4 +1,4 @@
-import { MisconfiguredPlatformError } from "$/core/errors/misconfigured-platform.error";
+import { MisconfiguredPlatformError } from "$/core/errors/misconfigured-platform.error.js";
 
 export class MissingPlatformAgsConfigurationError extends MisconfiguredPlatformError {
   public constructor() {

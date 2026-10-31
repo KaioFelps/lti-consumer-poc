@@ -1,4 +1,4 @@
-import { ErrorBase, ErrorClassProperties } from "./error-base";
+import { ErrorBase, ErrorClassProperties } from "./error-base.js";
 
 /**
  * Indicates that a given argument is not valid.

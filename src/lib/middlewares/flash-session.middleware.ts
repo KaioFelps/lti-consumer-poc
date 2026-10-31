@@ -1,6 +1,6 @@
 import { Inject, Injectable, NestMiddleware } from "@nestjs/common";
-import { TranslatorService } from "@/message-string/translator.service";
-import { HttpRequest, HttpResponse } from "..";
+import type { HttpRequest, HttpResponse } from "@/lib.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
 
 @Injectable()
 export class SessionsAndFlashMessagesMiddleware implements NestMiddleware {

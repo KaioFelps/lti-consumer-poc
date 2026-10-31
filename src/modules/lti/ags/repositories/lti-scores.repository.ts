@@ -1,9 +1,9 @@
-import { type UUID } from "common/src/types/uuid";
-import { Either } from "fp-ts/lib/Either";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { Grade } from "@/modules/assignments-and-grades/entities/grade.entity";
-import { GradeNotFoundError } from "@/modules/assignments-and-grades/errors/grade-not-found.error";
-import { LtiScoresRepository as BaseLtiScoresRepository } from "$/assignment-and-grade/repositories";
+import { type UUID } from "common/src/types/uuid.js";
+import { Either } from "fp-ts/lib/Either.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { Grade } from "@/modules/assignments-and-grades/entities/grade.entity.js";
+import { GradeNotFoundError } from "@/modules/assignments-and-grades/errors/grade-not-found.error.js";
+import { LtiScoresRepository as BaseLtiScoresRepository } from "$/assignment-and-grade/repositories.js";
 
 /**
  * A score given to a student on a specific line item.

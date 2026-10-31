@@ -1,6 +1,6 @@
 import { either } from "fp-ts";
-import { ContextConcreteType } from "../../ags/enums/context-concrete-type";
-import { InvalidComposedContextIdError } from "../errors/invalid-composed-context-id.error";
+import { ContextConcreteType } from "../ags/enums/context-concrete-type.js";
+import { InvalidComposedContextIdError } from "./errors/invalid-composed-context-id.error.js";
 
 export function mountContextId(concreteEntityId: string, concreteType: ContextConcreteType) {
   return `${concreteType}:${concreteEntityId}`;

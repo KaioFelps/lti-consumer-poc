@@ -1,20 +1,20 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
-import { AuthModule } from "@/modules/auth/auth.module";
-import { IdentityModule } from "@/modules/identity/identity.module";
-import { LtiModule } from "@/modules/lti/lti.module";
-import { OIDCModule } from "@/modules/oidc/oidc.module";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
-import { AppConfigModule } from "./config/config.module";
-import { ExternalModule } from "./external/external.module";
-import { GlobalExceptionFiltersModule } from "./lib/globals/exception-filters.module";
-import { GlobalGuardsModule } from "./lib/globals/guards.module";
-import { GlobalInterceptorsModule } from "./lib/globals/interceptors.module";
-import { GlobalPipesModule } from "./lib/globals/pipes.module";
-import middlewares from "./lib/middlewares";
-import { MessageStringModule } from "./message-string/message-string.module";
-import { AssignmentsAndGradesModule } from "./modules/assignments-and-grades/assignments-and-grades.module";
-import { CoursesModule } from "./modules/courses-and-enrollments/courses.module";
+import { AuthModule } from "@/modules/auth/auth.module.js";
+import { IdentityModule } from "@/modules/identity/identity.module.js";
+import { LtiModule } from "@/modules/lti/lti.module.js";
+import { OIDCModule } from "@/modules/oidc/oidc.module.js";
+import { AppController } from "./app.controller.js";
+import { AppService } from "./app.service.js";
+import { AppConfigModule } from "./config/config.module.js";
+import { ExternalModule } from "./external/external.module.js";
+import { GlobalExceptionFiltersModule } from "./lib/globals/exception-filters.module.js";
+import { GlobalGuardsModule } from "./lib/globals/guards.module.js";
+import { GlobalInterceptorsModule } from "./lib/globals/interceptors.module.js";
+import { GlobalPipesModule } from "./lib/globals/pipes.module.js";
+import middlewares from "./lib/middlewares.js";
+import { MessageStringModule } from "./message-string/message-string.module.js";
+import { AssignmentsAndGradesModule } from "./modules/assignments-and-grades/assignments-and-grades.module.js";
+import { CoursesModule } from "./modules/courses-and-enrollments/courses.module.js";
 
 @Module({
   imports: [

@@ -1,6 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
-import { ErrorClassProperties } from "../error-base";
-import { RenderableError } from "./renderable-error";
+import { ErrorClassProperties } from "../error-base.js";
+import { RenderableError } from "./renderable-error.js";
 
 type Args = Omit<ErrorClassProperties<RenderableUnauthorizedError>, "status">;
 

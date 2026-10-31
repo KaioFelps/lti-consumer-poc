@@ -1,10 +1,10 @@
-import { generateUUID } from "common/src/types/uuid";
+import { generateUUID } from "common/src/types/uuid.js";
 import { either } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { ExternalLtiResource } from "$/advantage/external-resource";
-import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { InMemoryToolsRepository } from "./tools.repository";
+import { Either } from "fp-ts/lib/Either.js";
+import { ExternalLtiResource } from "$/advantage/external-resource.js";
+import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { InMemoryToolsRepository } from "./tools.repository.js";
 
 export class InMemoryExternalLtiResourcesRepository implements ExternalLtiResourcesRepository {
   public externalLtiResources: ExternalLtiResource[] = [];

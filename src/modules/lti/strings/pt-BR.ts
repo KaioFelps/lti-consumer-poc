@@ -1,4 +1,4 @@
-import { ptBR } from "@/message-string/internal/translations/pt-BR";
+import { ptBR } from "@/message-string/internal/translations/pt-BR.js";
 
 ptBR["lti:navigation:lti"] = "LTI";
 ptBR["lti:navigation:show-tools"] = "Ver ferramentas";

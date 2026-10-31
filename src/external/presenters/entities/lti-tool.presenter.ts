@@ -1,8 +1,8 @@
-import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity";
+import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity.js";
 import {
   LtiToolSupportedMessagePresenter,
   PresentedLtiToolSupportedMessage,
-} from "./lti-tool-supported-message.presenter";
+} from "./lti-tool-supported-message.presenter.js";
 
 type PresentedLtiTool = {
   id: string;

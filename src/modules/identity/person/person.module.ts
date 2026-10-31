@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
-import { FindPersonByIdService } from "./services/find-person-by-id.service";
-import { RegisterNewPersonService } from "./services/register-new-person.service";
+import { FindPersonByIdService } from "./services/find-person-by-id.service.js";
+import { RegisterNewPersonService } from "./services/register-new-person.service.js";
 
 @Module({
   providers: [RegisterNewPersonService, FindPersonByIdService],

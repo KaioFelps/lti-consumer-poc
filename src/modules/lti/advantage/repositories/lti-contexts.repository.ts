@@ -1,11 +1,11 @@
-import type { Either } from "fp-ts/lib/Either";
-import type { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { Context } from "$/core/context";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiContextsRepository as LtilibContextsRepository } from "$/core/repositories/contexts.repository";
-import { ContextConcreteType } from "../../ags/enums/context-concrete-type";
-import { ContextNotFoundError } from "../errors/context-not-found.error";
-import { InvalidComposedContextIdError } from "../errors/invalid-composed-context-id.error";
+import type { Either } from "fp-ts/lib/Either.js";
+import type { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { Context } from "$/core/context.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiContextsRepository as LtilibContextsRepository } from "$/core/repositories/contexts.repository.js";
+import { ContextConcreteType } from "../../ags/enums/context-concrete-type.js";
+import { ContextNotFoundError } from "../errors/context-not-found.error.js";
+import { InvalidComposedContextIdError } from "../errors/invalid-composed-context-id.error.js";
 
 export type CreateParams = {
   concreteId: string;

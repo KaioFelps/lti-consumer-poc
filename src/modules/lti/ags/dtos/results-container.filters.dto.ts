@@ -1,9 +1,9 @@
 import { Expose } from "class-transformer";
 import { either } from "fp-ts";
 import z from "zod";
-import { DTO } from "@/core/interfaces/dto";
-import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
-import { ResultsContainerFilters } from "$/assignment-and-grade/container-filters";
+import { DTO } from "@/core/interfaces/dto.js";
+import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error.js";
+import { ResultsContainerFilters } from "$/assignment-and-grade/container-filters.js";
 
 const schema = z.object({
   userId: z.uuid("lti:ags:results-container:errors:user-id-must-be-uuid").optional(),

@@ -1,16 +1,16 @@
 import { Injectable } from "@nestjs/common";
-import { UUID } from "common/src/types/uuid";
-import { systemRoleEnum, usersTable } from "drizzle/schema";
+import type { UUID } from "common/src/types/uuid.js";
+import { systemRoleEnum, usersTable } from "drizzle/schema.js";
 import { eq } from "drizzle-orm";
 import { taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { StudentsRepository } from "@/modules/courses-and-enrollments/repositories/students.repository";
-import { Person } from "@/modules/identity/person/person.entity";
-import { DrizzleClient } from "../client";
-import peopleMapper from "../mappers/people.mapper";
-import { DrizzleTransactionManager } from "../transaction-manager";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { StudentsRepository } from "@/modules/courses-and-enrollments/repositories/students.repository.js";
+import { Person } from "@/modules/identity/person/person.entity.js";
+import { DrizzleClient } from "../client.js";
+import peopleMapper from "../mappers/people.mapper.js";
+import { DrizzleTransactionManager } from "../transaction-manager.js";
 
 @Injectable()
 export class DrizzleStudentsRepository extends StudentsRepository {

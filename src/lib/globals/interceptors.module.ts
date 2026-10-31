@@ -1,7 +1,7 @@
 import { Global, Module } from "@nestjs/common";
 import { APP_INTERCEPTOR } from "@nestjs/core";
-import { AsyncRenderInterceptor } from "../async-render/interceptor";
-import { CoreValidationInterceptor } from "../core-validation/interceptor";
+import { AsyncRenderInterceptor } from "../async-render/interceptor.js";
+import { CoreValidationInterceptor } from "../core-validation/interceptor.js";
 
 @Global()
 @Module({

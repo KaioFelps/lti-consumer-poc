@@ -1,10 +1,10 @@
-import { UUID } from "common/src/types/uuid";
-import { Either } from "fp-ts/lib/Either";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
-import { LtiToolDeploymentsRepository as LtilibLtiToolsDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
-import { ContextConcreteType } from "../ags/enums/context-concrete-type";
-import { LtiToolDeployment } from "./entities/lti-tool-deployment.entity";
+import type { UUID } from "common/src/types/uuid.js";
+import { Either } from "fp-ts/lib/Either.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error.js";
+import { LtiToolDeploymentsRepository as LtilibLtiToolsDeploymentsRepository } from "$/core/repositories/tool-deployments.repository.js";
+import { ContextConcreteType } from "../ags/enums/context-concrete-type.js";
+import { LtiToolDeployment } from "./entities/lti-tool-deployment.entity.js";
 
 export abstract class LtiToolsDeploymentsRepository extends LtilibLtiToolsDeploymentsRepository {
   public abstract save(deployment: LtiToolDeployment): Promise<Either<IrrecoverableError, void>>;

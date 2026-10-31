@@ -1,7 +1,7 @@
 import { Inject, Injectable, Scope } from "@nestjs/common";
-import { BaseException } from "@/lib/exceptions/base/exception";
-import { TranslatorService } from "@/message-string/translator.service";
-import { ExceptionPresenter } from "../exception-presenter";
+import { BaseException } from "@/lib/exceptions/base/exception.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { ExceptionPresenter } from "../exception-presenter.js";
 
 type PresentedSimpleException = {
   readonly error: string;

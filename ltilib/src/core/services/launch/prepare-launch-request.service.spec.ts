@@ -4,40 +4,40 @@
 
 import { randomBytes } from "node:crypto";
 import { faker } from "@faker-js/faker";
-import { generateUUID } from "common/src/types/uuid";
+import { generateUUID } from "common/src/types/uuid.js";
 import { either as e } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
+import { Either } from "fp-ts/lib/Either.js";
 import { JSDOM, VirtualConsole } from "jsdom";
-import { createContext } from "ltilib/tests/common/factories/context.factory";
-import { createPlatform } from "ltilib/tests/common/factories/platform.factory";
-import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
-import { createTool } from "ltilib/tests/common/factories/tool.factory";
-import { InMemoryLtiContextsRepository } from "ltilib/tests/common/in-memory-repositories/contexts.repository";
-import { InMemoryLaunchesRepository } from "ltilib/tests/common/in-memory-repositories/launches.repository";
-import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
-import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
-import { InMemoryUserIdentitiesRepository } from "ltilib/tests/common/in-memory-repositories/user-identities.repository";
-import { InstitutionRole, MembershipRole } from "$/core/claims/enums/roles";
-import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
-import { CouldNotFindToolDueToExternalRepositoryError } from "$/core/errors/could-not-find-tool-due-to-external-error";
-import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiLaunchData } from "$/core/launch-data";
-import { MessageRequests } from "$/core/messages";
-import { InitiateLaunchRequest } from "$/core/messages/initiate-launch";
-import { LTIResourceLinkLaunchRequest } from "$/core/messages/resource-link-launch";
-import { Platform } from "$/core/platform";
-import { FindManyParams } from "$/core/repositories/resource-links.repository";
-import { LtiToolsRepository } from "$/core/repositories/tools.repository";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiTool } from "$/core/tool";
-import { UserIdentity, UserRoles } from "$/core/user-identity";
-import * as validateRequestFn from "$/security/validate-authentication-request";
-import { LtiLaunchServices } from ".";
+import { InstitutionRole, MembershipRole } from "$/core/claims/enums/roles.js";
+import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error.js";
+import { CouldNotFindToolDueToExternalRepositoryError } from "$/core/errors/could-not-find-tool-due-to-external-error.js";
+import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiLaunchData } from "$/core/launch-data.js";
+import { InitiateLaunchRequest } from "$/core/messages/initiate-launch.js";
+import { LTIResourceLinkLaunchRequest } from "$/core/messages/resource-link-launch.js";
+import { MessageRequests } from "$/core/messages.js";
+import { Platform } from "$/core/platform.js";
+import { FindManyParams } from "$/core/repositories/resource-links.repository.js";
+import { LtiToolsRepository } from "$/core/repositories/tools.repository.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiTool } from "$/core/tool.js";
+import { UserIdentity, UserRoles } from "$/core/user-identity.js";
+import * as validateRequestFn from "$/security/validate-authentication-request.js";
+import { createContext } from "$/tests/common/factories/context.factory.js";
+import { createPlatform } from "$/tests/common/factories/platform.factory.js";
+import { createResourceLink } from "$/tests/common/factories/resource-link.factory.js";
+import { createTool } from "$/tests/common/factories/tool.factory.js";
+import { InMemoryLtiContextsRepository } from "$/tests/common/in-memory-repositories/contexts.repository.js";
+import { InMemoryLaunchesRepository } from "$/tests/common/in-memory-repositories/launches.repository.js";
+import { InMemoryLtiResourceLinksRepository } from "$/tests/common/in-memory-repositories/resource-links.repository.js";
+import { InMemoryToolsRepository } from "$/tests/common/in-memory-repositories/tools.repository.js";
+import { InMemoryUserIdentitiesRepository } from "$/tests/common/in-memory-repositories/user-identities.repository.js";
+import { LtiLaunchServices } from "../launch.services.js";
 import {
   AuthenticateLaunchLoginRequestParams,
   LaunchAuthErrorDescriptionsRoutes,
-} from "./prepare-launch-request.service";
+} from "./prepare-launch-request.service.js";
 
 describe("[Core] Prepare Launch Request Service", async () => {
   const TARGET_LINK_URI_CLAIM = "https://purl.imsglobal.org/spec/lti/claim/target_link_uri";

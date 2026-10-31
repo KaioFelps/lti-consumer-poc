@@ -9,12 +9,12 @@
 
 import { randomBytes } from "node:crypto";
 import { either } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
+import { Either } from "fp-ts/lib/Either.js";
 import * as jose from "jose";
-import { createMockKeySet } from "ltilib/tests/utils/create-jwks";
-import { Platform } from "$/core/platform";
-import { JoseJwtClaimValidationFailureReason } from "$/lib/jose";
-import { validateMessageToolJwt } from "./validate-message-tool-jwt";
+import { Platform } from "$/core/platform.js";
+import { JoseJwtClaimValidationFailureReason } from "$/lib/jose.js";
+import { createMockKeySet } from "$/tests/utils/create-jwks.js";
+import { validateMessageToolJwt } from "./validate-message-tool-jwt.js";
 
 describe("validateMessageToolJwt", async () => {
   const { jwksResolver, privateKey, privateJwk: jwk, kid } = await createMockKeySet();

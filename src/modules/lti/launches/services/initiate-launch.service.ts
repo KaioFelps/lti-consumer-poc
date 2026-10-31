@@ -1,13 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { User } from "@/modules/identity/user/user.entity";
-import { findResourceLinkByIdService } from "@/modules/lti/resource-links/services/find-resource-link-by-id.service";
-import { FindToolByIdService } from "@/modules/lti/tools/services/find-tool-by-id.service";
-import { MessageRequests } from "$/core/messages";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiLaunchServices } from "$/core/services/launch";
+import { pipe } from "fp-ts/lib/function.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { User } from "@/modules/identity/user/user.entity.js";
+import { findResourceLinkByIdService } from "@/modules/lti/resource-links/services/find-resource-link-by-id.service.js";
+import { FindToolByIdService } from "@/modules/lti/tools/services/find-tool-by-id.service.js";
+import { MessageRequests } from "$/core/messages.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiLaunchServices } from "$/core/services/launch.services.js";
 
 type Params = {
   resourceLinkId: string;

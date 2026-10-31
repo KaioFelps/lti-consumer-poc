@@ -1,7 +1,7 @@
-import { type UUID } from "common/src/types/uuid";
-import { EntityBase } from "@/core/entity-base";
-import { Person } from "@/modules/identity/person/person.entity";
-import { Course } from "./course.entity";
+import { type UUID } from "common/src/types/uuid.js";
+import { EntityBase } from "@/core/entity-base.js";
+import { Person } from "@/modules/identity/person/person.entity.js";
+import { Course } from "./course.entity.js";
 
 type Props = {
   studentId: UUID;

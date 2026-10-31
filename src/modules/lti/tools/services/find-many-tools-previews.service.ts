@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { LtiToolsRepository } from "../lti-tools.repository";
+import { LtiToolsRepository } from "../lti-tools.repository.js";
 
 @Injectable()
 export class FindManyToolsPreviewsService {

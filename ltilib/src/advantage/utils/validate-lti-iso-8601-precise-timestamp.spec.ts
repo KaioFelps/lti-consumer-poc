@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { either as e } from "fp-ts";
-import { validateLtiIso8601AndPreciseTimestamp } from "./validate-lti-iso-8601-precise-timestamp";
+import { validateLtiIso8601AndPreciseTimestamp } from "./validate-lti-iso-8601-precise-timestamp.js";
 
 describe("[AGS] Score timestamps validateIso8601 helper", () => {
   it.each([

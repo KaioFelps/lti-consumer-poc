@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { usersTable } from "drizzle/schema";
+import { usersTable } from "drizzle/schema.js";
 import { sql } from "drizzle-orm";
-import { Person, PersonUncheckedProps } from "@/modules/identity/person/person.entity";
-import { User } from "@/modules/identity/user/user.entity";
-import { DrizzleClient } from "./external/data-store/drizzle/client";
-import { trimNullProperties } from "./utils/trim-null-properties";
+import { Person, PersonUncheckedProps } from "@/modules/identity/person/person.entity.js";
+import { User } from "@/modules/identity/user/user.entity.js";
+import { DrizzleClient } from "./external/data-store/drizzle/client.js";
+import { trimNullProperties } from "./utils/trim-null-properties.js";
 
 @Injectable()
 export class AppService {

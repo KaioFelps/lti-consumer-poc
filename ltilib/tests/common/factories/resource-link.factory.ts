@@ -1,8 +1,8 @@
 import { faker } from "@faker-js/faker";
-import { generateUUID } from "common/src/types/uuid";
-import { ILtiResourceLink, LtiResourceLink } from "$/core/resource-link";
-import { LtiTool } from "$/core/tool";
-import { createTool } from "./tool.factory";
+import { generateUUID } from "common/src/types/uuid.js";
+import { ILtiResourceLink, LtiResourceLink } from "$/core/resource-link.js";
+import { LtiTool } from "$/core/tool.js";
+import { createTool } from "./tool.factory.js";
 
 type CreateResourceLinkConstructorArgs = Omit<Partial<ILtiResourceLink>, "toolId"> & {
   tool?: LtiTool;

@@ -1,4 +1,4 @@
-import { InvalidArgumentError } from "$/core/errors/bases/invalid-argument.error";
+import { InvalidArgumentError } from "$/core/errors/bases/invalid-argument.error.js";
 
 export class InvalidLineItemArgumentError<
   Field extends InvalidLineItemArgumentError.Fields = InvalidLineItemArgumentError.Fields,

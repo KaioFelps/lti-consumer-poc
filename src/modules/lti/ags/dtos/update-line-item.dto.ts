@@ -1,10 +1,10 @@
 import { Expose, Transform } from "class-transformer";
-import { JsonValue } from "common/src/types/json-value";
+import { JsonValue } from "common/src/types/json-value.js";
 import { either } from "fp-ts";
 import z from "zod";
-import { DTO } from "@/core/interfaces/dto";
-import { ConfigCoreValidation } from "@/lib/core-validation";
-import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
+import { DTO } from "@/core/interfaces/dto.js";
+import { ConfigCoreValidation } from "@/lib/core-validation.js";
+import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error.js";
 
 const schema = z.object(
   {

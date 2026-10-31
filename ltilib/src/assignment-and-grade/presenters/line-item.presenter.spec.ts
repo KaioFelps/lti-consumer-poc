@@ -4,19 +4,19 @@
 
 import { faker } from "@faker-js/faker";
 import { either as e } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { createContext } from "ltilib/tests/common/factories/context.factory";
+import { pipe } from "fp-ts/lib/function.js";
+import { Platform } from "$/core/platform.js";
+import { createContext } from "$/tests/common/factories/context.factory.js";
 import {
   createFullLineItem,
   createMinimalLineItem,
-} from "ltilib/tests/common/factories/line-item.factory";
+} from "$/tests/common/factories/line-item.factory.js";
 import {
   createPlatform,
   createPlatformAgsConfiguration,
-} from "ltilib/tests/common/factories/platform.factory";
-import { createTool } from "ltilib/tests/common/factories/tool.factory";
-import { Platform } from "$/core/platform";
-import { PresentedLtiLineItem, presentLtiLineItem } from "./line-item.presenter";
+} from "$/tests/common/factories/platform.factory.js";
+import { createTool } from "$/tests/common/factories/tool.factory.js";
+import { PresentedLtiLineItem, presentLtiLineItem } from "./line-item.presenter.js";
 
 const iso8601Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/;
 

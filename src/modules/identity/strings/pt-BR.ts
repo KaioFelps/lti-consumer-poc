@@ -1,4 +1,4 @@
-import { ptBR } from "@/message-string/internal/translations/pt-BR";
+import { ptBR } from "@/message-string/internal/translations/pt-BR.js";
 
 ptBR["identity:person:cpf:non-numeric-chars"] = (args, identifier) => {
   if (!args.argumentName)

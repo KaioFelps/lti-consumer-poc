@@ -1,11 +1,11 @@
 import { forwardRef, MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import Provider from "oidc-provider";
-import middlewares from "@/lib/middlewares";
-import { AuthModule } from "@/modules/auth/auth.module";
-import { OIDCAdapterModule } from "./adapter/adapter.module";
-import { OIDCController } from "./oidc.controller";
-import { OIDCProviderFactory } from "./provider.factory";
-import { UnsafeOIDCClientsInjectionContainer } from "./unsafe-clients-injection-container";
+import middlewares from "@/lib/middlewares.js";
+import { AuthModule } from "@/modules/auth/auth.module.js";
+import { OIDCAdapterModule } from "./adapter/adapter.module.js";
+import { OIDCController } from "./oidc.controller.js";
+import { OIDCProviderFactory } from "./provider.factory.js";
+import { UnsafeOIDCClientsInjectionContainer } from "./unsafe-clients-injection-container.js";
 
 @Module({
   imports: [AuthModule, forwardRef(() => OIDCAdapterModule)],

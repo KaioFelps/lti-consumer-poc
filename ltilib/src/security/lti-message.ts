@@ -1,4 +1,4 @@
-import { Either } from "fp-ts/lib/Either";
+import { Either } from "fp-ts/lib/Either.js";
 
 export interface LtiInitiationMessage {
   intoUrl(): URL;

@@ -1,5 +1,5 @@
-import { CourseWithInstructor } from "@/modules/courses-and-enrollments/aggregates/course-with-instructor.aggregate";
-import { PersonPresenter, PresentedPerson } from "./person.presenter";
+import { CourseWithInstructor } from "@/modules/courses-and-enrollments/aggregates/course-with-instructor.aggregate.js";
+import { PersonPresenter, PresentedPerson } from "./person.presenter.js";
 
 type PresentedCourseWithInstructor = {
   id: string;

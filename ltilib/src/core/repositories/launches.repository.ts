@@ -1,6 +1,6 @@
-import { Either } from "fp-ts/lib/Either";
-import { LtiRepositoryError } from "../errors/repository.error";
-import { LtiLaunchData } from "../launch-data";
+import { Either } from "fp-ts/lib/Either.js";
+import { LtiRepositoryError } from "../errors/repository.error.js";
+import { LtiLaunchData } from "../launch-data.js";
 
 export abstract class LtiLaunchesRepository {
   public abstract save(

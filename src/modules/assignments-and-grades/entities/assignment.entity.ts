@@ -1,14 +1,14 @@
-import { type UUID } from "common/src/types/uuid";
+import { type UUID } from "common/src/types/uuid.js";
 import { either as e, option } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { EntityBase } from "@/core/entity-base";
-import { Course } from "@/modules/courses-and-enrollments/entities/course.entity";
-import { Person } from "@/modules/identity/person/person.entity";
-import { GradeOfAssignment } from "../aggregates/grade-of-assignment.aggregate";
-import { AssignmentKind } from "../enums/assignment-kind";
-import { InvalidAssignmentError } from "../errors/invalid-assignment.error";
-import { NonGradableAssignmentError } from "../errors/non-gradable-assignment";
-import { Grade } from "./grade.entity";
+import { pipe } from "fp-ts/lib/function.js";
+import { EntityBase } from "@/core/entity-base.js";
+import { Course } from "@/modules/courses-and-enrollments/entities/course.entity.js";
+import { Person } from "@/modules/identity/person/person.entity.js";
+import { GradeOfAssignment } from "../aggregates/grade-of-assignment.aggregate.js";
+import { AssignmentKind } from "../enums/assignment-kind.js";
+import { InvalidAssignmentError } from "../errors/invalid-assignment.error.js";
+import { NonGradableAssignmentError } from "../errors/non-gradable-assignment.js";
+import { Grade } from "./grade.entity.js";
 
 type Props = {
   id: UUID;

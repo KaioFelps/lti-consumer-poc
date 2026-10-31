@@ -1,9 +1,9 @@
-import { type UUID } from "common/src/types/uuid";
-import { Either } from "fp-ts/lib/Either";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { InstructorNotFoundError } from "@/modules/assignments-and-grades/errors/instructor-not-found.error";
-import { Instructor } from "../entities/instructor.entity";
-import { NotAnInstructorError } from "../errors/not-an-instructor";
+import { type UUID } from "common/src/types/uuid.js";
+import { Either } from "fp-ts/lib/Either.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { InstructorNotFoundError } from "@/modules/assignments-and-grades/errors/instructor-not-found.error.js";
+import { Instructor } from "../entities/instructor.entity.js";
+import { NotAnInstructorError } from "../errors/not-an-instructor.js";
 
 export abstract class InstructorsRepository {
   public abstract findInstructorById(

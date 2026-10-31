@@ -3,21 +3,21 @@ import {
   ExecutionContext,
   Inject,
   Injectable,
+  Scope,
   UnauthorizedException,
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { AuthGuard as PassportAuthGuard } from "@nestjs/passport";
-import { RenderableUnauthorizedError } from "@/core/errors/renderable/unauthorized.error";
-import { UnauthorizedError } from "@/core/errors/unauthorized.error";
-import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import mvcRoutes from "@/lib/mvc-routes";
-import { TranslatorService } from "@/message-string/translator.service";
-import protectedRoutes, { AuthStrategy } from ".";
-import publicRoutes, { AuthGuardConfig } from ".";
-import ltiToolsJwtStrategy from "./strategies/lti-tools-jwt.strategy";
-import sessionStrategy from "./strategies/session.strategy";
+import { RenderableUnauthorizedError } from "@/core/errors/renderable/unauthorized.error.js";
+import { UnauthorizedError } from "@/core/errors/unauthorized.error.js";
+import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory.js";
+import mvcRoutes from "@/lib/mvc-routes.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import protectedRoutes, { AuthGuardConfig, AuthStrategy } from "../protected-routes.js";
+import ltiToolsJwtStrategy from "./strategies/lti-tools-jwt.strategy.js";
+import sessionStrategy from "./strategies/session.strategy.js";
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class AuthGuard implements CanActivate {
   @Inject()
   private reflector!: Reflector;
@@ -27,7 +27,7 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublicRoute = this.reflector.getAllAndOverride<boolean>(
-      publicRoutes.publicRouteMetadataKey,
+      protectedRoutes.publicRouteMetadataKey,
       [context.getHandler(), context.getClass()],
     );
 

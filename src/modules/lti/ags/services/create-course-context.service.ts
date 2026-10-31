@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { Course } from "@/modules/courses-and-enrollments/entities/course.entity";
-import { LtiContextsRepository } from "../../advantage/repositories/lti-contexts.repository";
-import { ContextConcreteType } from "../enums/context-concrete-type";
+import { Course } from "@/modules/courses-and-enrollments/entities/course.entity.js";
+import { LtiContextsRepository } from "../../advantage/repositories/lti-contexts.repository.js";
+import { ContextConcreteType } from "../enums/context-concrete-type.js";
 
 type Params = {
   course: Course;

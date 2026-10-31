@@ -1,10 +1,10 @@
-import type * as schema from "drizzle/schema";
+import type * as schema from "drizzle/schema.js";
 import type { BuildQueryResult, DBQueryConfig, ExtractTablesWithRelations } from "drizzle-orm";
-import { AnyLtiRole } from "$/core/claims/enums/roles";
-import { MessageType } from "$/core/claims/serialization";
-import { LtiTool } from "$/core/tool";
-import { MessagePlacement } from "$/core/tool/message-placement";
-import { Contact, GrantType } from "$/registration/dynamic/tool-configuration";
+import { AnyLtiRole } from "$/core/claims/enums/roles.js";
+import { MessageType } from "$/core/claims/serialization.js";
+import { MessagePlacement } from "$/core/tool/message-placement.js";
+import { LtiTool } from "$/core/tool.js";
+import { Contact, GrantType } from "$/registration/dynamic/tool-configuration.js";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 

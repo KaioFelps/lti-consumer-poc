@@ -1,17 +1,17 @@
 import { either as e } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { AnyLtiRole } from "$/core/claims/enums/roles";
-import { MessageType } from "$/core/claims/serialization";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { Platform } from "$/core/platform";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { AnyLtiRole } from "$/core/claims/enums/roles.js";
+import { MessageType } from "$/core/claims/serialization.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { Platform } from "$/core/platform.js";
 import {
   PresentedLtiResourceLink,
   presentLtiResourceLink,
-} from "$/core/presenters/resource-link.presenter";
-import { LtiToolsRepository } from "$/core/repositories/tools.repository";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiTool } from "$/core/tool";
+} from "$/core/presenters/resource-link.presenter.js";
+import { LtiToolsRepository } from "$/core/repositories/tools.repository.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiTool } from "$/core/tool.js";
 
 export type GetLaunchLinksParams = {
   userRoles: AnyLtiRole[];

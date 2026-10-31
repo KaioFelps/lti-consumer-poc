@@ -1,22 +1,22 @@
 import { Body, Controller, Delete, Get, Param, Post, Query, Render } from "@nestjs/common";
 import { either as e, option as o, taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { LtiToolDeploymentPresenter } from "@/external/presenters/entities/lti-tool-deployment.presenter";
-import { ConfigCoreValidation } from "@/lib/core-validation";
-import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { Mvc, Rest } from "@/lib/mvc-routes";
-import { TranslatorService } from "@/message-string/translator.service";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { Platform } from "$/core/platform";
-import { presentLtiResourceLink } from "$/core/presenters/resource-link.presenter";
-import { LtiResourceLinkServices } from "$/core/services/resource-link.services";
-import { FindDeploymentByIdService } from "../deployments/services/find-deployment-by-id.service";
-import { CreateResourceLinkDto } from "./dtos/create-resource-link.dto";
-import type { ListResourceLinksQueryDto } from "./dtos/list-query.dto";
-import { CreateResourceLinkService } from "./services/create-resource-link.service";
-import { DeleteResourceLinkService } from "./services/delete-resource-link.service";
+import { pipe } from "fp-ts/lib/function.js";
+import { InvalidArgumentError } from "@/core/errors/invalid-argument.error.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { LtiToolDeploymentPresenter } from "@/external/presenters/entities/lti-tool-deployment.presenter.js";
+import { ConfigCoreValidation } from "@/lib/core-validation.js";
+import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory.js";
+import { Mvc, Rest } from "@/lib/mvc-routes.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { Platform } from "$/core/platform.js";
+import { presentLtiResourceLink } from "$/core/presenters/resource-link.presenter.js";
+import { LtiResourceLinkServices } from "$/core/services/resource-link.services.js";
+import { FindDeploymentByIdService } from "../deployments/services/find-deployment-by-id.service.js";
+import { CreateResourceLinkDto } from "./dtos/create-resource-link.dto.js";
+import type { ListResourceLinksQueryDto } from "./dtos/list-query.dto.js";
+import { CreateResourceLinkService } from "./services/create-resource-link.service.js";
+import { DeleteResourceLinkService } from "./services/delete-resource-link.service.js";
 
 @Mvc()
 @Controller("/lti/resource-links")
@@ -41,8 +41,8 @@ export class LtiResourceLinksController {
         deploymentId,
       }),
       e.map((links) => links.map((link) => presentLtiResourceLink(link, this.platform))),
-      e.getOrElseW((error: LtiRepositoryError<IrrecoverableError>) => {
-        throw ExceptionsFactory.fromError(error.cause);
+      e.getOrElseW((error) => {
+        throw ExceptionsFactory.fromError((error as LtiRepositoryError<IrrecoverableError>).cause);
       }),
     );
 

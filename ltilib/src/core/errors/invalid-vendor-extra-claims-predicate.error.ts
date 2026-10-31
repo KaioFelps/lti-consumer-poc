@@ -1,4 +1,4 @@
-import { InvalidArgumentError } from "./bases/invalid-argument.error";
+import { InvalidArgumentError } from "./bases/invalid-argument.error.js";
 
 type Field = "predicate";
 type Code = "must_be_url";

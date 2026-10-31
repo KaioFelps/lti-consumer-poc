@@ -1,14 +1,14 @@
-import courseContextFactory from "test/factories/course-context.factory";
-import deploymentFactory from "test/factories/deployment.factory";
-import externalLtiResourceFactory from "test/factories/external-lti-resource.factory";
-import ltiAssignmentFactory from "test/factories/lti-assignment.factory";
-import ltiResourceLinkFactory from "test/factories/lti-resource-link.factory";
-import ltiToolFactory from "test/factories/lti-tool.factory";
-import personFactory from "test/factories/person.factory";
-import { DrizzleClient } from "@/external/data-store/drizzle/client";
-import { AssignmentKind } from "@/modules/assignments-and-grades/enums/assignment-kind";
-import { Instructor } from "@/modules/courses-and-enrollments/entities/instructor.entity";
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
+import courseContextFactory from "test/factories/course-context.factory.js";
+import deploymentFactory from "test/factories/deployment.factory.js";
+import externalLtiResourceFactory from "test/factories/external-lti-resource.factory.js";
+import ltiAssignmentFactory from "test/factories/lti-assignment.factory.js";
+import ltiResourceLinkFactory from "test/factories/lti-resource-link.factory.js";
+import ltiToolFactory from "test/factories/lti-tool.factory.js";
+import personFactory from "test/factories/person.factory.js";
+import { DrizzleClient } from "@/external/data-store/drizzle/client.js";
+import { AssignmentKind } from "@/modules/assignments-and-grades/enums/assignment-kind.js";
+import { Instructor } from "@/modules/courses-and-enrollments/entities/instructor.entity.js";
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes.js";
 
 export type EntitiesFactoryGenerator = ReturnType<typeof generateEntitiesFactory>;
 

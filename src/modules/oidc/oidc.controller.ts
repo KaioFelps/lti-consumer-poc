@@ -1,24 +1,25 @@
 import { All, Body, Controller, Get, Header, Inject, Post, Req, Res } from "@nestjs/common";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { either } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
 import Provider, { Client, Interaction, type InteractionResults } from "oidc-provider";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { UnauthorizedError } from "@/core/errors/unauthorized.error";
-import { HttpRequest, HttpResponse } from "@/lib";
-import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { Mvc } from "@/lib/mvc-routes";
-import { TranslatorService } from "@/message-string/translator.service";
-import { LoginDTO } from "@/modules/auth/dtos/login.dto";
-import { Public } from "@/modules/auth/protected-routes";
-import { AuthenticateUserService } from "@/modules/auth/services/authenticate-user.service";
-import { Routes } from "@/routes";
-import { AvailableACRs } from "./consts";
-import { reasonsAreValidPromptReasons, resolveAcrValues } from "./helpers";
-import { OIDCAccountsRepository } from "./repositories/accounts.repository";
-import { ConsentViewManagerFactory } from "./view-manager/consent";
-import { LoginViewManager } from "./view-manager/login";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { UnauthorizedError } from "@/core/errors/unauthorized.error.js";
+import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory.js";
+import { Mvc } from "@/lib/mvc-routes.js";
+import type { HttpRequest, HttpResponse } from "@/lib.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { LoginDTO } from "@/modules/auth/dtos/login.dto.js";
+import { Public } from "@/modules/auth/protected-routes.js";
+import { AuthenticateUserService } from "@/modules/auth/services/authenticate-user.service.js";
+import { Routes } from "@/routes.js";
+import type { User } from "../identity/user/user.entity.js";
+import { AvailableACRs } from "./consts.js";
+import { reasonsAreValidPromptReasons, resolveAcrValues } from "./helpers.js";
+import { OIDCAccountsRepository } from "./repositories/accounts.repository.js";
+import { ConsentViewManagerFactory } from "./view-manager/consent.js";
+import { LoginViewManager } from "./view-manager/login.js";
 
 @Public()
 @Controller("oidc")
@@ -142,7 +143,7 @@ export class OIDCController {
       );
     }
 
-    const user = authentication.right;
+    const user = authentication.right as User;
 
     const acr = resolveAcrValues(details);
     // AMR values are specified in a IANA registry.

@@ -1,9 +1,9 @@
 import { Injectable, NestMiddleware } from "@nestjs/common";
-import { UserPresenter } from "@/external/presenters/entities/user.presenter";
-import { TranslatorService } from "@/message-string/translator.service";
-import { User } from "@/modules/identity/user/user.entity";
-import { Routes } from "@/routes";
-import { HttpRequest, HttpResponse, RequestSession } from "..";
+import { UserPresenter } from "@/external/presenters/entities/user.presenter.js";
+import type { HttpRequest, HttpResponse, RequestSession } from "@/lib.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { User } from "@/modules/identity/user/user.entity.js";
+import { Routes } from "@/routes.js";
 
 // moved from `main.ts` because this would cause Reflect.js typeerror when running
 // vitest tests, likely due to circular dependencies or whatever

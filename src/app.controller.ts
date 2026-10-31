@@ -1,15 +1,15 @@
 import { Controller, Get, Render } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { SessionUser } from "@/modules/auth/session-user";
-import { User } from "@/modules/identity/user/user.entity";
-import { mapRolesToLtiSystemRoles } from "@/modules/lti/mappers/convert-roles";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiLaunchServices } from "$/core/services/launch";
-import { AppService } from "./app.service";
-import { ResourceNotFoundError } from "./core/errors/resource-not-found.error";
-import { Mvc } from "./lib/mvc-routes";
-import { TranslatorService } from "./message-string/translator.service";
+import { pipe } from "fp-ts/lib/function.js";
+import { SessionUser } from "@/modules/auth/session-user.js";
+import { User } from "@/modules/identity/user/user.entity.js";
+import { mapRolesToLtiSystemRoles } from "@/modules/lti/mappers/convert-roles.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiLaunchServices } from "$/core/services/launch.services.js";
+import { AppService } from "./app.service.js";
+import { ResourceNotFoundError } from "./core/errors/resource-not-found.error.js";
+import { Mvc } from "./lib/mvc-routes.js";
+import { TranslatorService } from "./message-string/translator.service.js";
 
 @Controller()
 export class AppController {

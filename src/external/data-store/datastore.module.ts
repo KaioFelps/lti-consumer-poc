@@ -1,10 +1,10 @@
 import { Module } from "@nestjs/common";
-import { EnvironmentVars } from "@/config/environment-vars";
-import { TransactionManager } from "@/core/transaction-manager";
-import { DrizzleClient } from "./drizzle/client";
-import { DrizzleTransactionManager } from "./drizzle/transaction-manager";
-import { Redis } from "./redis/client";
-import { RepositoriesModule } from "./repositories.module";
+import { EnvironmentVars } from "@/config/environment-vars.js";
+import { TransactionManager } from "@/core/transaction-manager.js";
+import { DrizzleClient } from "./drizzle/client.js";
+import { DrizzleTransactionManager } from "./drizzle/transaction-manager.js";
+import { Redis } from "./redis/client.js";
+import { RepositoriesModule } from "./repositories.module.js";
 
 @Module({
   providers: [

@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
-import type { IErrorBase } from "@/core/errors/error-base";
+import type { IErrorBase } from "@/core/errors/error-base.js";
 
 /**
  * This exception may decorate any core error that inherits

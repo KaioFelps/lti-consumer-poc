@@ -1,6 +1,6 @@
-import { LtiTool } from "$/core/tool";
-import { Platform } from "../../core/platform";
-import { LtiInitiationMessage } from "../lti-message";
+import { LtiTool } from "$/core/tool.js";
+import { Platform } from "../../core/platform.js";
+import { LtiInitiationMessage } from "../lti-message.js";
 
 export type CreateInitiateThirdPartyLoginRequestArgs = {
   tool: Readonly<LtiTool>;

@@ -5,8 +5,8 @@ import { Reflector } from "@nestjs/core";
 import { ORIGINAL_RENDER_FN, RenderFn, renderWithLayout } from "express-ejs-layouts";
 import { Observable } from "rxjs";
 import { mergeMap } from "rxjs/operators";
-import { HttpRequest, HttpResponse } from "..";
-import asyncRender from ".";
+import type { HttpRequest, HttpResponse } from "@/lib.js";
+import asyncRender from "./index.js";
 
 @Injectable()
 export class AsyncRenderInterceptor implements NestInterceptor {

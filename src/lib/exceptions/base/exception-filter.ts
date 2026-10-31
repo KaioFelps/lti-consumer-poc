@@ -1,13 +1,13 @@
 import { ArgumentsHost, Catch, ExceptionFilter, Injectable, Scope } from "@nestjs/common";
-import { RenderableError } from "@/core/errors/renderable/renderable-error";
-import { SimpleExceptionPresenter } from "@/external/presenters/exceptions/simple-exception.presenter";
-import { HttpRequest } from "@/lib";
-import mvcRoutes from "@/lib/mvc-routes";
-import { TranslatorService } from "@/message-string/translator.service";
-import { RenderableException } from "../renderable/exception";
-import { RenderableExceptionFilter } from "../renderable/exception-filter";
-import { BaseException } from "./exception";
-import { BaseExceptionFilterResponderFactory } from "./responder.factory";
+import { RenderableError } from "@/core/errors/renderable/renderable-error.js";
+import { SimpleExceptionPresenter } from "@/external/presenters/exceptions/simple-exception.presenter.js";
+import mvcRoutes from "@/lib/mvc-routes.js";
+import type { HttpRequest } from "@/lib.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { RenderableException } from "../renderable/exception.js";
+import { RenderableExceptionFilter } from "../renderable/exception-filter.js";
+import { BaseException } from "./exception.js";
+import { BaseExceptionFilterResponderFactory } from "./responder.factory.js";
 
 @Injectable({ scope: Scope.REQUEST })
 @Catch(BaseException)

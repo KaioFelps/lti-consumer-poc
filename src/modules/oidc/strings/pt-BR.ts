@@ -1,22 +1,22 @@
-import { ptBR } from "@/message-string/internal/translations/pt-BR";
-import { AvailableScope } from "../consts";
+import { ptBR } from "@/message-string/internal/translations/pt-BR.js";
+import { AvailableScope } from "../consts.js";
 
 ptBR["oidc:login:title"] = "[OIDC] Logue-se";
-ptBR["oidc:accounts:account-not-found"] = ({ id }: { id: string }) =>
+ptBR["oidc:accounts:account-not-found"] = ({ id }) =>
   `Não foi encontrada nenhuma conta com id ${id}.`;
 
-ptBR["oidc:confirm:title"] = ({ userName }: { userName: string }) => `[OIDC] Olá, ${userName}`;
+ptBR["oidc:confirm:title"] = ({ userName }) => `[OIDC] Olá, ${userName}`;
 
 ptBR["oidc:error-descriptions:no-client-id-parameter"] =
   "O parâmetro `client_id` é obrigatório, mas não foi fornecido.";
 ptBR["oidc:error-descriptions:unregistered-or-unauthorized-client"] =
   "Cliente não autorizado ou registrado.";
 
-ptBR["oidc:scopes:content:p1-no-scope"] = (args: { clientName: string }) =>
-  `A aplicação ${args.clientName} deseja acessar a sua conta.`;
+ptBR["oidc:scopes:content:p1-no-scope"] = ({ clientName }) =>
+  `A aplicação ${clientName} deseja acessar a sua conta.`;
 
-ptBR["oidc:scopes:content:p1-many-scopes"] = (args: { clientName: string }) =>
-  `A aplicação ${args.clientName} deseja acessar a sua conta e obter as seguintes permissões:`;
+ptBR["oidc:scopes:content:p1-many-scopes"] = ({ clientName }) =>
+  `A aplicação ${clientName} deseja acessar a sua conta e obter as seguintes permissões:`;
 
 ptBR["oidc:confirm:buttons:authorize"] = "Eu autorizo";
 ptBR["oidc:confirm:buttons:cancel"] = "Deixa baixo";

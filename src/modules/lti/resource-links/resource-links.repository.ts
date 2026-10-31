@@ -1,14 +1,14 @@
-import { UUID } from "common/src/types/uuid";
-import { Either } from "fp-ts/lib/Either";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
+import type { UUID } from "common/src/types/uuid.js";
+import { Either } from "fp-ts/lib/Either.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
 import {
   LtiResourceLinksRepository as BaseLtiResourceLinksRepository,
   FindManyParams,
-} from "$/core/repositories/resource-links.repository";
-import { LtiResourceLink } from "$/core/resource-link";
-import { InvalidComposedContextIdError } from "../advantage/errors/invalid-composed-context-id.error";
-import { ResourceLinkNotFoundError } from "./errors/resource-link-not-found.error";
+} from "$/core/repositories/resource-links.repository.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { InvalidComposedContextIdError } from "../advantage/errors/invalid-composed-context-id.error.js";
+import { ResourceLinkNotFoundError } from "./errors/resource-link-not-found.error.js";
 
 export abstract class LtiResourceLinksRepository extends BaseLtiResourceLinksRepository {
   public abstract findMany(

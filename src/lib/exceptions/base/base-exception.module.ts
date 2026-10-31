@@ -1,8 +1,8 @@
 import { Module } from "@nestjs/common";
 import { APP_FILTER } from "@nestjs/core";
-import { RenderableExceptionModule } from "../renderable/renderable-exception.module";
-import { BaseExceptionFilter } from "./exception-filter";
-import { BaseExceptionFilterResponderFactory } from "./responder.factory";
+import { RenderableExceptionModule } from "../renderable/renderable-exception.module.js";
+import { BaseExceptionFilter } from "./exception-filter.js";
+import { BaseExceptionFilterResponderFactory } from "./responder.factory.js";
 
 @Module({
   imports: [RenderableExceptionModule],

@@ -1,4 +1,4 @@
-import type { LtiTool } from "$/core/tool";
+import type { LtiTool } from "$/core/tool.js";
 
 export type PresentedLtiToolSupportedMessage = {
   type: string;

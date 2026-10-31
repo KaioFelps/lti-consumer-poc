@@ -1,6 +1,6 @@
-import { Optional } from "common/src/types/optional";
-import { generateUUID, UUID } from "common/src/types/uuid";
-import { EntityBase } from "@/core/entity-base";
+import { Optional } from "common/src/types/optional.js";
+import { generateUUID, UUID } from "common/src/types/uuid.js";
+import { EntityBase } from "@/core/entity-base.js";
 
 export type LtiToolDeploymentProps = {
   id: UUID;

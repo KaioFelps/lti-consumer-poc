@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { UUID } from "common/src/types/uuid";
-import { LtiResourceLinksRepository } from "../resource-links.repository";
+import type { UUID } from "common/src/types/uuid.js";
+import { LtiResourceLinksRepository } from "../resource-links.repository.js";
 
 type Params = {
   resourceLinkId: UUID;

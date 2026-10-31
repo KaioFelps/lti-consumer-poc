@@ -1,6 +1,6 @@
 import { either as e } from "fp-ts";
-import { MalformedRequestError } from "$/core/errors/malformed-request.error";
-import { validateAuthenticationRequest } from "./validate-authentication-request";
+import { MalformedRequestError } from "$/core/errors/malformed-request.error.js";
+import { validateAuthenticationRequest } from "./validate-authentication-request.js";
 
 describe("[Core] validateAuthenticationRequest", async () => {
   const validArgs = {

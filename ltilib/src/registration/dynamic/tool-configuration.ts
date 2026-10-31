@@ -1,4 +1,4 @@
-import { ToolConfigurationSupportedMessage } from "./supported-message";
+import { ToolConfigurationSupportedMessage } from "./supported-message.js";
 
 export type GrantType = "implicit" | "client_credentials";
 export type ResponseType = "id_token";

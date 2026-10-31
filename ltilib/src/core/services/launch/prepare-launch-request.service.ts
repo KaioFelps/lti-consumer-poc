@@ -1,30 +1,30 @@
 import { either as e, option as o, taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { TaskEither } from "fp-ts/lib/TaskEither";
-import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim";
-import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim";
-import { Context } from "$/core/context";
-import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error";
-import { CouldNotFindContextDueToExternalRepositoryError } from "$/core/errors/could-not-find-context-due-to-external-error";
-import { CouldNotFindToolDueToExternalRepositoryError } from "$/core/errors/could-not-find-tool-due-to-external-error";
-import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { HttpResponseWrapper } from "$/core/http/response-wrapper";
-import { LtiLaunchData } from "$/core/launch-data";
-import { LTIResourceLinkLaunchRequest } from "$/core/messages/resource-link-launch";
-import { Platform } from "$/core/platform";
-import { LtiContextsRepository } from "$/core/repositories/contexts.repository";
-import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
-import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
-import { LtiToolsRepository } from "$/core/repositories/tools.repository";
-import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identities.repository";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiTool } from "$/core/tool";
-import { UserIdentity, UserRoles } from "$/core/user-identity";
+import { pipe } from "fp-ts/lib/function.js";
+import { TaskEither } from "fp-ts/lib/TaskEither.js";
+import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim.js";
+import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim.services.js";
+import { Context } from "$/core/context.js";
+import { AuthenticationRedirectionError } from "$/core/errors/authentication-redirection.error.js";
+import { CouldNotFindContextDueToExternalRepositoryError } from "$/core/errors/could-not-find-context-due-to-external-error.js";
+import { CouldNotFindToolDueToExternalRepositoryError } from "$/core/errors/could-not-find-tool-due-to-external-error.js";
+import { InvalidRedirectUriError } from "$/core/errors/invalid-redirect-uri.error.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { HttpResponseWrapper } from "$/core/http/response-wrapper.js";
+import { LtiLaunchData } from "$/core/launch-data.js";
+import { LTIResourceLinkLaunchRequest } from "$/core/messages/resource-link-launch.js";
+import { Platform } from "$/core/platform.js";
+import { LtiContextsRepository } from "$/core/repositories/contexts.repository.js";
+import { LtiLaunchesRepository } from "$/core/repositories/launches.repository.js";
+import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository.js";
+import { LtiToolsRepository } from "$/core/repositories/tools.repository.js";
+import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identities.repository.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiTool } from "$/core/tool.js";
+import { UserIdentity, UserRoles } from "$/core/user-identity.js";
 import {
   ValidateAuthenticationRequestArgs,
   validateAuthenticationRequest,
-} from "$/security/validate-authentication-request";
+} from "$/security/validate-authentication-request.js";
 
 type RedirectionErrorFactory = (
   code: AuthenticationRedirectionError["code"],

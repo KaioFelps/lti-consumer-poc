@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { APP_FILTER } from "@nestjs/core";
-import { RenderableExceptionFilter } from "./exception-filter";
-import { RenderableExceptionFilterResponderFactory } from "./responder.factory";
+import { RenderableExceptionFilter } from "./exception-filter.js";
+import { RenderableExceptionFilterResponderFactory } from "./responder.factory.js";
 
 @Module({
   providers: [

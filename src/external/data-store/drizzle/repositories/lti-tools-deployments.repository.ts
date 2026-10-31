@@ -1,25 +1,25 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { UUID } from "common/src/types/uuid";
-import { ltiToolDeployments } from "drizzle/schema";
+import type { UUID } from "common/src/types/uuid.js";
+import { ltiToolDeployments } from "drizzle/schema.js";
 import { eq, sql } from "drizzle-orm";
 import { either, taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
-import { unmountContextId } from "@/modules/lti/advantage/context";
-import { ContextNotFoundError } from "@/modules/lti/advantage/errors/context-not-found.error";
-import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type";
-import { LtiToolDeployment } from "@/modules/lti/tools/entities/lti-tool-deployment.entity";
-import { DeploymentNotFoundError } from "@/modules/lti/tools/errors/deployment-not-found.error";
-import { LtiToolsDeploymentsRepository } from "@/modules/lti/tools/lti-tools-deployments.repository";
-import { Context } from "$/core/context";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiTool } from "$/core/tool";
-import { LtiToolDeployment as LtilibToolDeployment } from "$/core/tool-deployment";
-import { DrizzleClient } from "../client";
-import mapper, { type LtiToolDeploymentRow } from "../mappers/lti-tools-deployments.mapper";
-import { DrizzleTransactionManager } from "../transaction-manager";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error.js";
+import { unmountContextId } from "@/modules/lti/advantage/context.js";
+import { ContextNotFoundError } from "@/modules/lti/advantage/errors/context-not-found.error.js";
+import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type.js";
+import { LtiToolDeployment } from "@/modules/lti/tools/entities/lti-tool-deployment.entity.js";
+import { DeploymentNotFoundError } from "@/modules/lti/tools/errors/deployment-not-found.error.js";
+import { LtiToolsDeploymentsRepository } from "@/modules/lti/tools/lti-tools-deployments.repository.js";
+import { Context } from "$/core/context.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiTool } from "$/core/tool.js";
+import { LtiToolDeployment as LtilibToolDeployment } from "$/core/tool-deployment.js";
+import { DrizzleClient } from "../client.js";
+import mapper, { type LtiToolDeploymentRow } from "../mappers/lti-tools-deployments.mapper.js";
+import { DrizzleTransactionManager } from "../transaction-manager.js";
 
 @Injectable()
 export class DrizzleLtiToolsDeploymentsRepository extends LtiToolsDeploymentsRepository {

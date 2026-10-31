@@ -149,13 +149,13 @@ will create the correct error response (as said above).
 ```ts
 // /src/lib/exceptions/your/responder.factory.ts
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { HttpArgumentsHost } from "@nestjs/common/interfaces";
-import { YourExceptionPresenter } from "@/external/presenters/exceptions/your-exception.presenter";
-import { HttpRequest, HttpResponse } from "@/lib";
-import { TranslatorService } from "@/message-string/translator.service";
-import { ExceptionFilterResponderFactory } from "../../exception-responders/factory";
-import { ExceptionFilterResponder } from "../../exception-responders/responder";
-import { YourException } from "./exception";
+import { HttpArgumentsHost } from "@nestjs/common/interfaces/index.js";
+import { YourExceptionPresenter } from "@/external/presenters/exceptions/your-exception.presenter.js";
+import type { HttpRequest, HttpResponse } from "@/lib.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { ExceptionFilterResponderFactory } from "../../exception-responders/factory.js";
+import { ExceptionFilterResponder } from "../../exception-responders/responder.js";
+import { YourException } from "./exception.js";
 
 type Output = ...; // usually void for redirects and some sort of object for JSON responses
 

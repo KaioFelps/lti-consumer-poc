@@ -1,10 +1,10 @@
-import type * as schema from "drizzle/schema";
+import type * as schema from "drizzle/schema.js";
 import type { BuildQueryResult, DBQueryConfig, ExtractTablesWithRelations } from "drizzle-orm";
 import { either, option } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { mountContextId, unmountContextId } from "@/modules/lti/advantage/context";
-import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type";
-import { LtiResourceLink } from "$/core/resource-link";
+import { pipe } from "fp-ts/lib/function.js";
+import { mountContextId, unmountContextId } from "@/modules/lti/advantage/context.js";
+import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 

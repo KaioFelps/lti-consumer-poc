@@ -1,4 +1,4 @@
-import { BadRequestError } from "@/core/errors/bad-request.error";
+import { BadRequestError } from "@/core/errors/bad-request.error.js";
 
 export class InvalidComposedContextIdError extends BadRequestError {
   public constructor(reason: "malformed" | "unknown") {

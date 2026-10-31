@@ -1,12 +1,12 @@
 import { join } from "node:path";
-import * as schema from "drizzle/schema";
+import * as schema from "drizzle/schema.js";
 import { drizzle, NodePgDatabase } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { reset } from "drizzle-seed";
 import { Pool } from "pg";
 import { StartedTestContainer } from "testcontainers";
-import { loadMessageStrings } from "@/message-string/loader";
-import { getPostgresContainer, getRedisContainer } from "./fixtures/containers";
+import { loadMessageStrings } from "@/message-string/loader.js";
+import { getPostgresContainer, getRedisContainer } from "./fixtures/containers.js";
 
 let redisContainer: StartedTestContainer;
 let postgresContainer: StartedTestContainer;

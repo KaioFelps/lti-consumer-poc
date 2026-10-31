@@ -1,6 +1,6 @@
-import { ClassProperties } from "common/src/types/class-properties";
-import { AnyLtiRole } from "$/core/claims/enums/roles";
-import { IntoLtiClaim } from "$/core/claims/serialization";
+import { ClassProperties } from "common/src/types/class-properties.js";
+import { AnyLtiRole } from "$/core/claims/enums/roles.js";
+import { IntoLtiClaim } from "$/core/claims/serialization.js";
 
 type Args<CR> = Omit<ClassProperties<UserIdentity<CR>>, "extraClaims">;
 

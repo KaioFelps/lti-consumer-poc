@@ -1,11 +1,11 @@
-import type * as schema from "drizzle/schema";
+import type * as schema from "drizzle/schema.js";
 import {
   type BuildQueryResult,
   type DBQueryConfig,
   type ExtractTablesWithRelations,
 } from "drizzle-orm";
-import { Instructor } from "@/modules/courses-and-enrollments/entities/instructor.entity";
-import peopleMapper from "./people.mapper";
+import { Instructor } from "@/modules/courses-and-enrollments/entities/instructor.entity.js";
+import peopleMapper from "./people.mapper.js";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 

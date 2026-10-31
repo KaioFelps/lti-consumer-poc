@@ -1,10 +1,10 @@
 import { either } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
+import { pipe } from "fp-ts/lib/function.js";
 import { decodeJwt } from "jose";
-import { createMockKeySet } from "ltilib/tests/utils/create-jwks";
-import { Platform } from "$/core/platform";
-import { LtiTool } from "$/core/tool";
-import { prepareIdToken } from "./prepare-id-token";
+import { Platform } from "$/core/platform.js";
+import { LtiTool } from "$/core/tool.js";
+import { createMockKeySet } from "$/tests/utils/create-jwks.js";
+import { prepareIdToken } from "./prepare-id-token.js";
 
 describe("prepareIdToken", async () => {
   const { privateJwk: jwk } = await createMockKeySet();

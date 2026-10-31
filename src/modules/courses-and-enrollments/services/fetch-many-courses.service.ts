@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { CoursesRepository } from "@/modules/assignments-and-grades/repositories/courses.repository";
+import { CoursesRepository } from "@/modules/assignments-and-grades/repositories/courses.repository.js";
 
 @Injectable()
 export class FetchManyCoursesService {

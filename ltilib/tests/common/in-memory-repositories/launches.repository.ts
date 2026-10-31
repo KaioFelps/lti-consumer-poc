@@ -1,8 +1,8 @@
 import { either as e } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiLaunchData } from "$/core/launch-data";
-import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
+import { Either } from "fp-ts/lib/Either.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiLaunchData } from "$/core/launch-data.js";
+import { LtiLaunchesRepository } from "$/core/repositories/launches.repository.js";
 
 export class InMemoryLaunchesRepository implements LtiLaunchesRepository {
   public launches: { data: LtiLaunchData; ttl: number; savedAt: Date }[] = [];

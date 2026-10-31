@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { APP_FILTER } from "@nestjs/core";
-import { RenderableExceptionModule } from "../renderable/renderable-exception.module";
-import { RenderableDtoValidationExceptionFilter } from "./exception-filter";
+import { RenderableExceptionModule } from "../renderable/renderable-exception.module.js";
+import { RenderableDtoValidationExceptionFilter } from "./exception-filter.js";
 
 @Module({
   imports: [RenderableExceptionModule],

@@ -1,6 +1,6 @@
-import { EntityBase } from "@/core/entity-base";
-import { Assignment } from "../entities/assignment.entity";
-import { Grade } from "../entities/grade.entity";
+import { EntityBase } from "@/core/entity-base.js";
+import { Assignment } from "../entities/assignment.entity.js";
+import { Grade } from "../entities/grade.entity.js";
 
 type Props = {
   grade: Grade;

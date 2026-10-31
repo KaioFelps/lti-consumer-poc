@@ -1,15 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { usersTable } from "drizzle/schema";
+import { usersTable } from "drizzle/schema.js";
 import { sql } from "drizzle-orm";
 import { either, option, taskEither } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { tryCatch } from "fp-ts/lib/TaskEither";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
-import { User } from "@/modules/identity/user/user.entity";
-import { UsersRepository } from "@/modules/identity/user/users.repository";
-import { DrizzleClient } from "../client";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { tryCatch } from "fp-ts/lib/TaskEither.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error.js";
+import { User } from "@/modules/identity/user/user.entity.js";
+import { UsersRepository } from "@/modules/identity/user/users.repository.js";
+import { DrizzleClient } from "../client.js";
 
 @Injectable()
 export class DrizzleUsersRepository extends UsersRepository {
@@ -30,10 +30,10 @@ export class DrizzleUsersRepository extends UsersRepository {
             .where(sql`username = ${username}`)
             .limit(1)
             .execute(),
-        (error: Error) =>
+        (error) =>
           new IrrecoverableError(
             "An error occurred in DrizzleUsersRepository when " + "finding a user by its username.",
-            error,
+            error as Error,
           ),
       ),
       taskEither.map((userAsArray) => {

@@ -4,19 +4,19 @@
  */
 
 import { either, option, taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
+import { pipe } from "fp-ts/lib/function.js";
 import { Adapter, AdapterPayload, errors } from "oidc-provider";
-import { EnvironmentVars } from "@/config/environment-vars";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ValidationErrors } from "@/core/validation/validation-errors";
-import { OIDCServerErrorException } from "@/lib/exceptions/oidc/exception";
-import { LtiToolIdPrefix } from "@/modules/lti";
-import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity";
-import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository";
-import { ModelName } from "@/modules/oidc/adapter/factory";
-import { OIDCClient } from "@/modules/oidc/client";
-import { OIDCClientsRepository } from "@/modules/oidc/repositories/clients.repository";
-import { UnsafeOIDCClientsInjectionContainer } from "@/modules/oidc/unsafe-clients-injection-container";
+import { EnvironmentVars } from "@/config/environment-vars.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { ValidationErrors } from "@/core/validation/validation-errors.js";
+import { OIDCServerErrorException } from "@/lib/exceptions/oidc/exception.js";
+import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity.js";
+import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository.js";
+import { LtiToolIdPrefix } from "@/modules/lti.js";
+import { ModelName } from "@/modules/oidc/adapter/factory.js";
+import { OIDCClient } from "@/modules/oidc/client.js";
+import { OIDCClientsRepository } from "@/modules/oidc/repositories/clients.repository.js";
+import { UnsafeOIDCClientsInjectionContainer } from "@/modules/oidc/unsafe-clients-injection-container.js";
 
 export class DrizzleOIDCClientAdapter implements Adapter {
   public constructor(

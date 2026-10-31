@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
-import { ValidationErrors } from "@/core/validation/validation-errors";
+import { ValidationErrors } from "@/core/validation/validation-errors.js";
 
 /**
  * This is an exception even between exceptions. It does not benefit

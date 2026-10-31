@@ -1,4 +1,4 @@
-import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
+import { LtiRepositoryPaginatedResponse } from "$/core/repositories.js";
 
 export function calculateLastPageFromPaginatedData(
   paginatedData: LtiRepositoryPaginatedResponse<unknown>,

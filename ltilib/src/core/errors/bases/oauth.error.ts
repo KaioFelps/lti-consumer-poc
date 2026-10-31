@@ -1,4 +1,4 @@
-import { ILtilibError, LtilibError } from "./ltilib.error";
+import { ILtilibError, LtilibError } from "./ltilib.error.js";
 
 export interface IOAuthError<ErrorCode> extends Omit<ILtilibError, "message"> {
   reason: ErrorCode;

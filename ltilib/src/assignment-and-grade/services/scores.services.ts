@@ -1,16 +1,19 @@
 import { either as e, taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import { ILtiScore, LtiLineItem, LtiScore } from "$/assignment-and-grade/entities";
-import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors";
-import { LtiLineItemsRepository, LtiScoresRepository } from "$/assignment-and-grade/repositories";
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
-import { Context } from "$/core/context";
-import { HttpResponseWrapper } from "$/core/http/response-wrapper";
-import { Platform } from "$/core/platform";
-import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
-import { LtiTool } from "$/core/tool";
-import { AGSExecutorParams, AGServiceBase, AGServicesExecutor } from "..";
+import { pipe } from "fp-ts/lib/function.js";
+import { LtiAdvantageMediaType } from "$/advantage/media-types.js";
+import { ILtiScore, LtiLineItem, LtiScore } from "$/assignment-and-grade/entities/index.js";
+import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors.js";
+import {
+  LtiLineItemsRepository,
+  LtiScoresRepository,
+} from "$/assignment-and-grade/repositories.js";
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes.js";
+import { Context } from "$/core/context.js";
+import { HttpResponseWrapper } from "$/core/http/response-wrapper.js";
+import { Platform } from "$/core/platform.js";
+import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository.js";
+import { LtiTool } from "$/core/tool.js";
+import { AGSExecutorParams, AGServiceBase, AGServicesExecutor } from "./index.js";
 
 type PublishScoreServiceParams = {
   lineItemId: LtiLineItem["id"];

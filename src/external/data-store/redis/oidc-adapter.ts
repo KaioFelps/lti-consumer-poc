@@ -9,8 +9,8 @@ import {
   resolveOIDCKey,
   uidKeyFor,
   userCodeKeyFor,
-} from "@/modules/oidc/adapter/helpers";
-import { Redis } from "./client";
+} from "@/modules/oidc/adapter/helpers.js";
+import { Redis } from "./client.js";
 
 export class OIDCRedisAdapter {
   public constructor(

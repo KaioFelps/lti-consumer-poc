@@ -3,38 +3,38 @@
  */
 
 import { faker } from "@faker-js/faker";
-import { generateUUID } from "common/src/types/uuid";
+import { generateUUID } from "common/src/types/uuid.js";
 import { either as e } from "fp-ts";
-import { createContext } from "ltilib/tests/common/factories/context.factory";
-import { createExternalLtiResource } from "ltilib/tests/common/factories/external-lti-resource.factory";
-import {
-  createPlatform,
-  createPlatformAgsConfiguration,
-} from "ltilib/tests/common/factories/platform.factory";
-import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
-import { createTool } from "ltilib/tests/common/factories/tool.factory";
-import { createToolDeployment } from "ltilib/tests/common/factories/tool-deployment.factory";
-import { InMemoryExternalLtiResourcesRepository } from "ltilib/tests/common/in-memory-repositories/external-lti-resources.repository";
-import { InMemoryLtiLineItemsRepository } from "ltilib/tests/common/in-memory-repositories/line-items.repository";
-import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
-import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
-import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
-import { InvalidContentTypeError } from "$/advantage/errors/invalid-content-type.error";
-import { MissingScopeError } from "$/advantage/errors/missing-scope.error";
-import { ExternalLtiResource } from "$/advantage/external-resource";
-import { LtiAdvantageMediaType } from "$/advantage/media-types";
+import { InvalidContentTypeError } from "$/advantage/errors/invalid-content-type.error.js";
+import { MissingScopeError } from "$/advantage/errors/missing-scope.error.js";
+import { ExternalLtiResource } from "$/advantage/external-resource.js";
+import { LtiAdvantageMediaType } from "$/advantage/media-types.js";
 import {
   CannotAttachResourceLinkError,
   MissingPlatformAgsConfigurationError,
   ToolIsNotDeployedInContextError,
-} from "$/assignment-and-grade/errors";
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
-import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
-import { Context } from "$/core/context";
-import { InvalidArgumentError } from "$/core/errors/bases/invalid-argument.error";
-import { Platform } from "$/core/platform";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiTool } from "$/core/tool";
+} from "$/assignment-and-grade/errors.js";
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes.js";
+import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item.services.js";
+import { Context } from "$/core/context.js";
+import { InvalidArgumentError } from "$/core/errors/bases/invalid-argument.error.js";
+import { Platform } from "$/core/platform.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiTool } from "$/core/tool.js";
+import { createContext } from "$/tests/common/factories/context.factory.js";
+import { createExternalLtiResource } from "$/tests/common/factories/external-lti-resource.factory.js";
+import {
+  createPlatform,
+  createPlatformAgsConfiguration,
+} from "$/tests/common/factories/platform.factory.js";
+import { createResourceLink } from "$/tests/common/factories/resource-link.factory.js";
+import { createTool } from "$/tests/common/factories/tool.factory.js";
+import { createToolDeployment } from "$/tests/common/factories/tool-deployment.factory.js";
+import { InMemoryExternalLtiResourcesRepository } from "$/tests/common/in-memory-repositories/external-lti-resources.repository.js";
+import { InMemoryLtiLineItemsRepository } from "$/tests/common/in-memory-repositories/line-items.repository.js";
+import { InMemoryLtiResourceLinksRepository } from "$/tests/common/in-memory-repositories/resource-links.repository.js";
+import { InMemoryLtiToolDeploymentsRepository } from "$/tests/common/in-memory-repositories/tool-deployments.repository.js";
+import { InMemoryToolsRepository } from "$/tests/common/in-memory-repositories/tools.repository.js";
 
 describe("[AGS] Create Line Item Service", async () => {
   let platform: Platform;

@@ -1,5 +1,5 @@
-import { LtilibError } from "./bases/ltilib.error";
-import { LtiRepositoryError } from "./repository.error";
+import { LtilibError } from "./bases/ltilib.error.js";
+import { LtiRepositoryError } from "./repository.error.js";
 
 /**
  * This error occurs when the resource link's context could not be found due to some external error, not because it

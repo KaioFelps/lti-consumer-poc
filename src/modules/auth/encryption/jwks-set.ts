@@ -1,7 +1,7 @@
 import { Injectable, Scope } from "@nestjs/common";
+import type { JWK } from "jose";
 import * as jose from "jose";
-import { JWK } from "jose";
-import { EnvironmentVars } from "@/config/environment-vars";
+import { EnvironmentVars } from "@/config/environment-vars.js";
 
 @Injectable({ scope: Scope.DEFAULT })
 export class AuthJwkSet {

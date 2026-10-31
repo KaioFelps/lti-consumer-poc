@@ -1,5 +1,5 @@
-import { ClassProperties } from "common/src/types/class-properties";
-import { LtiInitiationMessage } from "$/security/lti-message";
+import { ClassProperties } from "common/src/types/class-properties.js";
+import { LtiInitiationMessage } from "$/security/lti-message.js";
 
 type LtiRegistrationInitiationRequestArgs = ClassProperties<LtiRegistrationInitiationRequest>;
 

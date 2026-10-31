@@ -1,14 +1,14 @@
-import type * as schema from "drizzle/schema";
-import { usersTable } from "drizzle/schema";
+import type * as schema from "drizzle/schema.js";
+import { usersTable } from "drizzle/schema.js";
 import {
   type BuildQueryResult,
   type DBQueryConfig,
   type ExtractTablesWithRelations,
   sql,
 } from "drizzle-orm";
-import { pipe } from "fp-ts/lib/function";
-import { Person, PersonUncheckedProps } from "@/modules/identity/person/person.entity";
-import { trimNullProperties } from "@/utils/trim-null-properties";
+import { pipe } from "fp-ts/lib/function.js";
+import { Person, PersonUncheckedProps } from "@/modules/identity/person/person.entity.js";
+import { trimNullProperties } from "@/utils/trim-null-properties.js";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 

@@ -1,6 +1,6 @@
-import scoreFactory from "ltilib/tests/common/factories/score.factory";
-import { LtiScore } from ".";
-import { resolveSubmission } from "./helpers";
+import scoreFactory from "$/tests/common/factories/score.factory.js";
+import { resolveSubmission } from "./helpers.js";
+import { LtiScore } from "./index.js";
 
 describe("[AGS] Score's helpers", () => {
   describe("resolveSubmission", () => {

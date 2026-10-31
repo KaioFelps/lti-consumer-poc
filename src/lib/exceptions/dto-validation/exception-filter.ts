@@ -1,12 +1,12 @@
 import { ArgumentsHost, Catch, ExceptionFilter, Injectable, Scope } from "@nestjs/common";
-import mvcRoutes from "@/lib/mvc-routes";
-import { TranslatorService } from "@/message-string/translator.service";
-import { HttpRequest } from "../..";
-import { RenderableDtoValidationException } from "../renderable-dto-validation/exception";
-import { RenderableDtoValidationExceptionFilter } from "../renderable-dto-validation/exception-filter";
-import { serializeValidationError } from ".";
-import { DTOValidationException } from "./exception";
-import { DtoValidationExceptionFilterResponderFactory } from "./responder.factory";
+import mvcRoutes from "@/lib/mvc-routes.js";
+import type { HttpRequest } from "@/lib.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { serializeValidationError } from "../dto-validation.js";
+import { RenderableDtoValidationException } from "../renderable-dto-validation/exception.js";
+import { RenderableDtoValidationExceptionFilter } from "../renderable-dto-validation/exception-filter.js";
+import { DTOValidationException } from "./exception.js";
+import { DtoValidationExceptionFilterResponderFactory } from "./responder.factory.js";
 
 /**
  * This exception filter translates and present every (nested) error from a

@@ -7,9 +7,9 @@ import cookieParser from "cookie-parser";
 import { json } from "express";
 import { middleware as ejsLayoutsMiddleware } from "express-ejs-layouts";
 import session from "express-session";
-import { EnvironmentVars } from "@/config/environment-vars";
-import { Redis } from "@/external/data-store/redis/client";
-import { LtiAdvantageMediaType } from "$/advantage/media-types";
+import { EnvironmentVars } from "@/config/environment-vars.js";
+import { Redis } from "@/external/data-store/redis/client.js";
+import { LtiAdvantageMediaType } from "$/advantage/media-types.js";
 
 export async function getTestingApp() {
   // we cannot import it normally because it would load the AppConfigModule and its dependencies

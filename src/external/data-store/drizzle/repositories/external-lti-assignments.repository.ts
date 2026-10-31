@@ -1,19 +1,19 @@
 import { Injectable } from "@nestjs/common";
-import { UUID } from "common/src/types/uuid";
-import { assignmentsT, ltiAssignmentsT } from "drizzle/schema";
+import type { UUID } from "common/src/types/uuid.js";
+import { assignmentsT, ltiAssignmentsT } from "drizzle/schema.js";
 import { eq } from "drizzle-orm";
 import { either as e, taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity";
-import { ExternalAssignmentNotFoundError } from "@/modules/lti/ags/errors/external-assignment-not-found.error";
-import { ExternalLtiAssignmentsRepository } from "@/modules/lti/ags/repositories/external-lti-assignments.repository";
-import { LtiResourceLink } from "$/core/resource-link";
-import { DrizzleClient } from "../client";
-import assignmentsMapper from "../mappers/assignments.mapper";
-import ltiResourceLinksMapper from "../mappers/lti-resource-links.mapper";
-import { DrizzleTransactionManager } from "../transaction-manager";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity.js";
+import { ExternalAssignmentNotFoundError } from "@/modules/lti/ags/errors/external-assignment-not-found.error.js";
+import { ExternalLtiAssignmentsRepository } from "@/modules/lti/ags/repositories/external-lti-assignments.repository.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { DrizzleClient } from "../client.js";
+import assignmentsMapper from "../mappers/assignments.mapper.js";
+import ltiResourceLinksMapper from "../mappers/lti-resource-links.mapper.js";
+import { DrizzleTransactionManager } from "../transaction-manager.js";
 
 @Injectable()
 export class DrizzleExternalLtiAssignmentsRepository extends ExternalLtiAssignmentsRepository {

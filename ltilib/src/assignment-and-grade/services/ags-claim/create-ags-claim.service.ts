@@ -1,15 +1,15 @@
 import { either as e, option as o, task as t, taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { Option } from "fp-ts/lib/Option";
-import agsPolicies from "$/assignment-and-grade/ags-policies";
-import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim";
-import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
-import { Context } from "$/core/context";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { Platform } from "$/core/platform";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiTool } from "$/core/tool";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { Option } from "fp-ts/lib/Option.js";
+import agsPolicies from "$/assignment-and-grade/ags-policies.js";
+import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim.js";
+import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository.js";
+import { Context } from "$/core/context.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { Platform } from "$/core/platform.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiTool } from "$/core/tool.js";
 
 export type CreateClaimParams<CustomContextType = never> = {
   tool: LtiTool;

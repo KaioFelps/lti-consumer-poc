@@ -1,4 +1,4 @@
-import { NullableToUndefined } from "common/src/types/nullable-to-undefined";
+import { NullableToUndefined } from "common/src/types/nullable-to-undefined.js";
 
 export function trimNullProperties<T extends Record<PropertyKey, unknown>>(
   property: T,

@@ -1,4 +1,4 @@
-import { LtiToolPreview } from "@/modules/lti/tools/entities/lti-tool-preview.entity";
+import { LtiToolPreview } from "@/modules/lti/tools/entities/lti-tool-preview.entity.js";
 
 type PresentedLtiToolPreview = {
   id: string;

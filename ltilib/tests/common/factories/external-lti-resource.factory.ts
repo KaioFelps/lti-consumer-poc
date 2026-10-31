@@ -1,7 +1,7 @@
-import { generateUUID } from "common/src/types/uuid";
-import { ExternalLtiResource, IExternalLtiResource } from "$/advantage/external-resource";
-import { createContext } from "./context.factory";
-import { createTool } from "./tool.factory";
+import { generateUUID } from "common/src/types/uuid.js";
+import { ExternalLtiResource, IExternalLtiResource } from "$/advantage/external-resource.js";
+import { createContext } from "./context.factory.js";
+import { createTool } from "./tool.factory.js";
 
 type CreateExternalLtiResourceConstructorArgs = Partial<IExternalLtiResource>;
 

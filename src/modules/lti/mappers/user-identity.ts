@@ -1,6 +1,6 @@
-import { Person } from "@/modules/identity/person/person.entity";
-import { UserIdentity, UserRoles } from "$/core/user-identity";
-import utils from ".";
+import { Person } from "@/modules/identity/person/person.entity.js";
+import { UserIdentity, UserRoles } from "$/core/user-identity.js";
+import utils from "./index.js";
 
 /**
  * Extracts a ltilib {@link UserIdentity `UserIdentity`} from

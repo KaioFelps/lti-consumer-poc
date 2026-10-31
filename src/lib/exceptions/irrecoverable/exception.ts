@@ -1,6 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { BaseException } from "../base/exception";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { BaseException } from "../base/exception.js";
 
 export class IrrecoverableException extends BaseException<IrrecoverableError> {
   public constructor(public error: IrrecoverableError) {

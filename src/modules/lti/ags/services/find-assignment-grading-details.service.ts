@@ -1,15 +1,18 @@
 import { Injectable } from "@nestjs/common";
-import { type UUID } from "common/src/types/uuid";
+import { type UUID } from "common/src/types/uuid.js";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { StudentsRepository } from "@/modules/courses-and-enrollments/repositories/students.repository";
-import { Person } from "@/modules/identity/person/person.entity";
-import { LtiLineItem } from "$/assignment-and-grade/entities";
-import { Context } from "$/core/context";
-import { CourseContextFetcher } from "../../advantage/context/fetchers/course-context-fetcher";
-import { ContextConcreteType } from "../enums/context-concrete-type";
-import { LtiLineItemsRepository } from "../repositories/lti-line-items.repository";
-import { LineItemStudentScore, LtiScoresRepository } from "../repositories/lti-scores.repository";
+import { pipe } from "fp-ts/lib/function.js";
+import { StudentsRepository } from "@/modules/courses-and-enrollments/repositories/students.repository.js";
+import { Person } from "@/modules/identity/person/person.entity.js";
+import { LtiLineItem } from "$/assignment-and-grade/entities/index.js";
+import { Context } from "$/core/context.js";
+import { CourseContextFetcher } from "../../advantage/context/fetchers/course-context-fetcher.js";
+import { ContextConcreteType } from "../enums/context-concrete-type.js";
+import { LtiLineItemsRepository } from "../repositories/lti-line-items.repository.js";
+import {
+  LineItemStudentScore,
+  LtiScoresRepository,
+} from "../repositories/lti-scores.repository.js";
 
 type Params = {
   assignmentId: UUID;

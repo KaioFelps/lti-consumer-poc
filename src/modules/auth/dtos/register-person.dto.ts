@@ -1,14 +1,14 @@
 import { Expose } from "class-transformer";
-import { ClassProperties } from "common/src/types/class-properties";
+import { ClassProperties } from "common/src/types/class-properties.js";
 import { either, option } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
+import { Either } from "fp-ts/lib/Either.js";
 import z from "zod";
-import { DTO } from "@/core/interfaces/dto";
-import { ValidationErrors } from "@/core/validation/validation-errors";
-import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
-import { PersonGender } from "@/modules/identity/person/enums/gender";
-import { CPF } from "@/modules/identity/person/value-objects/cpf";
-import { RegisterUserDTO } from "./register-user.dto";
+import { DTO } from "@/core/interfaces/dto.js";
+import { ValidationErrors } from "@/core/validation/validation-errors.js";
+import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error.js";
+import { PersonGender } from "@/modules/identity/person/enums/gender.js";
+import { CPF } from "@/modules/identity/person/value-objects/cpf.js";
+import { RegisterUserDTO } from "./register-user.dto.js";
 
 export class RegisterPersonDTO extends RegisterUserDTO implements DTO {
   protected static registerPersonSchema = z.object({

@@ -1,4 +1,4 @@
-import { InvalidLineItemArgumentError } from "./invalid-line-item-argument.error";
+import { InvalidLineItemArgumentError } from "./invalid-line-item-argument.error.js";
 
 /**
  * Line item cannot be attached to resource link because either don't they belong

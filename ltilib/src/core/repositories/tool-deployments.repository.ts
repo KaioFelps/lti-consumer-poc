@@ -1,8 +1,8 @@
-import { Either } from "fp-ts/lib/Either";
-import { Context, type ContextType } from "../context";
-import { LtiRepositoryError } from "../errors/repository.error";
-import { LtiTool } from "../tool";
-import { LtiToolDeployment } from "../tool-deployment";
+import { Either } from "fp-ts/lib/Either.js";
+import { Context, type ContextType } from "../context.js";
+import { LtiRepositoryError } from "../errors/repository.error.js";
+import { LtiTool } from "../tool.js";
+import { LtiToolDeployment } from "../tool-deployment.js";
 
 export abstract class LtiToolDeploymentsRepository {
   /**

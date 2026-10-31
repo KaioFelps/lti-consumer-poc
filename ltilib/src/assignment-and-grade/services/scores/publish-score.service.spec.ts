@@ -2,30 +2,30 @@
  * @see {@link https://www.imsglobal.org/spec/lti-ags/v2p0}
  */
 
-import { generateUUID } from "common/src/types/uuid";
+import { generateUUID } from "common/src/types/uuid.js";
 import { either as e } from "fp-ts";
-import { createContext } from "ltilib/tests/common/factories/context.factory";
-import { createMinimalLineItem } from "ltilib/tests/common/factories/line-item.factory";
-import { createPlatform } from "ltilib/tests/common/factories/platform.factory";
-import { createTool } from "ltilib/tests/common/factories/tool.factory";
-import { createToolDeployment } from "ltilib/tests/common/factories/tool-deployment.factory";
-import { InMemoryLtiLineItemsRepository } from "ltilib/tests/common/in-memory-repositories/line-items.repository";
-import { InMemoryLtiScoresRepository } from "ltilib/tests/common/in-memory-repositories/scores-repository";
-import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
-import { InvalidContentTypeError } from "$/advantage/errors/invalid-content-type.error";
-import { MissingScopeError } from "$/advantage/errors/missing-scope.error";
-import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import { LtiLineItem, LtiScore } from "$/assignment-and-grade/entities";
+import { InvalidContentTypeError } from "$/advantage/errors/invalid-content-type.error.js";
+import { MissingScopeError } from "$/advantage/errors/missing-scope.error.js";
+import { LtiAdvantageMediaType } from "$/advantage/media-types.js";
+import { LtiLineItem, LtiScore } from "$/assignment-and-grade/entities/index.js";
 import {
   InvalidScoreArgumentError,
   MissingPlatformAgsConfigurationError,
-} from "$/assignment-and-grade/errors";
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
-import { Context } from "$/core/context";
-import { InvalidArgumentError } from "$/core/errors/bases/invalid-argument.error";
-import { Platform } from "$/core/platform";
-import { LtiTool } from "$/core/tool";
-import { LtiScoreServices } from ".";
+} from "$/assignment-and-grade/errors.js";
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes.js";
+import { Context } from "$/core/context.js";
+import { InvalidArgumentError } from "$/core/errors/bases/invalid-argument.error.js";
+import { Platform } from "$/core/platform.js";
+import { LtiTool } from "$/core/tool.js";
+import { createContext } from "$/tests/common/factories/context.factory.js";
+import { createMinimalLineItem } from "$/tests/common/factories/line-item.factory.js";
+import { createPlatform } from "$/tests/common/factories/platform.factory.js";
+import { createTool } from "$/tests/common/factories/tool.factory.js";
+import { createToolDeployment } from "$/tests/common/factories/tool-deployment.factory.js";
+import { InMemoryLtiLineItemsRepository } from "$/tests/common/in-memory-repositories/line-items.repository.js";
+import { InMemoryLtiScoresRepository } from "$/tests/common/in-memory-repositories/scores-repository.js";
+import { InMemoryLtiToolDeploymentsRepository } from "$/tests/common/in-memory-repositories/tool-deployments.repository.js";
+import { LtiScoreServices } from "../scores.services.js";
 
 describe("[AGS] Publish Score Service", async () => {
   let platform: Platform;

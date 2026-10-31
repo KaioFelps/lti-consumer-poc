@@ -1,17 +1,17 @@
 import { Injectable } from "@nestjs/common";
-import { generateUUID } from "common/src/types/uuid";
-import { externalLtiResourcesT } from "drizzle/schema";
+import { generateUUID } from "common/src/types/uuid.js";
+import { externalLtiResourcesT } from "drizzle/schema.js";
 import { eq } from "drizzle-orm";
 import { taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ExternalLtiResource } from "$/advantage/external-resource";
-import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { DrizzleClient } from "../client";
-import externalLtiResourcesMapper from "../mappers/external-lti-resources.mapper";
-import { DrizzleTransactionManager } from "../transaction-manager";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { ExternalLtiResource } from "$/advantage/external-resource.js";
+import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { DrizzleClient } from "../client.js";
+import externalLtiResourcesMapper from "../mappers/external-lti-resources.mapper.js";
+import { DrizzleTransactionManager } from "../transaction-manager.js";
 
 @Injectable()
 export class DrizzleExternalLtiResourcesRepository extends ExternalLtiResourcesRepository {

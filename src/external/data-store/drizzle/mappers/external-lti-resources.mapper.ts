@@ -1,11 +1,11 @@
-import type * as schema from "drizzle/schema";
+import type * as schema from "drizzle/schema.js";
 import {
   type BuildQueryResult,
   type DBQueryConfig,
   type ExtractTablesWithRelations,
 } from "drizzle-orm";
-import { ExternalLtiResource } from "$/advantage/external-resource";
-import ltiToolsMapper from "./lti-tools.mapper";
+import { ExternalLtiResource } from "$/advantage/external-resource.js";
+import ltiToolsMapper from "./lti-tools.mapper.js";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 

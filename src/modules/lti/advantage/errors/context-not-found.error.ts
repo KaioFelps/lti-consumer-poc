@@ -1,4 +1,4 @@
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error.js";
 
 export class ContextNotFoundError extends ResourceNotFoundError {
   public constructor(contextConcreteId: string, contextType: string | string[]) {

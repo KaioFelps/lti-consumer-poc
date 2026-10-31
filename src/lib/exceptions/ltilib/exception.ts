@@ -1,5 +1,5 @@
 import { IntrinsicException } from "@nestjs/common";
-import { type ILtilibError } from "$/core/errors/bases/ltilib.error";
+import { type ILtilibError } from "$/core/errors/bases/ltilib.error.js";
 
 /**
  * A wrapper for every _ltilib_ error. They are to be treated in the

@@ -1,4 +1,4 @@
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error.js";
 
 type ConstructorParams = { toolId: string } | { deploymentId: string };
 

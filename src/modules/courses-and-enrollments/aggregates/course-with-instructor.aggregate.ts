@@ -1,8 +1,8 @@
-import { EntityBase } from "@/core/entity-base";
-import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity";
-import { AssignmentKind } from "@/modules/assignments-and-grades/enums/assignment-kind";
-import { Course } from "../entities/course.entity";
-import { Instructor } from "../entities/instructor.entity";
+import { EntityBase } from "@/core/entity-base.js";
+import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity.js";
+import { AssignmentKind } from "@/modules/assignments-and-grades/enums/assignment-kind.js";
+import { Course } from "../entities/course.entity.js";
+import { Instructor } from "../entities/instructor.entity.js";
 
 type Props = {
   course: Course;

@@ -13,23 +13,23 @@ import {
   Session,
 } from "@nestjs/common";
 import { either } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { EnvironmentVars } from "@/config/environment-vars";
-import { HttpRequest, HttpResponse } from "@/lib";
-import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { Mvc } from "@/lib/mvc-routes";
-import { TranslatorService } from "@/message-string/translator.service";
-import { PersonGender } from "@/modules/identity/person/enums/gender";
-import { RegisterNewPersonService } from "@/modules/identity/person/services/register-new-person.service";
-import { CPF } from "@/modules/identity/person/value-objects/cpf";
-import { User } from "@/modules/identity/user/user.entity";
-import { LoginViewManager } from "@/modules/oidc/view-manager/login";
-import { Routes } from "@/routes";
-import { LoginDTO } from "./dtos/login.dto";
-import { RegisterPersonDTO } from "./dtos/register-person.dto";
-import { Public } from "./protected-routes";
-import { AuthenticateUserService } from "./services/authenticate-user.service";
-import sessionUser, { SessionUser } from "./session-user";
+import { pipe } from "fp-ts/lib/function.js";
+import { EnvironmentVars } from "@/config/environment-vars.js";
+import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory.js";
+import { Mvc } from "@/lib/mvc-routes.js";
+import type { HttpRequest, HttpResponse } from "@/lib.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { PersonGender } from "@/modules/identity/person/enums/gender.js";
+import { RegisterNewPersonService } from "@/modules/identity/person/services/register-new-person.service.js";
+import { CPF } from "@/modules/identity/person/value-objects/cpf.js";
+import { User } from "@/modules/identity/user/user.entity.js";
+import { LoginViewManager } from "@/modules/oidc/view-manager/login.js";
+import { Routes } from "@/routes.js";
+import { LoginDTO } from "./dtos/login.dto.js";
+import { RegisterPersonDTO } from "./dtos/register-person.dto.js";
+import { Public } from "./protected-routes.js";
+import { AuthenticateUserService } from "./services/authenticate-user.service.js";
+import sessionUser, { SessionUser } from "./session-user.js";
 
 @Mvc()
 @Controller("auth")

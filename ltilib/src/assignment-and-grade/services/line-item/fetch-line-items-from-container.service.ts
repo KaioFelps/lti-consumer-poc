@@ -1,19 +1,19 @@
 import { array as ARR, either as e, taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import utils from "$/advantage/utils";
-import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters";
-import { LtiLineItem } from "$/assignment-and-grade/entities";
-import { presentLtiLineItem } from "$/assignment-and-grade/presenters/line-item.presenter";
-import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
-import { Context } from "$/core/context";
-import { HttpResponseWrapper } from "$/core/http/response-wrapper";
-import { Platform } from "$/core/platform";
-import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
-import { LtiTool } from "$/core/tool";
-import { AGServiceBase } from "..";
-import type { LtiLineItemServices } from ".";
+import { pipe } from "fp-ts/lib/function.js";
+import { LtiAdvantageMediaType } from "$/advantage/media-types.js";
+import utils from "$/advantage/utils.js";
+import { LineItemsContainerFilters } from "$/assignment-and-grade/container-filters.js";
+import { LtiLineItem } from "$/assignment-and-grade/entities/index.js";
+import { presentLtiLineItem } from "$/assignment-and-grade/presenters/line-item.presenter.js";
+import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository.js";
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes.js";
+import { Context } from "$/core/context.js";
+import { HttpResponseWrapper } from "$/core/http/response-wrapper.js";
+import { Platform } from "$/core/platform.js";
+import { LtiRepositoryPaginatedResponse } from "$/core/repositories.js";
+import { LtiTool } from "$/core/tool.js";
+import { AGServiceBase } from "../index.js";
+import type { LtiLineItemServices } from "../line-item.services.js";
 
 export type FetchLineItemsFromContainerParams = {
   /**

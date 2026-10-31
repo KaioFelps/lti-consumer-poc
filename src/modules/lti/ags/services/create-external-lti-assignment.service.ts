@@ -1,21 +1,21 @@
 import { Injectable } from "@nestjs/common";
-import type { UUID } from "common/src/types/uuid";
+import type { UUID } from "common/src/types/uuid.js";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { ErrorBase } from "@/core/errors/error-base";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
-import { TransactionManager } from "@/core/transaction-manager";
-import { CreateAssignmentService } from "@/modules/assignments-and-grades/services/create-assignment.service";
-import { Context } from "$/core/context";
-import { LtilibError } from "$/core/errors/bases/ltilib.error";
-import { unmountContextId } from "../../advantage/context";
-import { FindContextByIdService } from "../../advantage/context/services/find-context-by-id.service";
-import { CreateResourceLinkService } from "../../resource-links/services/create-resource-link.service";
-import { LtiToolDeployment } from "../../tools/entities/lti-tool-deployment.entity";
-import { LtiToolsDeploymentsRepository } from "../../tools/lti-tools-deployments.repository";
-import { ToolNotDeployedError } from "../errors/tool-not-deployed.error";
-import { ExternalLtiAssignmentsRepository } from "../repositories/external-lti-assignments.repository";
+import { pipe } from "fp-ts/lib/function.js";
+import { ErrorBase } from "@/core/errors/error-base.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error.js";
+import { TransactionManager } from "@/core/transaction-manager.js";
+import { CreateAssignmentService } from "@/modules/assignments-and-grades/services/create-assignment.service.js";
+import { Context } from "$/core/context.js";
+import { LtilibError } from "$/core/errors/bases/ltilib.error.js";
+import { FindContextByIdService } from "../../advantage/context/services/find-context-by-id.service.js";
+import { unmountContextId } from "../../advantage/context.js";
+import { CreateResourceLinkService } from "../../resource-links/services/create-resource-link.service.js";
+import { LtiToolDeployment } from "../../tools/entities/lti-tool-deployment.entity.js";
+import { LtiToolsDeploymentsRepository } from "../../tools/lti-tools-deployments.repository.js";
+import { ToolNotDeployedError } from "../errors/tool-not-deployed.error.js";
+import { ExternalLtiAssignmentsRepository } from "../repositories/external-lti-assignments.repository.js";
 
 type Params = {
   contextComposedId: string;

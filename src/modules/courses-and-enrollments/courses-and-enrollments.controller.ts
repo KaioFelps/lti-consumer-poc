@@ -1,25 +1,25 @@
 import { Body, Controller, Get, Param, Post, Render, Res, Session } from "@nestjs/common";
-import { type UUID } from "common/src/types/uuid";
+import { type UUID } from "common/src/types/uuid.js";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { ErrorBase } from "@/core/errors/error-base";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { TransactionManager } from "@/core/transaction-manager";
-import { AssignmentPresenter } from "@/external/presenters/entities/assignment.presenter";
-import { CourseWithInstructorPresenter } from "@/external/presenters/entities/course-with-instructor.presenter";
-import type { HttpResponse, RequestSession } from "@/lib";
-import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { Mvc } from "@/lib/mvc-routes";
-import { TranslatorService } from "@/message-string/translator.service";
-import { ListAssignmentsFromCourseService } from "../assignments-and-grades/services/list-assignments-from-course.service";
-import { SessionUser } from "../auth/session-user";
-import { Course } from "../courses-and-enrollments/entities/course.entity";
-import { User } from "../identity/user/user.entity";
-import { CreateCourseContextService } from "../lti/ags/services/create-course-context.service";
-import { CreateCourseDTO } from "./dtos/create-course.dto";
-import { CreateCourseService } from "./services/create-course.service";
-import { FetchManyCoursesService } from "./services/fetch-many-courses.service";
-import { FindCourseByIdService } from "./services/find-course-by-id.service";
+import { pipe } from "fp-ts/lib/function.js";
+import { ErrorBase } from "@/core/errors/error-base.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { TransactionManager } from "@/core/transaction-manager.js";
+import { AssignmentPresenter } from "@/external/presenters/entities/assignment.presenter.js";
+import { CourseWithInstructorPresenter } from "@/external/presenters/entities/course-with-instructor.presenter.js";
+import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory.js";
+import { Mvc } from "@/lib/mvc-routes.js";
+import type { HttpResponse, RequestSession } from "@/lib.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { ListAssignmentsFromCourseService } from "../assignments-and-grades/services/list-assignments-from-course.service.js";
+import { SessionUser } from "../auth/session-user.js";
+import { Course } from "../courses-and-enrollments/entities/course.entity.js";
+import { User } from "../identity/user/user.entity.js";
+import { CreateCourseContextService } from "../lti/ags/services/create-course-context.service.js";
+import { CreateCourseDTO } from "./dtos/create-course.dto.js";
+import { CreateCourseService } from "./services/create-course.service.js";
+import { FetchManyCoursesService } from "./services/fetch-many-courses.service.js";
+import { FindCourseByIdService } from "./services/find-course-by-id.service.js";
 
 @Mvc()
 @Controller("/courses")

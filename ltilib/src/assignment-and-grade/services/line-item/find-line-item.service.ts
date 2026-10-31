@@ -1,16 +1,16 @@
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import { LtiLineItem } from "$/assignment-and-grade/entities";
-import { InaccessibleLineItemError } from "$/assignment-and-grade/errors";
-import { presentLtiLineItem } from "$/assignment-and-grade/presenters/line-item.presenter";
-import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository";
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
-import { Context } from "$/core/context";
-import { HttpResponseWrapper } from "$/core/http/response-wrapper";
-import { Platform } from "$/core/platform";
-import { LtiTool } from "$/core/tool";
-import { AGServiceBase } from "..";
+import { pipe } from "fp-ts/lib/function.js";
+import { LtiAdvantageMediaType } from "$/advantage/media-types.js";
+import { LtiLineItem } from "$/assignment-and-grade/entities/index.js";
+import { InaccessibleLineItemError } from "$/assignment-and-grade/errors.js";
+import { presentLtiLineItem } from "$/assignment-and-grade/presenters/line-item.presenter.js";
+import { LtiLineItemsRepository } from "$/assignment-and-grade/repositories/line-items.repository.js";
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes.js";
+import { Context } from "$/core/context.js";
+import { HttpResponseWrapper } from "$/core/http/response-wrapper.js";
+import { Platform } from "$/core/platform.js";
+import { LtiTool } from "$/core/tool.js";
+import { AGServiceBase } from "../index.js";
 
 export type FindLineItemParams = {
   lineItemId: LtiLineItem["id"];

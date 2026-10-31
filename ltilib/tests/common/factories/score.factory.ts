@@ -1,7 +1,7 @@
-import { generateUUID } from "common/src/types/uuid";
+import { generateUUID } from "common/src/types/uuid.js";
 import { either } from "fp-ts";
-import { LtiScore } from "$/assignment-and-grade/entities";
-import { NullifyUndefined } from "../types/nullify";
+import { LtiScore } from "$/assignment-and-grade/entities/index.js";
+import { NullifyUndefined } from "../types/nullify.js";
 
 type CreateScoreConstructorArgs = Partial<NullifyUndefined<Parameters<typeof LtiScore.create>[0]>>;
 

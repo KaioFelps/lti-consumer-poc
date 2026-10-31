@@ -1,4 +1,4 @@
-import { IOAuthError, OAuthError } from "./bases/oauth.error";
+import { IOAuthError, OAuthError } from "./bases/oauth.error.js";
 
 type ErrorCode =
   | "invalid_deployment"

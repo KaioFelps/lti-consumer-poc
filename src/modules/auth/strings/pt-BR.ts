@@ -1,5 +1,5 @@
-import { ptBR } from "@/message-string/internal/translations/pt-BR";
-import { SystemRole } from "@/modules/identity/user/enums/system-role";
+import { ptBR } from "@/message-string/internal/translations/pt-BR.js";
+import { SystemRole } from "@/modules/identity/user/enums/system-role.js";
 
 ptBR["auth:navigation:login"] = "Logar";
 ptBR["auth:navigation:logout"] = "Deslogar";
@@ -21,7 +21,7 @@ ptBR["auth:register-user:password-too-long"] = ({ maximum }) =>
   `A senha não deve exceder ${maximum} caracteres.`;
 
 ptBR["auth:user-register:system-role-invalid-type"] =
-  "O cargo do usuário deve assumir um dos valores " + `${SystemRole.Admin} ou ${SystemRole.User}.`;
+  `O cargo do usuário deve assumir um dos valores "${SystemRole.Admin}" ou "${SystemRole.User}".`;
 
 ptBR["auth:register-person:date-invalid-type"] = "A data precisa estar num formato válido.";
 
@@ -60,7 +60,7 @@ ptBR["auth:forms:register:labels:gender"] = "Gênero";
 ptBR["auth:forms:register:buttons:create"] = "Criar";
 ptBR["auth:forms:register:buttons:already-has-account"] = "Já tenho uma conta";
 ptBR["auth:forms:register:buttons:go-login"] = "Faça login";
-ptBR["auth:forms:register:success-message"] = ({ id }: { id: string }) =>
+ptBR["auth:forms:register:success-message"] = ({ id }) =>
   `Conta criada com sucesso. Seu ID é: ${id}.`;
 
 ptBR["auth:forms:login:title"] = "Fazer login";

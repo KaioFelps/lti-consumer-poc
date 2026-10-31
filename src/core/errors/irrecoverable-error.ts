@@ -1,4 +1,4 @@
-import { type IErrorBase } from "./error-base";
+import { type IErrorBase } from "./error-base.js";
 
 /**
  * Indicates an programmin-level error that is not recoverable. The message describes

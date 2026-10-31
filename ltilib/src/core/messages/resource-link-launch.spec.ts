@@ -1,21 +1,21 @@
 import { randomBytes } from "node:crypto";
 import { faker } from "@faker-js/faker";
-import { generateUUID } from "common/src/types/uuid";
+import { generateUUID } from "common/src/types/uuid.js";
 import { either as e } from "fp-ts";
 import * as jose from "jose";
 import { JSDOM, VirtualConsole } from "jsdom";
-import { createContext } from "ltilib/tests/common/factories/context.factory";
-import { createPlatform } from "ltilib/tests/common/factories/platform.factory";
-import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
-import { createTool } from "ltilib/tests/common/factories/tool.factory";
-import { createMockKeySet } from "ltilib/tests/utils/create-jwks";
-import { MessageType } from "$/core/claims/serialization";
-import { Platform } from "../platform";
-import { LtiResourceLink } from "../resource-link";
-import { LtiTool } from "../tool";
-import { UserIdentity } from "../user-identity";
-import { MessageRequests } from ".";
-import { LTIResourceLinkLaunchRequest } from "./resource-link-launch";
+import { MessageType } from "$/core/claims/serialization.js";
+import { createContext } from "$/tests/common/factories/context.factory.js";
+import { createPlatform } from "$/tests/common/factories/platform.factory.js";
+import { createResourceLink } from "$/tests/common/factories/resource-link.factory.js";
+import { createTool } from "$/tests/common/factories/tool.factory.js";
+import { createMockKeySet } from "$/tests/utils/create-jwks.js";
+import { MessageRequests } from "../messages.js";
+import { Platform } from "../platform.js";
+import { LtiResourceLink } from "../resource-link.js";
+import { LtiTool } from "../tool.js";
+import { UserIdentity } from "../user-identity.js";
+import { LTIResourceLinkLaunchRequest } from "./resource-link-launch.js";
 
 describe("[Core] Resource link Launch Request", async () => {
   const CUSTOM_CLAIM = "https://purl.imsglobal.org/spec/lti/claim/custom";

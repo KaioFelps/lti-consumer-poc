@@ -11,10 +11,13 @@
 
 import { faker } from "@faker-js/faker";
 import { either as e } from "fp-ts";
-import { createContext } from "ltilib/tests/common/factories/context.factory";
-import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
-import { CannotAttachResourceLinkError, InvalidLineItemArgumentError } from "../../errors";
-import { LtiLineItem } from ".";
+import {
+  CannotAttachResourceLinkError,
+  InvalidLineItemArgumentError,
+} from "$/assignment-and-grade/errors.js";
+import { createContext } from "$/tests/common/factories/context.factory.js";
+import { createResourceLink } from "$/tests/common/factories/resource-link.factory.js";
+import { LtiLineItem } from "../../entities.js";
 
 describe("[AGS] Line Item properties' domain rules", () => {
   const context = createContext();

@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { LtiToolsDeploymentsRepository } from "@/modules/lti/tools/lti-tools-deployments.repository";
+import { LtiToolsDeploymentsRepository } from "@/modules/lti/tools/lti-tools-deployments.repository.js";
 
 type Params = {
   deploymentId: string;

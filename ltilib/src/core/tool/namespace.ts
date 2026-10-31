@@ -1,2 +1,2 @@
-export * from "./message-placement";
-export * from "./supported-messages";
+export * from "./message-placement.js";
+export * from "./supported-messages.js";

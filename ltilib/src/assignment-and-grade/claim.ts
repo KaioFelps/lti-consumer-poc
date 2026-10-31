@@ -1,9 +1,9 @@
 import { either as e } from "fp-ts";
-import { IntoLtiClaim } from "$/core/claims/serialization";
-import { Context } from "$/core/context";
-import { Platform } from "$/core/platform";
-import { LtiLineItem } from "./entities";
-import { AssignmentAndGradeServiceScopes } from "./scopes";
+import { IntoLtiClaim } from "$/core/claims/serialization.js";
+import { Context } from "$/core/context.js";
+import { Platform } from "$/core/platform.js";
+import { LtiLineItem } from "./entities/index.js";
+import { AssignmentAndGradeServiceScopes } from "./scopes.js";
 
 const AGS_CLAIM_KEY = "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint";
 

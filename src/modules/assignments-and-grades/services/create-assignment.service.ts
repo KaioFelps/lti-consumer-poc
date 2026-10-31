@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
-import { type UUID } from "common/src/types/uuid";
+import { type UUID } from "common/src/types/uuid.js";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { CourseWithInstructor } from "@/modules/courses-and-enrollments/aggregates/course-with-instructor.aggregate";
-import { InstructorsRepository } from "@/modules/courses-and-enrollments/repositories/instructors.repository";
-import policies from "../policies";
-import { AssignmentsRepository } from "../repositories/assignments.repository";
-import { CoursesRepository } from "../repositories/courses.repository";
+import { pipe } from "fp-ts/lib/function.js";
+import { CourseWithInstructor } from "@/modules/courses-and-enrollments/aggregates/course-with-instructor.aggregate.js";
+import { InstructorsRepository } from "@/modules/courses-and-enrollments/repositories/instructors.repository.js";
+import policies from "../policies/index.js";
+import { AssignmentsRepository } from "../repositories/assignments.repository.js";
+import { CoursesRepository } from "../repositories/courses.repository.js";
 
 type Params = {
   instructorId: UUID;

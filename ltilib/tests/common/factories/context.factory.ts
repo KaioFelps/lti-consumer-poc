@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
-import { generateUUID } from "common/src/types/uuid";
-import { Context, ContextType, IContext } from "$/core/context";
+import { generateUUID } from "common/src/types/uuid.js";
+import { Context, ContextType, IContext } from "$/core/context.js";
 
 type CreateContextConstructorArgs<CT> = Partial<IContext<CT>>;
 

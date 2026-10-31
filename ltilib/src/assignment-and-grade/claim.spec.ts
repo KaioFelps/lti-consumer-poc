@@ -1,10 +1,10 @@
 import { either as e } from "fp-ts";
-import { createContext } from "ltilib/tests/common/factories/context.factory";
-import { createFullLineItem } from "ltilib/tests/common/factories/line-item.factory";
-import platformFactory from "ltilib/tests/common/factories/platform.factory";
-import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
-import { AssignmentAndGradeServiceClaim } from "./claim";
-import { ASSIGNMENT_AND_GRADE_SERVICES_SCOPES, AssignmentAndGradeServiceScopes } from "./scopes";
+import { createContext } from "$/tests/common/factories/context.factory.js";
+import { createFullLineItem } from "$/tests/common/factories/line-item.factory.js";
+import platformFactory from "$/tests/common/factories/platform.factory.js";
+import { createResourceLink } from "$/tests/common/factories/resource-link.factory.js";
+import { AssignmentAndGradeServiceClaim } from "./claim.js";
+import { ASSIGNMENT_AND_GRADE_SERVICES_SCOPES, AssignmentAndGradeServiceScopes } from "./scopes.js";
 
 describe("[AGS] Assignment and Grade Service Claim", () => {
   it("should always include lineitem endpoint when a specific line item is given and any scope is present", () => {

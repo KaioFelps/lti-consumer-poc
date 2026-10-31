@@ -1,5 +1,5 @@
-import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
-import { calculateLastPageFromPaginatedData } from "./calculate-last-page-from-paginated-data";
+import { LtiRepositoryPaginatedResponse } from "$/core/repositories.js";
+import { calculateLastPageFromPaginatedData } from "./calculate-last-page-from-paginated-data.js";
 
 describe("Calculate Last Page From Paginated Data", () => {
   it.each([

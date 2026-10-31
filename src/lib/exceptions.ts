@@ -1,14 +1,14 @@
 import { HttpStatus } from "@nestjs/common";
 import { unflatten } from "flat";
-import { BadRequestError } from "@/core/errors/bad-request.error";
-import { type IErrorBase } from "@/core/errors/error-base";
-import { ForbiddenError } from "@/core/errors/forbidden.error";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { RenderableError } from "@/core/errors/renderable/renderable-error";
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
-import { UnauthorizedError } from "@/core/errors/unauthorized.error";
-import { HttpRequest, RequestSession } from "..";
-import { IrrecoverableException } from "./irrecoverable/exception";
+import { BadRequestError } from "@/core/errors/bad-request.error.js";
+import { type IErrorBase } from "@/core/errors/error-base.js";
+import { ForbiddenError } from "@/core/errors/forbidden.error.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { RenderableError } from "@/core/errors/renderable/renderable-error.js";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error.js";
+import { UnauthorizedError } from "@/core/errors/unauthorized.error.js";
+import type { HttpRequest, RequestSession } from "@/lib.js";
+import { IrrecoverableException } from "./exceptions/irrecoverable/exception.js";
 
 export function resolveStatus(error: IErrorBase | RenderableError) {
   if (error instanceof IrrecoverableError) return HttpStatus.INTERNAL_SERVER_ERROR;

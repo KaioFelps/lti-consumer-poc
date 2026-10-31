@@ -1,20 +1,20 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { usersTable } from "drizzle/schema";
+import { usersTable } from "drizzle/schema.js";
 import { and, eq } from "drizzle-orm";
 import { taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { tryCatch } from "fp-ts/lib/TaskEither";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { PersonNotFoundError } from "@/modules/identity/errors/person-not-found.error";
-import { PeopleRepository } from "@/modules/identity/person/people.repository";
-import { Person } from "@/modules/identity/person/person.entity";
-import mappers from "@/modules/lti/mappers";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identities.repository";
-import { UserIdentity } from "$/core/user-identity";
-import { DrizzleClient } from "../client";
-import peopleMapper from "../mappers/people.mapper";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { tryCatch } from "fp-ts/lib/TaskEither.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { PersonNotFoundError } from "@/modules/identity/errors/person-not-found.error.js";
+import { PeopleRepository } from "@/modules/identity/person/people.repository.js";
+import { Person } from "@/modules/identity/person/person.entity.js";
+import mappers from "@/modules/lti/mappers/index.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiUserIdentitiesRespository } from "$/core/repositories/user-identities.repository.js";
+import { UserIdentity } from "$/core/user-identity.js";
+import { DrizzleClient } from "../client.js";
+import peopleMapper from "../mappers/people.mapper.js";
 
 @Injectable()
 export class DrizzlePeopleRepository
@@ -30,11 +30,11 @@ export class DrizzlePeopleRepository
         () => {
           return this.drizzle.getClient().insert(usersTable).values(peopleMapper.intoRow(person));
         },
-        (error: Error) =>
+        (error) =>
           new IrrecoverableError(
             `An error occurred in ${DrizzlePeopleRepository.name} on ` +
               "persisting a person instance in the database.",
-            error,
+            error as Error,
           ),
       ),
       te.map(() => person),
@@ -55,10 +55,10 @@ export class DrizzlePeopleRepository
             .where(and(eq(usersTable.id, personId), peopleMapper.requiredQueryConfig.where))
             .limit(1)
             .execute(),
-        (error: Error) =>
+        (error) =>
           new IrrecoverableError(
             `An error occurred in ${DrizzlePeopleRepository.name} on finding person by its id.`,
-            error,
+            error as Error,
           ),
       ),
       te.map((rows) => rows.map(peopleMapper.fromRow)),

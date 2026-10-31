@@ -1,14 +1,14 @@
 import { type INestApplication } from "@nestjs/common";
 import { importJWK, JWK, SignJWT } from "jose";
-import toolFactory from "ltilib/tests/common/factories/tool.factory";
-import { createMockKeySet } from "ltilib/tests/utils/create-jwks";
 import supertest from "supertest";
-import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity";
-import { UnsafeOIDCClientsInjectionContainer } from "@/modules/oidc/unsafe-clients-injection-container";
-import { Routes } from "@/routes";
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
-import { Platform } from "$/core/platform";
-import { LtiTool as LtilibTool } from "$/core/tool";
+import { LtiTool } from "@/modules/lti/tools/entities/lti-tool.entity.js";
+import { UnsafeOIDCClientsInjectionContainer } from "@/modules/oidc/unsafe-clients-injection-container.js";
+import { Routes } from "@/routes.js";
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes.js";
+import { Platform } from "$/core/platform.js";
+import { LtiTool as LtilibTool } from "$/core/tool.js";
+import toolFactory from "$/tests/common/factories/tool.factory.js";
+import { createMockKeySet } from "$/tests/utils/create-jwks.js";
 
 export async function generateClientAssertion(
   clientId: string,

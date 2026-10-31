@@ -1,15 +1,15 @@
 import { INestApplication } from "@nestjs/common";
-import { generateUUID } from "common/src/types/uuid";
+import { generateUUID } from "common/src/types/uuid.js";
 import request from "supertest";
-import { App } from "supertest/types";
-import { getTestingApp } from "test";
-import ltiLineItemFactory from "test/factories/lti-line-item.factory";
-import { getToolAndItsOidcAccessToken } from "test/fixtures/oidc";
-import { EnvironmentVars } from "@/config/environment-vars";
-import { DrizzleClient } from "@/external/data-store/drizzle/client";
-import { Routes } from "@/routes";
-import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item";
-import { EntitiesFactoryGenerator, generateEntitiesFactory } from "./tests";
+import { App } from "supertest/types.js";
+import ltiLineItemFactory from "test/factories/lti-line-item.factory.js";
+import { getToolAndItsOidcAccessToken } from "test/fixtures/oidc.js";
+import { getTestingApp } from "test/index.js";
+import { EnvironmentVars } from "@/config/environment-vars.js";
+import { DrizzleClient } from "@/external/data-store/drizzle/client.js";
+import { Routes } from "@/routes.js";
+import { LtiLineItemServices } from "$/assignment-and-grade/services/line-item.services.js";
+import { EntitiesFactoryGenerator, generateEntitiesFactory } from "./tests.js";
 
 describe("[e2e::LTI] Find Line Item By ID", async () => {
   let app: INestApplication<App>;

@@ -1,12 +1,12 @@
-import { generateUUID } from "common/src/types/uuid";
-import { externalLtiResourcesT } from "drizzle/schema";
-import { createExternalLtiResource } from "ltilib/tests/common/factories/external-lti-resource.factory";
-import { DrizzleClient } from "@/external/data-store/drizzle/client";
-import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity";
-import { CourseContextAdapter } from "@/modules/lti/advantage/context/adapters/course-context.adapter";
-import assignmentFactory from "./assignment.factory";
-import courseFactory from "./course.factory";
-import ltiToolFactory from "./lti-tool.factory";
+import { generateUUID } from "common/src/types/uuid.js";
+import { externalLtiResourcesT } from "drizzle/schema.js";
+import { DrizzleClient } from "@/external/data-store/drizzle/client.js";
+import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity.js";
+import { CourseContextAdapter } from "@/modules/lti/advantage/context/adapters/course-context.adapter.js";
+import { createExternalLtiResource } from "$/tests/common/factories/external-lti-resource.factory.js";
+import assignmentFactory from "./assignment.factory.js";
+import courseFactory from "./course.factory.js";
+import ltiToolFactory from "./lti-tool.factory.js";
 
 type OriginalFactoryParams = Exclude<Parameters<typeof createExternalLtiResource>[0], undefined>;
 type FactoryParams = Partial<

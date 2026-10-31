@@ -1,4 +1,4 @@
-import { EntityBase } from "@/core/entity-base";
+import { EntityBase } from "@/core/entity-base.js";
 
 type LtiToolPreviewProps = {
   id: string;

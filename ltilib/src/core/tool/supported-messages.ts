@@ -1,7 +1,7 @@
-import { ClassProperties } from "common/src/types/class-properties";
-import { AnyLtiRole } from "$/core/claims/enums/roles";
-import { MessageType } from "$/core/claims/serialization";
-import { MessagePlacement } from "$/core/tool/message-placement";
+import { ClassProperties } from "common/src/types/class-properties.js";
+import { AnyLtiRole } from "$/core/claims/enums/roles.js";
+import { MessageType } from "$/core/claims/serialization.js";
+import { MessagePlacement } from "$/core/tool/message-placement.js";
 
 export type ILtiToolSupportedMessage = ClassProperties<LtiToolSupportedMessage>;
 

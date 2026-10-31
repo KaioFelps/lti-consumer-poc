@@ -1,8 +1,8 @@
 import { Inject, Injectable, Scope } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
-import { HttpRequest } from "@/lib";
-import { MessageStringFormatterArg } from "./internal";
-import { translate } from "./internal/translate";
+import type { HttpRequest } from "@/lib.js";
+import { MessageStringFormatterArg } from "./internal/index.js";
+import { translate } from "./internal/translate.js";
 
 @Injectable({ scope: Scope.REQUEST })
 export class TranslatorService {
@@ -44,7 +44,7 @@ export class TranslatorService {
   private async getStringsFromLanguageTag(tag: string) {
     switch (tag) {
       case "pt-BR":
-        return (await import("./internal/translations/pt-BR")).ptBR;
+        return (await import("./internal/translations/pt-BR.js")).ptBR;
     }
   }
 }

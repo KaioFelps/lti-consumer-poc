@@ -10,26 +10,26 @@
 
 import ejs from "ejs";
 import { either as e, option as o } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim";
-import { RolesHelper } from "$/core/claims/enums/roles";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { AssignmentAndGradeServiceClaim } from "$/assignment-and-grade/claim.js";
+import { RolesHelper } from "$/core/claims/enums/roles.js";
 import {
   AvailableLtiVersion,
   IntoLtiClaim,
   LTIClaimKey,
   MessageType,
   resolveClaimKey,
-} from "$/core/claims/serialization";
-import { Context } from "$/core/context";
-import { LtiResourceLink } from "$/core/resource-link";
-import { UserIdentity, UserRoles } from "$/core/user-identity";
-import { LtiSubmittableMessage } from "$/security/lti-message";
-import { PrepareIdTokenError, prepareIdToken } from "$/security/prepare-id-token";
-import { InvalidResourceLinkLaunchError } from "../errors/invalid-resource-link-launch.error";
-import { Platform } from "../platform";
-import { LtiTool } from "../tool";
-import { MessageRequests } from ".";
+} from "$/core/claims/serialization.js";
+import { Context } from "$/core/context.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { UserIdentity, UserRoles } from "$/core/user-identity.js";
+import { LtiSubmittableMessage } from "$/security/lti-message.js";
+import { PrepareIdTokenError, prepareIdToken } from "$/security/prepare-id-token.js";
+import { InvalidResourceLinkLaunchError } from "../errors/invalid-resource-link-launch.error.js";
+import { MessageRequests } from "../messages.js";
+import { Platform } from "../platform.js";
+import { LtiTool } from "../tool.js";
 
 type CreateFromLtiRecordArgs<CR = never, CC = never> = {
   tool: LtiTool;

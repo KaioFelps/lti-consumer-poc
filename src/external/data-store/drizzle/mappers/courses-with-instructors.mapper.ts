@@ -1,14 +1,14 @@
-import type * as schema from "drizzle/schema";
+import type * as schema from "drizzle/schema.js";
 import {
   type BuildQueryResult,
   type DBQueryConfig,
   type ExtractTablesWithRelations,
 } from "drizzle-orm";
-import { pipe } from "fp-ts/lib/function";
-import { CourseWithInstructor } from "@/modules/courses-and-enrollments/aggregates/course-with-instructor.aggregate";
-import { trimNullProperties } from "@/utils/trim-null-properties";
-import coursesMapper from "./courses.mapper";
-import instructorsMapper from "./instructors.mapper";
+import { pipe } from "fp-ts/lib/function.js";
+import { CourseWithInstructor } from "@/modules/courses-and-enrollments/aggregates/course-with-instructor.aggregate.js";
+import { trimNullProperties } from "@/utils/trim-null-properties.js";
+import coursesMapper from "./courses.mapper.js";
+import instructorsMapper from "./instructors.mapper.js";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 

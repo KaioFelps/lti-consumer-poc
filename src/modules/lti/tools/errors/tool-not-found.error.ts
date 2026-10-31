@@ -1,4 +1,4 @@
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error.js";
 
 export class ToolNotFoundError extends ResourceNotFoundError {
   public constructor(toolId: string) {

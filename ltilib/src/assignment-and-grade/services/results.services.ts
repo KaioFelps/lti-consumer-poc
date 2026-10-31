@@ -1,25 +1,28 @@
 import { array as ARR, either as e, taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { TaskEither } from "fp-ts/lib/TaskEither";
-import { LtiAdvantageMediaType } from "$/advantage/media-types";
-import utils from "$/advantage/utils";
-import { ResultsContainerFilters } from "$/assignment-and-grade/container-filters";
-import { LtiLineItem, LtiScore } from "$/assignment-and-grade/entities";
-import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors";
+import { pipe } from "fp-ts/lib/function.js";
+import { TaskEither } from "fp-ts/lib/TaskEither.js";
+import { LtiAdvantageMediaType } from "$/advantage/media-types.js";
+import utils from "$/advantage/utils.js";
+import { ResultsContainerFilters } from "$/assignment-and-grade/container-filters.js";
+import { LtiLineItem, LtiScore } from "$/assignment-and-grade/entities/index.js";
+import { MissingPlatformAgsConfigurationError } from "$/assignment-and-grade/errors.js";
 import {
   PresentedLtiResult,
   presentLtiResult,
-} from "$/assignment-and-grade/presenters/result.presenter";
-import { LtiLineItemsRepository, LtiScoresRepository } from "$/assignment-and-grade/repositories";
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
-import { Context } from "$/core/context";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { HttpResponseWrapper } from "$/core/http/response-wrapper";
-import { Platform } from "$/core/platform";
-import { LtiRepositoryPaginatedResponse } from "$/core/repositories";
-import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
-import { LtiTool } from "$/core/tool";
-import { AGSExecutorParams, AGServiceBase, AGServicesExecutor } from "..";
+} from "$/assignment-and-grade/presenters/result.presenter.js";
+import {
+  LtiLineItemsRepository,
+  LtiScoresRepository,
+} from "$/assignment-and-grade/repositories.js";
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes.js";
+import { Context } from "$/core/context.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { HttpResponseWrapper } from "$/core/http/response-wrapper.js";
+import { Platform } from "$/core/platform.js";
+import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository.js";
+import { LtiRepositoryPaginatedResponse } from "$/core/repositories.js";
+import { LtiTool } from "$/core/tool.js";
+import { AGSExecutorParams, AGServiceBase, AGServicesExecutor } from "./index.js";
 
 type FetchResultsServiceParams = {
   /**

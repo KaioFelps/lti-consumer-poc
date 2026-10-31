@@ -1,7 +1,7 @@
-import { AvailableScope } from "@/modules/oidc/consts";
-import { Routes } from "@/routes";
-import { ViewManager } from "..";
-import { ConsentViewManagerData } from ".";
+import { AvailableScope } from "@/modules/oidc/consts.js";
+import { Routes } from "@/routes.js";
+import { ViewManager } from "../../view-manager.js";
+import { ConsentViewManagerData } from "../consent.js";
 
 export class ScopesAreMissingConsentViewManager extends ViewManager {
   public constructor(private data: ConsentViewManagerData) {

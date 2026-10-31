@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
-import { CONTEXT_FETCHERS, ContextFetcher } from ".";
-import { CourseContextFetcher } from "./course-context-fetcher";
+import { CourseContextFetcher } from "./course-context-fetcher.js";
+import { CONTEXT_FETCHERS, ContextFetcher } from "./index.js";
 
 @Module({
   providers: [

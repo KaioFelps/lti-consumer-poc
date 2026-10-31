@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
-import { PasswordComparator } from "@/modules/auth/password/comparator";
-import { PasswordHasher } from "@/modules/auth/password/hasher";
-import { ArgonRSPasswordHasherAndComparator } from "./hasher-and-comparator";
+import { PasswordComparator } from "@/modules/auth/password/comparator.js";
+import { PasswordHasher } from "@/modules/auth/password/hasher.js";
+import { ArgonRSPasswordHasherAndComparator } from "./hasher-and-comparator.js";
 
 @Module({
   providers: [

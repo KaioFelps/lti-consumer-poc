@@ -1,4 +1,4 @@
-import { HttpArgumentsHost } from "@nestjs/common/interfaces";
+import { HttpArgumentsHost } from "@nestjs/common/interfaces/index.js";
 
 export abstract class ExceptionFilterResponder<B = unknown, Output = unknown> {
   public abstract respond(status: number, ctx: HttpArgumentsHost, body: B): Promise<Output>;

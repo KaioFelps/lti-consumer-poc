@@ -4,25 +4,25 @@
 
 import { randomBytes } from "node:crypto";
 import { faker } from "@faker-js/faker";
-import { generateUUID } from "common/src/types/uuid";
+import { generateUUID } from "common/src/types/uuid.js";
 import { either as e } from "fp-ts";
-import { createContext } from "ltilib/tests/common/factories/context.factory";
-import { createPlatform } from "ltilib/tests/common/factories/platform.factory";
-import { createResourceLink } from "ltilib/tests/common/factories/resource-link.factory";
-import toolFactory from "ltilib/tests/common/factories/tool.factory";
-import { createToolDeployment } from "ltilib/tests/common/factories/tool-deployment.factory";
-import { InMemoryLtiContextsRepository } from "ltilib/tests/common/in-memory-repositories/contexts.repository";
-import { InMemoryLaunchesRepository } from "ltilib/tests/common/in-memory-repositories/launches.repository";
-import { InMemoryLtiLineItemsRepository } from "ltilib/tests/common/in-memory-repositories/line-items.repository";
-import { InMemoryLtiResourceLinksRepository } from "ltilib/tests/common/in-memory-repositories/resource-links.repository";
-import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
-import { InMemoryToolsRepository } from "ltilib/tests/common/in-memory-repositories/tools.repository";
-import { InMemoryUserIdentitiesRepository } from "ltilib/tests/common/in-memory-repositories/user-identities.repository";
-import { ASSIGNMENT_AND_GRADE_SERVICES_SCOPES } from "$/assignment-and-grade/scopes";
-import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim";
-import { LtiLaunchData } from "$/core/launch-data";
-import { LtiLaunchServices } from "$/core/services/launch";
-import { UserIdentity } from "$/core/user-identity";
+import { ASSIGNMENT_AND_GRADE_SERVICES_SCOPES } from "$/assignment-and-grade/scopes.js";
+import { LtiAgsClaimServices } from "$/assignment-and-grade/services/ags-claim.services.js";
+import { LtiLaunchData } from "$/core/launch-data.js";
+import { LtiLaunchServices } from "$/core/services/launch.services.js";
+import { UserIdentity } from "$/core/user-identity.js";
+import { createContext } from "$/tests/common/factories/context.factory.js";
+import { createPlatform } from "$/tests/common/factories/platform.factory.js";
+import { createResourceLink } from "$/tests/common/factories/resource-link.factory.js";
+import toolFactory from "$/tests/common/factories/tool.factory.js";
+import { createToolDeployment } from "$/tests/common/factories/tool-deployment.factory.js";
+import { InMemoryLtiContextsRepository } from "$/tests/common/in-memory-repositories/contexts.repository.js";
+import { InMemoryLaunchesRepository } from "$/tests/common/in-memory-repositories/launches.repository.js";
+import { InMemoryLtiLineItemsRepository } from "$/tests/common/in-memory-repositories/line-items.repository.js";
+import { InMemoryLtiResourceLinksRepository } from "$/tests/common/in-memory-repositories/resource-links.repository.js";
+import { InMemoryLtiToolDeploymentsRepository } from "$/tests/common/in-memory-repositories/tool-deployments.repository.js";
+import { InMemoryToolsRepository } from "$/tests/common/in-memory-repositories/tools.repository.js";
+import { InMemoryUserIdentitiesRepository } from "$/tests/common/in-memory-repositories/user-identities.repository.js";
 
 describe("[AGS] LTI Launch Messages with AGS claim", async () => {
   const REQUIRED_CLAIM = "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint";

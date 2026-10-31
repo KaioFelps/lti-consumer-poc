@@ -1,8 +1,8 @@
 import { Injectable, OnModuleDestroy } from "@nestjs/common";
-import * as schema from "drizzle/schema";
+import * as schema from "drizzle/schema.js";
 import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import type { EnvironmentVars } from "@/config/environment-vars";
+import type { EnvironmentVars } from "@/config/environment-vars.js";
 
 @Injectable()
 export class DrizzleClient implements OnModuleDestroy {

@@ -1,11 +1,11 @@
 import { either as e } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
+import { Either } from "fp-ts/lib/Either.js";
 import { JsonValue } from "oidc-provider";
-import { Context } from "$/core/context";
-import { MisconfiguredPlatformError } from "$/core/errors/misconfigured-platform.error";
-import { Platform } from "$/core/platform";
-import { LtiScore } from "../entities";
-import { MissingPlatformAgsConfigurationError } from "../errors";
+import { Context } from "$/core/context.js";
+import { MisconfiguredPlatformError } from "$/core/errors/misconfigured-platform.error.js";
+import { Platform } from "$/core/platform.js";
+import { LtiScore } from "../entities/index.js";
+import { MissingPlatformAgsConfigurationError } from "../errors.js";
 
 export type PresentedLtiResult = {
   /**

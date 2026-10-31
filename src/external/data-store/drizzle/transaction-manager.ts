@@ -1,11 +1,11 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { Injectable } from "@nestjs/common";
-import * as schema from "drizzle/schema";
+import * as schema from "drizzle/schema.js";
 import { ExtractTablesWithRelations } from "drizzle-orm";
 import { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import { PgTransaction } from "drizzle-orm/pg-core";
-import { TransactionManager } from "@/core/transaction-manager";
-import { DrizzleClient } from "./client";
+import { TransactionManager } from "@/core/transaction-manager.js";
+import { DrizzleClient } from "./client.js";
 
 export type Transaction = PgTransaction<
   NodePgQueryResultHKT,

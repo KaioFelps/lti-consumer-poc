@@ -1,9 +1,12 @@
 import { either as e } from "fp-ts";
-import { ensureHasAnyScope } from "$/advantage/guards/ensure-has-any-scope";
-import { Context } from "$/core/context";
-import { Platform } from "$/core/platform";
-import { LtiTool } from "$/core/tool";
-import { ASSIGNMENT_AND_GRADE_SERVICES_SCOPES, AssignmentAndGradeServiceScopes } from "../scopes";
+import { ensureHasAnyScope } from "$/advantage/guards/ensure-has-any-scope.js";
+import { Context } from "$/core/context.js";
+import { Platform } from "$/core/platform.js";
+import { LtiTool } from "$/core/tool.js";
+import {
+  ASSIGNMENT_AND_GRADE_SERVICES_SCOPES,
+  AssignmentAndGradeServiceScopes,
+} from "../scopes.js";
 
 export async function toolHasAccessToAgs(
   tool: LtiTool,

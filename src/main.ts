@@ -10,14 +10,14 @@ import { json } from "express";
 import { middleware as ejsLayoutsMiddleware } from "express-ejs-layouts";
 import session from "express-session";
 import { MockAgent, setGlobalDispatcher } from "undici";
-import { AppModule } from "./app.module";
-import { EnvironmentVars } from "./config/environment-vars";
-import { Redis } from "./external/data-store/redis/client";
-import { loadMessageStrings } from "./message-string/loader";
+import { AppModule } from "./app.module.js";
+import { EnvironmentVars } from "./config/environment-vars.js";
+import { Redis } from "./external/data-store/redis/client.js";
+import { loadMessageStrings } from "./message-string/loader.js";
 
-import "@/lib";
-import { HttpResponse } from "@/lib";
-import { LtiAdvantageMediaType } from "$/advantage/media-types";
+import "@/lib.js";
+import type { HttpResponse } from "@/lib.js";
+import { LtiAdvantageMediaType } from "$/advantage/media-types.js";
 
 async function bootstrap() {
   expand(config({ override: false }));
@@ -80,8 +80,8 @@ async function bootstrap() {
     }),
   );
 
-  app.useStaticAssets(join(__dirname, "../..", "public"));
-  app.setBaseViewsDir(join(__dirname, "../..", "views"));
+  app.useStaticAssets(join(import.meta.dirname, "../..", "public"));
+  app.setBaseViewsDir(join(import.meta.dirname, "../..", "views"));
   app.setViewEngine("ejs");
   app.set("view options", {
     async: true,

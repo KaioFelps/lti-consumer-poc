@@ -1,10 +1,10 @@
 import { either as e } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { CustomParameters, RawCustomParameters } from "$/assignment-and-grade/custom-parameters";
-import { InvalidScoreArgumentError } from "$/assignment-and-grade/errors";
-import { validateLtiIso8601AndPreciseTimestamp } from "../../../advantage/utils/validate-lti-iso-8601-precise-timestamp";
-import { resolveSubmission } from "./helpers";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { CustomParameters, RawCustomParameters } from "$/assignment-and-grade/custom-parameters.js";
+import { InvalidScoreArgumentError } from "$/assignment-and-grade/errors.js";
+import { validateLtiIso8601AndPreciseTimestamp } from "../../../advantage/utils/validate-lti-iso-8601-precise-timestamp.js";
+import { resolveSubmission } from "./helpers.js";
 
 export interface ILtiScore {
   /**

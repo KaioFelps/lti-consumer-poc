@@ -1,7 +1,7 @@
 import { forwardRef, Module } from "@nestjs/common";
-import { DataStoreModule } from "@/external/data-store/datastore.module";
-import { OIDCModule } from "../oidc.module";
-import { OIDCAdapterFactory } from "./factory";
+import { DataStoreModule } from "@/external/data-store/datastore.module.js";
+import { OIDCModule } from "../oidc.module.js";
+import { OIDCAdapterFactory } from "./factory.js";
 
 @Module({
   imports: [DataStoreModule, forwardRef(() => OIDCModule)],

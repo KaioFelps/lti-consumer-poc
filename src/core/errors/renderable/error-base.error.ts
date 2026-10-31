@@ -1,7 +1,7 @@
-import { resolveStatus } from "@/lib/exceptions";
-import { TranslatorService } from "@/message-string/translator.service";
-import { type IErrorBase } from "../error-base";
-import { RenderableError } from "./renderable-error";
+import { resolveStatus } from "@/lib/exceptions.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { type IErrorBase } from "../error-base.js";
+import { RenderableError } from "./renderable-error.js";
 
 export class ErrorBaseRenderableError extends RenderableError {
   protected constructor(innerError: IErrorBase, viewProperties: RenderableError["viewProperties"]) {

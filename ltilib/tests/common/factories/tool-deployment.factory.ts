@@ -1,11 +1,11 @@
-import { generateUUID } from "common/src/types/uuid";
-import { resolveFactoryOptional } from "ltilib/tests/utils/resolve-nullified-optional";
-import { Context } from "$/core/context";
-import { LtiTool } from "$/core/tool";
-import { LtiToolDeployment } from "$/core/tool-deployment";
-import { NullifyUndefined } from "../types/nullify";
-import { createContext } from "./context.factory";
-import { createTool } from "./tool.factory";
+import { generateUUID } from "common/src/types/uuid.js";
+import { Context } from "$/core/context.js";
+import { LtiTool } from "$/core/tool.js";
+import { LtiToolDeployment } from "$/core/tool-deployment.js";
+import { resolveFactoryOptional } from "$/tests/utils/resolve-nullified-optional.js";
+import { NullifyUndefined } from "../types/nullify.js";
+import { createContext } from "./context.factory.js";
+import { createTool } from "./tool.factory.js";
 
 type CreateToolDeploymentParams = Partial<
   NullifyUndefined<{ id: LtiToolDeployment["id"]; context?: Context<unknown>; tool: LtiTool }>

@@ -1,4 +1,4 @@
-import { MessageStringTranslationMap } from "@/message-string/internal";
+import { MessageStringTranslationMap } from "@/message-string/internal/index.js";
 
 export const ptBR: MessageStringTranslationMap = {
   "core:error": "Erro",

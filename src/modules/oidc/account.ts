@@ -4,7 +4,7 @@ import {
   type CanBePromise,
   ClaimsParameterMember,
 } from "oidc-provider";
-import { Person } from "@/modules/identity/person/person.entity";
+import { Person } from "@/modules/identity/person/person.entity.js";
 
 export class OIDCAccount implements Account {
   public constructor(public readonly person: Person) {}

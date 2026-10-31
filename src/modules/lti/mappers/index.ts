@@ -1,5 +1,5 @@
-import { mapRolesToLtiSystemRoles } from "./convert-roles";
-import { mapPersonToUserIdentity } from "./user-identity";
+import { mapRolesToLtiSystemRoles } from "./convert-roles.js";
+import { mapPersonToUserIdentity } from "./user-identity.js";
 
 export default {
   mapRolesToLtiSystemRoles,

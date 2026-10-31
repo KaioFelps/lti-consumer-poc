@@ -1,8 +1,8 @@
-import { ltiToolDeployments } from "drizzle/schema";
-import { createToolDeployment } from "ltilib/tests/common/factories/tool-deployment.factory";
-import { DrizzleClient } from "@/external/data-store/drizzle/client";
-import ltiToolsDeploymentsMapper from "@/external/data-store/drizzle/mappers/lti-tools-deployments.mapper";
-import { LtiToolDeployment } from "@/modules/lti/tools/entities/lti-tool-deployment.entity";
+import { ltiToolDeployments } from "drizzle/schema.js";
+import { DrizzleClient } from "@/external/data-store/drizzle/client.js";
+import ltiToolsDeploymentsMapper from "@/external/data-store/drizzle/mappers/lti-tools-deployments.mapper.js";
+import { LtiToolDeployment } from "@/modules/lti/tools/entities/lti-tool-deployment.entity.js";
+import { createToolDeployment } from "$/tests/common/factories/tool-deployment.factory.js";
 
 type FactoryParams = Parameters<typeof createToolDeployment>[0];
 

@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { HttpArgumentsHost } from "@nestjs/common/interfaces";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { HttpRequest, HttpResponse } from "@/lib";
-import { ExceptionFilterResponderFactory } from "../../exception-responders/factory";
-import { ExceptionFilterResponder } from "../../exception-responders/responder";
-import { RenderableException } from "./exception";
+import { HttpArgumentsHost } from "@nestjs/common/interfaces/index.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import type { HttpRequest, HttpResponse } from "@/lib.js";
+import { ExceptionFilterResponderFactory } from "../../exception-responders/factory.js";
+import { ExceptionFilterResponder } from "../../exception-responders/responder.js";
+import { RenderableException } from "./exception.js";
 
 type Body = RenderableException;
 type Output = object | void;

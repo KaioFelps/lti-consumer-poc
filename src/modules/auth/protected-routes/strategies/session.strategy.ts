@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy } from "passport-custom";
-import { HttpRequest, RequestSession } from "@/lib";
+import type { HttpRequest, RequestSession } from "@/lib.js";
 
 const strategyName = "session";
 export default strategyName;

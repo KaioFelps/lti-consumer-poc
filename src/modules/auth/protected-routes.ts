@@ -1,5 +1,5 @@
 import { SetMetadata } from "@nestjs/common";
-import { type HttpRequest } from "@/lib";
+import { type HttpRequest } from "@/lib.js";
 
 const IS_PUBLIC_ROUTE_METADATA_KEY = "isPublicRoute";
 const AUTH_GUARD_STRATEGY_METADATA_KEY = "authGuardStrategy";

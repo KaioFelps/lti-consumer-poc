@@ -1,21 +1,21 @@
 import { Injectable, Scope } from "@nestjs/common";
-import { generateUUID } from "common/src/types/uuid";
+import { generateUUID } from "common/src/types/uuid.js";
 import { taskEither } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
+import { pipe } from "fp-ts/lib/function.js";
 import Provider, { type Configuration, errors } from "oidc-provider";
-import { EnvironmentVars } from "@/config/environment-vars";
-import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory";
-import { AuthJwkSet } from "@/modules/auth/encryption/jwks-set";
-import { LtiToolIdPrefix } from "@/modules/lti";
-import { ltiToolConfigurationSchema } from "@/modules/lti/tools/lti-tool-config-schemas";
-import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository";
-import { OIDCAdapterBridge } from "@/modules/oidc/adapter/bridge";
-import { OIDCAdapterFactory } from "@/modules/oidc/adapter/factory";
-import { LTI_TOOL_CONFIGURATION_KEY } from "$/registration/dynamic/tool-configuration";
-import { ODICClientIdPrefix } from ".";
-import { AvailableACRs, AvailableScopes } from "./consts";
-import { OIDCAccountsRepository } from "./repositories/accounts.repository";
-import { OIDCClientsRepository } from "./repositories/clients.repository";
+import { EnvironmentVars } from "@/config/environment-vars.js";
+import { ExceptionsFactory } from "@/lib/exceptions/exceptions.factory.js";
+import { AuthJwkSet } from "@/modules/auth/encryption/jwks-set.js";
+import { ltiToolConfigurationSchema } from "@/modules/lti/tools/lti-tool-config-schemas.js";
+import { LtiToolsRepository } from "@/modules/lti/tools/lti-tools.repository.js";
+import { LtiToolIdPrefix } from "@/modules/lti.js";
+import { OIDCAdapterBridge } from "@/modules/oidc/adapter/bridge.js";
+import { OIDCAdapterFactory } from "@/modules/oidc/adapter/factory.js";
+import { LTI_TOOL_CONFIGURATION_KEY } from "$/registration/dynamic/tool-configuration.js";
+import { ODICClientIdPrefix } from "../oidc.js";
+import { AvailableACRs, AvailableScopes } from "./consts.js";
+import { OIDCAccountsRepository } from "./repositories/accounts.repository.js";
+import { OIDCClientsRepository } from "./repositories/clients.repository.js";
 
 @Injectable({ scope: Scope.DEFAULT }) // ensure it's singletone
 export class OIDCProviderFactory {

@@ -1,5 +1,5 @@
 import { HttpStatus, SetMetadata } from "@nestjs/common";
-import { HttpRequest } from "..";
+import type { HttpRequest } from "@/lib.js";
 
 const METADATA_KEY = "coreValidationErrorConfig";
 const HANDLER_KEY = "__handler_core_validation_error_config";

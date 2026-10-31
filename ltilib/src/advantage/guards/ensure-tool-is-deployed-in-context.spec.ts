@@ -1,16 +1,16 @@
 import { either as e } from "fp-ts";
-import { createContext } from "ltilib/tests/common/factories/context.factory";
-import { createTool } from "ltilib/tests/common/factories/tool.factory";
-import {
-  createToolDeployment,
-  createToolGlobalDeployment,
-} from "ltilib/tests/common/factories/tool-deployment.factory";
-import { InMemoryLtiToolDeploymentsRepository } from "ltilib/tests/common/in-memory-repositories/tool-deployments.repository";
 import {
   MissingLtiContextError,
   ToolIsNotDeployedInContextError,
-} from "$/assignment-and-grade/errors";
-import { ensureToolIsDeployedInContext } from "./ensure-tool-is-deployed-in-context";
+} from "$/assignment-and-grade/errors.js";
+import { createContext } from "$/tests/common/factories/context.factory.js";
+import { createTool } from "$/tests/common/factories/tool.factory.js";
+import {
+  createToolDeployment,
+  createToolGlobalDeployment,
+} from "$/tests/common/factories/tool-deployment.factory.js";
+import { InMemoryLtiToolDeploymentsRepository } from "$/tests/common/in-memory-repositories/tool-deployments.repository.js";
+import { ensureToolIsDeployedInContext } from "./ensure-tool-is-deployed-in-context.js";
 
 describe("[LTI Advantage/GUARDS] Ensure Tool Is Deployed In Context", () => {
   let deploymentsRepo: InMemoryLtiToolDeploymentsRepository;

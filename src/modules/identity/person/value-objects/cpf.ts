@@ -1,8 +1,8 @@
 import { either, option } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { Option } from "fp-ts/lib/Option";
-import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { Option } from "fp-ts/lib/Option.js";
+import { InvalidArgumentError } from "@/core/errors/invalid-argument.error.js";
 
 export class CPF {
   private digits: Uint8Array;

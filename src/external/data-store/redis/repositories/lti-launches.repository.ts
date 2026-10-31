@@ -1,15 +1,15 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { LaunchNotFoundError } from "@/modules/lti/resource-links/errors/launch-not-found.error";
-import { NoValidLaunchFoundError } from "@/modules/lti/resource-links/errors/no-valid-launch-found.error";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiLaunchData } from "$/core/launch-data";
-import { LtiLaunchesRepository } from "$/core/repositories/launches.repository";
-import { Redis } from "../client";
-import ltiLaunchMapper from "../mappers/lti-launch.mapper";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { LaunchNotFoundError } from "@/modules/lti/resource-links/errors/launch-not-found.error.js";
+import { NoValidLaunchFoundError } from "@/modules/lti/resource-links/errors/no-valid-launch-found.error.js";
+import { LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiLaunchData } from "$/core/launch-data.js";
+import { LtiLaunchesRepository } from "$/core/repositories/launches.repository.js";
+import { Redis } from "../client.js";
+import ltiLaunchMapper from "../mappers/lti-launch.mapper.js";
 
 @Injectable()
 export class RedisLtiLaunchesRepository extends LtiLaunchesRepository {
@@ -31,13 +31,13 @@ export class RedisLtiLaunchesRepository extends LtiLaunchesRepository {
           multi.expire(key, timeToLiveSeconds);
           await multi.exec();
         },
-        (error: Error) =>
+        (error) =>
           new LtiRepositoryError({
             type: "ExternalError",
             cause: new IrrecoverableError(
               `An error occurred in ${RedisLtiLaunchesRepository.name} on ` +
                 `saving launch data (${JSON.stringify(launch)}).`,
-              error,
+              error as Error,
             ),
           }),
       ),
@@ -55,13 +55,13 @@ export class RedisLtiLaunchesRepository extends LtiLaunchesRepository {
     return await pipe(
       te.tryCatch(
         () => this.redis.client.json.get(key),
-        (error: Error) =>
+        (error) =>
           new LtiRepositoryError({
             type: "ExternalError",
             cause: new IrrecoverableError(
               `An error occurred in ${RedisLtiLaunchesRepository.name} ` +
                 `on finding launch data by id "${launchId}".`,
-              error,
+              error as Error,
             ),
           }),
       ),
@@ -75,7 +75,7 @@ export class RedisLtiLaunchesRepository extends LtiLaunchesRepository {
         ),
       ),
       te.map((data) => ltiLaunchMapper.fromPayload(data)),
-      te.chain(
+      te.chainW(
         te.fromOption(
           () =>
             new LtiRepositoryError({
@@ -85,7 +85,6 @@ export class RedisLtiLaunchesRepository extends LtiLaunchesRepository {
             }),
         ),
       ),
-      (a) => a,
     )();
   }
 

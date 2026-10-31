@@ -1,10 +1,10 @@
 import { Client, Interaction } from "oidc-provider";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { TranslatorService } from "@/message-string/translator.service";
-import { OIDCAccount } from "@/modules/oidc/account";
-import { ConsentPromptReason } from "@/modules/oidc/helpers";
-import { ViewManager } from "..";
-import { ScopesAreMissingConsentViewManager } from "./scopes-missing";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { OIDCAccount } from "@/modules/oidc/account.js";
+import { ConsentPromptReason } from "@/modules/oidc/helpers.js";
+import { ViewManager } from "../view-manager.js";
+import { ScopesAreMissingConsentViewManager } from "./consent/scopes-missing.js";
 
 export type ConsentViewManagerData = {
   translatorService: TranslatorService;

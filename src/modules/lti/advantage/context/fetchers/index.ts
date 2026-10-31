@@ -1,9 +1,9 @@
-import { Either } from "fp-ts/lib/Either";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type";
-import { Context } from "$/core/context";
-import { ContextNotFoundError } from "../../errors/context-not-found.error";
-import { LtiContextAdapter } from "../adapters";
+import { Either } from "fp-ts/lib/Either.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { ContextConcreteType } from "@/modules/lti/ags/enums/context-concrete-type.js";
+import { Context } from "$/core/context.js";
+import { ContextNotFoundError } from "../../errors/context-not-found.error.js";
+import { LtiContextAdapter } from "../adapters/index.js";
 
 export const CONTEXT_FETCHERS = Symbol("context_fetchers");
 

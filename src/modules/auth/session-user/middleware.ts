@@ -1,6 +1,6 @@
 import { NestMiddleware } from "@nestjs/common";
-import { HttpRequest, HttpResponse } from "@/lib";
-import sessionUser from ".";
+import type { HttpRequest, HttpResponse } from "@/lib.js";
+import sessionUser from "../session-user.js";
 
 export class SessionUserMiddleware implements NestMiddleware {
   use(req: HttpRequest, _res: HttpResponse, next: (error?: unknown) => void) {

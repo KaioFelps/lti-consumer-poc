@@ -1,6 +1,6 @@
-import { ClassProperties } from "common/src/types/class-properties";
-import { MessageType } from "$/core/claims/serialization";
-import { MessagePlacement } from "$/core/tool/message-placement";
+import { ClassProperties } from "common/src/types/class-properties.js";
+import { MessageType } from "$/core/claims/serialization.js";
+import { MessagePlacement } from "$/core/tool/message-placement.js";
 
 export interface IOpenIdConfiguration {
   /**

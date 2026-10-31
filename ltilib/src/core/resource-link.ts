@@ -1,7 +1,7 @@
-import { generateUUID } from "common/src/types/uuid";
-import { IntoLtiClaim } from "$/core/claims/serialization";
-import { Context } from "./context";
-import { LtiTool } from "./tool";
+import { generateUUID } from "common/src/types/uuid.js";
+import { IntoLtiClaim } from "$/core/claims/serialization.js";
+import { Context } from "./context.js";
+import { LtiTool } from "./tool.js";
 
 export interface ILtiResourceLink {
   /**

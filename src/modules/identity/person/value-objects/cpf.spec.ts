@@ -1,5 +1,5 @@
 import { either } from "fp-ts";
-import { CPF } from "./cpf";
+import { CPF } from "./cpf.js";
 
 describe("CPF value-object", () => {
   it("should correctly store a valid CPF", () => {

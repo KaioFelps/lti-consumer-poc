@@ -1,5 +1,5 @@
-import { ValidationError, ValidationErrorsMap } from "@/core/validation/validation-errors";
-import { TranslatorService } from "@/message-string/translator.service";
+import { ValidationError, ValidationErrorsMap } from "@/core/validation/validation-errors.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
 
 export type SerializedValidationError = {
   message: string;
@@ -33,6 +33,7 @@ export async function serializeValidationError(
 }
 
 export async function serializeFinalValidationError(
+  this: { translator: TranslatorService },
   error: Required<ValidationError>,
 ): Promise<SerializedValidationError> {
   const { errorMessageIdentifier, argumentName, messageParams } = error;

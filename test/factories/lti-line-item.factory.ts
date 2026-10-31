@@ -1,9 +1,9 @@
-import { UUID } from "common/src/types/uuid";
-import { ltiLineItemsT } from "drizzle/schema";
+import type { UUID } from "common/src/types/uuid.js";
+import { ltiLineItemsT } from "drizzle/schema.js";
 import { either } from "fp-ts";
-import lineItemFactory from "ltilib/tests/common/factories/line-item.factory";
-import { DrizzleClient } from "@/external/data-store/drizzle/client";
-import ltiLineItemsMapper from "@/external/data-store/drizzle/mappers/lti-line-items.mapper";
+import { DrizzleClient } from "@/external/data-store/drizzle/client.js";
+import ltiLineItemsMapper from "@/external/data-store/drizzle/mappers/lti-line-items.mapper.js";
+import lineItemFactory from "$/tests/common/factories/line-item.factory.js";
 
 type OriginalFactoryParams = Exclude<
   Parameters<typeof lineItemFactory.createMinimal>[0],

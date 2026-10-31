@@ -1,17 +1,17 @@
 import { Injectable } from "@nestjs/common";
-import { UUID } from "common/src/types/uuid";
-import { coursesT } from "drizzle/schema";
+import type { UUID } from "common/src/types/uuid.js";
+import { coursesT } from "drizzle/schema.js";
 import { DrizzleQueryError, eq } from "drizzle-orm";
 import { either as e, taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { CourseNotFoundError } from "@/modules/assignments-and-grades/errors/course-not-found.error";
-import { CoursesRepository } from "@/modules/assignments-and-grades/repositories/courses.repository";
-import { Course } from "@/modules/courses-and-enrollments/entities/course.entity";
-import { DrizzleClient } from "../client";
-import coursesMapper from "../mappers/courses.mapper";
-import coursesWithInstructorsMapper from "../mappers/courses-with-instructors.mapper";
-import { DrizzleTransactionManager } from "../transaction-manager";
+import { pipe } from "fp-ts/lib/function.js";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { CourseNotFoundError } from "@/modules/assignments-and-grades/errors/course-not-found.error.js";
+import { CoursesRepository } from "@/modules/assignments-and-grades/repositories/courses.repository.js";
+import { Course } from "@/modules/courses-and-enrollments/entities/course.entity.js";
+import { DrizzleClient } from "../client.js";
+import coursesMapper from "../mappers/courses.mapper.js";
+import coursesWithInstructorsMapper from "../mappers/courses-with-instructors.mapper.js";
+import { DrizzleTransactionManager } from "../transaction-manager.js";
 
 @Injectable()
 export class DrizzleCoursesRepository extends CoursesRepository {

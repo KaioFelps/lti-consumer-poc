@@ -1,7 +1,7 @@
-import { type UUID } from "common/src/types/uuid";
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error";
-import { Person } from "@/modules/identity/person/person.entity";
-import { Assignment } from "../entities/assignment.entity";
+import { type UUID } from "common/src/types/uuid.js";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found.error.js";
+import { Person } from "@/modules/identity/person/person.entity.js";
+import { Assignment } from "../entities/assignment.entity.js";
 
 export class GradeNotFoundError extends ResourceNotFoundError {
   public constructor(assignment: UUID | Assignment, student: UUID | Person) {

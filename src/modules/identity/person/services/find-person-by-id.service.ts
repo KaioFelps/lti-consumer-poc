@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { UUID } from "common/src/types/uuid";
-import { PeopleRepository } from "../people.repository";
+import type { UUID } from "common/src/types/uuid.js";
+import { PeopleRepository } from "../people.repository.js";
 
 type Params = {
   id: UUID;

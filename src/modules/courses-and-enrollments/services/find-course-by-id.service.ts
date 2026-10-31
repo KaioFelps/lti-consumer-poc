@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { type UUID } from "common/src/types/uuid";
-import { CoursesRepository } from "@/modules/assignments-and-grades/repositories/courses.repository";
+import { type UUID } from "common/src/types/uuid.js";
+import { CoursesRepository } from "@/modules/assignments-and-grades/repositories/courses.repository.js";
 
 type Params = {
   courseId: UUID;

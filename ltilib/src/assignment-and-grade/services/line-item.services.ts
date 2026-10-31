@@ -1,17 +1,23 @@
-import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository";
-import { Platform } from "$/core/platform";
-import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository";
-import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository";
-import { LtiLineItemsRepository } from "../../repositories/line-items.repository";
-import { AGSExecutorParams, AGServicesExecutor } from "..";
-import { CreateLineItemServiceParams, CreateService } from "./create-line-item.service";
-import { DeleteLineItemServiceParams, DeleteService } from "./delete-line-item.service";
+import { ExternalLtiResourcesRepository } from "$/advantage/repositories/resources.repository.js";
+import { Platform } from "$/core/platform.js";
+import { LtiResourceLinksRepository } from "$/core/repositories/resource-links.repository.js";
+import { LtiToolDeploymentsRepository } from "$/core/repositories/tool-deployments.repository.js";
+import { LtiLineItemsRepository } from "../repositories/line-items.repository.js";
+import { AGSExecutorParams, AGServicesExecutor } from "./index.js";
+import {
+  CreateLineItemServiceParams,
+  CreateService,
+} from "./line-item/create-line-item.service.js";
+import {
+  DeleteLineItemServiceParams,
+  DeleteService,
+} from "./line-item/delete-line-item.service.js";
 import {
   FetchFromContainerService,
   FetchLineItemsFromContainerParams,
-} from "./fetch-line-items-from-container.service";
-import { FindLineItemParams, FindService } from "./find-line-item.service";
-import { UpdateLineItemParams, UpdateService } from "./update-line-item.service";
+} from "./line-item/fetch-line-items-from-container.service.js";
+import { FindLineItemParams, FindService } from "./line-item/find-line-item.service.js";
+import { UpdateLineItemParams, UpdateService } from "./line-item/update-line-item.service.js";
 
 export class LtiLineItemServices<
   CustomContextType extends string = never,

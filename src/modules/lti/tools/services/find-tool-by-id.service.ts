@@ -1,13 +1,13 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { UUID } from "common/src/types/uuid";
+import type { UUID } from "common/src/types/uuid.js";
 import { either } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { LtiRepositoryError } from "$/core/errors/repository.error";
-import { LtiTool } from "../entities/lti-tool.entity";
-import { ToolNotFoundError } from "../errors/tool-not-found.error";
-import { LtiToolsRepository } from "../lti-tools.repository";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { type IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { type LtiRepositoryError } from "$/core/errors/repository.error.js";
+import { LtiTool } from "../entities/lti-tool.entity.js";
+import { type ToolNotFoundError } from "../errors/tool-not-found.error.js";
+import { LtiToolsRepository } from "../lti-tools.repository.js";
 
 type Params = {
   id: UUID;
@@ -24,7 +24,7 @@ export class FindToolByIdService {
     return pipe(
       await this.toolsRepo.findToolById(id.toString()),
       either.map((record) => new LtiTool(record)),
-      either.mapLeft((error: LtiRepositoryError<PossibleErrors>) => error.cause),
+      either.mapLeft((error) => (error as LtiRepositoryError<PossibleErrors>).cause),
     );
   }
 }

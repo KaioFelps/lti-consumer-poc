@@ -1,7 +1,7 @@
 import { either as e } from "fp-ts";
-import { createTool } from "ltilib/tests/common/factories/tool.factory";
-import { MissingAnyScopeError } from "../errors/missing-scope.error";
-import { ensureHasAnyScope } from "./ensure-has-any-scope";
+import { createTool } from "$/tests/common/factories/tool.factory.js";
+import { MissingAnyScopeError } from "../errors/missing-scope.error.js";
+import { ensureHasAnyScope } from "./ensure-has-any-scope.js";
 
 describe("[LTI Advantage/Guards] Ensure Has Any Scope", () => {
   it.each([

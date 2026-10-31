@@ -1,5 +1,5 @@
-import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes";
-import { NamesAndRolesProvisioningServiceScopes } from "$/names-and-roles-provisioning/scopes";
+import { AssignmentAndGradeServiceScopes } from "$/assignment-and-grade/scopes.js";
+import { NamesAndRolesProvisioningServiceScopes } from "$/names-and-roles-provisioning/scopes.js";
 
 export const AvailableACRs = Object.freeze({
   /**

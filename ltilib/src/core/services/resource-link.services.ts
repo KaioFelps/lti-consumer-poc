@@ -1,4 +1,4 @@
-import { LtiResourceLinksRepository } from "../repositories/resource-links.repository";
+import { LtiResourceLinksRepository } from "../repositories/resource-links.repository.js";
 
 type GetResourceLinksOfToolParams = {
   deploymentId: string;

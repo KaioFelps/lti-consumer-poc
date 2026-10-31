@@ -1,21 +1,21 @@
-import { JsonValue } from "common/src/types/json-value";
-import { Optional } from "common/src/types/optional";
-import { generateUUID, type UUID } from "common/src/types/uuid";
+import { JsonValue } from "common/src/types/json-value.js";
+import { Optional } from "common/src/types/optional.js";
+import { generateUUID, type UUID } from "common/src/types/uuid.js";
 import { either as e } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
-import { ExternalLtiResource } from "$/advantage/external-resource";
+import { Either } from "fp-ts/lib/Either.js";
+import { pipe } from "fp-ts/lib/function.js";
+import { ExternalLtiResource } from "$/advantage/external-resource.js";
 import {
   CannotAttachResourceLinkError,
   InvalidLineItemArgumentError,
-} from "$/assignment-and-grade/errors";
-import { Context } from "$/core/context";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiTool } from "$/core/tool";
-import { CustomParameters, RawCustomParameters } from "../../custom-parameters";
-import { validateLabel, validateScoreMaximum } from "./helpers";
+} from "$/assignment-and-grade/errors.js";
+import { Context } from "$/core/context.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiTool } from "$/core/tool.js";
+import { CustomParameters, RawCustomParameters } from "./custom-parameters.js";
+import { validateLabel, validateScoreMaximum } from "./entities/line-item/helpers.js";
 
-import * as updateRecord from "./update-record";
+import * as updateRecord from "./entities/line-item/update-record.js";
 
 export interface ILtiLineItem<CustomContextType = never> {
   /**

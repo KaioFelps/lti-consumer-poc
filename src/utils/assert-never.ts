@@ -1,4 +1,4 @@
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
 
 /**
  * Typescript utility to ensure every case of `x` have been covered.

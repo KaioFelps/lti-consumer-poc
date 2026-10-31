@@ -1,7 +1,7 @@
 import { ZodError } from "zod";
-import { InvalidArgumentError } from "@/core/errors/invalid-argument.error";
-import { ValidationErrors } from "@/core/validation/validation-errors";
-import { MessageStringFormatterArg } from "@/message-string/internal";
+import { InvalidArgumentError } from "@/core/errors/invalid-argument.error.js";
+import { ValidationErrors } from "@/core/validation/validation-errors.js";
+import { MessageStringFormatterArg } from "@/message-string/internal/index.js";
 
 export function mapZodErrorsToCoreValidationErrors(errors: ZodError) {
   const validationErrors = new ValidationErrors();

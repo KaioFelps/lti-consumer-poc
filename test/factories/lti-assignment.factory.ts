@@ -1,11 +1,11 @@
-import { ltiAssignmentsT } from "drizzle/schema";
-import { DrizzleClient } from "@/external/data-store/drizzle/client";
-import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity";
-import { AssignmentKind } from "@/modules/assignments-and-grades/enums/assignment-kind";
-import { Course } from "@/modules/courses-and-enrollments/entities/course.entity";
-import { LtiResourceLink } from "$/core/resource-link";
-import assignmentFactory from "./assignment.factory";
-import ltiResourceLinkFactory from "./lti-resource-link.factory";
+import { ltiAssignmentsT } from "drizzle/schema.js";
+import { DrizzleClient } from "@/external/data-store/drizzle/client.js";
+import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity.js";
+import { AssignmentKind } from "@/modules/assignments-and-grades/enums/assignment-kind.js";
+import { Course } from "@/modules/courses-and-enrollments/entities/course.entity.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import assignmentFactory from "./assignment.factory.js";
+import ltiResourceLinkFactory from "./lti-resource-link.factory.js";
 
 type AssignmentProps = Assignment["props"];
 

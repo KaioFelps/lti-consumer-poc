@@ -1,5 +1,5 @@
 import { either as e } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
+import { Either } from "fp-ts/lib/Either.js";
 
 type Reason = "invalid_datetime" | "missing_subsecond_precision" | "missing_timezone_designator";
 

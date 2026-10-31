@@ -1,4 +1,4 @@
-import { LtilibError } from "./bases/ltilib.error";
+import { LtilibError } from "./bases/ltilib.error.js";
 
 interface ILtiRepositoryError<InnerError> {
   type: "ExternalError" | "NotFound";

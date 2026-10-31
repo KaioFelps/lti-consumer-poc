@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { either } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
+import { Either } from "fp-ts/lib/Either.js";
 import { ClientMetadata } from "oidc-provider";
-import { IrrecoverableError } from "@/core/errors/irrecoverable-error";
-import { OIDCClient } from "@/modules/oidc/client";
-import { OIDCClientsRepository } from "@/modules/oidc/repositories/clients.repository";
+import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
+import { OIDCClient } from "@/modules/oidc/client.js";
+import { OIDCClientsRepository } from "@/modules/oidc/repositories/clients.repository.js";
 
 @Injectable()
 export class DrizzleOIDCClientsRepository extends OIDCClientsRepository {

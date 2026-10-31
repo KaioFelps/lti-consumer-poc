@@ -1,7 +1,7 @@
-import { Either } from "fp-ts/lib/Either";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiRepositoryError } from "../errors/repository.error";
-import { LtiTool } from "../tool";
+import { Either } from "fp-ts/lib/Either.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiRepositoryError } from "../errors/repository.error.js";
+import { LtiTool } from "../tool.js";
 
 export abstract class LtiToolsRepository {
   public abstract findToolsOwningResourceLinks(

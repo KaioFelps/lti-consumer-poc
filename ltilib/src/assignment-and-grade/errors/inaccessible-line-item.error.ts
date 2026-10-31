@@ -1,5 +1,5 @@
-import { LtilibError } from "$/core/errors/bases/ltilib.error";
-import { LtiLineItem } from "../entities";
+import { LtilibError } from "$/core/errors/bases/ltilib.error.js";
+import { LtiLineItem } from "../entities/index.js";
 
 /**
  * An error that means that either no line item exists with given `lineItemId` or

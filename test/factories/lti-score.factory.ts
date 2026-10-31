@@ -1,7 +1,7 @@
-import { ltiScoresT } from "drizzle/schema";
-import scoreFactory from "ltilib/tests/common/factories/score.factory";
-import { DrizzleClient } from "@/external/data-store/drizzle/client";
-import scoresMapper from "@/external/data-store/drizzle/mappers/scores.mapper";
+import { ltiScoresT } from "drizzle/schema.js";
+import { DrizzleClient } from "@/external/data-store/drizzle/client.js";
+import scoresMapper from "@/external/data-store/drizzle/mappers/scores.mapper.js";
+import scoreFactory from "$/tests/common/factories/score.factory.js";
 
 type OriginalFactoryParams = Exclude<Parameters<typeof scoreFactory.createScore>[0], undefined>;
 

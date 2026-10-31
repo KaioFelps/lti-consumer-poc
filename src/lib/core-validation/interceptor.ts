@@ -2,8 +2,8 @@ import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nes
 import { PARAMTYPES_METADATA } from "@nestjs/common/constants";
 import { Reflector } from "@nestjs/core";
 import { Observable } from "rxjs";
-import { HttpRequest } from "..";
-import coreValidation, { type CoreValidationConfig } from ".";
+import type { HttpRequest } from "@/lib.js";
+import coreValidation, { type CoreValidationConfig } from "../core-validation.js";
 
 @Injectable()
 export class CoreValidationInterceptor implements NestInterceptor {

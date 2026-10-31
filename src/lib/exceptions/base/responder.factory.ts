@@ -1,12 +1,12 @@
-import type { HttpArgumentsHost } from "@nestjs/common/interfaces";
-import { ExceptionPresenter } from "@/external/presenters/exception-presenter";
-import { SimpleExceptionPresenter } from "@/external/presenters/exceptions/simple-exception.presenter";
-import { HttpRequest, HttpResponse, RequestSession } from "@/lib";
-import { TranslatorService } from "@/message-string/translator.service";
-import { ExceptionFilterResponderFactory } from "../../exception-responders/factory";
-import { ExceptionFilterResponder } from "../../exception-responders/responder";
-import { flashRequestBody } from "..";
-import { BaseException } from "./exception";
+import type { HttpArgumentsHost } from "@nestjs/common/interfaces/index.js";
+import { ExceptionPresenter } from "@/external/presenters/exception-presenter.js";
+import { SimpleExceptionPresenter } from "@/external/presenters/exceptions/simple-exception.presenter.js";
+import type { HttpRequest, HttpResponse, RequestSession } from "@/lib.js";
+import { TranslatorService } from "@/message-string/translator.service.js";
+import { ExceptionFilterResponderFactory } from "../../exception-responders/factory.js";
+import { ExceptionFilterResponder } from "../../exception-responders/responder.js";
+import { flashRequestBody } from "../../exceptions.js";
+import { BaseException } from "./exception.js";
 
 type Body = BaseException;
 type Output = object | void;

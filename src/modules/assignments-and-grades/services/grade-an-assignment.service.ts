@@ -1,15 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { type UUID } from "common/src/types/uuid";
+import { type UUID } from "common/src/types/uuid.js";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { InstructorsRepository } from "@/modules/courses-and-enrollments/repositories/instructors.repository";
-import { PersonNotFoundError } from "@/modules/identity/errors/person-not-found.error";
-import { PeopleRepository } from "@/modules/identity/person/people.repository";
-import { NonGradableAssignmentError } from "../errors/non-gradable-assignment";
-import { StudentNotFoundError } from "../errors/student-not-found.error";
-import policies from "../policies";
-import { AssignmentsRepository } from "../repositories/assignments.repository";
-import { CoursesRepository } from "../repositories/courses.repository";
+import { pipe } from "fp-ts/lib/function.js";
+import { InstructorsRepository } from "@/modules/courses-and-enrollments/repositories/instructors.repository.js";
+import { PersonNotFoundError } from "@/modules/identity/errors/person-not-found.error.js";
+import { PeopleRepository } from "@/modules/identity/person/people.repository.js";
+import { NonGradableAssignmentError } from "../errors/non-gradable-assignment.js";
+import { StudentNotFoundError } from "../errors/student-not-found.error.js";
+import policies from "../policies/index.js";
+import { AssignmentsRepository } from "../repositories/assignments.repository.js";
+import { CoursesRepository } from "../repositories/courses.repository.js";
 
 type Params = {
   assignmentId: UUID;

@@ -1,4 +1,4 @@
-import { LtilibError } from "$/core/errors/bases/ltilib.error";
+import { LtilibError } from "$/core/errors/bases/ltilib.error.js";
 
 export class MissingLtiContextError extends LtilibError {
   public constructor() {

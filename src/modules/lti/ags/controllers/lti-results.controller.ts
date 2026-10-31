@@ -1,18 +1,18 @@
 import { Controller, Get, Headers, Param, Query, Res } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { HttpResponse } from "@/lib";
-import { ExtendedExceptionsFactory } from "@/lib/exceptions/extended-exceptions.factory";
-import { Rest } from "@/lib/mvc-routes";
-import { AuthStrategy, ConfigAuthGuard } from "@/modules/auth/protected-routes";
-import { CurrentTool } from "@/modules/auth/protected-routes/decorators/current-tool";
-import { type LtiToolJwtPayload } from "@/modules/auth/protected-routes/lti-tool-jwt-payload";
-import { LtiResultServices } from "$/assignment-and-grade";
-import { ResultsContainerFilters } from "$/assignment-and-grade/container-filters";
-import { FindContextByIdService } from "../../advantage/context/services/find-context-by-id.service";
-import { FindToolByIdService } from "../../tools/services/find-tool-by-id.service";
-import { ResultsContainerFiltersDto } from "../dtos/results-container.filters.dto";
-import { ContextConcreteType } from "../enums/context-concrete-type";
+import { pipe } from "fp-ts/lib/function.js";
+import { ExtendedExceptionsFactory } from "@/lib/exceptions/extended-exceptions.factory.js";
+import { Rest } from "@/lib/mvc-routes.js";
+import type { HttpResponse } from "@/lib.js";
+import { CurrentTool } from "@/modules/auth/protected-routes/decorators/current-tool.js";
+import { type LtiToolJwtPayload } from "@/modules/auth/protected-routes/lti-tool-jwt-payload.js";
+import { AuthStrategy, ConfigAuthGuard } from "@/modules/auth/protected-routes.js";
+import { ResultsContainerFilters } from "$/assignment-and-grade/container-filters.js";
+import { LtiResultServices } from "$/assignment-and-grade.js";
+import { FindContextByIdService } from "../../advantage/context/services/find-context-by-id.service.js";
+import { FindToolByIdService } from "../../tools/services/find-tool-by-id.service.js";
+import { ResultsContainerFiltersDto } from "../dtos/results-container.filters.dto.js";
+import { ContextConcreteType } from "../enums/context-concrete-type.js";
 
 @Rest()
 @Controller("/lti/ags/:contextId/lineitems")

@@ -1,6 +1,6 @@
-import { Either } from "fp-ts/lib/Either";
-import { LtiResourceLink } from "$/core/resource-link";
-import { LtiRepositoryError } from "../errors/repository.error";
+import { Either } from "fp-ts/lib/Either.js";
+import { LtiResourceLink } from "$/core/resource-link.js";
+import { LtiRepositoryError } from "../errors/repository.error.js";
 
 export interface FindManyParams {
   withToolId?: string;

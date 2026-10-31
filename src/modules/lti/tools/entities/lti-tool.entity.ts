@@ -1,13 +1,13 @@
 import { either } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
+import { pipe } from "fp-ts/lib/function.js";
 import { nanoid } from "nanoid";
 import { ClientMetadata } from "oidc-provider";
 import type { ZodError } from "zod";
-import { ValidationError, ValidationErrors } from "@/core/validation/validation-errors";
-import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
-import { LtiTool as BaseLtiTool } from "$/core/tool";
-import { Contact, LTI_TOOL_CONFIGURATION_KEY } from "$/registration/dynamic/tool-configuration";
-import { draftLtiDynamicToolConfigurationSchema } from "../lti-tool-config-schemas";
+import { ValidationError, ValidationErrors } from "@/core/validation/validation-errors.js";
+import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error.js";
+import { LtiTool as BaseLtiTool } from "$/core/tool.js";
+import { Contact, LTI_TOOL_CONFIGURATION_KEY } from "$/registration/dynamic/tool-configuration.js";
+import { draftLtiDynamicToolConfigurationSchema } from "../lti-tool-config-schemas.js";
 
 export class LtiTool {
   public constructor(public record: BaseLtiTool) {}

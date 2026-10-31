@@ -1,7 +1,7 @@
-import { JsonValue } from "common/src/types/json-value";
+import { JsonValue } from "common/src/types/json-value.js";
 import { either as e } from "fp-ts";
-import { pipe } from "fp-ts/lib/function";
-import { InvalidLineItemArgumentError } from "$/assignment-and-grade/errors";
+import { pipe } from "fp-ts/lib/function.js";
+import { InvalidLineItemArgumentError } from "$/assignment-and-grade/errors.js";
 
 export type RawCustomParameters = Record<string, JsonValue>;
 

@@ -1,12 +1,12 @@
 import { HttpStatus } from "@nestjs/common";
 import { Expose } from "class-transformer";
 import { either as e } from "fp-ts";
-import { Either } from "fp-ts/lib/Either";
+import { Either } from "fp-ts/lib/Either.js";
 import { z } from "zod";
-import { DTO } from "@/core/interfaces/dto";
-import { ValidationErrors } from "@/core/validation/validation-errors";
-import { ConfigCoreValidation } from "@/lib/core-validation";
-import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error";
+import { DTO } from "@/core/interfaces/dto.js";
+import { ValidationErrors } from "@/core/validation/validation-errors.js";
+import { ConfigCoreValidation } from "@/lib/core-validation.js";
+import { mapZodErrorsToCoreValidationErrors } from "@/lib/zod/map-zod-errors-to-core-validation-error.js";
 
 @ConfigCoreValidation({ status: HttpStatus.BAD_REQUEST })
 export class LaunchLoginDto implements DTO {

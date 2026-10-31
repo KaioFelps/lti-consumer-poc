@@ -1,13 +1,13 @@
-import type * as schema from "drizzle/schema";
+import type * as schema from "drizzle/schema.js";
 import {
   type BuildQueryResult,
   type DBQueryConfig,
   type ExtractTablesWithRelations,
 } from "drizzle-orm";
-import { pipe } from "fp-ts/lib/function";
-import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity";
-import { AssignmentKind } from "@/modules/assignments-and-grades/enums/assignment-kind";
-import { trimNullProperties } from "@/utils/trim-null-properties";
+import { pipe } from "fp-ts/lib/function.js";
+import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity.js";
+import { AssignmentKind } from "@/modules/assignments-and-grades/enums/assignment-kind.js";
+import { trimNullProperties } from "@/utils/trim-null-properties.js";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 

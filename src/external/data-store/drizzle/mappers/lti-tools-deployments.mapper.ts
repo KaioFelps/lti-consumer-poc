@@ -1,6 +1,6 @@
-import type * as schema from "drizzle/schema";
+import type * as schema from "drizzle/schema.js";
 import type { BuildQueryResult, DBQueryConfig, ExtractTablesWithRelations } from "drizzle-orm";
-import { LtiToolDeployment } from "@/modules/lti/tools/entities/lti-tool-deployment.entity";
+import { LtiToolDeployment } from "@/modules/lti/tools/entities/lti-tool-deployment.entity.js";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 
