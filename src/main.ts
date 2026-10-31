@@ -16,6 +16,7 @@ import { Redis } from "./external/data-store/redis/client.js";
 import { loadMessageStrings } from "./message-string/loader.js";
 
 import "@/lib.js";
+import ejs from "ejs";
 import type { HttpResponse } from "@/lib.js";
 import { LtiAdvantageMediaType } from "$/advantage/media-types.js";
 
@@ -82,11 +83,17 @@ async function bootstrap() {
 
   app.useStaticAssets(join(import.meta.dirname, "../..", "public"));
   app.setBaseViewsDir(join(import.meta.dirname, "../..", "views"));
-  app.setViewEngine("ejs");
-  app.set("view options", {
-    async: true,
-  });
 
+  app.engine("ejs", (file: string, data: ejs.Data, cb: (err: unknown, html?: string) => void) => {
+    ejs
+      .renderFile(file, data, {
+        async: true,
+        views: data.settings?.views,
+        cache: !!data.settings?.["view cache"],
+      })
+      .then((html) => cb(null, html), cb);
+  });
+  app.setViewEngine("ejs");
   app.use(ejsLayoutsMiddleware);
 
   let _counter = 0;
