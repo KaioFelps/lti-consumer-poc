@@ -168,12 +168,12 @@ Quanto aos _line items_, é especificado que um link de recurso pode ter vários
 na PoC, uma atividade externa LTI pode também possuir vários line items. Para lidar com isso, adotamos a seguinte
 política:
 1. **Quando não há nenhum _line item_ para a atividade externa LTI**: o aluno é notificado, na interface, que a
-atividade ainda não está configurada para receber notas.
+    atividade ainda não está configurada para receber notas.
 2. **Quando há um _line item_ para a atividade**: as notas atuais são mostradas pro aluno, independente da vontade
-da ferramenta LTI (sinalizada via campos como `gradesReleased`; o que é permitido pela especificação).
+    da ferramenta LTI (sinalizada via campos como `gradesReleased`; o que é permitido pela especificação).
 3. **Quando há mais de um _line item_ para a atividade**: o aluno é notificado, na interface da atividade, que
-esta não está configurada para exibir notas. Um professor, ao visualizar os detalhes da atividade, é notificado que
-ele deve selecionar um dos _line items_ existentes para representar as notas daquela atividade.
+    esta não está configurada para exibir notas. Um professor, ao visualizar os detalhes da atividade, é notificado que
+    ele deve selecionar um dos _line items_ existentes para representar as notas daquela atividade.
 
     (Isso implica uma nova tela onde o professor/administrador pode visualizar todos os _line items_ de uma atividade
     e decidir qual vai ser a escolhida para representar as notas da atividade através de um _radio group input_.)
@@ -182,3 +182,36 @@ ele deve selecionar um dos _line items_ existentes para representar as notas daq
 - [ ] Fazer a página de visualizar `score`s manuais.
 - [x] Fazer a página de visualização de _line items_ de uma atividade.
 - [x] Viabilizar seleção do _line item_ principal manualmente.
+
+## Atualização de notas em tempo real
+Pela especificação, as ferramentas não têm obrigação de atualizar as notas de maneira síncrona. O Moodle, por
+exemplo, adota uma sincronização assíncrona: ele agenda um evento de atualização e, dependendo da configuração
+do servidor, a cada $n$ minutos, quando o serviço _cron job_ for executado, os eventos de atualização são
+finalmente executados e as notas são sincronizadas. O menor intervalo possível é de 1 minuto.
+
+Além disso, embora seja obrigatório, algumas ferramentas podem não ter plena implementação da especificação
+básica em relação a apresentação do lançamento. Novamente, o Moodle não emite mensagens para fechar o pop-up
+aberto diante do lançamento, assim, a plataforma fica sem meios de detectar a conclusão da atividade somente
+pelos meios do LTI.
+
+Para reforçar essa sincronização, serão utilizados eventos do lado do servidor ([_Server-sent Events_]) para
+enviar mensagens ao front-end, permitindo que este busque se atualizar com as informações da nota do aluno.
+
+(Esse mecanismo pode servir também, por exemplo, para atividades sequenciais, isto é, quando o aluno precisa
+concluir a atividade atual para que uma nova seja imediatamente iniciada se o aluno tiver acertado.)
+
+Considerando que a plataforma real provavelmente rodará em múltiplas instâncias por trás de algum _proxy_
+reverso, uma solução um pouco mais robusta será utilizada para gerenciar as conexões servidor-cliente:
+- Cada instância da plataforma manterá um _hashmap_ de conexões com o front-end, mapeado pelos IDs da atividade
+  e do usuário.
+- Toda insância da plataforma estará conectado com o Redis no modelo publicador/consumidor.
+- Ao receber um novo _score_, a instância deve publicar um evento no Redis anunciando que a nota foi recebida.
+- Ao receber um novo evento de nota recebida, cada instância (consumidora) deve verificar pelos IDs da atividade
+  e do usuário (extraídos do _payload_ do evento) se ela é a detentora da conexão com o front-end:
+  - Se sim, então, esta instância deve enviar uma mensagem para o front-end contendo a nova pontuação para que
+    o front-end se atualize e prossiga.
+
+(O Redis foi escolhido no lugar de outros serviços de mensageria, como Kafka ou RabbitMQ, devido a efemeridade
+dessas mensagens — não são críticas nem demandam toda a resiliência que as alternativas proveem.)
+
+[_Server-sent Events_]: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
