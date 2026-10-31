@@ -4,6 +4,7 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { Test, TestingModule } from "@nestjs/testing";
 import { RedisStore } from "connect-redis";
 import cookieParser from "cookie-parser";
+import ejs from "ejs";
 import { json } from "express";
 import { middleware as ejsLayoutsMiddleware } from "express-ejs-layouts";
 import session from "express-session";
@@ -51,10 +52,16 @@ export async function getTestingApp() {
 
   app.useStaticAssets(join(process.cwd(), "public"));
   app.setBaseViewsDir(join(process.cwd(), "views"));
-  app.setViewEngine("ejs");
-  app.set("view options", {
-    async: true,
+  app.engine("ejs", (file: string, data: ejs.Data, cb: (err: unknown, html?: string) => void) => {
+    ejs
+      .renderFile(file, data, {
+        async: true,
+        views: data.settings?.views,
+        cache: !!data.settings?.["view cache"],
+      })
+      .then((html) => cb(null, html), cb);
   });
+  app.setViewEngine("ejs");
 
   app.use(ejsLayoutsMiddleware);
 
