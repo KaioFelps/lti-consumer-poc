@@ -1,4 +1,7 @@
+import { InjectQueue } from "@nestjs/bullmq";
 import { Body, Controller, Headers, Param, Post, Res } from "@nestjs/common";
+import { Queue } from "bullmq";
+import { type UUID } from "common/src/types/uuid.js";
 import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function.js";
 import { InvalidArgumentError } from "@/core/errors/invalid-argument.error.js";
@@ -9,12 +12,15 @@ import type { HttpResponse } from "@/lib.js";
 import { CurrentTool } from "@/modules/auth/protected-routes/decorators/current-tool.js";
 import { type LtiToolJwtPayload } from "@/modules/auth/protected-routes/lti-tool-jwt-payload.js";
 import { AuthStrategy, ConfigAuthGuard } from "@/modules/auth/protected-routes.js";
+import { LTI_ACTIVITIES_GRADES_SYNC_QUEUE } from "@/modules/lti.js";
+import { LtiScore } from "$/assignment-and-grade/entities/index.js";
 import { InvalidScoreArgumentError } from "$/assignment-and-grade/errors.js";
 import { LtiScoreServices } from "$/assignment-and-grade.js";
 import { FindContextByIdService } from "../../advantage/context/services/find-context-by-id.service.js";
 import { FindToolByIdService } from "../../tools/services/find-tool-by-id.service.js";
 import { ScoreDTO } from "../dtos/score.dto.js";
 import { ContextConcreteType } from "../enums/context-concrete-type.js";
+import { IncomingScoreEvent } from "../events/incoming-score.event.js";
 
 @Rest()
 @Controller("/lti/ags/:contextId/lineitems")
@@ -23,6 +29,7 @@ export class LtiScoresController {
     private readonly scoresServices: LtiScoreServices<ContextConcreteType>,
     private readonly findContextByIdService: FindContextByIdService,
     private readonly findToolByIdService: FindToolByIdService,
+    @InjectQueue(LTI_ACTIVITIES_GRADES_SYNC_QUEUE) private readonly syncQueue: Queue,
   ) {}
 
   @Post(":lineItemId/scores")
@@ -52,6 +59,9 @@ export class LtiScoresController {
               lineItemId,
             }),
       ),
+      te.tapTask((scoresResponse) =>
+        this.silentlyEnqueueGradeSyncJob(lineItemId, scoresResponse.rawContent),
+      ),
       te.map((scoresResponse) => {
         response
           .setHeaders(scoresResponse.headers)
@@ -62,6 +72,27 @@ export class LtiScoresController {
         throw ExtendedExceptionsFactory.fromError(resolveTimestampsErrors(error));
       }),
     )();
+  }
+
+  private silentlyEnqueueGradeSyncJob(lineItemId: UUID, score: Readonly<LtiScore>) {
+    return pipe(
+      te.tryCatch(
+        () =>
+          this.syncQueue.add(
+            "sync-grade",
+            new IncomingScoreEvent(
+              lineItemId,
+              score.userId,
+              score.activityProgress,
+              score.gradingProgress,
+              score.score,
+            ),
+          ),
+        (error) => {
+          console.error("Failed to schedule LTI activity grade synchronization event", error);
+        },
+      ),
+    );
   }
 }
 
