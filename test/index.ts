@@ -18,7 +18,7 @@ export async function getTestingApp() {
   //
   // nestjs modules are resolved upon import, even before the app actually is raised. Not every
   // module, tbf, but the ones using methods like `forRoot` or `forFeature` do get resolved immediately.
-  const { AppModule } = await import("@/app.module");
+  const { AppModule } = await import("@/app.module.js");
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
   }).compile();
