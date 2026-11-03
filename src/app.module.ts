@@ -1,3 +1,4 @@
+import { BullModule } from "@nestjs/bullmq";
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { AuthModule } from "@/modules/auth/auth.module.js";
 import { IdentityModule } from "@/modules/identity/identity.module.js";
@@ -6,6 +7,7 @@ import { OIDCModule } from "@/modules/oidc/oidc.module.js";
 import { AppController } from "./app.controller.js";
 import { AppService } from "./app.service.js";
 import { AppConfigModule } from "./config/config.module.js";
+import { Redis } from "./external/data-store/redis/client.js";
 import { ExternalModule } from "./external/external.module.js";
 import { GlobalExceptionFiltersModule } from "./lib/globals/exception-filters.module.js";
 import { GlobalGuardsModule } from "./lib/globals/guards.module.js";
@@ -31,6 +33,12 @@ import { CoursesModule } from "./modules/courses-and-enrollments/courses.module.
     LtiModule,
     CoursesModule,
     AssignmentsAndGradesModule,
+    BullModule.forRootAsync({
+      inject: [Redis],
+      useFactory: async (redis: Redis) => ({
+        connection: redis.queuesClient,
+      }),
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

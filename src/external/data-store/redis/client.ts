@@ -4,12 +4,14 @@ import { EnvironmentVars } from "@/config/environment-vars.js";
 
 export class Redis implements OnModuleInit, OnModuleDestroy {
   public readonly client: RedisClientType;
+  public readonly queuesClient: RedisClientType;
 
   public constructor(@Inject(EnvironmentVars) env: EnvironmentVars) {
     const url = `redis://${env.redis.user}:${env.redis.password}@${env.redis.host}:${env.redis.port}`;
     const client = createClient({ url });
 
     this.client = client as RedisClientType;
+    this.queuesClient = this.client.duplicate();
   }
 
   async onModuleInit() {
