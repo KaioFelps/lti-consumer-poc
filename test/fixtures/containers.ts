@@ -11,7 +11,7 @@ export async function getRedisContainer() {
       REDIS_ARGS: [
         `--requirepass ${process.env.REDIS_PASSWORD}`,
         `--user ${process.env.REDIS_USER}`,
-        `on >${process.env.REDIS_PASSWORD} allkeys allcommands +@all`,
+        `on >${process.env.REDIS_PASSWORD} allkeys allcommands +@all &*`,
       ].join(" "),
     })
     .start();
