@@ -169,6 +169,9 @@ export class LtiAssignmentsController {
               externalAssignmentRecord.resourceLink,
               this.platform,
             ),
+            contextId: course
+              ? mountContextId(course.getCourse().getId().toString(), ContextConcreteType.Course)
+              : undefined,
           }),
       ),
       te.getOrElse((error) => {

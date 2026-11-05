@@ -10,8 +10,6 @@ const dateFormattingOptions = {
 };
 %>
 
-<% console.log(studentAssignmentsDetails)  %>
-
 <main class="main">
     <h1><%= title %></h1>
     <a href="<%= routes.courses.view(course.id) %>"><%= await t.translate("assignments:details:buttons:back-to-course", { courseTitle: course.title }) %></a>
@@ -19,13 +17,7 @@ const dateFormattingOptions = {
 
     <% if (studentAssignmentsDetails) { %>
         <br>
-        <% if (studentAssignmentsDetails.hasGrade) { %>
-            <span class="chip success">✅ Atividade realizada e avaliada</span>
-        <% } else if (studentAssignmentsDetails.hasSubmitted) { %>
-            <span class="chip warning">🚧 Atividade realizada</span>
-        <% } else { %>
-            <span class="chip error">❗️ Atividade pendente</span>
-        <% } %>
+        <span id="activity-status-chip" class="chip">...</span>
         <br>
     <% } %>
 
@@ -57,7 +49,7 @@ const dateFormattingOptions = {
             </div>
             <div class="item">
                 <header><%= await t.translate("courses:details:assignments:max-score") %></header>
-                <span><%= assignment.maxScore %></span>
+                <span id="assignment-max-score"><%= assignment.maxScore %></span>
             </div>
             <% const releaseDateToShow = assignment.releasedAt ?? assignment.createdAt; %>
             <div class="item">
@@ -171,11 +163,13 @@ const dateFormattingOptions = {
             <div class="vertical-table">
                 <div class="item">
                     <header>Nota atribuída</header>
-                    <% if (studentAssignmentsDetails.details) { %>
-                        <span><%= studentAssignmentsDetails.details.grade %> de <%= studentAssignmentsDetails.details.maxGrade %></span>
-                    <% } else { %>
-                        <span>Nota ainda não atribuída</span>
-                    <% } %>
+                    <span id="current-grade">
+                        <% if (studentAssignmentsDetails.details) { %>
+                            <%= studentAssignmentsDetails.details.grade %> de <%= studentAssignmentsDetails.details.maxGrade %>
+                        <% } else { %>
+                            Nota ainda não atribuída
+                        <% } %>
+                    </span>
                 </div>
                 <div class="item">
                     <header>Status da avaliação</header>
@@ -184,7 +178,7 @@ const dateFormattingOptions = {
                         if (studentAssignmentsDetails.hasGrade) ASSIGNMENT_GRADING_STATUS = "Atividade avaliada pelo professor";
                         else if (studentAssignmentsDetails.hasSubmitted) ASSIGNMENT_GRADING_STATUS = "Aguardando aprovação do professor";
                     %>
-                    <span><%= ASSIGNMENT_GRADING_STATUS %></span>
+                    <span id="grading-progress"><%= ASSIGNMENT_GRADING_STATUS %></span>
                 </div>
                 <% if (studentAssignmentsDetails.details?.gradedAt) { %>
                     <div class="item">
@@ -195,7 +189,7 @@ const dateFormattingOptions = {
                 <% if (studentAssignmentsDetails.details?.lastUpdatedAt) { %>
                     <div class="item">
                         <header>Último lançamento de nota</header>
-                        <span><%= studentAssignmentsDetails.details.lastUpdatedAt.toLocaleString("pt-BR", dateFormattingOptions) %></span>
+                        <span id="latest-grade-release-timestamp"><%= studentAssignmentsDetails.details.lastUpdatedAt.toLocaleString("pt-BR", dateFormattingOptions) %></span>
                     </div>
                 <% } %>
             </div>
@@ -228,9 +222,90 @@ const dateFormattingOptions = {
                 .map(([key, value]) => `${key}=${value}`)
                 .join(",");
 
-            window.open(endpoint, "lti_popup", windowFeatures);
+            const launchPopup = window.open(endpoint, "lti_popup", windowFeatures);
+            window.addEventListener("close-popups", () => { launchPopup.close(); })
         }
 
         document.getElementById("launch-btn").addEventListener("click", initiateLaunch);
     </script>
+
+    <script>
+        const latestGradeReleaseTimestampSpan = document.getElementById("latest-grade-release-timestamp");
+        const currentGradeSpan = document.getElementById("current-grade");
+        const gradingProgressSpan = document.getElementById("grading-progress");
+        const assignmentMaxScore = document.getElementById("assignment-max-score");
+
+        const GRADING_PROGRESS_LABELS = {
+            FullyGraded: "Atividade avaliada pelo professor",
+            Pending: "Atividade com envio pendente",
+            NotReady: "Atividade com envio pendente",
+            PendingManual: "Aguardando aprovação do professor",
+            Failed: "Problemas na atribuição de notas",
+        };
+
+        function updateAssignmentGradingDetails(lastGradeUpdate, gradeDetails, gradingProgress) {
+            const lastUpdatedAt = lastGradeUpdate ? new Date(lastGradeUpdate).toLocaleString("pt-BR", dateFormattingOptions) : undefined;
+            const grade = gradeDetails ? `${gradeDetails.given} de ${gradeDetails.maximum}` : "Nota ainda não atribuída";
+
+            if (lastUpdatedAt) latestGradeReleaseTimestampSpan.textContent = lastUpdatedAt;
+            currentGradeSpan.textContent = grade;
+            gradingProgressSpan.textContent = GRADING_PROGRESS_LABELS[gradingProgress];
+            assignmentMaxScore.textContent = gradeDetails.maximum;
+        }
+
+        function updateActivityStatusChip(progress) {
+            let newClass = "";
+            let textContent = "-"
+            switch (progress) {
+                case "Initialized":
+                case "Started":
+                case "InProgress":
+                    textContent = "❗️ Atividade pendente";
+                    newClass = "error";
+                    break;
+                case "Submitted":
+                    textContent = "🚧 Atividade realizada";
+                    newClass = "warning";
+                    break;
+                case "Completed":
+                    textContent = "✅ Atividade realizada e avaliada";
+                    newClass = "success";
+                    break;
+            }
+
+            const span = document.getElementById("activity-status-chip");
+            span.textContent = textContent;
+            span.classList.remove("error", "warning", "success");
+            span.classList.add(newClass);
+        }
+
+        <% if (studentAssignmentsDetails) { %>
+            <%
+                let similarActivityProgress = "Initialized";
+                if (studentAssignmentsDetails.hasGrade) similarActivityProgress = "Completed";
+                else if (studentAssignmentsDetails.hasSubmitted) similarActivityProgress = "Submitted";
+            %>
+            updateActivityStatusChip("<%= similarActivityProgress %>");
+        <% } %>
+
+    </script>
+
+    <% if (contextId) { %>
+        <script>
+            const gradeSyncEvent = new EventSource("<%= routes.lti.ags.scores.syncGrades(contextId, assignment.id.toString()) %>");
+            gradeSyncEvent.onmessage = ({ data }) => {
+                const { activityProgress, gradingProgress, score, lastUpdatedAt } = JSON.parse(data);
+                updateAssignmentGradingDetails(lastUpdatedAt, score, gradingProgress);
+
+                const closeLaunchPopUpEvent = new CustomEvent("close-popups", {
+                    detail: undefined,
+                    bubbles: true,
+                    cancelable: true,
+                    composed: true,
+                });
+
+                window.dispatchEvent(closeLaunchPopUpEvent)
+            };
+        </script>
+    <% } %>
 </main>
