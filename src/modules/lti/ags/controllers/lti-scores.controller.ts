@@ -1,38 +1,43 @@
-import { InjectQueue } from "@nestjs/bullmq";
-import { Body, Controller, Headers, Param, Post, Res } from "@nestjs/common";
-import { Queue } from "bullmq";
-import { type UUID } from "common/src/types/uuid.js";
+import { Body, Controller, Headers, Param, Post, Res, Sse, SseSignal } from "@nestjs/common";
 import { taskEither as te } from "fp-ts";
 import { pipe } from "fp-ts/lib/function.js";
+import { EMPTY, finalize, Observable } from "rxjs";
 import { InvalidArgumentError } from "@/core/errors/invalid-argument.error.js";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
 import { ExtendedExceptionsFactory } from "@/lib/exceptions/extended-exceptions.factory.js";
-import { Rest } from "@/lib/mvc-routes.js";
+import { Mvc, Rest } from "@/lib/mvc-routes.js";
 import type { HttpResponse } from "@/lib.js";
+import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity.js";
 import { CurrentTool } from "@/modules/auth/protected-routes/decorators/current-tool.js";
 import { type LtiToolJwtPayload } from "@/modules/auth/protected-routes/lti-tool-jwt-payload.js";
 import { AuthStrategy, ConfigAuthGuard } from "@/modules/auth/protected-routes.js";
-import { LTI_ACTIVITIES_GRADES_SYNC_QUEUE } from "@/modules/lti.js";
+import { SessionUser } from "@/modules/auth/session-user.js";
+import { User } from "@/modules/identity/user/user.entity.js";
 import { LtiScore } from "$/assignment-and-grade/entities/index.js";
 import { InvalidScoreArgumentError } from "$/assignment-and-grade/errors.js";
 import { LtiScoreServices } from "$/assignment-and-grade.js";
 import { FindContextByIdService } from "../../advantage/context/services/find-context-by-id.service.js";
+import { IncomingScoreEvent } from "../../grade-sync/incoming-score.event.js";
+import { SseConnectionsService } from "../../grade-sync/services/sse-connections.service.js";
+import { SyncLtiAssignmentGradeService } from "../../grade-sync/services/sync-lti-assignment-grade.service.js";
 import { FindToolByIdService } from "../../tools/services/find-tool-by-id.service.js";
 import { ScoreDTO } from "../dtos/score.dto.js";
 import { ContextConcreteType } from "../enums/context-concrete-type.js";
-import { IncomingScoreEvent } from "../events/incoming-score.event.js";
+import { ExternalLtiAssignmentsRepository } from "../repositories/external-lti-assignments.repository.js";
 
-@Rest()
-@Controller("/lti/ags/:contextId/lineitems")
+@Controller("/lti/ags/:contextId")
 export class LtiScoresController {
   public constructor(
     private readonly scoresServices: LtiScoreServices<ContextConcreteType>,
     private readonly findContextByIdService: FindContextByIdService,
     private readonly findToolByIdService: FindToolByIdService,
-    @InjectQueue(LTI_ACTIVITIES_GRADES_SYNC_QUEUE) private readonly syncQueue: Queue,
+    private readonly syncGradeService: SyncLtiAssignmentGradeService,
+    private readonly sseConnections: SseConnectionsService,
+    private readonly externalAssignmentsRepo: ExternalLtiAssignmentsRepository,
   ) {}
 
-  @Post(":lineItemId/scores")
+  @Rest()
+  @Post("lineitems/:lineItemId/scores")
   @ConfigAuthGuard({ strategy: AuthStrategy.LtiToolsJwt })
   public createLineItem(
     @Headers("accept") acceptHeader: string | undefined,
@@ -45,9 +50,18 @@ export class LtiScoresController {
   ) {
     return pipe(
       te.Do,
-      te.apS("tool", () => this.findToolByIdService.exec({ id: toolId })),
-      te.apS("context", () => this.findContextByIdService.exec({ contextComposedId: contextId })),
-      te.chainW(
+      te.apSW("tool", () => this.findToolByIdService.exec({ id: toolId })),
+      te.apSW("context", () => this.findContextByIdService.exec({ contextComposedId: contextId })),
+      te.apSW("assignment", () =>
+        pipe(
+          () => this.externalAssignmentsRepo.findExternalLtiAssignmentByLineItemId(lineItemId),
+          te.orElseW((error) =>
+            error instanceof IrrecoverableError ? te.left(error) : te.right(undefined),
+          ),
+        )(),
+      ),
+      te.bindW(
+        "scoresResponse",
         ({ tool, context }) =>
           () =>
             this.scoresServices.publish({
@@ -59,10 +73,10 @@ export class LtiScoresController {
               lineItemId,
             }),
       ),
-      te.tapTask((scoresResponse) =>
-        this.silentlyEnqueueGradeSyncJob(lineItemId, scoresResponse.rawContent),
-      ),
-      te.map((scoresResponse) => {
+      te.tapTask(({ scoresResponse, assignment }) => async () => {
+        if (assignment) this.silentlyEnqueueGradeSyncJob(assignment, scoresResponse.rawContent);
+      }),
+      te.map(({ scoresResponse }) => {
         response
           .setHeaders(scoresResponse.headers)
           .status(scoresResponse.httpStatusCode)
@@ -74,23 +88,39 @@ export class LtiScoresController {
     )();
   }
 
-  private silentlyEnqueueGradeSyncJob(lineItemId: UUID, score: Readonly<LtiScore>) {
-    return pipe(
-      te.tryCatch(
-        () =>
-          this.syncQueue.add(
-            "sync-grade",
-            new IncomingScoreEvent(
-              lineItemId,
-              score.userId,
-              score.activityProgress,
-              score.gradingProgress,
-              score.score,
-            ),
-          ),
-        (error) => {
-          console.error("Failed to schedule LTI activity grade synchronization event", error);
-        },
+  @Mvc()
+  @Sse(":assignmentId/stream")
+  stream(
+    @Param("assignmentId") assignmentId: string,
+    @SessionUser() student: User,
+    @SseSignal() signal: AbortSignal,
+  ): Observable<MessageEvent> {
+    if (signal.aborted) return EMPTY;
+
+    const subject = this.sseConnections.register(assignmentId, student.getId().toString());
+    const userId = student.getId().toString();
+
+    return subject.pipe(
+      finalize(() => this.sseConnections.unregister(assignmentId, userId, subject)),
+    );
+  }
+
+  private silentlyEnqueueGradeSyncJob(assignment: Readonly<Assignment>, score: Readonly<LtiScore>) {
+    const isNewGradeUpdate = [
+      LtiScore.GradingProgress.FullyGraded,
+      LtiScore.GradingProgress.PendingManual,
+    ].includes(score.gradingProgress);
+
+    this.syncGradeService.sync(
+      new IncomingScoreEvent(
+        assignment.getId().toString(),
+        score.userId,
+        score.activityProgress,
+        score.gradingProgress,
+        score.score,
+        isNewGradeUpdate
+          ? new Date(score.submission?.submittedAt ?? score.timestamp).toISOString()
+          : undefined,
       ),
     );
   }

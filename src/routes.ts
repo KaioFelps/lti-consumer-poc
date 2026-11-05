@@ -68,6 +68,8 @@ export const Routes = {
       scores: {
         publish: (contextComposedId: string, lineItemId: string) =>
           `${Routes.lti.ags.lineitems.instance(contextComposedId, lineItemId)}/scores`,
+        syncGrades: (contextComposedId: string, assignmentId: string) =>
+          `/lti/ags/${contextComposedId}/${assignmentId}/stream`,
       },
       results: {
         container: (contextComposedId: string, lineItemId: string) =>
