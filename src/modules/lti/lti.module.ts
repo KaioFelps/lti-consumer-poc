@@ -216,6 +216,7 @@ export class LtiModule implements NestModule {
         LtiResourceLinksController,
         LtiLaunchesController,
         LtiAssignmentsController,
+        LtiScoresController,
       );
   }
 }
