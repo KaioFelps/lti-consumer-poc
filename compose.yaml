@@ -74,7 +74,7 @@ services:
       REDIS_ARGS: |
         --requirepass ${REDIS_PASSWORD}
         --user ${REDIS_USER}
-        on >${REDIS_PASSWORD} allkeys allcommands +@all
+        on >${REDIS_PASSWORD} allkeys allcommands +@all &*
     ports:
       - ${REDIS_PORT}:6379
     healthcheck:
