@@ -4,6 +4,7 @@ import type { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
 import type { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity.js";
 import type { LtiResourceLink } from "$/core/resource-link.js";
 import { ExternalAssignmentNotFoundError } from "../errors/external-assignment-not-found.error.js";
+import { LineItemNotFoundError } from "../errors/line-item-not-found.error.js";
 
 export abstract class ExternalLtiAssignmentsRepository {
   public abstract makeAssignmentExternal(
@@ -18,5 +19,11 @@ export abstract class ExternalLtiAssignmentsRepository {
       IrrecoverableError | ExternalAssignmentNotFoundError,
       { assignment: Assignment; resourceLink: LtiResourceLink }
     >
+  >;
+
+  public abstract findExternalLtiAssignmentByLineItemId(
+    lineItemId: UUID,
+  ): Promise<
+    Either<LineItemNotFoundError | ExternalAssignmentNotFoundError | IrrecoverableError, Assignment>
   >;
 }

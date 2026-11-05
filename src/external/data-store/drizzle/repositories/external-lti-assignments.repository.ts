@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import type { UUID } from "common/src/types/uuid.js";
-import { assignmentsT, ltiAssignmentsT } from "drizzle/schema.js";
+import { assignmentsT, ltiAssignmentsT, ltiLineItemsT } from "drizzle/schema.js";
 import { eq } from "drizzle-orm";
 import { either as e, taskEither as te } from "fp-ts";
 import { Either } from "fp-ts/lib/Either.js";
@@ -8,6 +8,7 @@ import { pipe } from "fp-ts/lib/function.js";
 import { IrrecoverableError } from "@/core/errors/irrecoverable-error.js";
 import { Assignment } from "@/modules/assignments-and-grades/entities/assignment.entity.js";
 import { ExternalAssignmentNotFoundError } from "@/modules/lti/ags/errors/external-assignment-not-found.error.js";
+import { LineItemNotFoundError } from "@/modules/lti/ags/errors/line-item-not-found.error.js";
 import { ExternalLtiAssignmentsRepository } from "@/modules/lti/ags/repositories/external-lti-assignments.repository.js";
 import { LtiResourceLink } from "$/core/resource-link.js";
 import { DrizzleClient } from "../client.js";
@@ -87,6 +88,40 @@ export class DrizzleExternalLtiAssignmentsRepository extends ExternalLtiAssignme
           assignment: assignmentsMapper.fromRow(row.assignmemnt),
           resourceLink: ltiResourceLinksMapper.fromRow(row.resourceLink),
         });
+      }),
+    )();
+  }
+
+  public findExternalLtiAssignmentByLineItemId(
+    lineItemId: UUID,
+  ): Promise<
+    Either<LineItemNotFoundError | ExternalAssignmentNotFoundError | IrrecoverableError, Assignment>
+  > {
+    const client = this.txManager.getTx() ?? this.drizzle.getClient();
+
+    return pipe(
+      te.tryCatch(
+        () =>
+          client.query.ltiLineItemsT.findFirst({
+            where: eq(ltiLineItemsT.id, lineItemId.toString()),
+            columns: { id: true },
+            with: {
+              ltiAssignment: {
+                columns: { assignmentId: false, resourceLinkId: false },
+                with: { assignmemnt: assignmentsMapper.requiredQueryConfig },
+              },
+            },
+          }),
+        (error) =>
+          new IrrecoverableError(
+            `Error occurred in ${DrizzleExternalLtiAssignmentsRepository.name} when trying to get the assignment from the line item "${lineItemId}".`,
+            error as Error,
+          ),
+      ),
+      te.chainEitherKW((row) => {
+        if (!row) return e.left(new LineItemNotFoundError(lineItemId));
+        if (!row.ltiAssignment) return e.left(new ExternalAssignmentNotFoundError(lineItemId));
+        return e.right(assignmentsMapper.fromRow(row.ltiAssignment.assignmemnt));
       }),
     )();
   }
