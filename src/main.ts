@@ -55,6 +55,9 @@ async function bootstrap() {
   await loadMessageStrings();
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    // closes SSE connections upon kill/exit signals
+    // without this, sse connections will keep reconnecting and the server wont shutdown
+    forceCloseConnections: true,
     httpsOptions: {
       key: fs.readFileSync(join(process.cwd(), "certs", "localhost-key.pem")),
       cert: fs.readFileSync(join(process.cwd(), "certs", "localhost.pem")),
