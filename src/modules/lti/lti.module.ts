@@ -1,4 +1,3 @@
-import { BullModule } from "@nestjs/bullmq";
 import { forwardRef, MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import middlewares from "@/lib/middlewares.js";
 import { AuthModule } from "@/modules/auth/auth.module.js";
@@ -18,7 +17,6 @@ import { LtiLaunchServices } from "$/core/services/launch.services.js";
 import { LtiResourceLinkServices } from "$/core/services/resource-link.services.js";
 import { AssignmentsAndGradesModule } from "../assignments-and-grades/assignments-and-grades.module.js";
 import { CoursesModule } from "../courses-and-enrollments/courses.module.js";
-import { LTI_ACTIVITIES_GRADES_SYNC_QUEUE } from "../lti.js";
 import { ContextFetchersModule } from "./advantage/context/fetchers/context-fetchers.module.js";
 import { FindContextByIdService } from "./advantage/context/services/find-context-by-id.service.js";
 import { LtiContextsRepository } from "./advantage/repositories/lti-contexts.repository.js";
@@ -26,7 +24,6 @@ import { LtiAssignmentsController } from "./ags/controllers/lti-assignments.cont
 import { LtiLineItemsController } from "./ags/controllers/lti-line-items/index.js";
 import { LtiResultsController } from "./ags/controllers/lti-results.controller.js";
 import { LtiScoresController } from "./ags/controllers/lti-scores.controller.js";
-import { AgsEventsModule } from "./ags/events/events.module.js";
 import { ChooseMainLineItemService } from "./ags/services/choose-main-line-item.service.js";
 import { CreateCourseContextService } from "./ags/services/create-course-context.service.js";
 import { CreateExternalLtiAssignmentService } from "./ags/services/create-external-lti-assignment.service.js";
@@ -37,6 +34,7 @@ import { LtiDeploymentsController } from "./deployments/deployments.controller.j
 import { DeployToolService } from "./deployments/services/deploy-tool.service.js";
 import { FindDeploymentByIdService } from "./deployments/services/find-deployment-by-id.service.js";
 import { RemoveToolDeploymentService } from "./deployments/services/remove-tool-deployment.service.js";
+import { AgsEventsModule } from "./grade-sync/events.module.js";
 import { LtiLaunchesController } from "./launches/launches.controller.js";
 import { InitiateLaunchService } from "./launches/services/initiate-launch.service.js";
 import { LtiController } from "./lti.controller.js";
@@ -60,10 +58,6 @@ import { LtiToolsController } from "./tools/tools.controller.js";
     AssignmentsAndGradesModule,
     forwardRef(() => CoursesModule),
     ContextFetchersModule,
-    BullModule.registerQueue({
-      name: LTI_ACTIVITIES_GRADES_SYNC_QUEUE,
-      defaultJobOptions: { attempts: 3 },
-    }),
     AgsEventsModule,
   ],
   providers: [
