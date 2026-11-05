@@ -91,7 +91,7 @@ describe("[AGS] Publish Score Service", async () => {
 
     assert(e.isRight(response));
     expect(response.right.content).toBeUndefined();
-    expect(response.right.rawContent).toBeUndefined();
+    expect(response.right.rawContent).toBeInstanceOf(LtiScore);
     expect(response.right.httpStatusCode).toBe(204);
 
     expect(scoresRepo.scores).toHaveLength(1);
