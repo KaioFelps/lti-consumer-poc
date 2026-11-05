@@ -201,17 +201,26 @@ enviar mensagens ao front-end, permitindo que este busque se atualizar com as in
 concluir a atividade atual para que uma nova seja imediatamente iniciada se o aluno tiver acertado.)
 
 Considerando que a plataforma real provavelmente rodará em múltiplas instâncias por trás de algum _proxy_
-reverso, uma solução um pouco mais robusta será utilizada para gerenciar as conexões servidor-cliente:
+reverso, uma solução um pouco mais robusta — _Fanout_ —será utilizada para gerenciar as conexões servidor-cliente:
 - Cada instância da plataforma manterá um _hashmap_ de conexões com o front-end, mapeado pelos IDs da atividade
   e do usuário.
+
+    [Como o _hashmap_ será utilizado pelos _workers_ que processam os _jobs_ (neste caso, os de sincronização
+    de notas), ele precisa ser _thread-safe_. A biblioteca lru-cache foi utilizada visando utilizar seu
+    mecanismo de TTL.]
+
 - Toda insância da plataforma estará conectado com o Redis no modelo publicador/consumidor.
 - Ao receber um novo _score_, a instância deve publicar um evento no Redis anunciando que a nota foi recebida.
 - Ao receber um novo evento de nota recebida, cada instância (consumidora) deve verificar pelos IDs da atividade
   e do usuário (extraídos do _payload_ do evento) se ela é a detentora da conexão com o front-end:
   - Se sim, então, esta instância deve enviar uma mensagem para o front-end contendo a nova pontuação para que
     o front-end se atualize e prossiga.
+- A página de detalhes da atividade se conecta ao endpoint de SSE e, diante de uma nova mensagem, atualiza
+  as notas, a data de lançamento de notas mais recente, o estado da avaliação e o estado da realização da
+  atividade em questão.
 
-(O Redis foi escolhido no lugar de outros serviços de mensageria, como Kafka ou RabbitMQ, devido a efemeridade
-dessas mensagens — não são críticas nem demandam toda a resiliência que as alternativas proveem.)
+(O Redis foi escolhido no lugar de outros serviços de mensageria, como Kafka ou RabbitMQ, devido à efemeridade
+dessas mensagens e à simplicidade do canal publicador/consumidor — não são mensagens críticas e essa solução
+não demanda toda a robustez que as alternativas proveem.)
 
 [_Server-sent Events_]: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
