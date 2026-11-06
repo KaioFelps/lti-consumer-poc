@@ -111,6 +111,10 @@ export class LtiScoresController {
       LtiScore.GradingProgress.PendingManual,
     ].includes(score.gradingProgress);
 
+    const lastUpdatedAt = isNewGradeUpdate
+      ? new Date(score.submission?.submittedAt ?? score.timestamp).toISOString()
+      : undefined;
+
     this.syncGradeService.sync(
       new IncomingScoreEvent(
         assignment.getId().toString(),
@@ -118,9 +122,7 @@ export class LtiScoresController {
         score.activityProgress,
         score.gradingProgress,
         score.score,
-        isNewGradeUpdate
-          ? new Date(score.submission?.submittedAt ?? score.timestamp).toISOString()
-          : undefined,
+        lastUpdatedAt,
       ),
     );
   }
