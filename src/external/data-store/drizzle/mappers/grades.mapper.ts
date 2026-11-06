@@ -8,6 +8,7 @@ import {
 import { pipe } from "fp-ts/lib/function.js";
 import { Grade } from "@/modules/assignments-and-grades/entities/grade.entity.js";
 import { trimNullProperties } from "@/utils/trim-null-properties.js";
+import { LtiScore } from "$/assignment-and-grade/entities/index.js";
 
 type Schema = ExtractTablesWithRelations<typeof schema>;
 
@@ -49,6 +50,13 @@ const ltiScoreRequiredQueryConfig = {
 } as const satisfies ScoresQueryConfig;
 
 function fromLtiScoreRow(assignmentId: UUID, courseId: UUID, row: ScoreRow): Grade {
+  const gradedStatuses = [
+    LtiScore.GradingProgress.FullyGraded,
+    LtiScore.GradingProgress.PendingManual,
+  ];
+
+  console.log(row);
+
   return Grade.createUnchecked({
     assignmentId,
     courseId,
@@ -57,8 +65,9 @@ function fromLtiScoreRow(assignmentId: UUID, courseId: UUID, row: ScoreRow): Gra
     maxScore: row.scoreMaximum ?? 1,
     released: row.lineItem.gradesReleased ?? true,
     studentId: row.userId,
-    lastUpdatedAt:
-      (row.submittedAt ?? row.timestamp) !== row.timestamp ? new Date(row.timestamp) : undefined,
+    lastUpdatedAt: gradedStatuses.includes(row.gradingProgress)
+      ? new Date(row.submittedAt ?? row.timestamp)
+      : undefined,
   });
 }
 
