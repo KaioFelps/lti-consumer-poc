@@ -4,6 +4,10 @@
     padding: 0;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 label {
     display: block;
     margin-bottom: 12px;
@@ -127,7 +131,7 @@ label.checkbox-item > span {
         vertical-align: super;
     }
 
-    tbody tr:not(:last-child) {
+    tbody tr:not([hidden]):not(:nth-last-child(1 of :not([hidden]))) {
         border-bottom: 1px solid black;
     }
 
@@ -150,7 +154,7 @@ label.checkbox-item > span {
             padding: 4px 8px;
         }
 
-        &:not(:last-child) {
+        &:not([hidden]):not(:nth-last-child(1 of :not([hidden]))) {
             border-bottom: 1px solid black;
         }
 

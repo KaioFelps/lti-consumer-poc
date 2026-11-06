@@ -187,9 +187,14 @@ const dateFormattingOptions = {
                     </div>
                 <% } %>
                 <% if (studentAssignmentsDetails.details?.lastUpdatedAt) { %>
-                    <div class="item">
+                    <div id="latest-grade-release-timestamp-container" class="item">
                         <header>Último lançamento de nota</header>
                         <span id="latest-grade-release-timestamp"><%= studentAssignmentsDetails.details.lastUpdatedAt.toLocaleString("pt-BR", dateFormattingOptions) %></span>
+                    </div>
+                <% } else { %>
+                    <div id="latest-grade-release-timestamp-container" class="item" hidden>
+                        <header>Último lançamento de nota</header>
+                        <span id="latest-grade-release-timestamp"></span>
                     </div>
                 <% } %>
             </div>
@@ -230,6 +235,9 @@ const dateFormattingOptions = {
     </script>
 
     <script>
+        const dateFormattingOptions = <%- JSON.stringify(dateFormattingOptions) %>;
+
+        const latestGradeReleaseTimestampContainer = document.getElementById("latest-grade-release-timestamp-container");
         const latestGradeReleaseTimestampSpan = document.getElementById("latest-grade-release-timestamp");
         const currentGradeSpan = document.getElementById("current-grade");
         const gradingProgressSpan = document.getElementById("grading-progress");
@@ -247,7 +255,11 @@ const dateFormattingOptions = {
             const lastUpdatedAt = lastGradeUpdate ? new Date(lastGradeUpdate).toLocaleString("pt-BR", dateFormattingOptions) : undefined;
             const grade = gradeDetails ? `${gradeDetails.given} de ${gradeDetails.maximum}` : "Nota ainda não atribuída";
 
-            if (lastUpdatedAt) latestGradeReleaseTimestampSpan.textContent = lastUpdatedAt;
+            if (lastUpdatedAt) {
+                latestGradeReleaseTimestampSpan.textContent = lastUpdatedAt;
+                latestGradeReleaseTimestampContainer.hidden = null;
+            }
+
             currentGradeSpan.textContent = grade;
             gradingProgressSpan.textContent = GRADING_PROGRESS_LABELS[gradingProgress];
             assignmentMaxScore.textContent = gradeDetails.maximum;
@@ -296,6 +308,7 @@ const dateFormattingOptions = {
             gradeSyncEvent.onmessage = ({ data }) => {
                 const { activityProgress, gradingProgress, score, lastUpdatedAt } = JSON.parse(data);
                 updateAssignmentGradingDetails(lastUpdatedAt, score, gradingProgress);
+                updateActivityStatusChip(activityProgress);
 
                 const closeLaunchPopUpEvent = new CustomEvent("close-popups", {
                     detail: undefined,
