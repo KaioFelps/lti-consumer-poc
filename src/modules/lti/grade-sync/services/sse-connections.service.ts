@@ -56,8 +56,7 @@ export class SseConnectionsService implements OnModuleDestroy {
 
     if (!subject) return false;
 
-    const { activityProgress, gradingProgress, score } = event;
-    subject.next({ data: { activityProgress, gradingProgress, score } } as MessageEvent);
+    subject.next({ data: event } as MessageEvent);
     return true;
   }
 
